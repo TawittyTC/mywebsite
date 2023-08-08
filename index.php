@@ -444,20 +444,19 @@
     <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
       <div class="carousel-inner">
     
-        <div class="carousel-item active">
-          <img src="assets/img/certificate/img- (1).jpg" class="d-block w-100 img-fluid" alt="">
+        <!-- เริ่มลูป -->
+        <?php
+        for ($i = 1; $i <= 46; $i++) {
+          $imageSrc = "assets/img/certificate/img- ($i).jpg"; // แทนที่ด้วย URL ของรูปภาพที่ถูกต้อง
+        ?>
+        <div class="carousel-item<?php if ($i === 1) echo " active"; ?>">
+          <img src="<?php echo $imageSrc; ?>" class="d-block w-100 img-fluid" alt="">
         </div>
-    
-        <div class="carousel-item">
-          <img src="assets/img/certificate/img- (2).jpg" class="d-block w-100 img-fluid" alt="">
-        </div>
-    
-        <!-- เพิ่ม carousel-item ต่อไปตามรูปแบบเดิม -->
-    
-        <div class="carousel-item">
-          <img src="assets/img/certificate/img- (3).png" class="d-block w-100 img-fluid" alt="">
-        </div>
-    
+        <?php
+        }
+        ?>
+        <!-- จบลูป -->
+        
       </div>
     
       <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
