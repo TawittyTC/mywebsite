@@ -1227,3 +1227,17 @@ section {
 #footer .credits {
   font-size: 13px;
 }
+
+/* Add this CSS code at the end of your existing styles */
+
+/* Increase font size for smaller screens */
+@media screen and (max-width: 768px) {
+  body {
+    font-size: 16px;
+  }
+  
+  /* Add more specific rules here if needed */
+  /* For example, if you want to increase the font size for specific elements */
+  /* h1, h2, h3, etc. */
+  /* .section-title h2, .about .content h3, etc. */
+}
