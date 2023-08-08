@@ -441,23 +441,43 @@
 
     <!-- ======= Services Section ======= -->
     <div class = "container">
-    <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
-      <div class="carousel-inner">
-    
-        <!-- เริ่มลูป -->
-        <?php
-        for ($i = 1; $i <= 46; $i++) {
-          $imageSrc = "assets/img/certificate/img- ($i).jpg"; // แทนที่ด้วย URL ของรูปภาพที่ถูกต้อง
-        ?>
-        <div class="carousel-item<?php if ($i === 1) echo " active"; ?>">
-          <img src="<?php echo $imageSrc; ?>" class="d-block w-100 img-fluid" alt="">
+      <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner" id="carousel-inner">
+          <!-- รูปภาพจะถูกเพิ่มที่นี่ -->
         </div>
-        <?php
-        }
-        ?>
-        <!-- จบลูป -->
+      
+        <!-- ปุ่ม Previous -->
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true" style="font-size: 5rem;"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
         
+        <!-- ปุ่ม Next -->
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true" style="font-size: 5rem;"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
       </div>
+      
+      <script>
+        // สร้างลูปใน JavaScript เพื่อเพิ่มรูปภาพใน carousel-inner
+        const carouselInner = document.getElementById("carousel-inner");
+        for (let i = 1; i <= 46; i++) {
+          const imageSrc = `assets/img/certificate/img- (${i}).jpg`; // แทนที่ด้วย URL ของรูปภาพที่ถูกต้อง
+          const carouselItem = document.createElement("div");
+          carouselItem.classList.add("carousel-item");
+          if (i === 1) {
+            carouselItem.classList.add("active");
+          }
+          const imgElement = document.createElement("img");
+          imgElement.src = imageSrc;
+          imgElement.className = "d-block w-100 img-fluid";
+          imgElement.alt = "";
+          carouselItem.appendChild(imgElement);
+          carouselInner.appendChild(carouselItem);
+        }
+      </script>
+      
     
       <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
         <span class="carousel-control-prev-icon" aria-hidden="true" style="font-size: 10rem;"></span>
