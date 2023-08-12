@@ -1237,3 +1237,9 @@ section {
   padding: 10px;
 }
 
+@media (max-width: 767px) {
+  .portfolio-info {
+    display: none;
+  }
+}
+
