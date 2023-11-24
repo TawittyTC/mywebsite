@@ -1243,3 +1243,21 @@ section {
   }
 }
 
+<style>
+    .carousel-control-prev,
+    .carousel-control-next {
+        background-color: rgba(0, 0, 0, 0.5);
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        padding: 10px;
+        position: absolute;
+        top: 50%; /* Center vertically */
+        transform: translateY(-50%); /* Adjust for centering */
+    }
+
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+        color: #ffffff;
+    }
+</style>
