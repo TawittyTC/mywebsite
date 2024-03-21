@@ -1252,4 +1252,11 @@ section {
   font-size: 50px; /* ปรับขนาดของ icon ตามต้องการ */
 }
 
+* {
+  font-style: normal !important;
+}
+
+body, h1, h2, h3, h4, h5, h6, p, a, li, ul, span, div {
+  font-family: sans-serif !important;
+}
 
