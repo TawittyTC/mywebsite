@@ -506,7 +506,7 @@ section {
 }
 
 .skills .progress .skill .val {
-  float: right;
+  float: center;
   font-style: normal;
 }
 
