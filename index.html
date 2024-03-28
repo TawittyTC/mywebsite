@@ -475,96 +475,84 @@
   </section>
 
   <section id="TomorrowScg-container" class="TomorrowScg">
-    <div class="container-fluid p-0 py-5 appear-animation animated fadeInLeftShorter appear-animation-visible" data-appear-animation="fadeInLeftShorter" style="animation-delay: 100ms;">
+    <div class="container-fluid py-5">
         <div class="row">
             <div class="col-sm-12 text-right">
                 <img class="imgTitle" src="https://career.scg.com/template/images/_tomorrow_at_scg/TmrSCG.png" alt="" height="100">
             </div>
         </div>
     </div>
-    <div class="container pb-5 appear-animation animated fadeInLeftShorter appear-animation-visible" data-appear-animation="fadeInLeftShorter" style="animation-delay: 100ms;">
+    <div class="container pb-5">
         <div class="row">
             <div class="col-sm-4">
-                <!-- Responsive -->
-                <div class="form-row d-block d-sm-none">
-                    <div class="form-group col-sm-12">
-                        <select class="form-control" name="tomorrowAtSCG" id="tomorrowAtSCG">
-                            <option value="1593137304">Engineering</option>
-                            <option value="1593137330">Accounting, Internal Audit</option>
-                            <option value="1593137337">Architect and Designer</option>
-                            <option value="1593137438">Communication, Advertising &amp; Branding</option>
-                            <option value="1593137449">Digital and IT</option>
-                            <option value="1593137457">Finance, Business Analyst and Planning</option>
-                            <option value="1593137469">HR, Legal, Audit and Administration</option>
-                            <option value="1593137481">R&amp;D, Science, and Specialist</option>
-                            <option value="1593137489">Safety and Environment</option>
-                            <option value="1593137498">Sales, Marketing and Customer Services</option>
-                            <option value="1593137511">Logistics, Supply Chain, Procurement and Warehouse</option>
-                        </select>
-                    </div>
-                </div>
-                <!-- Responsive -->
-                <div class="list-body d-none d-sm-block">
-                    <div id="1593137304" class="list-TomorrowScg tablinks   active" style="cursor: pointer;" onmouseover="openContent(event, 'box-1593137304')">
-                        <a>Engineering</a>
-                    </div>
-                    <!-- ต่อจากนี้เป็นตัวอย่างเท่านั้น -->
-                    <!-- เพิ่มเติมตามลำดับ -->
+                <div class="form-group">
+                    <select class="form-control" name="tomorrowAtSCG" id="tomorrowAtSCG">
+                        <option value="1593137304">Engineering</option>
+                        <option value="1593137330">Accounting, Internal Audit</option>
+                        <option value="1593137337">Architect and Designer</option>
+                        <option value="1593137438">Communication, Advertising &amp; Branding</option>
+                        <option value="1593137449">Digital and IT</option>
+                        <option value="1593137457">Finance, Business Analyst and Planning</option>
+                        <option value="1593137469">HR, Legal, Audit and Administration</option>
+                        <option value="1593137481">R&amp;D, Science, and Specialist</option>
+                        <option value="1593137489">Safety and Environment</option>
+                        <option value="1593137498">Sales, Marketing and Customer Services</option>
+                        <option value="1593137511">Logistics, Supply Chain, Procurement and Warehouse</option>
+                    </select>
                 </div>
             </div>
             <div class="col-sm-8">
-                <div id="box-1593137304" class="tabcontent  active " style="display: block;">
-                    <img src="https://career.scg.com/upload/tomorrowAtSCG/image/1597212087.jpeg" alt="" width="100%">
-                    <p class="title my-3">Engineering</p>
-                    <p class="my-3"></p>
-                    <a href="https://career.scg.com/th/SearchJobs" target="_self" class="btn btn-primary">สมัคร</a>
+                <div class="tab-content">
+                    <div id="box-1593137304" class="tab-pane active">
+                        <img src="https://career.scg.com/upload/tomorrowAtSCG/image/1597212087.jpeg" alt="" class="img-fluid">
+                        <p class="title my-3">Engineering</p>
+                        <a href="https://career.scg.com/th/SearchJobs" target="_self" class="btn btn-primary">สมัคร</a>
+                    </div>
+                    <div id="box-1593137330" class="tab-pane">
+                        <img src="https://career.scg.com/upload/tomorrowAtSCG/image/1597212070.jpeg" alt="" class="img-fluid">
+                        <p class="title my-3">Accounting, Internal Audit</p>
+                        <a href="https://career.scg.com/th/SearchJobs" target="_self" class="btn btn-primary">สมัคร</a>
+                    </div>
+                    <!-- เพิ่มตามลำดับ -->
                 </div>
-                <!-- ต่อจากนี้เป็นตัวอย่างเท่านั้น -->
-                <!-- เพิ่มเติมตามลำดับ -->
             </div>
         </div>
     </div>
 </section>
 
 <script>
-  var images = [
-    "https://career.scg.com/upload/tomorrowAtSCG/image/1597212087.jpeg",
-    "https://career.scg.com/upload/tomorrowAtSCG/image/1597212070.jpeg",
-    "https://career.scg.com/upload/tomorrowAtSCG/image/1597212055.jpeg",
-    "https://career.scg.com/upload/tomorrowAtSCG/image/1597212041.jpeg",
-    "https://career.scg.com/upload/tomorrowAtSCG/image/1597212026.jpeg",
-    "https://career.scg.com/upload/tomorrowAtSCG/image/1597211998.jpeg",
-    "https://career.scg.com/upload/tomorrowAtSCG/image/1597211979.jpeg",
-    "https://career.scg.com/upload/tomorrowAtSCG/image/1597211962.jpeg",
-    "https://career.scg.com/upload/tomorrowAtSCG/image/1597211948.jpeg",
-    "https://career.scg.com/upload/tomorrowAtSCG/image/1597211922.jpeg",
-    "https://career.scg.com/upload/tomorrowAtSCG/image/1597211933.jpeg"
-  ];
+    document.getElementById('tomorrowAtSCG').addEventListener('change', function() {
+        var selectedOption = this.options[this.selectedIndex];
+        var tabId = selectedOption.value;
+        var tabContent = document.querySelectorAll('.tab-pane');
+        var tablinks = document.querySelectorAll('.nav-link');
+        
+        tabContent.forEach(function(tab) {
+            tab.classList.remove('active');
+        });
 
-  var currentIndex = 0;
+        tablinks.forEach(function(tablink) {
+            tablink.classList.remove('active');
+        });
 
-  function changeImage() {
-    var img = document.querySelector('.tabcontent.active img');
-    img.src = images[currentIndex];
-    currentIndex = (currentIndex + 1) % images.length;
-  }
+        document.getElementById('box-' + tabId).classList.add('active');
+        selectedOption.classList.add('active');
+    });
 
-  setInterval(changeImage, 2000); // Change image every 2 seconds
+    var images = [
+        "https://career.scg.com/upload/tomorrowAtSCG/image/1597212087.jpeg"
+        // เพิ่มรูปตามลำดับ
+    ];
 
-  // เพิ่มการ highlight เมื่อเลือก option
-  var select = document.getElementById('tomorrowAtSCG');
-  select.addEventListener('change', function() {
-    var selectedOption = this.options[this.selectedIndex];
-    var tablink = document.querySelector('.tablinks.active');
-    if (tablink) {
-      tablink.classList.remove('active');
+    var currentIndex = 0;
+    var imgElement = document.querySelector('.img-fluid');
+
+    function changeImage() {
+        imgElement.src = images[currentIndex];
+        currentIndex = (currentIndex + 1) % images.length;
     }
-    var tabId = selectedOption.value;
-    var selectedTab = document.getElementById(tabId);
-    selectedTab.classList.add('active');
-    var img = selectedTab.querySelector('img');
-    img.src = images[currentIndex]; // เปลี่ยนรูปภาพตามที่เลือก
-  });
+
+    setInterval(changeImage, 3000); // เปลี่ยนรูปทุก 3 วินาที
 </script>
 
   <!-- ======= Services Section ======= -->
