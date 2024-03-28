@@ -472,17 +472,17 @@
 
       
     </div>
-  </section>End Portfolio Section
+  </section>
 
   <section id="TomorrowScg-container" class="TomorrowScg">
-    <div class="container-fluid p-0 py-5">
+    <div class="container-fluid p-0 py-5 appear-animation animated fadeInLeftShorter appear-animation-visible" data-appear-animation="fadeInLeftShorter" style="animation-delay: 100ms;">
         <div class="row">
             <div class="col-sm-12 text-right">
-                <img class="imgTitle" src="https://career.scg.com/template/images/_tomorrow_at_scg/TmrSCG.png" alt="Tomorrow at SCG" height="100">
+                <img class="imgTitle" src="https://career.scg.com/template/images/_tomorrow_at_scg/TmrSCG.png" alt="" height="100">
             </div>
         </div>
     </div>
-    <div class="container pb-5">
+    <div class="container pb-5 appear-animation animated fadeInLeftShorter appear-animation-visible" data-appear-animation="fadeInLeftShorter" style="animation-delay: 100ms;">
         <div class="row">
             <div class="col-sm-4">
                 <!-- Responsive -->
@@ -505,7 +505,7 @@
                 </div>
                 <!-- Responsive -->
                 <div class="list-body d-none d-sm-block">
-                    <div id="1593137304" class="list-TomorrowScg tablinks" style="cursor: pointer;" onmouseover="openContent(event, 'box-1593137304')">
+                    <div id="1593137304" class="list-TomorrowScg tablinks   active" style="cursor: pointer;" onmouseover="openContent(event, 'box-1593137304')">
                         <a>Engineering</a>
                     </div>
                     <!-- ต่อจากนี้เป็นตัวอย่างเท่านั้น -->
@@ -513,8 +513,8 @@
                 </div>
             </div>
             <div class="col-sm-8">
-                <div id="box-1593137304" class="tabcontent active">
-                    <img src="https://career.scg.com/upload/tomorrowAtSCG/image/1597212087.jpeg" alt="Engineering" class="img-fluid">
+                <div id="box-1593137304" class="tabcontent  active " style="display: block;">
+                    <img src="https://career.scg.com/upload/tomorrowAtSCG/image/1597212087.jpeg" alt="" width="100%">
                     <p class="title my-3">Engineering</p>
                     <p class="my-3"></p>
                     <a href="https://career.scg.com/th/SearchJobs" target="_self" class="btn btn-primary">สมัคร</a>
@@ -525,10 +525,6 @@
         </div>
     </div>
 </section>
-
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 <script>
   var images = [
@@ -554,6 +550,21 @@
   }
 
   setInterval(changeImage, 2000); // Change image every 2 seconds
+
+  // เพิ่มการ highlight เมื่อเลือก option
+  var select = document.getElementById('tomorrowAtSCG');
+  select.addEventListener('change', function() {
+    var selectedOption = this.options[this.selectedIndex];
+    var tablink = document.querySelector('.tablinks.active');
+    if (tablink) {
+      tablink.classList.remove('active');
+    }
+    var tabId = selectedOption.value;
+    var selectedTab = document.getElementById(tabId);
+    selectedTab.classList.add('active');
+    var img = selectedTab.querySelector('img');
+    img.src = images[currentIndex]; // เปลี่ยนรูปภาพตามที่เลือก
+  });
 </script>
 
   <!-- ======= Services Section ======= -->
