@@ -335,7 +335,7 @@
       </div>
 
       <div class="row">
-        <div class="col-6">
+        <div class="col-12 col-md-6">
           <div class="portfolio-info">
   
   
@@ -364,7 +364,7 @@
           </div>
   
         </div>
-        <div class="col-6">
+        <div class="col-12 col-md-6">
           <div id="carouselExampleDark" class="carousel carousel-dark slide" data-bs-ride="carousel">
             <div class="carousel-inner">
               <div class="carousel-item active" data-bs-interval="10000">
@@ -472,81 +472,7 @@
 
       
     </div>
-  </section>
-
-  <section id="TomorrowScg-container" class="TomorrowScg">
-    <div class="container pb-5">
-        <div class="row">
-            <div class="col-sm-4">
-                <div class="form-group">
-                    <select class="form-control" name="tomorrowAtSCG" id="tomorrowAtSCG">
-                        <option value="1593137304">Engineering</option>
-                        <option value="1593137330">Accounting, Internal Audit</option>
-                        <option value="1593137337">Architect and Designer</option>
-                        <option value="1593137438">Communication, Advertising &amp; Branding</option>
-                        <option value="1593137449">Digital and IT</option>
-                        <option value="1593137457">Finance, Business Analyst and Planning</option>
-                        <option value="1593137469">HR, Legal, Audit and Administration</option>
-                        <option value="1593137481">R&amp;D, Science, and Specialist</option>
-                        <option value="1593137489">Safety and Environment</option>
-                        <option value="1593137498">Sales, Marketing and Customer Services</option>
-                        <option value="1593137511">Logistics, Supply Chain, Procurement and Warehouse</option>
-                    </select>
-                </div>
-            </div>
-            <div class="col-sm-8">
-                <div class="tab-content">
-                    <div id="box-1593137304" class="tab-pane active">
-                        <img src="https://career.scg.com/upload/tomorrowAtSCG/image/1597212087.jpeg" alt="" class="img-fluid">
-                        <p class="title my-3">Engineering</p>
-                        <a href="https://career.scg.com/th/SearchJobs" target="_self" class="btn btn-primary">สมัคร</a>
-                    </div>
-                    <div id="box-1593137330" class="tab-pane">
-                        <img src="https://career.scg.com/upload/tomorrowAtSCG/image/1597212070.jpeg" alt="" class="img-fluid">
-                        <p class="title my-3">Accounting, Internal Audit</p>
-                        <a href="https://career.scg.com/th/SearchJobs" target="_self" class="btn btn-primary">สมัคร</a>
-                    </div>
-                    <!-- เพิ่มตามลำดับ -->
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<script>
-    document.getElementById('tomorrowAtSCG').addEventListener('change', function() {
-        var selectedOption = this.options[this.selectedIndex];
-        var tabId = selectedOption.value;
-        var tabContent = document.querySelectorAll('.tab-pane');
-        var tablinks = document.querySelectorAll('.nav-link');
-        
-        tabContent.forEach(function(tab) {
-            tab.classList.remove('active');
-        });
-
-        tablinks.forEach(function(tablink) {
-            tablink.classList.remove('active');
-        });
-
-        document.getElementById('box-' + tabId).classList.add('active');
-        selectedOption.classList.add('active');
-    });
-
-    var images = [
-        "https://career.scg.com/upload/tomorrowAtSCG/image/1597212087.jpeg"
-        // เพิ่มรูปตามลำดับ
-    ];
-
-    var currentIndex = 0;
-    var imgElement = document.querySelector('.img-fluid');
-
-    function changeImage() {
-        imgElement.src = images[currentIndex];
-        currentIndex = (currentIndex + 1) % images.length;
-    }
-
-    setInterval(changeImage, 3000); // เปลี่ยนรูปทุก 3 วินาที
-</script>
+  </section><!-- End Portfolio Section -->
 
   <!-- ======= Services Section ======= -->
   <section id="services" class="services bg-white">
