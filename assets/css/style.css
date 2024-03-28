@@ -1239,7 +1239,7 @@ section {
   padding: 10px;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 768px) {
   .portfolio-info {
     display: none;
   }
@@ -1258,5 +1258,11 @@ section {
 
 body, h1, h2, h3, h4, h5, h6, p, a, li, ul, span, div {
   font-family: sans-serif !important;
+}
+
+@media (min-width: 992px) {
+  body {
+    overflow: auto;
+  }
 }
 
