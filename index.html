@@ -95,34 +95,12 @@
       </div>
       <!-- <p style="font-size: 10px;">The Future Starts Today Not Tomorrow.</p> -->
     </div>
+    <div id="fallback-background" class="fallback-background d-none">
+      <!-- คุณสามารถใส่ภาพพื้นหลังหรือเนื้อหาอื่น ๆ ที่นี่ -->
+    </div>
   </section>
   
-  <script>
-document.addEventListener('DOMContentLoaded', function() {
-  var video = document.getElementById('hero-video');
-  var fallback = document.getElementById('fallback-background');
-
-  function handleVideoPlay() {
-    if (video.readyState >= 3) { // READY_STATE_HAVE_FUTURE_DATA
-      console.log('Video is ready to play');
-      video.play().catch(function() {
-        console.log('Autoplay failed');
-        video.style.display = 'none';
-        fallback.classList.remove('d-none');
-      });
-    }
-  }
-
-  video.addEventListener('play', handleVideoPlay);
-  video.addEventListener('canplay', handleVideoPlay);
-  video.addEventListener('error', function() {
-    // หากมีข้อผิดพลาดในการเล่นวิดีโอ
-    video.style.display = 'none';
-    fallback.classList.remove('d-none');
-  });
-});
-
-  </script>
+  
   
   
 
