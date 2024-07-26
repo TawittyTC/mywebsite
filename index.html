@@ -66,14 +66,14 @@
 
   <!-- ======= Hero Section ======= -->
   <section id="hero" class="d-flex flex-column justify-content-center">
-    <video src="assets/video/hero.mp4" autoplay loop muted playsinline class="video-background"></video>
+    <video id="hero-video" src="assets/video/hero.mp4" autoplay loop muted playsinline class="video-background"></video>
     <div class="container" data-aos="zoom-in" data-aos-delay="100">
       <div class="row m-5">
         <div class="col-12 col-md-12">
           <img src="assets/img/img01.jpg" class="img-thumbnail rounded-circle d-block d-md-none" alt="...">
         </div>
       </div>
-      <h1 class = "text-dark">Tanapol Chamnanhan</h1>
+      <h1 class="text-dark">Tanapol Chamnanhan</h1>
       <p>- I am <span class="typed" data-typed-items="Programmer, Web Developer, Front-End Developer, Back-End Developer, Full-Stack Developer, Video Editor"></span></p>
       <div class="social-links">
         <a href="https://github.com/TawittyTC" class="github"><i class="bx bxl-github"></i></a>
@@ -83,7 +83,24 @@
       </div>
       <!-- <p style="font-size: 10px;">The Future Starts Today Not Tomorrow.</p> -->
     </div>
-  </section><!-- End Hero -->
+    <div id="fallback-background" class="fallback-background d-none">
+      <!-- คุณสามารถใส่ภาพพื้นหลังหรือเนื้อหาอื่น ๆ ที่นี่ -->
+    </div>
+  </section>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var video = document.getElementById('hero-video');
+      var fallback = document.getElementById('fallback-background');
+  
+      video.addEventListener('error', function() {
+        // หากมีข้อผิดพลาดในการเล่นวิดีโอ
+        video.style.display = 'none';
+        fallback.classList.remove('d-none');
+      });
+    });
+  </script>
+  
   
 
 
