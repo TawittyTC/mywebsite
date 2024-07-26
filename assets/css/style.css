@@ -288,7 +288,6 @@ h6 {
   overflow: hidden;
   background: url('../img/hero-bg.jpg') no-repeat center center;
   background-size: cover;
-  filter: blur(5px);
 }
 
 #hero .video-background {
