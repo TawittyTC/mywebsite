@@ -311,7 +311,7 @@ h6 {
   }
 }
 
-#hero:before {
+/* #hero:before {
   content: "";
   background: rgba(255, 255, 255, 0.8);
   position: absolute;
@@ -319,7 +319,7 @@ h6 {
   top: 0;
   left: 0;
   right: 0;
-}
+} */
 
 #hero h1 {
   margin: 0;
