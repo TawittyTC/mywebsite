@@ -39,19 +39,19 @@
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
     crossorigin="anonymous"></script>
 
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        if (!localStorage.getItem('refreshed')) {
-          // ถ้ายังไม่มีการตั้งค่า 'refreshed' ใน LocalStorage
-          localStorage.setItem('refreshed', 'true');
-          // ทำการรีเฟรชหน้าเว็บ
-          window.location.reload();
-        } else {
-          // เมื่อรีเฟรชแล้ว ให้ลบค่า 'refreshed'
-          localStorage.removeItem('refreshed');
-        }
-      });
-    </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      if (!localStorage.getItem('refreshed')) {
+        // ถ้ายังไม่มีการตั้งค่า 'refreshed' ใน LocalStorage
+        localStorage.setItem('refreshed', 'true');
+        // ทำการรีเฟรชหน้าเว็บ
+        window.location.reload();
+      } else {
+        // เมื่อรีเฟรชแล้ว ให้ลบค่า 'refreshed'
+        localStorage.removeItem('refreshed');
+      }
+    });
+  </script>
 </head>
 
 <body>
@@ -79,6 +79,7 @@
   <!-- ======= Hero Section ======= -->
   <section id="hero" class="d-flex flex-column justify-content-center">
     <video id="hero-video" src="assets/video/hero.mp4" autoplay loop muted playsinline preload="auto" class="video-background"></video>
+      class="video-background"></video>
     <div class="container" data-aos="zoom-in" data-aos-delay="100">
       <div class="row m-5">
         <div class="col-12 col-md-12">
@@ -86,7 +87,9 @@
         </div>
       </div>
       <h1 class="text-dark">Tanapol Chamnanhan</h1>
-      <p>- I am <span class="typed" data-typed-items="Programmer, Web Developer, Front-End Developer, Back-End Developer, Full-Stack Developer, Video Editor"></span></p>
+      <p>- I am <span class="typed"
+          data-typed-items="Programmer, Web Developer, Front-End Developer, Back-End Developer, Full-Stack Developer, Video Editor"></span>
+      </p>
       <div class="social-links">
         <a href="https://github.com/TawittyTC" class="github"><i class="bx bxl-github"></i></a>
         <a href="https://www.linkedin.com/in/tanapol-chamnanhan/" class="linkedin"><i class="bx bxl-linkedin"></i></a>
@@ -99,35 +102,35 @@
       <!-- คุณสามารถใส่ภาพพื้นหลังหรือเนื้อหาอื่น ๆ ที่นี่ -->
     </div>
   </section>
-  
+
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       var video = document.getElementById('hero-video');
       var fallback = document.getElementById('fallback-background');
-    
+
       function handleVideoPlay() {
         console.log('handleVideoPlay function called');
         if (video.readyState >= 3) { // READY_STATE_HAVE_FUTURE_DATA
           console.log('Video is ready to play');
-          video.play().catch(function() {
-            console.log('Autoplay failed');
+          video.play().catch(function (error) {
+            console.log('Autoplay failed', error);
             video.style.display = 'none';
             fallback.classList.remove('d-none');
           });
         }
       }
-    
+
       video.addEventListener('canplay', handleVideoPlay);
-      video.addEventListener('error', function() {
+      video.addEventListener('error', function () {
         console.log('Video error occurred');
         video.style.display = 'none';
         fallback.classList.remove('d-none');
       });
-    
+
       // Optional: Ensure video starts loading and playing
       video.load(); // Ensure the video is loaded
     });
-    </script>
+  </script>
 
   <!-- ======= About Section ======= -->
   <section id="about" class="about mt-5 mb-5">
@@ -287,116 +290,117 @@
   <!-- ======= Skills Section ======= -->
   <section id="skill" class="bg-white text-dark">
     <div class="container p-4">
-        <div class="section-title">
-            <h2>Skill</h2>
-            <p>This is my skill.</p>
-        </div>
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-4 col-md-6 pt-3 mb-5 fade">
-                    <div class="boxWhyScg">
-                        <p class="icon text-center"><img src="assets/icon/img16.png" class="w-75 h-auto text-center" alt=""></p>
-                        <div class="title pb-2 h3">Web Design</div>
-                        <ul>
-                            <li>UX/UI Design</li>
-                            <li>Graphic Design</li>
-                            <li>Responsive Design</li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 pt-3 mb-5 fade">
-                    <div class="boxWhyScg">
-                        <p class="icon text-center"><img src="assets/icon/img1.png" class="w-75 h-auto text-center" alt=""></p>
-                        <div class="title pb-2 h3">Web Development</div>
-                        <ul>
-                            <li>Front-end Development</li>
-                            <li>Back-end Development</li>
-                            <li>Database Management</li>
-                            <li>API Integration</li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 pt-3 mb-5 fade">
-                    <div class="boxWhyScg">
-                        <p class="icon text-center"><img src="assets/icon/img2.png" class="w-75 h-auto text-center" alt=""></p>
-                        <div class="title pb-2 h3">Web Security</div>
-                        <ul>
-                            <li>Web Security : Cross-Site Scripting (XSS), SQL Injection, และ Cross-Site Request Forgery (CSRF)</li>
-                            <li>SSL/TLS Configuration</li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 pt-3 mb-5 fade">
-                    <div class="boxWhyScg">
-                        <p class="icon text-center"><img src="assets/icon/img7.png" class="w-75 h-auto text-center" alt=""></p>
-                        <div class="title pb-2 h3">Version Control Systems</div>
-                        <ul>
-                            <li>Git</li>
-                            <li>Subversion</li>
-                            <li>Mercurial</li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 pt-3 mb-5 fade">
-                    <div class="boxWhyScg">
-                        <p class="icon text-center"><img src="assets/icon/img4.png" class="w-75 h-auto text-center" alt=""></p>
-                        <div class="title pb-2 h3">Learning and Troubleshooting</div>
-                        <ul>
-                            <li>Fast Learning</li>
-                            <li>Problem Solving</li>
-                            <li>Testing and Debugging</li>
-                            <li>Utilizing Development Tools : IDEs (Integrated Development Environments), Debugging Tools, Browser Developer Tools</li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 pt-3 mb-5 fade">
-                    <div class="boxWhyScg">
-                        <p class="icon text-center"><img src="assets/icon/img3.png" class="w-75 h-auto text-center" alt=""></p>
-                        <div class="title pb-2 h3">Project Management</div>
-                        <ul>
-                            <li>Project Initiation</li>
-                            <li>Project Planning</li>
-                            <li>Project Execution</li>
-                            <li>Project Performance</li>
-                            <li>Project Closure</li>
-                        </ul>
-                    </div>
-                </div>
+      <div class="section-title">
+        <h2>Skill</h2>
+        <p>This is my skill.</p>
+      </div>
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-4 col-md-6 pt-3 mb-5 fade">
+            <div class="boxWhyScg">
+              <p class="icon text-center"><img src="assets/icon/img16.png" class="w-75 h-auto text-center" alt=""></p>
+              <div class="title pb-2 h3">Web Design</div>
+              <ul>
+                <li>UX/UI Design</li>
+                <li>Graphic Design</li>
+                <li>Responsive Design</li>
+              </ul>
             </div>
+          </div>
+          <div class="col-lg-4 col-md-6 pt-3 mb-5 fade">
+            <div class="boxWhyScg">
+              <p class="icon text-center"><img src="assets/icon/img1.png" class="w-75 h-auto text-center" alt=""></p>
+              <div class="title pb-2 h3">Web Development</div>
+              <ul>
+                <li>Front-end Development</li>
+                <li>Back-end Development</li>
+                <li>Database Management</li>
+                <li>API Integration</li>
+              </ul>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-6 pt-3 mb-5 fade">
+            <div class="boxWhyScg">
+              <p class="icon text-center"><img src="assets/icon/img2.png" class="w-75 h-auto text-center" alt=""></p>
+              <div class="title pb-2 h3">Web Security</div>
+              <ul>
+                <li>Web Security : Cross-Site Scripting (XSS), SQL Injection, และ Cross-Site Request Forgery (CSRF)</li>
+                <li>SSL/TLS Configuration</li>
+              </ul>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-6 pt-3 mb-5 fade">
+            <div class="boxWhyScg">
+              <p class="icon text-center"><img src="assets/icon/img7.png" class="w-75 h-auto text-center" alt=""></p>
+              <div class="title pb-2 h3">Version Control Systems</div>
+              <ul>
+                <li>Git</li>
+                <li>Subversion</li>
+                <li>Mercurial</li>
+              </ul>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-6 pt-3 mb-5 fade">
+            <div class="boxWhyScg">
+              <p class="icon text-center"><img src="assets/icon/img4.png" class="w-75 h-auto text-center" alt=""></p>
+              <div class="title pb-2 h3">Learning and Troubleshooting</div>
+              <ul>
+                <li>Fast Learning</li>
+                <li>Problem Solving</li>
+                <li>Testing and Debugging</li>
+                <li>Utilizing Development Tools : IDEs (Integrated Development Environments), Debugging Tools, Browser
+                  Developer Tools</li>
+              </ul>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-6 pt-3 mb-5 fade">
+            <div class="boxWhyScg">
+              <p class="icon text-center"><img src="assets/icon/img3.png" class="w-75 h-auto text-center" alt=""></p>
+              <div class="title pb-2 h3">Project Management</div>
+              <ul>
+                <li>Project Initiation</li>
+                <li>Project Planning</li>
+                <li>Project Execution</li>
+                <li>Project Performance</li>
+                <li>Project Closure</li>
+              </ul>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
-</section>
+  </section>
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    const elements = document.querySelectorAll('.fade');
-    const offset = 100; // Adjust this value based on when you want the animation to start
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const elements = document.querySelectorAll('.fade');
+      const offset = 100; // Adjust this value based on when you want the animation to start
 
-    function onScroll() {
+      function onScroll() {
         elements.forEach((el, index) => {
-            if (el.getBoundingClientRect().top < window.innerHeight - offset) {
-                setTimeout(() => {
-                    el.classList.add('show');
-                }, index * 200); // Adjust the delay as needed
-            }
+          if (el.getBoundingClientRect().top < window.innerHeight - offset) {
+            setTimeout(() => {
+              el.classList.add('show');
+            }, index * 200); // Adjust the delay as needed
+          }
         });
+      }
+
+      window.addEventListener('scroll', onScroll);
+      onScroll(); // Run the function on page load
+    });
+  </script>
+
+  <style>
+    .fade {
+      opacity: 0;
+      transition: opacity 1.5s ease-in-out;
     }
 
-    window.addEventListener('scroll', onScroll);
-    onScroll(); // Run the function on page load
-});
-</script>
-
-<style>
-.fade {
-    opacity: 0;
-    transition: opacity 1.5s ease-in-out;
-}
-
-.fade.show {
-    opacity: 1;
-}
-</style>
+    .fade.show {
+      opacity: 1;
+    }
+  </style>
 
 
 
@@ -418,9 +422,9 @@ document.addEventListener("DOMContentLoaded", function() {
               </li>
               <br>
               <li><span class="fw-bold text-primary">Project Booking </span>(19 March 2024)
-                <div>Skill Related: PHP, HTML, JavaScript, CSS, SQL Server, ChartJS, 
+                <div>Skill Related: PHP, HTML, JavaScript, CSS, SQL Server, ChartJS,
                   Bootstrap, Sweet Alert, Jquery, Data Table Library
-                  </div>
+                </div>
               </li>
               <br>
               <li><span class="fw-bold text-primary">Project Job South </span>(12 March 2024)
@@ -428,7 +432,7 @@ document.addEventListener("DOMContentLoaded", function() {
               </li>
               <br>
               <li><span class="fw-bold text-primary">Project Assets </span>(7 July 2023)
-                <div>Skill Related: PHP, HTML, CSS, MySQL, ChartJS, Bootstrap, 
+                <div>Skill Related: PHP, HTML, CSS, MySQL, ChartJS, Bootstrap,
                   Sweet Alert, Web Security</div>
               </li>
               <br>
@@ -442,7 +446,7 @@ document.addEventListener("DOMContentLoaded", function() {
               </li>
               <br>
               <li><span class="fw-bold text-primary">Covid-19 Spread Analysis Website </span>(November 2022)
-                <div>Skill Related: Flask, HTML, CSS, and displayed as a 
+                <div>Skill Related: Flask, HTML, CSS, and displayed as a
                   map by using the Python library</div>
               </li>
               <br>

@@ -297,7 +297,7 @@ h6 {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  z-index: -1;
+  z-index: -1; /* ต้องอยู่ด้านหลัง */
 }
 
 #hero .fallback-background {
@@ -308,9 +308,10 @@ h6 {
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: -2;
-  display: none; /* Default to hidden, show only if video fails */
+  z-index: -2; /* ต้องอยู่ด้านหลัง video */
+  display: none; /* ต้องเริ่มต้นซ่อนไว้ */
 }
+
 
 
 #hero .content {
