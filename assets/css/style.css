@@ -299,7 +299,7 @@ h6 {
   z-index: -1; /* ต้องอยู่ด้านหลัง */
 }
 
-#hero .fallback-active {
+#hero .fallback-background {
   background: url('../img/hero-bg.jpg') no-repeat center center;
   background-size: cover;
   position: absolute;
