@@ -106,11 +106,12 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      video.load(); // Ensure the video is loaded
+     
       var video = document.getElementById('hero-video');
       var fallback = document.getElementById('fallback-background');
       var hero = document.getElementById('hero');
     
+      video.load(); // Ensure the video is loaded
       function handleVideoPlay() {
         console.log('handleVideoPlay function called');
         if (video.readyState >= 3) { // READY_STATE_HAVE_FUTURE_DATA
