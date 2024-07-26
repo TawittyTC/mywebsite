@@ -491,7 +491,7 @@ section {
   font-size: 36px;
   display: block;
   font-weight: 600;
-  color: #011426;
+  color: #45505b;
 }
 
 .facts .count-box p {
@@ -622,7 +622,7 @@ section {
   font-weight: 600;
   line-height: 1;
   text-transform: uppercase;
-  color: #272829;
+  color: #45505b;
   margin-bottom: 5px;
   transition: all 0.3s ease-in-out;
 }
@@ -979,7 +979,7 @@ section {
   font-size: 20px;
   font-weight: bold;
   margin: 10px 0 5px 0;
-  color: #111;
+  color: #45505b;
 }
 
 .testimonials .testimonial-item h4 {
