@@ -302,7 +302,6 @@ h6 {
 
 #hero .fallback-background {
   background: url('../img/hero-bg.jpg') no-repeat center center;
-  background: rgba(255, 255, 255, 0.8);
   background-size: cover;
   position: absolute;
   top: 0;
@@ -313,6 +312,16 @@ h6 {
   display: none; /* ต้องเริ่มต้นซ่อนไว้ */
 }
 
+#hero.fallback-active:before {
+  content: "";
+  background: rgba(255, 255, 255, 0.8);
+  position: absolute;
+  bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: -2; /* ต้องอยู่ด้านหลังเนื้อหา */
+}
 
 
 #hero .content {

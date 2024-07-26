@@ -103,33 +103,37 @@
   </section>
 
   <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
       var video = document.getElementById('hero-video');
       var fallback = document.getElementById('fallback-background');
-
+      var hero = document.getElementById('hero');
+    
       function handleVideoPlay() {
         console.log('handleVideoPlay function called');
         if (video.readyState >= 3) { // READY_STATE_HAVE_FUTURE_DATA
           console.log('Video is ready to play');
-          video.play().catch(function (error) {
-            console.log('Autoplay failed', error);
+          video.play().catch(function() {
+            console.log('Autoplay failed');
             video.style.display = 'none';
             fallback.classList.remove('d-none');
+            hero.classList.add('fallback-active'); // เพิ่มคลาส fallback-active
           });
         }
       }
-
+    
       video.addEventListener('canplay', handleVideoPlay);
-      video.addEventListener('error', function () {
+      video.addEventListener('error', function() {
         console.log('Video error occurred');
         video.style.display = 'none';
         fallback.classList.remove('d-none');
+        hero.classList.add('fallback-active'); // เพิ่มคลาส fallback-active
       });
-
+    
       // Optional: Ensure video starts loading and playing
       video.load(); // Ensure the video is loaded
     });
-  </script>
+    </script>
+    
 
   <!-- ======= About Section ======= -->
   <section id="about" class="about mt-5 mb-5">
