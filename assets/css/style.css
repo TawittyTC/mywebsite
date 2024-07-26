@@ -1216,7 +1216,7 @@ section {
 
 
 #footer .social-links a {
-  font-size: 30px; /* ปรับขนาดของ icon ตามต้องการ */
+  font-size: 24px; /* ปรับขนาดของ icon ตามต้องการ */
   display: inline-block;
   background: #0563bb;
   color: #fff;
@@ -1260,12 +1260,12 @@ section {
   }
 }
 
-/* .social-links .github i,
+.social-links .github i,
 .social-links .linkedin i,
 .social-links .facebook i,
 .social-links .instagram i {
-  font-size: 50px; 
-} */
+  font-size: 50px; /* ปรับขนาดของ icon ตามต้องการ */
+}
 
 * {
   font-style: normal !important;
