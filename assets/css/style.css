@@ -1216,19 +1216,27 @@ section {
 
 
 #footer .social-links a {
-  font-size: 24px; /* ปรับขนาดของ icon ตามต้องการ */
-  display: inline-block;
+  font-size: 24px; /* ขนาดของไอคอน */
+  display: inline-flex; /* ใช้ inline-flex เพื่อให้การจัดตำแหน่งของไอคอนภายในวงกลมถูกต้อง */
+  align-items: center; /* จัดแนวกลางไอคอนในแนวตั้ง */
+  justify-content: center; /* จัดแนวกลางไอคอนในแนวนอน */
   background: #0563bb;
   color: #fff;
   line-height: 1;
-  padding: 8px 0;
+  padding: 8px; /* ปรับ padding ให้อยู่ในขนาดที่เหมาะสม */
   margin-right: 4px;
-  border-radius: 50%;
+  border-radius: 50%; /* วงกลม */
   text-align: center;
-  width: 36px;
-  height: 36px;
+  width: 36px; /* กำหนดขนาดของวงกลม */
+  height: 36px; /* กำหนดขนาดของวงกลม */
   transition: 0.3s;
+  box-sizing: border-box; /* รวม padding และ border ในขนาดที่กำหนด */
 }
+
+#footer .social-links a i {
+  line-height: 1; /* ปรับ line-height ของไอคอนให้เหมาะสม */
+}
+
 
 
 #footer .social-links a:hover {
