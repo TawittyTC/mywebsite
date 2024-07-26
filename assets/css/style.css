@@ -282,11 +282,27 @@ h6 {
 # Hero Section
 --------------------------------------------------------------*/
 #hero {
+  position: relative;
   width: 100%;
   height: 100vh;
-  background: url("../video/hero.mp4") top right no-repeat;
-  background-size: cover;
+  overflow: hidden; /* ป้องกันไม่ให้เนื้อหาภายในล้น */
+}
+
+#hero .video-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* ให้วิดีโอครอบคลุมพื้นที่ทั้งหมด */
+  z-index: -1; /* ให้วิดีโออยู่ด้านหลังเนื้อหา */
+}
+
+#hero .content {
   position: relative;
+  z-index: 1; /* ให้อยู่ด้านหน้าเนื้อหา */
+  color: white; /* ตัวอย่างการตั้งค่าสีตัวอักษร */
+  /* เพิ่มการตั้งค่าอื่น ๆ ตามที่คุณต้องการ */
 }
 
 @media (min-width: 992px) {
