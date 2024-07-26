@@ -85,13 +85,14 @@
       </div>
       <!-- <p style="font-size: 10px;">The Future Starts Today Not Tomorrow.</p> -->
     </div>
-    <div id="fallback-background" class="fallback-background d-none">
+    <div id="fallback-active" class="fallback-active d-none">
       <!-- คุณสามารถใส่ภาพพื้นหลังหรือเนื้อหาอื่น ๆ ที่นี่ -->
     </div>
   </section>
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
+      video.load(); // Ensure the video is loaded
       var video = document.getElementById('hero-video');
       var fallback = document.getElementById('fallback-background');
       var hero = document.getElementById('hero');
@@ -118,7 +119,7 @@
       });
     
       // Optional: Ensure video starts loading and playing
-      video.load(); // Ensure the video is loaded
+     
     });
     </script>
     
