@@ -66,7 +66,7 @@
 
   <!-- ======= Hero Section ======= -->
   <section id="hero" class="d-flex flex-column justify-content-center">
-    <video id="hero-video" src="assets/video/hero.mp4" autoplay loop muted playsinline class="video-background"></video>
+    <video id="hero-video" src="assets/video/hero.mp4" autoplay loop muted playsinline preload="auto" class="video-background"></video>
     <div class="container" data-aos="zoom-in" data-aos-delay="100">
       <div class="row m-5">
         <div class="col-12 col-md-12">
@@ -89,16 +89,30 @@
   </section>
   
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      var video = document.getElementById('hero-video');
-      var fallback = document.getElementById('fallback-background');
-  
-      video.addEventListener('error', function() {
-        // หากมีข้อผิดพลาดในการเล่นวิดีโอ
+document.addEventListener('DOMContentLoaded', function() {
+  var video = document.getElementById('hero-video');
+  var fallback = document.getElementById('fallback-background');
+
+  function handleVideoPlay() {
+    if (video.readyState >= 3) { // READY_STATE_HAVE_FUTURE_DATA
+      console.log('Video is ready to play');
+      video.play().catch(function() {
+        console.log('Autoplay failed');
         video.style.display = 'none';
         fallback.classList.remove('d-none');
       });
-    });
+    }
+  }
+
+  video.addEventListener('play', handleVideoPlay);
+  video.addEventListener('canplay', handleVideoPlay);
+  video.addEventListener('error', function() {
+    // หากมีข้อผิดพลาดในการเล่นวิดีโอ
+    video.style.display = 'none';
+    fallback.classList.remove('d-none');
+  });
+});
+
   </script>
   
   
