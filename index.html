@@ -69,7 +69,8 @@
     <div class="container" data-aos="zoom-in" data-aos-delay="100">
       <div class="row m-5">
         <div class="col-12 col-md-12">
-          <img src="assets/img/img01.jpg" class="img-thumbnail rounded-circle d-block d-md-none" alt="...">
+          <!-- <img src="assets/img/img01.jpg" class="img-thumbnail rounded-circle d-block d-md-none" alt="..."> -->
+          <video src="https://persistent.oaistatic.com/sonic/landing/bg_v2.mp4" autoplay="" loop="" playsinline="" muted="" class="pointer-events-none absolute left-0 top-0 h-[calc(100vh+8rem)] w-full object-cover transition-opacity delay-1000 duration-1000"></video>
         </div>
       </div>
       
@@ -334,11 +335,20 @@
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     const elements = document.querySelectorAll('.fade');
-    elements.forEach((el, index) => {
-        setTimeout(() => {
-            el.classList.add('show');
-        }, index * 500); // Delay 500ms for each element
-    });
+    const offset = 100; // Adjust this value based on when you want the animation to start
+
+    function onScroll() {
+        elements.forEach((el, index) => {
+            if (el.getBoundingClientRect().top < window.innerHeight - offset) {
+                setTimeout(() => {
+                    el.classList.add('show');
+                }, index * 200); // Adjust the delay as needed
+            }
+        });
+    }
+
+    window.addEventListener('scroll', onScroll);
+    onScroll(); // Run the function on page load
 });
 </script>
 
@@ -352,6 +362,7 @@ document.addEventListener("DOMContentLoaded", function() {
     opacity: 1;
 }
 </style>
+
 
 
   <!-- ======= Portfolio Section ======= -->
