@@ -39,6 +39,20 @@
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
     crossorigin="anonymous"></script>
 
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        if (!localStorage.getItem('refreshed')) {
+          // ถ้ายังไม่มีการตั้งค่า 'refreshed' ใน LocalStorage
+          localStorage.setItem('refreshed', 'true');
+          // ทำการรีเฟรชหน้าเว็บ
+          window.location.reload();
+        } else {
+          // เมื่อรีเฟรชแล้ว ให้ลบค่า 'refreshed'
+          localStorage.removeItem('refreshed');
+        }
+      });
+    </script>
+  
 
 </head>
 
