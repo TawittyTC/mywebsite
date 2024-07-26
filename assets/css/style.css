@@ -1223,8 +1223,8 @@ section {
   background: #0563bb;
   color: #fff;
   line-height: 1;
-  padding: 8px; /* ปรับ padding ให้อยู่ในขนาดที่เหมาะสม */
-  margin-right: 4px;
+  padding: 30px; /* ปรับ padding ให้อยู่ในขนาดที่เหมาะสม */
+  margin-right: 10px;
   border-radius: 50%; /* วงกลม */
   text-align: center;
   width: 36px; /* กำหนดขนาดของวงกลม */
