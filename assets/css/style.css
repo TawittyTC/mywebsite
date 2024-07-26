@@ -1260,12 +1260,12 @@ section {
   }
 }
 
-.social-links .github i,
+/* .social-links .github i,
 .social-links .linkedin i,
 .social-links .facebook i,
 .social-links .instagram i {
-  font-size: 50px; /* ปรับขนาดของ icon ตามต้องการ */
-}
+  font-size: 50px; 
+} */
 
 * {
   font-style: normal !important;
