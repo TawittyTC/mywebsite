@@ -44,6 +44,7 @@
       if (!localStorage.getItem('refreshed')) {
         // ถ้ายังไม่มีการตั้งค่า 'refreshed' ใน LocalStorage
         localStorage.setItem('refreshed', 'true');
+        console.log ('Refesh Complete');
         // ทำการรีเฟรชหน้าเว็บ
         window.location.reload();
       } else {
