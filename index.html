@@ -39,20 +39,31 @@
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
     crossorigin="anonymous"></script>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      if (!localStorage.getItem('refreshed')) {
-        // ถ้ายังไม่มีการตั้งค่า 'refreshed' ใน LocalStorage
-        localStorage.setItem('refreshed', 'true');
-        console.log('Refesh Complete');
-        // ทำการรีเฟรชหน้าเว็บ
-        window.location.reload();
-      } else {
-        // เมื่อรีเฟรชแล้ว ให้ลบค่า 'refreshed'
-        localStorage.removeItem('refreshed');
-      }
-    });
-  </script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const refreshCount = localStorage.getItem('refreshCount');
+        const maxRefreshes = 3;
+    
+        if (refreshCount === null) {
+          // ถ้ายังไม่มีค่า 'refreshCount' ใน LocalStorage
+          localStorage.setItem('refreshCount', 1);
+          console.log('First refresh');
+          // ทำการรีเฟรชหน้าเว็บ
+          window.location.reload();
+        } else if (parseInt(refreshCount) < maxRefreshes) {
+          // หากจำนวนครั้งที่รีเฟรชน้อยกว่าที่กำหนด
+          localStorage.setItem('refreshCount', parseInt(refreshCount) + 1);
+          console.log('Refresh count: ' + (parseInt(refreshCount) + 1));
+          // ทำการรีเฟรชหน้าเว็บ
+          window.location.reload();
+        } else {
+          // เมื่อถึงจำนวนครั้งที่กำหนดแล้ว ให้ลบค่า 'refreshCount'
+          localStorage.removeItem('refreshCount');
+          console.log('Refresh limit reached');
+        }
+      });
+    </script>
+    
 
 
 </head>
