@@ -34,34 +34,7 @@
 
   <!-- bootstrap icon -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    
-
-    <script>
-      document.addEventListener('DOMContentLoaded', function () {
-        const refreshCount = localStorage.getItem('refreshCount');
-        const maxRefreshes = 3;
-    
-        if (refreshCount === null) {
-          // ถ้ายังไม่มีค่า 'refreshCount' ใน LocalStorage
-          localStorage.setItem('refreshCount', 1);
-          console.log('First refresh');
-          // ทำการรีเฟรชหน้าเว็บ
-          window.location.reload();
-        } else if (parseInt(refreshCount) < maxRefreshes) {
-          // หากจำนวนครั้งที่รีเฟรชน้อยกว่าที่กำหนด
-          localStorage.setItem('refreshCount', parseInt(refreshCount) + 1);
-          console.log('Refresh count: ' + (parseInt(refreshCount) + 1));
-          // ทำการรีเฟรชหน้าเว็บ
-          window.location.reload();
-        } else {
-          // เมื่อถึงจำนวนครั้งที่กำหนดแล้ว ให้ลบค่า 'refreshCount'
-          localStorage.removeItem('refreshCount');
-          console.log('Refresh limit reached');
-        }
-      });
-    </script>
-    
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
 
 </head>
@@ -375,39 +348,6 @@
     </div>
   </section>
 
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const elements = document.querySelectorAll('.fade');
-      const offset = 100; // Adjust this value based on when you want the animation to start
-
-      function onScroll() {
-        elements.forEach((el, index) => {
-          if (el.getBoundingClientRect().top < window.innerHeight - offset) {
-            setTimeout(() => {
-              el.classList.add('show');
-            }, index * 200); // Adjust the delay as needed
-          }
-        });
-      }
-
-      window.addEventListener('scroll', onScroll);
-      onScroll(); // Run the function on page load
-    });
-  </script>
-
-  <style>
-    .fade {
-      opacity: 0;
-      transition: opacity 1.5s ease-in-out;
-    }
-
-    .fade.show {
-      opacity: 1;
-    }
-  </style>
-
-
-
   <!-- ======= Portfolio Section ======= -->
   <section id="portfolio" class="bg-light portfolio section-bg ">
     <div class="container" data-aos="fade-up">
@@ -615,25 +555,6 @@
                 </button>
               </div>
             </div>
-            <script>
-              // สร้างลูปใน JavaScript เพื่อเพิ่มรูปภาพใน carousel-inner
-              const carouselInner = document.getElementById("carousel-inner");
-              for (let i = 1; i <= 30; i++) {
-                const imageSrc = `assets/img/certificate/img (${i}).jpg`; // แทนที่ด้วย URL ของรูปภาพที่ถูกต้อง
-                const carouselItem = document.createElement("div");
-                carouselItem.classList.add("carousel-item");
-                if (i === 1) {
-                  carouselItem.classList.add("active");
-                }
-                const imgElement = document.createElement("img");
-                imgElement.src = imageSrc;
-                imgElement.className = "d-block w-100 img-fluid lazyload";
-                imgElement.alt = "";
-                imgElement.loading = "lazy"; // Add lazy loading
-                carouselItem.appendChild(imgElement);
-                carouselInner.appendChild(carouselItem);
-              }
-            </script>
           </div>
           </div>
       </div>
@@ -650,30 +571,6 @@
       </div>
     </div>
   </div>
-
-  <script>
-    const imagesList = document.getElementById("images-list");
-    for (let i = 1; i <= 30; i++) {
-      const imageSrc = `assets/img/certificate/img (${i}).jpg`; // Replace with the correct URL of your images
-      const colDiv = document.createElement("div");
-      
-      // Responsive column classes
-      colDiv.classList.add("col-12", "col-md-6", "col-lg-3", "mb-4");
-      
-      const imgElement = document.createElement("img");
-      imgElement.src = imageSrc;
-      imgElement.className = "img-fluid lazyload";
-      imgElement.alt = "Certificate Image";
-      imgElement.style.cursor = "pointer";
-      imgElement.loading = "lazy"; // Add lazy loading
-      imgElement.onclick = () => {
-        document.getElementById("modalImage").src = imageSrc;
-        new bootstrap.Modal(document.getElementById('imageModal')).show();
-      };
-      colDiv.appendChild(imgElement);
-      imagesList.appendChild(colDiv);
-    }
-  </script>
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
@@ -695,21 +592,7 @@
           </div>
 
           <div class="col-0 col-md-4">
-
           </div>
-          <style>
-            .custom-link {
-              color: #45505b;
-              /* Default text color (black or any color you prefer) */
-            }
-
-            .custom-link:hover {
-              color: #0d6efd;
-              /* Bootstrap primary color (blue) on hover */
-              text-decoration: underline;
-              /* Optional: underline on hover */
-            }
-          </style>
 
           <div class="col-12 col-md-4 mt-3">
             <div class="display-6 fw-bold">CONTACT ME</div>
@@ -745,7 +628,7 @@
         class="bi bi-arrow-up-short"></i></a>
 
     <!-- Vendor JS Files -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.3.2/lazysizes.min.js" integrity="sha512-9g9g7uU7SPLF5K1zE+FJ8KsCFBCzj1nJdsQBl8HXjA1H7r8LZwK7THX62aYIg0uLzCvGhC0LN1r4GkTpXz06g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.3.2/lazysizes.min.js" integrity="ab9f37a692ab09173b3793b49f69f352227eb2e52fec4b752467a5b386d739a30541c6a63e4f478dd5249d9bae16304db3bb6c32e69d81ee64f51cdd98efb519" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
     <script src="assets/vendor/aos/aos.js"></script>
     <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
