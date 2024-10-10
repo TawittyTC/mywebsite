@@ -332,7 +332,7 @@ for (let i = 1; i <= 30; i++) {
   const imgElement = document.createElement("img");
   imgElement.src = imageSrc;
   imgElement.className = "d-block w-100 img-fluid lazyload";
-  imgElement.alt = "";
+  imgElement.alt = "Tanapol's Certificate Images";
   imgElement.loading = "lazy"; // Add lazy loading
   carouselItem.appendChild(imgElement);
   carouselInner.appendChild(carouselItem);
@@ -349,7 +349,7 @@ for (let i = 1; i <= 30; i++) {
   const imgElement = document.createElement("img");
   imgElement.src = imageSrc;
   imgElement.className = "img-fluid lazyload";
-  imgElement.alt = "Certificate Image";
+  imgElement.alt = "Tanapol's Certificate Images";
   imgElement.style.cursor = "pointer";
   imgElement.loading = "lazy"; // Add lazy loading
   imgElement.onclick = () => {
