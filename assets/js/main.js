@@ -323,7 +323,7 @@ document.addEventListener("DOMContentLoaded", function () {
 // สร้างลูปใน JavaScript เพื่อเพิ่มรูปภาพใน carousel-inner
 const carouselInner = document.getElementById("carousel-inner");
 for (let i = 1; i <= 30; i++) {
-  const imageSrc = `assets/img/certificate/img (${i}).jpg`; // แทนที่ด้วย URL ของรูปภาพที่ถูกต้อง
+  const imageSrc = `assets/img/certificate/img (${i}).avif`; // แทนที่ด้วย URL ของรูปภาพที่ถูกต้อง
   const carouselItem = document.createElement("div");
   carouselItem.classList.add("carousel-item");
   if (i === 1) {
@@ -340,7 +340,7 @@ for (let i = 1; i <= 30; i++) {
 
 const imagesList = document.getElementById("images-list");
 for (let i = 1; i <= 30; i++) {
-  const imageSrc = `assets/img/certificate/img (${i}).jpg`; // Replace with the correct URL of your images
+  const imageSrc = `assets/img/certificate/img (${i}).avif`; // Replace with the correct URL of your images
   const colDiv = document.createElement("div");
 
   // Responsive column classes
