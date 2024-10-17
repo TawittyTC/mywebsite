@@ -304,7 +304,7 @@ h6 {
 }
 
 #hero .fallback-background {
-  background: url('../img/hero-bg.jpg') no-repeat center center;
+  background: url('../img/hero-bg.avif') no-repeat center center;
   background-size: cover;
   position: absolute;
   top: 0;
