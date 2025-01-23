@@ -359,3 +359,20 @@ for (let i = 1; i <= 30; i++) {
   colDiv.appendChild(imgElement);
   imagesList.appendChild(colDiv);
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+  const prevBtn = document.querySelector('.paddlenav-arrow-previous');
+  const nextBtn = document.querySelector('.paddlenav-arrow-next');
+  const scroller = document.getElementById('scroller');
+
+  // เมื่อกดปุ่ม "Previous" เลื่อนกลับไป 1 ช่อง
+  prevBtn.addEventListener('click', function () {
+      scroller.scrollBy({ left: -300, behavior: 'smooth' });
+  });
+
+  // เมื่อกดปุ่ม "Next" เลื่อนไปข้างหน้า 1 ช่อง
+  nextBtn.addEventListener('click', function () {
+      scroller.scrollBy({ left: 300, behavior: 'smooth' });
+  });
+});
+``

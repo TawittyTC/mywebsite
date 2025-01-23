@@ -4,6 +4,7 @@
 body {
   font-family: sans-serif;
   color: #45505b;
+  
 }
 
 a {
@@ -1197,8 +1198,8 @@ section {
 # Footer
 --------------------------------------------------------------*/
 #footer {
-  background: #f7f8f9;
-  color: #45505b;
+  background: #090909;
+  color: #ffffff;
   font-size: 14px;
   text-align: center;
   padding: 30px 0;
@@ -1264,7 +1265,7 @@ body, h1, h2, h3, h4, h5, h6, p, a, li, ul, span, div {
 
 
 .custom-link {
-  color: #45505b;
+  color: #ffffff;
   /* Default text color (black or any color you prefer) */
 }
 
@@ -1278,3 +1279,241 @@ body, h1, h2, h3, h4, h5, h6, p, a, li, ul, span, div {
 .fw-light{
   font-size: 15px;
 }
+
+.project-section-grid-item img {
+	width: 100%;
+	height: 200px;
+	object-fit: cover;
+}
+
+/* Global reset สำหรับ element ทั้งหมด */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-family: SF Pro Text, SF Pro Icons, Helvetica Neue, Helvetica, Arial, sans-serif;
+  font-size: 17px; /* 17px */
+  quotes: "“" "”";
+}
+
+/* ฟอนต์สำหรับภาษาไทย, เกาหลี, ญี่ปุ่น, จีน */
+:lang(ja), :lang(ko), :lang(th), :lang(zh) {
+  font-style: normal;
+}
+
+/* ฟอนต์พิเศษสำหรับภาษาไทย */
+body:lang(th) {
+  font-family: 'SF Pro TH', 'SF Pro Text', 'SF Pro Icons', Helvetica, Arial, sans-serif;
+  line-height: 1.35;
+}
+
+.paddlenav {
+  display: flex;
+  justify-content: space-between; /* จัดตำแหน่งปุ่มลูกศรให้ห่างกัน */
+  align-items: center;
+  width: 100%; /* ทำให้ปุ่มลูกศรใช้พื้นที่เต็ม */
+  padding: 0 20px; /* เพิ่มระยะห่างทั้งซ้ายและขวาของ paddlenav */
+  position: absolute;
+  top: 60%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* ส่วนของการกำหนดสีพื้นฐานและข้อความ */
+:root {
+  --sk-body-text-color: #1d1d1f;
+  --sk-body-background-color: #fff;
+  --sk-focus-color: #0071e3;
+  --sk-link-disabled-opacity: 0.42;
+  --sk-paddlenav-background: #d2d2d7a3;
+  --sk-paddlenav-arrow-color: #0000008f;
+  --sk-paddlenav-arrow-color-hover: #000000a3;
+  --sk-paddlenav-arrow-color-active: #000000a3;
+  --sk-paddlenav-diameter: 36px; /* ขนาดของปุ่ม */
+  --sk-paddlenav-background-hover: hsla(240, 6%, 88%, 0.698);
+  --sk-paddlenav-background-active: hsla(240, 4%, 77%, 0.654);
+}
+
+/* กำหนดให้เนื้อหาหลักมีการตั้งค่าฟอนต์และการเว้นบรรทัด */
+body {
+  color: var(--sk-body-text-color);
+  font-size: 17px;
+  font-weight: 400;
+  letter-spacing: -.022em;
+  line-height: 1.47;
+}
+
+/* ปุ่มลูกศร */
+.paddlenav-arrow {
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%); /* ให้ปุ่มอยู่กลางแนวตั้ง */
+  width: var(--sk-paddlenav-diameter);
+  height: var(--sk-paddlenav-diameter);
+  background: var(--sk-paddlenav-background);
+  border-radius: 50%;
+  color: var(--sk-paddlenav-arrow-color);
+  text-align: center;
+  line-height: 1;
+  display: block;
+  transition: background 0.1s linear, color 0.1s linear, opacity 0.1s linear;
+}
+
+/* ปรับการแสดงผลเมื่อโฮเวอร์และคลิก */
+.paddlenav-arrow:hover {
+  background: var(--sk-paddlenav-background-hover);
+  color: var(--sk-paddlenav-arrow-color-hover);
+}
+
+.paddlenav-arrow:active {
+  background: var(--sk-paddlenav-background-active);
+  color: var(--sk-paddlenav-arrow-color-active);
+}
+
+.paddlenav-arrow:focus {
+  outline: 3px solid var(--sk-focus-color);
+  outline-offset: 3px;
+}
+
+.paddlenav-arrow.disabled,
+.paddlenav-arrow:disabled {
+  opacity: var(--sk-link-disabled-opacity);
+  pointer-events: none;
+}
+
+/* ปุ่มลูกศรก่อนหน้า */
+.paddlenav-arrow-previous {
+  left: 0; /* ให้ปุ่มอยู่ทางซ้าย */
+}
+
+/* ปุ่มลูกศรถัดไป */
+.paddlenav-arrow-next {
+  right: 0; /* ให้ปุ่มอยู่ทางขวา */
+}
+
+/* การจัดการปุ่มเลื่อนในสถานะที่ถูก disabled */
+button:disabled {
+  cursor: default;
+}
+
+/* การจัดการลิสต์ของปุ่ม */
+.paddlenav ul {
+  display: flex;
+  justify-content: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* ปรับการตั้งค่าของปุ่ม */
+button {
+  background: none;
+  border: 0;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+  line-height: inherit;
+  padding: 0;
+}
+
+/* การจัดการการ์ด */
+.rf-cards-scroller-overflow {
+  display: flex;
+  flex-wrap: nowrap;
+  -webkit-overflow-scrolling: touch;
+  padding: 10px 0;
+  overflow-x: auto; /* ให้สามารถ scroll ได้ */
+  /* ซ่อน scroll bar */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.rf-cards-scroller-overflow::-webkit-scrollbar {
+  display: none;
+}
+
+.rf-cards-scroller-item {
+  flex: 0 0 auto;
+  width: 300px;
+  margin-right: 15px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  padding: 20px;
+  transition: transform 0.3s ease;
+}
+
+.rf-cards-scroller-item:hover {
+  transform: scale(1.05);
+}
+
+/* การจัดการรูปภาพในการ์ด */
+.rf-cards-scroller-item img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+/* ปรับปรุงเลย์เอาต์ในหน้าจอขนาดเล็ก */
+@media (max-width: 768px) {
+  .rf-cards-scroller-overflow {
+    padding: 5px 0;
+    overflow-x: auto; /* ให้สามารถ scroll ได้ */
+  }
+
+  .rf-cards-scroller-item {
+    width: 240px;
+    margin-right: 10px;
+  }
+
+  /* ซ่อนปุ่มลูกศรในหน้าจอมือถือ */
+  .paddlenav {
+    display: none;
+  }
+}
+
+/* ปรับปรุงเลย์เอาต์ในหน้าจอขนาดกลาง */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .rf-cards-scroller-overflow {
+    padding: 20px 0;
+    overflow-x: hidden; /* ซ่อน scroll bar */
+  }
+
+  .rf-cards-scroller-item {
+    width: 350px;
+    margin-right: 20px;
+  }
+
+  /* แสดงปุ่มลูกศรในหน้าจอขนาดกลางขึ้นไป */
+  .paddlenav {
+    display: flex;
+  }
+}
+
+/* ปรับปรุงเลย์เอาต์ในหน้าจอขนาดใหญ่ */
+@media (min-width: 1024px) {
+  .rf-cards-scroller-overflow {
+    padding: 30px 0;
+    overflow-x: hidden; /* ซ่อน scroll bar */
+  }
+
+  .rf-cards-scroller-item {
+    width: 400px;
+    margin-right: 25px;
+  }
+
+  /* แสดงปุ่มลูกศรในขนาด Desktop */
+  .paddlenav {
+    display: flex;
+  }
+}
+
+.rf-cards-scroller {
+  position: relative;
+}
+
+
