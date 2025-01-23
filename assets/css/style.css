@@ -570,7 +570,6 @@ section {
 .resume .resume-item h4 {
   line-height: 18px;
   font-size: 18px;
-  font-weight: 600;
   text-transform: uppercase;
   font-family: sans-serif;
   margin-bottom: 10px;
@@ -581,7 +580,6 @@ section {
   background: #f7f8f9;
   padding: 5px 15px;
   display: inline-block;
-  font-weight: 600;
   margin-bottom: 10px;
 }
 
