@@ -311,7 +311,7 @@ document.addEventListener("DOMContentLoaded", function () {
       if (el.getBoundingClientRect().top < window.innerHeight - offset) {
         setTimeout(() => {
           el.classList.add("show");
-        }, index * 200); // Adjust the delay as needed
+        }, index * 150); // Adjust the delay as needed
       }
     });
   }
