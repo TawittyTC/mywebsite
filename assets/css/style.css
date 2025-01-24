@@ -1257,7 +1257,7 @@ body, h1, h2, h3, h4, h5, h6, p, a, li, ul, span, div {
 
 .fade {
   opacity: 0;
-  transition: opacity 1.5s ease-in-out;
+  transition: opacity 1.0s ease-in-out;
 }
 
 .fade.show {
