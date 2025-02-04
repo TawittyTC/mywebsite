@@ -376,3 +376,10 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 });
 ``
+
+
+
+var currentYear = new Date().getFullYear();
+    
+// เปลี่ยนเนื้อหาใน <span> ที่มี id="current-year"
+document.getElementById('current-year').textContent = currentYear;
