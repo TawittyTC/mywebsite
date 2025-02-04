@@ -279,28 +279,6 @@
   new PureCounter();
 })();
 
-document.addEventListener("DOMContentLoaded", function () {
-  const refreshCount = localStorage.getItem("refreshCount");
-  const maxRefreshes = 3;
-
-  if (refreshCount === null) {
-    // ถ้ายังไม่มีค่า 'refreshCount' ใน LocalStorage
-    localStorage.setItem("refreshCount", 1);
-    console.log("First refresh");
-    // ทำการรีเฟรชหน้าเว็บ
-    window.location.reload();
-  } else if (parseInt(refreshCount) < maxRefreshes) {
-    // หากจำนวนครั้งที่รีเฟรชน้อยกว่าที่กำหนด
-    localStorage.setItem("refreshCount", parseInt(refreshCount) + 1);
-    console.log("Refresh count: " + (parseInt(refreshCount) + 1));
-    // ทำการรีเฟรชหน้าเว็บ
-    window.location.reload();
-  } else {
-    // เมื่อถึงจำนวนครั้งที่กำหนดแล้ว ให้ลบค่า 'refreshCount'
-    localStorage.removeItem("refreshCount");
-    console.log("Refresh limit reached");
-  }
-});
 
 document.addEventListener("DOMContentLoaded", function () {
   const elements = document.querySelectorAll(".fade");
@@ -322,8 +300,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // สร้างลูปใน JavaScript เพื่อเพิ่มรูปภาพใน carousel-inner
 const carouselInner = document.getElementById("carousel-inner");
-for (let i = 1; i <= 30; i++) {
-  const imageSrc = `assets/img/certificate/img (${i}).avif`; // แทนที่ด้วย URL ของรูปภาพที่ถูกต้อง
+for (let i = 1; i <= 28; i++) {
+  const imageSrc = `assets/img/certificate/img-${i}.avif`; // แทนที่ด้วย URL ของรูปภาพที่ถูกต้อง
   const carouselItem = document.createElement("div");
   carouselItem.classList.add("carousel-item");
   if (i === 1) {
@@ -339,8 +317,8 @@ for (let i = 1; i <= 30; i++) {
 }
 
 const imagesList = document.getElementById("images-list");
-for (let i = 1; i <= 30; i++) {
-  const imageSrc = `assets/img/certificate/img (${i}).avif`; // Replace with the correct URL of your images
+for (let i = 1; i <= 28; i++) {
+  const imageSrc = `assets/img/certificate/img-${i}.avif`; // Replace with the correct URL of your images
   const colDiv = document.createElement("div");
 
   // Responsive column classes
