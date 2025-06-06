@@ -2,10 +2,17 @@
 # General
 --------------------------------------------------------------*/
 body {
-  font-family: sans-serif;
-  color: #45505b;
-  
+  font-family:
+    'SF Pro TH',
+    'SF Pro Text',
+    'Noto Sans Thai',
+    'Kanit',
+    Helvetica,
+    Arial,
+    sans-serif;
+  line-height: 1.6;
 }
+
 
 a {
   color: #0563bb;
@@ -1251,7 +1258,16 @@ section {
 }
 
 body, h1, h2, h3, h4, h5, h6, p, a, li, ul, span, div {
-  font-family: sans-serif !important;
+    font-family:
+      'SF Pro TH',
+      'SF Pro Text',
+      'Noto Sans Thai',
+      'Kanit',
+      Helvetica,
+      Arial,
+      sans-serif;
+    line-height: 1.6;
+  
 }
 
 
@@ -1307,8 +1323,15 @@ html {
 
 /* ฟอนต์พิเศษสำหรับภาษาไทย */
 body:lang(th) {
-  font-family: 'SF Pro TH', 'SF Pro Text', 'SF Pro Icons', Helvetica, Arial, sans-serif;
-  line-height: 1.35;
+  font-family:
+    'SF Pro TH',
+    'SF Pro Text',
+    'Noto Sans Thai',
+    'Kanit',
+    Helvetica,
+    Arial,
+    sans-serif;
+  line-height: 1.6;
 }
 
 .paddlenav {
@@ -1344,7 +1367,7 @@ body {
   font-size: 17px;
   font-weight: 400;
   letter-spacing: -.022em;
-  line-height: 1.47;
+  line-height: 1.6;
 }
 
 /* ปุ่มลูกศร */
