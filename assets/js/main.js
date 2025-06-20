@@ -344,17 +344,42 @@ document.addEventListener('DOMContentLoaded', function () {
   const nextBtn = document.querySelector('.paddlenav-arrow-next');
   const scroller = document.getElementById('scroller');
 
+  function updateScrollerButtons() {
+    const scrollLeft = scroller.scrollLeft;
+    const maxScrollLeft = scroller.scrollWidth - scroller.clientWidth;
+
+    if (scrollLeft <= 0) {
+      prevBtn.disabled = true;
+      prevBtn.classList.add('disabled');
+    } else {
+      prevBtn.disabled = false;
+      prevBtn.classList.remove('disabled');
+    }
+
+    if (scrollLeft >= maxScrollLeft - 1) {
+      nextBtn.disabled = true;
+      nextBtn.classList.add('disabled');
+    } else {
+      nextBtn.disabled = false;
+      nextBtn.classList.remove('disabled');
+    }
+  }
+
   // เมื่อกดปุ่ม "Previous" เลื่อนกลับไป 1 ช่อง
   prevBtn.addEventListener('click', function () {
-      scroller.scrollBy({ left: -300, behavior: 'smooth' });
+    scroller.scrollBy({ left: -300, behavior: 'smooth' });
   });
 
   // เมื่อกดปุ่ม "Next" เลื่อนไปข้างหน้า 1 ช่อง
   nextBtn.addEventListener('click', function () {
-      scroller.scrollBy({ left: 300, behavior: 'smooth' });
+    scroller.scrollBy({ left: 300, behavior: 'smooth' });
   });
+
+  // อัปเดตปุ่มเมื่อ scroll
+  scroller.addEventListener('scroll', updateScrollerButtons);
+  window.addEventListener('load', updateScrollerButtons); // เช็กตอนโหลดหน้า
 });
-``
+
 
 
 

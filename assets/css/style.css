@@ -1377,7 +1377,7 @@ body {
   transform: translateY(-50%); /* ให้ปุ่มอยู่กลางแนวตั้ง */
   width: var(--sk-paddlenav-diameter);
   height: var(--sk-paddlenav-diameter);
-  background: var(--sk-paddlenav-background);
+  /* background: var(--sk-paddlenav-background); */
   border-radius: 50%;
   color: var(--sk-paddlenav-arrow-color);
   text-align: center;
@@ -1614,3 +1614,8 @@ button {
 }
 
 
+.paddlenav-arrow.disabled {
+  opacity: 0.3;
+  pointer-events: none;
+  cursor: default;
+}
