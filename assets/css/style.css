@@ -24,15 +24,6 @@ a:hover {
   text-decoration: none;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: sans-serif;
-}
-
 /*--------------------------------------------------------------
 # Back to top button
 --------------------------------------------------------------*/
@@ -576,9 +567,14 @@ section {
 }
 
 .resume .resume-item h4 {
+<<<<<<< Updated upstream
   line-height: 18px;
   font-size: 18px;
   text-transform: uppercase;
+=======
+  line-height: 10px;
+  font-size: 10px;
+>>>>>>> Stashed changes
   font-family: sans-serif;
   margin-bottom: 10px;
 }
@@ -1257,20 +1253,6 @@ section {
   font-style: normal !important;
 }
 
-body, h1, h2, h3, h4, h5, h6, p, a, li, ul, span, div {
-    font-family:
-      'SF Pro TH',
-      'SF Pro Text',
-      'Noto Sans Thai',
-      'Kanit',
-      Helvetica,
-      Arial,
-      sans-serif;
-    line-height: 1.6;
-  
-}
-
-
 .fade {
   opacity: 0;
   transition: opacity 1.0s ease-in-out;
@@ -1278,6 +1260,15 @@ body, h1, h2, h3, h4, h5, h6, p, a, li, ul, span, div {
 
 .fade.show {
   opacity: 1;
+}
+
+.data-box {
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  padding: 20px;
+  background-color: #fff;
+  max-width: 600px;
+  margin: 20px auto;
 }
 
 
