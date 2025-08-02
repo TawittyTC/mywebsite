@@ -567,14 +567,8 @@ section {
 }
 
 .resume .resume-item h4 {
-<<<<<<< Updated upstream
-  line-height: 18px;
-  font-size: 18px;
-  text-transform: uppercase;
-=======
   line-height: 10px;
   font-size: 10px;
->>>>>>> Stashed changes
   font-family: sans-serif;
   margin-bottom: 10px;
 }
