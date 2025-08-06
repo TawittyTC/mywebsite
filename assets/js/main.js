@@ -299,45 +299,34 @@ document.addEventListener("DOMContentLoaded", function () {
   onScroll(); // Run the function on page load
 });
 
-// สร้างลูปใน JavaScript เพื่อเพิ่มรูปภาพใน carousel-inner
-const carouselInner = document.getElementById("carousel-inner");
-for (let i = 1; i <= 28; i++) {
-  const imageSrc = `assets/img/certificate/img-${i}.avif`; // แทนที่ด้วย URL ของรูปภาพที่ถูกต้อง
-  const carouselItem = document.createElement("div");
-  carouselItem.classList.add("carousel-item");
-  if (i === 1) {
-    carouselItem.classList.add("active");
+document.addEventListener("DOMContentLoaded", function () {
+  const imagesList = document.getElementById("images-list");
+  if (!imagesList) return;
+
+  for (let i = 1; i <= 28; i++) {
+    const imageSrc = `assets/img/certificate/img-${i}.avif`;
+    const colDiv = document.createElement("div");
+
+    // Responsive column classes
+    colDiv.classList.add("col-6", "col-md-6", "col-lg-3", "mb-4");
+
+    const imgElement = document.createElement("img");
+    imgElement.src = imageSrc;
+    imgElement.className = "img-fluid lazyload";
+    imgElement.alt = "Tanapol's Certificate Images";
+    imgElement.style.cursor = "pointer";
+    imgElement.loading = "lazy";
+
+    imgElement.onclick = () => {
+      document.getElementById("modalImage").src = imageSrc;
+      new bootstrap.Modal(document.getElementById("imageModal")).show();
+    };
+
+    colDiv.appendChild(imgElement);
+    imagesList.appendChild(colDiv);
   }
-  const imgElement = document.createElement("img");
-  imgElement.src = imageSrc;
-  imgElement.className = "d-block w-100 img-fluid lazyload";
-  imgElement.alt = "Tanapol's Certificate Images";
-  imgElement.loading = "lazy"; // Add lazy loading
-  carouselItem.appendChild(imgElement);
-  carouselInner.appendChild(carouselItem);
-}
+});
 
-const imagesList = document.getElementById("images-list");
-for (let i = 1; i <= 28; i++) {
-  const imageSrc = `assets/img/certificate/img-${i}.avif`; // Replace with the correct URL of your images
-  const colDiv = document.createElement("div");
-
-  // Responsive column classes
-  colDiv.classList.add("col-12", "col-md-6", "col-lg-3", "mb-4");
-
-  const imgElement = document.createElement("img");
-  imgElement.src = imageSrc;
-  imgElement.className = "img-fluid lazyload";
-  imgElement.alt = "Tanapol's Certificate Images";
-  imgElement.style.cursor = "pointer";
-  imgElement.loading = "lazy"; // Add lazy loading
-  imgElement.onclick = () => {
-    document.getElementById("modalImage").src = imageSrc;
-    new bootstrap.Modal(document.getElementById("imageModal")).show();
-  };
-  colDiv.appendChild(imgElement);
-  imagesList.appendChild(colDiv);
-}
 
 document.addEventListener('DOMContentLoaded', function () {
   const prevBtn = document.querySelector('.paddlenav-arrow-previous');
