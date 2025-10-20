@@ -267,7 +267,7 @@
    */
   window.addEventListener("load", () => {
     AOS.init({
-      duration: 1000,
+      duration: 500,
       easing: "ease-in-out",
       once: true,
       mirror: false,
@@ -290,7 +290,7 @@ document.addEventListener("DOMContentLoaded", function () {
       if (el.getBoundingClientRect().top < window.innerHeight - offset) {
         setTimeout(() => {
           el.classList.add("show");
-        }, index * 150); // Adjust the delay as needed
+        }, index * 50); // Adjust the delay as needed
       }
     });
   }
