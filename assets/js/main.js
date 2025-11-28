@@ -303,7 +303,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const imagesList = document.getElementById("images-list");
   if (!imagesList) return;
 
-  for (let i = 1; i <= 28; i++) {
+  for (let i = 1; i <= 29; i++) {
     const imageSrc = `assets/img/certificate/img-${i}.avif`;
     const colDiv = document.createElement("div");
 
