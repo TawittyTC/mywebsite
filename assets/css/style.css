@@ -1635,3 +1635,63 @@ button {
   pointer-events: none;
   cursor: default;
 }
+
+/*--------------------------------------------------------------
+# Skeleton Loading
+--------------------------------------------------------------*/
+.skeleton-wrapper {
+  position: relative;
+  overflow: hidden;
+  background-color: #e2e8f0;
+}
+
+.skeleton-wrapper::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.6) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes skeleton-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton-wrapper img {
+  display: block;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.skeleton-wrapper.loaded img {
+  opacity: 1;
+}
+
+.skeleton-wrapper.loaded::after {
+  display: none;
+}
+
+/* Project scroller skeleton */
+.skeleton-project {
+  width: 100%;
+  height: 450px;
+  border-radius: 8px;
+}
+
+@media (max-width: 768px) {
+  .skeleton-project { height: 250px; }
+}
+
+/* Certificate skeleton */
+.skeleton-cert {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  border-radius: 4px;
+}

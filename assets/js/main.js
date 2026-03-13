@@ -310,6 +310,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // Responsive column classes
     colDiv.classList.add("col-6", "col-md-6", "col-lg-3", "mb-4");
 
+    const wrapper = document.createElement("div");
+    wrapper.classList.add("skeleton-wrapper", "skeleton-cert");
+
     const imgElement = document.createElement("img");
     imgElement.src = imageSrc;
     imgElement.className = "img-fluid lazyload";
@@ -317,12 +320,17 @@ document.addEventListener("DOMContentLoaded", function () {
     imgElement.style.cursor = "pointer";
     imgElement.loading = "lazy";
 
+    imgElement.onload = () => wrapper.classList.add("loaded");
+    imgElement.onerror = () => wrapper.classList.add("loaded");
+    if (imgElement.complete) wrapper.classList.add("loaded");
+
     imgElement.onclick = () => {
       document.getElementById("modalImage").src = imageSrc;
       new bootstrap.Modal(document.getElementById("imageModal")).show();
     };
 
-    colDiv.appendChild(imgElement);
+    wrapper.appendChild(imgElement);
+    colDiv.appendChild(wrapper);
     imagesList.appendChild(colDiv);
   }
 });
@@ -373,6 +381,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 var currentYear = new Date().getFullYear();
-    
+
 // เปลี่ยนเนื้อหาใน <span> ที่มี id="current-year"
 document.getElementById('current-year').textContent = currentYear;
+
+// Skeleton loading for static images
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll(".skeleton-wrapper img").forEach(function (img) {
+    const wrapper = img.parentElement;
+    if (img.complete) {
+      wrapper.classList.add("loaded");
+    } else {
+      img.addEventListener("load", function () { wrapper.classList.add("loaded"); });
+      img.addEventListener("error", function () { wrapper.classList.add("loaded"); });
+    }
+  });
+});
