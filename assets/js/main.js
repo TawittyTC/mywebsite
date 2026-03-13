@@ -161,108 +161,6 @@
   }
 
   /**
-   * Skills animation
-   */
-  let skilsContent = select(".skills-content");
-  if (skilsContent) {
-    new Waypoint({
-      element: skilsContent,
-      offset: "80%",
-      handler: function (direction) {
-        let progress = select(".progress .progress-bar", true);
-        progress.forEach((el) => {
-          el.style.width = el.getAttribute("aria-valuenow") + "%";
-        });
-      },
-    });
-  }
-
-  /**
-   * Porfolio isotope and filter
-   */
-  window.addEventListener("load", () => {
-    let portfolioContainer = select(".portfolio-container");
-    if (portfolioContainer) {
-      let portfolioIsotope = new Isotope(portfolioContainer, {
-        itemSelector: ".portfolio-item",
-      });
-
-      let portfolioFilters = select("#portfolio-flters li", true);
-
-      on(
-        "click",
-        "#portfolio-flters li",
-        function (e) {
-          e.preventDefault();
-          portfolioFilters.forEach(function (el) {
-            el.classList.remove("filter-active");
-          });
-          this.classList.add("filter-active");
-
-          portfolioIsotope.arrange({
-            filter: this.getAttribute("data-filter"),
-          });
-          portfolioIsotope.on("arrangeComplete", function () {
-            AOS.refresh();
-          });
-        },
-        true
-      );
-    }
-  });
-
-  /**
-   * Initiate portfolio lightbox
-   */
-  const portfolioLightbox = GLightbox({
-    selector: ".portfolio-lightbox",
-  });
-
-  /**
-   * Initiate portfolio details lightbox
-   */
-  const portfolioDetailsLightbox = GLightbox({
-    selector: ".portfolio-details-lightbox",
-    width: "90%",
-    height: "90vh",
-  });
-
-  /**
-   * Portfolio details slider
-   */
-  new Swiper(".portfolio-details-slider", {
-    speed: 400,
-    loop: true,
-    autoplay: {
-      delay: 5000,
-      disableOnInteraction: false,
-    },
-    pagination: {
-      el: ".swiper-pagination",
-      type: "bullets",
-      clickable: true,
-    },
-  });
-
-  /**
-   * Testimonials slider
-   */
-  new Swiper(".testimonials-slider", {
-    speed: 600,
-    loop: true,
-    autoplay: {
-      delay: 5000,
-      disableOnInteraction: false,
-    },
-    slidesPerView: "auto",
-    pagination: {
-      el: ".swiper-pagination",
-      type: "bullets",
-      clickable: true,
-    },
-  });
-
-  /**
    * Animation on scroll
    */
   window.addEventListener("load", () => {
@@ -274,10 +172,6 @@
     });
   });
 
-  /**
-   * Initiate Pure Counter
-   */
-  new PureCounter();
 })();
 
 
@@ -307,8 +201,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const imageSrc = `assets/img/certificate/img-${i}.avif`;
     const colDiv = document.createElement("div");
 
-    // Responsive column classes
-    colDiv.classList.add("col-6", "col-md-6", "col-lg-3", "mb-4");
+    // Responsive column classes: 2 columns on mobile, 3 on desktop
+    colDiv.classList.add("col-6", "col-lg-4", "mb-5");
 
     const wrapper = document.createElement("div");
     wrapper.classList.add("skeleton-wrapper", "skeleton-cert");
@@ -348,17 +242,21 @@ document.addEventListener('DOMContentLoaded', function () {
     if (scrollLeft <= 0) {
       prevBtn.disabled = true;
       prevBtn.classList.add('disabled');
+      prevBtn.style.visibility = 'hidden';
     } else {
       prevBtn.disabled = false;
       prevBtn.classList.remove('disabled');
+      prevBtn.style.visibility = 'visible';
     }
 
     if (scrollLeft >= maxScrollLeft - 1) {
       nextBtn.disabled = true;
       nextBtn.classList.add('disabled');
+      nextBtn.style.visibility = 'hidden';
     } else {
       nextBtn.disabled = false;
       nextBtn.classList.remove('disabled');
+      nextBtn.style.visibility = 'visible';
     }
   }
 
@@ -375,6 +273,12 @@ document.addEventListener('DOMContentLoaded', function () {
   // อัปเดตปุ่มเมื่อ scroll
   scroller.addEventListener('scroll', updateScrollerButtons);
   window.addEventListener('load', updateScrollerButtons); // เช็กตอนโหลดหน้า
+
+  // เช็กสถานะปุ่มทันทีหลังจาก DOM loaded
+  updateScrollerButtons();
+
+  // เช็กอีกครั้งหลังจากรูปโหลดเสร็จ
+  setTimeout(updateScrollerButtons, 500);
 });
 
 
