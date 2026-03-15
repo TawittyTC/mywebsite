@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://tawittytc.github.io/mywebsite/sitemap.xml
