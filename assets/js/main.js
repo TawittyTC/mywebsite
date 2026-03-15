@@ -339,27 +339,9 @@ document.addEventListener('DOMContentLoaded', function () {
     }, 1200);
   }
 
-  // Fix: Allow vertical page scroll when touching project cards (iOS Safari)
-  var vtStartX = 0, vtStartY = 0, vtLocked = null;
-  scroller.addEventListener('touchstart', function(e) {
-    vtStartX = e.touches[0].clientX;
-    vtStartY = e.touches[0].clientY;
-    vtLocked = null;
-  }, { passive: true });
-  scroller.addEventListener('touchmove', function(e) {
-    var dx = Math.abs(e.touches[0].clientX - vtStartX);
-    var dy = Math.abs(e.touches[0].clientY - vtStartY);
-    // Use 15px threshold + angle detection for clearer direction
-    var threshold = 15;
-    if (vtLocked === null && (dx > threshold || dy > threshold)) {
-      // If vertical movement is significantly larger than horizontal (1.5x ratio)
-      vtLocked = dy > dx * 1.5 ? 'v' : 'h';
-    }
-    // Only prevent default for horizontal-locked swipes
-    if (vtLocked === 'h') {
-      e.preventDefault();
-    }
-  }, { passive: false });
+  // iOS Safari: Allow natural vertical page scroll by not intercepting vertical touches
+  // All vertical scroll events pass through to page naturally
+  // Horizontal scroll is handled by CSS overflow-x: auto
 });
 
 
