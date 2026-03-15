@@ -253,6 +253,22 @@ section {
   margin: 24px auto;
 }
 
+.company-logo {
+  height: 44px;
+  width: auto;
+  max-width: 130px;
+  object-fit: contain;
+  flex-shrink: 0;
+  margin-top: 12px;
+}
+
+@media (max-width: 576px) {
+  .company-logo {
+    height: 32px;
+    max-width: 100px;
+  }
+}
+
 .custom-link {
   color: #3e3e3e;
 }
