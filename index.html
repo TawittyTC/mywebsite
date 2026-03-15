@@ -42,14 +42,14 @@
   <link rel="preload" href="assets/img/hero-bg.avif" as="image" fetchpriority="high">
 
   <!-- Google Fonts async (non-blocking) -->
-  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@100..900&family=Kanit&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@100..900&family=Kanit&display=swap" rel="stylesheet"></noscript>
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
 
   <!-- Critical CSS inlined: hero renders instantly, zero blocking requests -->
   <style>
     /* ── Bootstrap critical subset ── */
     *,::after,::before{box-sizing:border-box}
-    body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:1rem;font-weight:400;line-height:1.5;color:#212529;background-color:#fff}
+    body{margin:0;font-family:'Inter',-apple-system,BlinkMacSystemFont,"Noto Sans Thai","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:1rem;font-weight:400;line-height:1.5;color:#212529;background-color:#fff}
     .container{width:100%;padding-right:.75rem;padding-left:.75rem;margin-right:auto;margin-left:auto}
     @media(min-width:576px){.container{max-width:540px}}
     @media(min-width:768px){.container{max-width:720px}}
@@ -76,7 +76,7 @@
 
     /* ── Site critical CSS (hero section) ── */
     *{box-sizing:border-box;margin:0;padding:0;font-style:normal!important}
-    body{font-family:'SF Pro TH','SF Pro Text','Noto Sans Thai','Kanit',Helvetica,Arial,sans-serif;line-height:1.6;color:#1d1d1f;font-size:17px;font-weight:400;letter-spacing:-.022em}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Inter','Noto Sans Thai','Helvetica Neue',Helvetica,Arial,sans-serif;line-height:1.6;color:#1d1d1f;font-size:17px;font-weight:400;letter-spacing:-.022em}
     a{color:#0563bb;text-decoration:none}
     #hero{position:relative;width:100%;height:100vh;overflow:hidden;background-size:cover;display:flex;flex-direction:column;justify-content:center}
     #hero:before{content:"";background:rgba(255,255,255,0.8);position:absolute;bottom:0;top:0;left:0;right:0;z-index:-2}
@@ -97,8 +97,8 @@
   <link rel="preload" href="assets/vendor/bootstrap/css/bootstrap.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet"></noscript>
 
-  <link rel="preload" href="assets/css/style.min.css?v=1.1.0" as="style" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link href="assets/css/style.min.css?v=1.1.0" rel="stylesheet"></noscript>
+  <link rel="preload" href="assets/css/style.min.css?v=1.2.0" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link href="assets/css/style.min.css?v=1.2.0" rel="stylesheet"></noscript>
 
   <!-- Non-critical vendor CSS: loaded async -->
   <link rel="preload" href="assets/vendor/aos/aos.css" as="style" onload="this.onload=null;this.rel='stylesheet'">

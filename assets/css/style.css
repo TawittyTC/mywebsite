@@ -3,10 +3,11 @@
 --------------------------------------------------------------*/
 body {
   font-family:
-    'SF Pro TH',
-    'SF Pro Text',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Inter',
     'Noto Sans Thai',
-    'Kanit',
+    'Helvetica Neue',
     Helvetica,
     Arial,
     sans-serif;
@@ -461,7 +462,7 @@ section {
 }
 
 html {
-  font-family: SF Pro Text, SF Pro Icons, Helvetica Neue, Helvetica, Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Noto Sans Thai', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-size: 17px;
   quotes: "\201C" "\201D";
 }
@@ -472,10 +473,11 @@ html {
 
 body:lang(th) {
   font-family:
-    'SF Pro TH',
-    'SF Pro Text',
     'Noto Sans Thai',
-    'Kanit',
+    'Inter',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Helvetica Neue',
     Helvetica,
     Arial,
     sans-serif;
