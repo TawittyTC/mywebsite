@@ -403,10 +403,11 @@ button {
   -webkit-overflow-scrolling: touch;
   padding: 10px 0;
   overflow-x: auto;
-  overflow-y: hidden;
+  overflow-y: auto;
   overscroll-behavior-x: contain;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  touch-action: pan-y;
 }
 
 .rf-cards-scroller-overflow::-webkit-scrollbar {
