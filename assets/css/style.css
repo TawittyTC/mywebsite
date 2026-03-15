@@ -262,10 +262,19 @@ section {
   margin-top: 12px;
 }
 
+.company-logo--lg {
+  height: 72px;
+  max-width: 160px;
+}
+
 @media (max-width: 576px) {
   .company-logo {
     height: 32px;
     max-width: 100px;
+  }
+  .company-logo--lg {
+    height: 56px;
+    max-width: 130px;
   }
 }
 
