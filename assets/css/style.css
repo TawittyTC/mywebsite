@@ -405,6 +405,7 @@ button {
   overflow-x: auto;
   overflow-y: hidden;
   touch-action: pan-x;
+  overscroll-behavior-x: contain;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
@@ -434,11 +435,13 @@ button {
   .rf-cards-scroller-overflow {
     padding: 5px 0;
     overflow-x: auto;
+    overflow-y: hidden;
   }
 
   .rf-cards-scroller-item {
     width: 240px;
     margin-right: 10px;
+    transform: none !important;
   }
 
   .rf-cards-scroller-item img {
@@ -450,6 +453,19 @@ button {
 
   .paddlenav {
     display: none;
+  }
+}
+
+/* Scroll hint animation on mobile */
+@keyframes scroll-hint {
+  0%   { transform: translateX(0); }
+  25%  { transform: translateX(-48px); }
+  55%  { transform: translateX(0); }
+  100% { transform: translateX(0); }
+}
+@media (max-width: 768px) {
+  .rf-cards-scroller-overflow.scroll-hint {
+    animation: scroll-hint 1s ease-in-out 1s both;
   }
 }
 
@@ -631,8 +647,19 @@ button {
 
 .filter-btn:hover,
 .filter-btn.active {
-  background: #0563bb;
+  background: #0071e3;
   color: #fff;
+}
+
+/* Cert images: disable click (no modal) */
+.cert-img img {
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Project cards: add shadow so visible on gray bg */
+.rf-cards-scroller-item {
+  box-shadow: 0 2px 16px rgba(0,0,0,0.08);
 }
 
 /*--------------------------------------------------------------

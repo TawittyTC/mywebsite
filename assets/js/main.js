@@ -186,28 +186,38 @@ document.addEventListener("DOMContentLoaded", function () {
   onScroll(); // Run the function on page load
 });
 
+// Load cert images only when section scrolls into view (performance)
 document.addEventListener("DOMContentLoaded", function () {
   const imagesList = document.getElementById("images-list");
   if (!imagesList) return;
 
-  for (let i = 1; i <= 29; i++) {
-    const imageSrc = `assets/img/certificate/img-${i}.avif`;
-    const colDiv = document.createElement("div");
+  function buildCerts() {
+    if (imagesList.dataset.loaded) return;
+    imagesList.dataset.loaded = "1";
+    for (let i = 1; i <= 29; i++) {
+      const colDiv = document.createElement("div");
+      colDiv.classList.add("col-6", "col-lg-4", "mb-5");
+      const wrapper = document.createElement("div");
+      wrapper.classList.add("cert-img");
+      const imgElement = document.createElement("img");
+      imgElement.src = `assets/img/certificate/img-${i}.avif`;
+      imgElement.className = "img-fluid";
+      imgElement.alt = "Tanapol Certificate " + i;
+      imgElement.loading = "lazy";
+      imgElement.draggable = false;
+      wrapper.appendChild(imgElement);
+      colDiv.appendChild(wrapper);
+      imagesList.appendChild(colDiv);
+    }
+  }
 
-    colDiv.classList.add("col-6", "col-lg-4", "mb-5");
-
-    const wrapper = document.createElement("div");
-    wrapper.classList.add("cert-img");
-
-    const imgElement = document.createElement("img");
-    imgElement.src = imageSrc;
-    imgElement.className = "img-fluid";
-    imgElement.alt = "Tanapol's Certificate Images";
-    imgElement.loading = "lazy";
-
-    wrapper.appendChild(imgElement);
-    colDiv.appendChild(wrapper);
-    imagesList.appendChild(colDiv);
+  if ("IntersectionObserver" in window) {
+    const obs = new IntersectionObserver(function(entries) {
+      if (entries[0].isIntersecting) { buildCerts(); obs.disconnect(); }
+    }, { rootMargin: "200px" });
+    obs.observe(imagesList);
+  } else {
+    buildCerts();
   }
 });
 
@@ -431,6 +441,17 @@ window.addEventListener('load', function () {
 
 var currentYear = new Date().getFullYear();
 document.getElementById('current-year').textContent = currentYear;
+
+// Scroll hint: nudge project cards on mobile to hint horizontal scroll
+window.addEventListener('load', function() {
+  if (window.innerWidth > 768) return;
+  var scroller = document.getElementById('scroller');
+  if (!scroller) return;
+  scroller.classList.add('scroll-hint');
+  scroller.addEventListener('animationend', function() {
+    scroller.classList.remove('scroll-hint');
+  }, { once: true });
+});
 
 // View Resume → slow scroll to Experience
 document.querySelector('a[href="#experience"]').addEventListener('click', function(e) {
