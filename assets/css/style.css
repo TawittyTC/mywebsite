@@ -924,50 +924,6 @@ a:hover { color: #0077ed; }
 .rf-cards-scroller-item h4 { font-weight: 600; color: #1d1d1f; letter-spacing: -0.2px; }
 .rf-cards-scroller-item p.fw-light { color: #6e6e73; font-size: 14px; }
 
-/*--------------------------------------------------------------
-# Expandable Cards (Achievement/Experience)
---------------------------------------------------------------*/
-.data-box.expandable {
-  position: relative;
-  overflow: hidden;
-}
-.expandable-content {
-  max-height: 180px;
-  overflow: hidden;
-  transition: max-height 0.3s ease;
-}
-.expandable-content.expanded {
-  max-height: none;
-}
-.expand-btn {
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: #0071e3;
-  border: none;
-  color: #fff;
-  font-size: 24px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 12px rgba(0, 113, 227, 0.3);
-}
-.expand-btn:hover {
-  background: #0077ed;
-  box-shadow: 0 4px 16px rgba(0, 113, 227, 0.4);
-  transform: scale(1.1);
-}
-.expand-btn.expanded::after {
-  content: '−';
-}
-.expand-btn::after {
-  content: '+';
-}
 
 /*--------------------------------------------------------------
 # Footer + Buttons

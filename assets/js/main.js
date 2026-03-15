@@ -376,19 +376,6 @@ window.addEventListener('load', function () {
   );
 });
 
-// Expandable Cards (Achievement/Experience)
-document.addEventListener('DOMContentLoaded', function () {
-  const expandBtns = document.querySelectorAll('.expand-btn');
-  expandBtns.forEach(btn => {
-    btn.addEventListener('click', function () {
-      const card = this.closest('.expandable');
-      const content = card.querySelector('.expandable-content');
-      this.classList.toggle('expanded');
-      content.classList.toggle('expanded');
-    });
-  });
-});
-
 var currentYear = new Date().getFullYear();
 document.getElementById('current-year').textContent = currentYear;
 
