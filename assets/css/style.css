@@ -730,12 +730,12 @@ button {
 }
 
 /*--------------------------------------------------------------
-# Skeleton Loading
+# Image Containers + Skeleton Loading
 --------------------------------------------------------------*/
 .skeleton-wrapper {
-  position: relative;
   overflow: hidden;
-  background-color: #ffffff;
+  position: relative;
+  background-color: #e8ecf0;
 }
 
 .skeleton-wrapper::after {
@@ -745,16 +745,17 @@ button {
   background: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(255, 255, 255, 0.6) 50%,
+    rgba(255, 255, 255, 0.5) 50%,
     transparent 100%
   );
   background-size: 200% 100%;
   animation: skeleton-shimmer 1.5s ease-in-out infinite;
+  pointer-events: none;
 }
 
 @keyframes skeleton-shimmer {
   0%   { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  100% { background-position:  200% 0; }
 }
 
 .skeleton-wrapper img {
@@ -763,6 +764,14 @@ button {
   height: 100%;
   opacity: 0;
   transition: opacity 0.4s ease;
+}
+
+.skeleton-wrapper.loaded img {
+  opacity: 1;
+}
+
+.skeleton-wrapper.loaded::after {
+  display: none;
 }
 
 /* Certificates: show full image */
@@ -774,14 +783,6 @@ button {
 .skeleton-project img {
   object-fit: cover;
   cursor: pointer;
-}
-
-.skeleton-wrapper.loaded img {
-  opacity: 1;
-}
-
-.skeleton-wrapper.loaded::after {
-  display: none;
 }
 
 .skeleton-project {

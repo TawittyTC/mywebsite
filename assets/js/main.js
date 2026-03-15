@@ -285,19 +285,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 var currentYear = new Date().getFullYear();
-
-// เปลี่ยนเนื้อหาใน <span> ที่มี id="current-year"
 document.getElementById('current-year').textContent = currentYear;
 
-// Skeleton loading for static images
-document.addEventListener("DOMContentLoaded", function () {
-  document.querySelectorAll(".skeleton-wrapper img").forEach(function (img) {
-    const wrapper = img.parentElement;
+// Remove hero skeleton when DOM is ready
+document.addEventListener('DOMContentLoaded', function () {
+  document.body.classList.remove('page-loading');
+
+  // Skeleton: fade in static images (project cards) when loaded
+  document.querySelectorAll('.skeleton-wrapper img').forEach(function (img) {
+    var wrapper = img.parentElement;
     if (img.complete) {
-      wrapper.classList.add("loaded");
+      wrapper.classList.add('loaded');
     } else {
-      img.addEventListener("load", function () { wrapper.classList.add("loaded"); });
-      img.addEventListener("error", function () { wrapper.classList.add("loaded"); });
+      img.addEventListener('load', function () { wrapper.classList.add('loaded'); });
+      img.addEventListener('error', function () { wrapper.classList.add('loaded'); });
     }
   });
 });
+
