@@ -129,7 +129,6 @@ a:hover {
   color: #45505b;
   margin: 15px 0 0 0;
   font-size: 26px;
-  font-family: sans-serif;
 }
 
 #hero p span {
@@ -193,33 +192,15 @@ section {
 .section-title h2 {
   font-size: 32px;
   font-weight: bold;
-  text-transform: uppercase;
-  margin-bottom: 20px;
-  padding-bottom: 20px;
+  margin-bottom: 12px;
+  padding-bottom: 0;
   position: relative;
   color: #45505b;
 }
 
-.section-title h2::before {
-  content: "";
-  position: absolute;
-  display: block;
-  width: 120px;
-  height: 1px;
-  background: #ddd;
-  bottom: 1px;
-  left: calc(50% - 60px);
-}
-
+.section-title h2::before,
 .section-title h2::after {
-  content: "";
-  position: absolute;
-  display: block;
-  width: 40px;
-  height: 3px;
-  background: #0563bb;
-  bottom: 0;
-  left: calc(50% - 20px);
+  display: none;
 }
 
 .section-title p {
@@ -234,7 +215,7 @@ section {
   font-weight: 700;
   margin-top: 20px;
   margin-bottom: 8px;
-  color: #45505b;
+  color: #1d1d1f;
 }
 
 /*--------------------------------------------------------------
@@ -859,18 +840,32 @@ body { padding-top: 48px; }
 /*--------------------------------------------------------------
 # Apple Colors + Typography
 --------------------------------------------------------------*/
-.section-title h2 {
-  font-size: 40px;
-  font-weight: 700;
-  letter-spacing: -0.5px;
-  color: #1d1d1f;
+.section-title {
+  padding-bottom: 40px;
 }
-.section-title p { font-size: 17px; color: #6e6e73; }
+.section-title h2 {
+  font-size: clamp(32px, 4vw, 48px);
+  font-weight: 700;
+  letter-spacing: -0.8px;
+  color: #1d1d1f;
+  text-transform: none;
+  line-height: 1.1;
+  margin-bottom: 12px;
+  padding-bottom: 0;
+}
+.section-title p { font-size: 17px; color: #6e6e73; line-height: 1.6; }
 section { padding: 120px 0; }
 
 /* Alternating backgrounds: Gray/White pattern */
 #resume, #portfolio, #contact { background: #f8f8f8; }
 #skill, #services { background: #fff; }
+
+/* Explicit white cards on gray sections */
+#resume .data-box,
+#portfolio .data-box,
+#contact .data-box {
+  background: #fff;
+}
 
 /* White cards with subtle shadows for white background sections */
 #skill .data-box,
@@ -888,11 +883,10 @@ section { padding: 120px 0; }
   line-height: 1.05;
   color: #1d1d1f;
 }
-#hero p { color: #6e6e73; font-size: clamp(18px, 2.5vw, 24px); }
-#hero p span { color: #0071e3; }
+#hero p { color: #6e6e73; font-size: clamp(18px, 2.5vw, 24px); font-family: inherit; }
+#hero p span { color: #0071e3; letter-spacing: normal; }
 #hero .social-links a { color: #1d1d1f; }
 #hero .social-links a:hover { color: #0071e3; }
-.section-title h2::after { background: #0071e3; }
 a { color: #0071e3; }
 a:hover { color: #0077ed; }
 
@@ -910,7 +904,7 @@ a:hover { color: #0077ed; }
 }
 .boxWhyScg:hover {
   transform: translateY(-4px);
-  box-shadow: none;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.10);
 }
 .data-box {
   border-radius: 28px;
