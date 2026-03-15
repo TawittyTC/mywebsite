@@ -1050,6 +1050,41 @@ select:focus-visible {
   outline-offset: 3px;
 }
 
+/* ── Inline SVG Icons (replaces Boxicons + Bootstrap Icons + Font Awesome) ── */
+.social-icon {
+  width: 48px;
+  height: 48px;
+  display: block;
+  transition: color 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+.section-icon {
+  width: 32px;
+  height: 32px;
+  display: block;
+  color: #1d1d1f;
+}
+.backtotop-icon {
+  width: 22px;
+  height: 22px;
+  display: block;
+}
+.footer-social {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+.footer-social a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  color: #1d1d1f;
+  transition: color 0.3s ease-in-out;
+}
+.footer-social a:hover { color: #0071e3; }
+#hero .social-links a:hover .social-icon { color: #0071e3; transform: scale(1.1); }
+
 /* ── Reduce Motion: Honor prefers-reduced-motion (Apple HIG Accessibility) ── */
 @media (prefers-reduced-motion: reduce) {
   *,
