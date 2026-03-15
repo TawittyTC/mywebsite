@@ -82,21 +82,6 @@
     requestAnimationFrame(step);
   };
 
-  /**
-   * Back to top button
-   */
-  let backtotop = select(".back-to-top");
-  if (backtotop) {
-    const toggleBacktotop = () => {
-      if (window.scrollY > 100) {
-        backtotop.classList.add("active");
-      } else {
-        backtotop.classList.remove("active");
-      }
-    };
-    window.addEventListener("load", toggleBacktotop);
-    onscroll(document, toggleBacktotop);
-  }
 
   /**
    * Mobile nav toggle
@@ -209,7 +194,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const imageSrc = `assets/img/certificate/img-${i}.avif`;
     const colDiv = document.createElement("div");
 
-    // Responsive column classes: 2 columns on mobile, 3 on desktop
     colDiv.classList.add("col-6", "col-lg-4", "mb-5");
 
     const wrapper = document.createElement("div");
@@ -219,13 +203,7 @@ document.addEventListener("DOMContentLoaded", function () {
     imgElement.src = imageSrc;
     imgElement.className = "img-fluid";
     imgElement.alt = "Tanapol's Certificate Images";
-    imgElement.style.cursor = "pointer";
     imgElement.loading = "lazy";
-
-    imgElement.onclick = () => {
-      document.getElementById("modalImage").src = imageSrc;
-      new bootstrap.Modal(document.getElementById("imageModal")).show();
-    };
 
     wrapper.appendChild(imgElement);
     colDiv.appendChild(wrapper);
@@ -283,6 +261,73 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // เช็กอีกครั้งหลังจากรูปโหลดเสร็จ
   setTimeout(updateScrollerButtons, 500);
+
+  // Hint animation บน mobile: เลื่อนการ์ดซ้ายแล้วกลับ วน loop ทุก 3 วิ
+  if (window.innerWidth < 768 && scroller) {
+    const hintDistance = 80;
+    const duration = 400;
+    let userScrolling = false;
+    let isAnimating = false;
+    let scrollEndTimer = null;
+    let hintInterval = null;
+
+    function easeInOut(t) {
+      return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+    }
+
+    function runHint() {
+      if (userScrolling || isAnimating) return;
+
+      const maxScrollLeft = scroller.scrollWidth - scroller.clientWidth;
+      const atRightEnd = scroller.scrollLeft >= maxScrollLeft - 1;
+      const dir = atRightEnd ? -1 : 1; // ขวาสุด → hint ซ้าย, อื่นๆ → hint ขวา
+
+      isAnimating = true;
+      const baseScroll = scroller.scrollLeft;
+      const fwdStart = performance.now();
+      function forward(ts) {
+        if (userScrolling) { isAnimating = false; return; }
+        const p = Math.min((ts - fwdStart) / duration, 1);
+        scroller.scrollLeft = baseScroll + dir * hintDistance * easeInOut(p);
+        if (p < 1) { requestAnimationFrame(forward); return; }
+        const bkStart = performance.now();
+        function back(ts2) {
+          if (userScrolling) { isAnimating = false; return; }
+          const p2 = Math.min((ts2 - bkStart) / duration, 1);
+          scroller.scrollLeft = baseScroll + dir * hintDistance * (1 - easeInOut(p2));
+          if (p2 < 1) { requestAnimationFrame(back); return; }
+          isAnimating = false;
+        }
+        requestAnimationFrame(back);
+      }
+      requestAnimationFrame(forward);
+    }
+
+    function startHintLoop() {
+      clearInterval(hintInterval);
+      hintInterval = setInterval(runHint, 3000);
+    }
+
+    function onUserScroll() {
+      if (isAnimating) return;
+      userScrolling = true;
+      clearInterval(hintInterval);
+      hintInterval = null;
+      clearTimeout(scrollEndTimer);
+      scrollEndTimer = setTimeout(function () {
+        userScrolling = false;
+        startHintLoop();
+      }, 7000);
+    }
+
+    scroller.addEventListener('touchstart', onUserScroll, { passive: true });
+    scroller.addEventListener('scroll', onUserScroll, { passive: true });
+
+    setTimeout(function () {
+      runHint();
+      startHintLoop();
+    }, 1200);
+  }
 });
 
 

@@ -27,35 +27,6 @@ a:hover {
 /*--------------------------------------------------------------
 # Back to top button
 --------------------------------------------------------------*/
-.back-to-top {
-  position: fixed;
-  visibility: hidden;
-  opacity: 0;
-  right: 15px;
-  bottom: 15px;
-  z-index: 996;
-  background: #0563bb;
-  width: 40px;
-  height: 40px;
-  border-radius: 50px;
-  transition: all 0.4s;
-}
-
-.back-to-top i {
-  font-size: 28px;
-  color: #fff;
-  line-height: 0;
-}
-
-.back-to-top:hover {
-  background: #0678e3;
-  color: #fff;
-}
-
-.back-to-top.active {
-  visibility: visible;
-  opacity: 1;
-}
 
 /*--------------------------------------------------------------
 # Disable aos animation delay on mobile devices
@@ -432,6 +403,8 @@ button {
   -webkit-overflow-scrolling: touch;
   padding: 10px 0;
   overflow-x: auto;
+  overflow-y: hidden;
+  touch-action: pan-x;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
@@ -448,11 +421,6 @@ button {
   box-shadow: none;
   background-color: #fff;
   padding: 24px;
-  transition: transform 0.3s ease;
-}
-
-.rf-cards-scroller-item:hover {
-  transform: scale(1.05);
 }
 
 .rf-cards-scroller-item img {
@@ -975,7 +943,6 @@ h1, h2, h3, h4, h5, h6 { color: #111111; }
 #contact .form-control { color: #111111; font-size: 17px; }
 #contact .form-control::placeholder { color: #aeaeb2; }
 .btn-contact { background: #0071e3; font-size: 17px; letter-spacing: -0.2px; }
-.back-to-top { background: #0071e3; width: 44px; height: 44px; }
 
 /* ── Typography Scale: Apple HIG Responsive Headings ── */
 /* Desktop >1068px: 48px / 600 / -0.003em / 1.08 */
@@ -1027,7 +994,6 @@ h1, h2, h3, h4, h5, h6 { color: #111111; }
 .rf-cards-scroller-item,
 .filter-btn,
 .btn-contact,
-.back-to-top,
 .apple-nav-link,
 .apple-nav-logo,
 #contact .form-control {
@@ -1062,11 +1028,6 @@ select:focus-visible {
   height: 32px;
   display: block;
   color: #1d1d1f;
-}
-.backtotop-icon {
-  width: 22px;
-  height: 22px;
-  display: block;
 }
 .footer-social {
   display: flex;
