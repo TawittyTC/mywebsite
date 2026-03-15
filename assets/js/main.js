@@ -66,12 +66,20 @@
   /**
    * Scrolls to an element with header offset
    */
-  const scrollto = (el) => {
-    let elementPos = select(el).offsetTop;
-    window.scrollTo({
-      top: elementPos,
-      behavior: "smooth",
-    });
+  const scrollto = (el, duration = 600) => {
+    let element = select(el);
+    if (!element) return;
+    let start = window.scrollY;
+    let target = element.getBoundingClientRect().top + window.scrollY - 60;
+    let startTime = null;
+    const ease = (t) => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+    const step = (timestamp) => {
+      if (!startTime) startTime = timestamp;
+      let progress = Math.min((timestamp - startTime) / duration, 1);
+      window.scrollTo(0, start + (target - start) * ease(progress));
+      if (progress < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
   };
 
   /**
@@ -378,5 +386,25 @@ window.addEventListener('load', function () {
 
 var currentYear = new Date().getFullYear();
 document.getElementById('current-year').textContent = currentYear;
+
+// View Resume → slow scroll to Experience
+document.querySelector('a[href="#experience"]').addEventListener('click', function(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  var el = document.getElementById('experience');
+  if (!el) return;
+  var start = window.scrollY;
+  var target = el.getBoundingClientRect().top + window.scrollY - 60;
+  var startTime = null;
+  var duration = 1500;
+  var ease = function(t) { return t < 0.5 ? 2*t*t : -1+(4-2*t)*t; };
+  var step = function(timestamp) {
+    if (!startTime) startTime = timestamp;
+    var progress = Math.min((timestamp - startTime) / duration, 1);
+    window.scrollTo(0, start + (target - start) * ease(progress));
+    if (progress < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+});
 
 
