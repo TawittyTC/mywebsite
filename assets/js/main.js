@@ -205,7 +205,7 @@ document.addEventListener("DOMContentLoaded", function () {
     colDiv.classList.add("col-6", "col-lg-4", "mb-5");
 
     const wrapper = document.createElement("div");
-    wrapper.classList.add("skeleton-wrapper", "skeleton-cert");
+    wrapper.classList.add("cert-img");
 
     const imgElement = document.createElement("img");
     imgElement.src = imageSrc;
@@ -334,6 +334,58 @@ document.addEventListener('DOMContentLoaded', function () {
       status.style.display = 'block';
       status.innerHTML = '<span style="color:#0563bb">Opening your email client... Thank you for reaching out!</span>';
     }
+  });
+});
+
+// Apple Navigation
+document.addEventListener('DOMContentLoaded', function () {
+  const hamburger = document.getElementById('apple-nav-toggle');
+  const mobileMenu = document.getElementById('apple-nav-mobile');
+  if (!hamburger || !mobileMenu) return;
+
+  hamburger.addEventListener('click', function () {
+    this.classList.toggle('open');
+    mobileMenu.classList.toggle('open');
+  });
+
+  mobileMenu.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      hamburger.classList.remove('open');
+      mobileMenu.classList.remove('open');
+    });
+  });
+});
+
+// GSAP Hero Animation
+window.addEventListener('load', function () {
+  if (typeof gsap === 'undefined') return;
+  const tl = gsap.timeline({ delay: 0.1 });
+  tl.fromTo('#hero h1',
+    { opacity: 0, y: 40 },
+    { opacity: 1, y: 0, duration: 1, ease: 'power3.out' }
+  )
+  .fromTo('#hero p',
+    { opacity: 0, y: 30 },
+    { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out' },
+    '-=0.6'
+  )
+  .fromTo('#hero .social-links',
+    { opacity: 0, y: 20 },
+    { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' },
+    '-=0.6'
+  );
+});
+
+// Expandable Cards (Achievement/Experience)
+document.addEventListener('DOMContentLoaded', function () {
+  const expandBtns = document.querySelectorAll('.expand-btn');
+  expandBtns.forEach(btn => {
+    btn.addEventListener('click', function () {
+      const card = this.closest('.expandable');
+      const content = card.querySelector('.expandable-content');
+      this.classList.toggle('expanded');
+      content.classList.toggle('expanded');
+    });
   });
 });
 
