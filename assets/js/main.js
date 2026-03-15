@@ -214,10 +214,6 @@ document.addEventListener("DOMContentLoaded", function () {
     imgElement.style.cursor = "pointer";
     imgElement.loading = "lazy";
 
-    imgElement.onload = () => wrapper.classList.add("loaded");
-    imgElement.onerror = () => wrapper.classList.add("loaded");
-    if (imgElement.complete) wrapper.classList.add("loaded");
-
     imgElement.onclick = () => {
       document.getElementById("modalImage").src = imageSrc;
       new bootstrap.Modal(document.getElementById("imageModal")).show();
@@ -287,19 +283,4 @@ document.addEventListener('DOMContentLoaded', function () {
 var currentYear = new Date().getFullYear();
 document.getElementById('current-year').textContent = currentYear;
 
-// Remove hero skeleton when DOM is ready
-document.addEventListener('DOMContentLoaded', function () {
-  document.body.classList.remove('page-loading');
-
-  // Skeleton: fade in static images (project cards) when loaded
-  document.querySelectorAll('.skeleton-wrapper img').forEach(function (img) {
-    var wrapper = img.parentElement;
-    if (img.complete) {
-      wrapper.classList.add('loaded');
-    } else {
-      img.addEventListener('load', function () { wrapper.classList.add('loaded'); });
-      img.addEventListener('error', function () { wrapper.classList.add('loaded'); });
-    }
-  });
-});
 
