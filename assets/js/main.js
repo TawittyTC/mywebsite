@@ -340,20 +340,23 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // Fix: iOS Safari blocks vertical page scroll when touching overflow-x container
-  var vtStartX = 0, vtStartY = 0, vtLastY = 0;
+  var vtStartX = 0, vtStartY = 0, vtLastY = 0, vtLocked = null;
   scroller.addEventListener('touchstart', function(e) {
     vtStartX = e.touches[0].clientX;
     vtStartY = e.touches[0].clientY;
     vtLastY = vtStartY;
+    vtLocked = null;
   }, { passive: true });
   scroller.addEventListener('touchmove', function(e) {
     var dx = Math.abs(e.touches[0].clientX - vtStartX);
     var dy = Math.abs(e.touches[0].clientY - vtStartY);
-    if (dy > dx) {
+    if (vtLocked === null && (dx > 5 || dy > 5)) vtLocked = dy > dx ? 'v' : 'h';
+    if (vtLocked === 'v') {
+      e.preventDefault();
       window.scrollBy(0, vtLastY - e.touches[0].clientY);
       vtLastY = e.touches[0].clientY;
     }
-  }, { passive: true });
+  }, { passive: false });
 });
 
 
