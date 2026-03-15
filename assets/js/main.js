@@ -349,9 +349,13 @@ document.addEventListener('DOMContentLoaded', function () {
   scroller.addEventListener('touchmove', function(e) {
     var dx = Math.abs(e.touches[0].clientX - vtStartX);
     var dy = Math.abs(e.touches[0].clientY - vtStartY);
-    if (vtLocked === null && (dx > 5 || dy > 5)) vtLocked = dy > dx ? 'v' : 'h';
-    // Let vertical scroll pass through to page scroll naturally
-    // Only prevent default for horizontal scroll (cards have overflow-x already)
+    // Use 15px threshold + angle detection for clearer direction
+    var threshold = 15;
+    if (vtLocked === null && (dx > threshold || dy > threshold)) {
+      // If vertical movement is significantly larger than horizontal (1.5x ratio)
+      vtLocked = dy > dx * 1.5 ? 'v' : 'h';
+    }
+    // Only prevent default for horizontal-locked swipes
     if (vtLocked === 'h') {
       e.preventDefault();
     }
