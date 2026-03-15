@@ -339,22 +339,21 @@ document.addEventListener('DOMContentLoaded', function () {
     }, 1200);
   }
 
-  // Fix: iOS Safari blocks vertical page scroll when touching overflow-x container
-  var vtStartX = 0, vtStartY = 0, vtLastY = 0, vtLocked = null;
+  // Fix: Allow vertical page scroll when touching project cards (iOS Safari)
+  var vtStartX = 0, vtStartY = 0, vtLocked = null;
   scroller.addEventListener('touchstart', function(e) {
     vtStartX = e.touches[0].clientX;
     vtStartY = e.touches[0].clientY;
-    vtLastY = vtStartY;
     vtLocked = null;
   }, { passive: true });
   scroller.addEventListener('touchmove', function(e) {
     var dx = Math.abs(e.touches[0].clientX - vtStartX);
     var dy = Math.abs(e.touches[0].clientY - vtStartY);
     if (vtLocked === null && (dx > 5 || dy > 5)) vtLocked = dy > dx ? 'v' : 'h';
-    if (vtLocked === 'v') {
+    // Let vertical scroll pass through to page scroll naturally
+    // Only prevent default for horizontal scroll (cards have overflow-x already)
+    if (vtLocked === 'h') {
       e.preventDefault();
-      window.scrollBy(0, vtLastY - e.touches[0].clientY);
-      vtLastY = e.touches[0].clientY;
     }
   }, { passive: false });
 });
