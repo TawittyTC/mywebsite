@@ -765,6 +765,7 @@ button {
   width: 100%;
   min-height: 280px;
   border-radius: 4px;
+  background-color: #ffffff;
 }
 
 @media (max-width: 768px) {
