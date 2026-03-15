@@ -962,3 +962,107 @@ a:hover { color: #0077ed; }
 .filter-btn { border: none; background: #f0f0f5; color: #1d1d1f; }
 .filter-btn.active, .filter-btn:hover { background: #0071e3; color: #fff; }
 #contact .form-control:focus { background: #ebebf0; box-shadow: none; border: none; }
+
+/*==============================================================
+# Apple Human Interface Guidelines
+==============================================================*/
+
+/* ── Color: #111 primary text (Apple HIG) ── */
+body { color: #111111; }
+h1, h2, h3, h4, h5, h6 { color: #111111; }
+.resume .resume-title { color: #111111; }
+#contact .form-label { color: #111111; font-size: 15px; font-weight: 500; letter-spacing: -0.1px; }
+#contact .form-control { color: #111111; font-size: 17px; }
+#contact .form-control::placeholder { color: #aeaeb2; }
+.btn-contact { background: #0071e3; font-size: 17px; letter-spacing: -0.2px; }
+.back-to-top { background: #0071e3; width: 44px; height: 44px; }
+
+/* ── Typography Scale: Apple HIG Responsive Headings ── */
+/* Desktop >1068px: 48px / 600 / -0.003em / 1.08 */
+.section-title h2 {
+  font-size: 48px;
+  font-weight: 600;
+  letter-spacing: -0.003em;
+  line-height: 1.08;
+  color: #111111;
+  text-transform: none;
+  padding-bottom: 0;
+  margin-bottom: 12px;
+}
+/* Tablet 735–1068px: 40px / 600 / 0 / 1.1 */
+@media (max-width: 1068px) {
+  .section-title h2 { font-size: 40px; letter-spacing: 0; line-height: 1.1; }
+}
+/* Mobile <735px: 32px / 600 / +0.004em / 1.125 */
+@media (max-width: 735px) {
+  .section-title h2 { font-size: 32px; letter-spacing: 0.004em; line-height: 1.125; }
+  section { padding: 60px 0; }
+  .section-title { padding-bottom: 24px; }
+}
+
+/* ── Touch Targets: 44×44px minimum (Apple HIG) ── */
+.filter-btn {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+.apple-nav-hamburger { width: 44px; height: 44px; }
+.apple-nav-link {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+#hero .social-links a {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.paddlenav-arrow { min-width: 44px; min-height: 44px; }
+
+/* ── Transitions: 250–400ms ease-in-out (Apple HIG) ── */
+.data-box,
+.boxWhyScg,
+.rf-cards-scroller-item,
+.filter-btn,
+.btn-contact,
+.back-to-top,
+.apple-nav-link,
+.apple-nav-logo,
+#contact .form-control {
+  transition-timing-function: ease-in-out;
+  transition-duration: 0.3s;
+}
+
+/* ── Focus States: Visible for all interactive elements (Apple HIG Accessibility) ── */
+:focus-visible {
+  outline: 2px solid #0071e3;
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid #0071e3;
+  outline-offset: 3px;
+}
+
+/* ── Reduce Motion: Honor prefers-reduced-motion (Apple HIG Accessibility) ── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  [data-aos] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
