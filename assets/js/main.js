@@ -280,6 +280,63 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
+// Project Filters
+document.addEventListener('DOMContentLoaded', function () {
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  const projectItems = document.querySelectorAll('.rf-cards-scroller-item');
+  if (!filterBtns.length) return;
+
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', function () {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+
+      const filter = this.getAttribute('data-filter');
+      projectItems.forEach(item => {
+        item.style.display = (filter === 'all' || item.getAttribute('data-tech') === filter) ? '' : 'none';
+      });
+
+      const scroller = document.getElementById('scroller');
+      if (scroller) {
+        scroller.scrollLeft = 0;
+        setTimeout(() => {
+          const maxScrollLeft = scroller.scrollWidth - scroller.clientWidth;
+          const prevBtn = document.querySelector('.paddlenav-arrow-previous');
+          const nextBtn = document.querySelector('.paddlenav-arrow-next');
+          if (prevBtn) { prevBtn.disabled = true; prevBtn.style.visibility = 'hidden'; }
+          if (nextBtn) {
+            nextBtn.disabled = maxScrollLeft <= 0;
+            nextBtn.style.visibility = maxScrollLeft <= 0 ? 'hidden' : 'visible';
+          }
+        }, 100);
+      }
+    });
+  });
+});
+
+// Contact Form
+document.addEventListener('DOMContentLoaded', function () {
+  const form = document.getElementById('contact-form');
+  if (!form) return;
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    const name = document.getElementById('contact-name').value;
+    const email = document.getElementById('contact-email').value;
+    const subject = document.getElementById('contact-subject').value;
+    const message = document.getElementById('contact-message').value;
+
+    const body = `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`;
+    window.location.href = `mailto:tawitty.tc@gmail.com?subject=${encodeURIComponent(subject + ' - from ' + name)}&body=${encodeURIComponent(body)}`;
+
+    const status = document.getElementById('form-status');
+    if (status) {
+      status.style.display = 'block';
+      status.innerHTML = '<span style="color:#0563bb">Opening your email client... Thank you for reaching out!</span>';
+    }
+  });
+});
+
 var currentYear = new Date().getFullYear();
 document.getElementById('current-year').textContent = currentYear;
 

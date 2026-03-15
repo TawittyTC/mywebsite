@@ -97,8 +97,8 @@
   <link rel="preload" href="assets/vendor/bootstrap/css/bootstrap.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet"></noscript>
 
-  <link rel="preload" href="assets/css/style.min.css?v=1.0.3" as="style" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link href="assets/css/style.min.css?v=1.0.3" rel="stylesheet"></noscript>
+  <link rel="preload" href="assets/css/style.min.css?v=1.1.0" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link href="assets/css/style.min.css?v=1.1.0" rel="stylesheet"></noscript>
 
   <!-- Non-critical vendor CSS: loaded async -->
   <link rel="preload" href="assets/vendor/aos/aos.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
@@ -207,6 +207,7 @@
         <li><a href="#portfolio" class="nav-link scrollto"><i class="bx bx-book-content"></i> <span>Project</span></a>
         </li>
         <li><a href="#services" class="nav-link scrollto"><i class="bx bx-server"></i> <span>Certificate</span></a></li>
+        <li><a href="#contact" class="nav-link scrollto"><i class="bx bx-envelope"></i> <span>Contact</span></a></li>
       </ul>
     </nav><!-- .nav-menu -->
 
@@ -542,11 +543,20 @@
         <p class="fade">Explore some of the projects I've worked on.</p>
       </div>
 
+      <!-- Project Filters -->
+      <div class="project-filters fade" data-aos="fade-up">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="iot">IoT / AWS</button>
+        <button class="filter-btn" data-filter="php">PHP</button>
+        <button class="filter-btn" data-filter="python">Python</button>
+        <button class="filter-btn" data-filter="java">Java</button>
+      </div>
+
       <!-- Project Scroller Wrapper -->
       <div class="rf-cards-scoller fade">
         <div class="rf-cards-scroller-overflow" id="scroller">
           <!-- Project 1 -->
-          <div class="rf-cards-scroller-item" role="region" aria-labelledby="project1-title">
+          <div class="rf-cards-scroller-item" role="region" aria-labelledby="project1-title" data-tech="iot">
             <div class="skeleton-wrapper skeleton-project">
               <img src="assets/img/projects/RealTimePulseTemperature Monitoring System/portfolio-details-3.avif"
                 alt="Real Time Pulse & Temperature Monitoring System with AWS and ThingsBoard" class="img-fluid rounded"
@@ -557,7 +567,7 @@
           </div>
 
           <!-- Project 2 -->
-          <div class="rf-cards-scroller-item" role="region" aria-labelledby="project2-title">
+          <div class="rf-cards-scroller-item" role="region" aria-labelledby="project2-title" data-tech="php">
             <div class="skeleton-wrapper skeleton-project">
               <img src="assets/img/projects/StudentProjectManagementSystem/portfolio-details-7.avif"
                 alt="Student Project Management System with PHP, MySQL, and HTML" class="img-fluid rounded"
@@ -568,7 +578,7 @@
           </div>
 
           <!-- Project 3 -->
-          <div class="rf-cards-scroller-item" role="region" aria-labelledby="project3-title">
+          <div class="rf-cards-scroller-item" role="region" aria-labelledby="project3-title" data-tech="python">
             <div class="skeleton-wrapper skeleton-project">
               <img src="assets/img/projects/Covid-19SpreadAnalysisWebsite/portfolio-details-2.avif"
                 alt="Covid-19 Spread Analysis Website with Flask and Python" class="img-fluid rounded" loading="lazy" />
@@ -578,7 +588,7 @@
           </div>
 
           <!-- Project 4 -->
-          <div class="rf-cards-scroller-item" role="region" aria-labelledby="project4-title">
+          <div class="rf-cards-scroller-item" role="region" aria-labelledby="project4-title" data-tech="java">
             <div class="skeleton-wrapper skeleton-project">
               <img src="assets/img/projects/ClassroomBookingRecordSystem/portfolio-details-1.avif"
                 alt="Classroom Booking Record System using Java and NetBeans" class="img-fluid rounded" loading="lazy" />
@@ -649,6 +659,44 @@
   </section>
 
 
+
+  <!-- ======= Contact Section ======= -->
+  <section id="contact" class="bg-white">
+    <div class="container" data-aos="fade-up">
+      <div class="section-title">
+        <h2>Contact</h2>
+        <p>Have a project in mind? Let's work together.</p>
+      </div>
+      <div class="row justify-content-center">
+        <div class="col-lg-7">
+          <div class="contact-form-wrapper">
+            <form id="contact-form" novalidate>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="contact-name" class="form-label">Name *</label>
+                  <input type="text" class="form-control" id="contact-name" name="name" placeholder="Your name" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="contact-email" class="form-label">Email *</label>
+                  <input type="email" class="form-control" id="contact-email" name="email" placeholder="your@email.com" required>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="contact-subject" class="form-label">Subject *</label>
+                <input type="text" class="form-control" id="contact-subject" name="subject" placeholder="What's this about?" required>
+              </div>
+              <div class="mb-4">
+                <label for="contact-message" class="form-label">Message *</label>
+                <textarea class="form-control" id="contact-message" name="message" rows="5" placeholder="Tell me about your project..." required></textarea>
+              </div>
+              <button type="submit" class="btn-contact">Send Message</button>
+              <div id="form-status" class="mt-3 text-center" style="display:none;"></div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- ======= Footer ======= -->
   <footer id="footer">
