@@ -403,8 +403,9 @@ button {
   -webkit-overflow-scrolling: touch;
   padding: 10px 0;
   overflow-x: auto;
-  overflow-y: auto;
+  overflow-y: hidden;
   overscroll-behavior-x: contain;
+  overscroll-behavior-y: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
   touch-action: pan-y;
