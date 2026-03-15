@@ -18,26 +18,38 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
+  <!-- Preload critical hero background image -->
+  <link rel="preload" href="assets/img/hero-bg.avif" as="image" fetchpriority="high">
+
   <!-- Google Fonts async (non-blocking) -->
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@100..900&family=Kanit&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@100..900&family=Kanit&display=swap" rel="stylesheet"></noscript>
 
-  <!-- Vendor CSS Files -->
-  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+  <!-- Critical CSS: Bootstrap (preload hint + sync load to avoid FOUC) -->
+  <link rel="preload" href="assets/vendor/bootstrap/css/bootstrap.min.css" as="style">
   <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+
+  <!-- Critical CSS: Main stylesheet (preload hint + sync load) -->
+  <link rel="preload" href="assets/css/style.min.css?v=1.0.3" as="style">
+  <link href="assets/css/style.min.css?v=1.0.3" rel="stylesheet">
+
+  <!-- Non-critical vendor CSS: loaded async -->
+  <link rel="preload" href="assets/vendor/aos/aos.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link href="assets/vendor/aos/aos.css" rel="stylesheet"></noscript>
+
+  <link rel="preload" href="assets/vendor/boxicons/css/boxicons.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet"></noscript>
+
+  <link rel="preload" href="assets/vendor/bootstrap-icons/bootstrap-icons.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet"></noscript>
 
   <!-- Font Awesome - Preconnect for faster CDN loading -->
   <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 
-  <!-- FONTAWESOME -->
+  <!-- FONTAWESOME (non-critical, async) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
     integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
     crossorigin="anonymous" referrerpolicy="no-referrer" media="print" onload="this.media='all'" />
-
-  <!-- Template Main CSS File -->
-  <link href="assets/css/style.min.css?v=1.0.2" rel="stylesheet">
 
   <script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="233b92be-5a2d-492b-b093-9c3ed14c9063"
     type="text/javascript" async></script>
@@ -78,7 +90,7 @@
     <div class="container" data-aos="fade-up" data-aos-delay="100">
       <div class="row m-5">
         <div class="col-12 col-md-12 d-flex justify-content-center">
-          <img src="assets/img/img01.avif" class="rounded-circle d-block d-md-none w-75" alt="my Profile">
+          <img src="assets/img/img01.avif" class="rounded-circle d-block d-md-none w-75" alt="my Profile" fetchpriority="high" width="300" height="300">
         </div>
 
       </div>
@@ -566,14 +578,11 @@
       class="bi bi-arrow-up-short"></i></a>
 
   <!-- Vendor JS Files -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.3.2/lazysizes.min.js"
-    integrity="ab9f37a692ab09173b3793b49f69f352227eb2e52fec4b752467a5b386d739a30541c6a63e4f478dd5249d9bae16304db3bb6c32e69d81ee64f51cdd98efb519"
-    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script src="assets/vendor/aos/aos.js"></script>
-  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="assets/vendor/typed.js/typed.min.js"></script>
+  <script defer src="assets/vendor/aos/aos.js"></script>
+  <script defer src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script defer src="assets/vendor/typed.js/typed.min.js"></script>
   <!-- Template Main JS File -->
-  <script src="assets/js/main.min.js"></script>
+  <script defer src="assets/js/main.min.js"></script>
 
 </body>
 
