@@ -127,14 +127,22 @@
   });
 
   /**
-   * Preloader
+   * Preloader — removed on load, but no later than 2s from navigation start
    */
   // let preloader = select("#preloader");
   let preloader = select(".loader");
   if (preloader) {
-    window.addEventListener("load", () => {
-      preloader.remove();
-    });
+    let done = false;
+    const hideLoader = () => {
+      if (done) return;
+      done = true;
+      preloader.style.transition = 'opacity 0.25s';
+      preloader.style.opacity = '0';
+      setTimeout(() => { if (preloader.parentNode) preloader.remove(); }, 260);
+    };
+    window.addEventListener("load", hideLoader);
+    // Failsafe: never block the page for more than 2s from navigation start
+    setTimeout(hideLoader, Math.max(0, 2000 - performance.now()));
   }
 
   /**
@@ -154,9 +162,9 @@
   }
 
   /**
-   * Animation on scroll
+   * Animation on scroll — init at DOMContentLoaded (deferred scripts ready by then)
    */
-  window.addEventListener("load", () => {
+  document.addEventListener("DOMContentLoaded", () => {
     AOS.init({
       duration: 500,
       easing: "ease-in-out",
@@ -423,25 +431,7 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 });
 
-// GSAP Hero Animation
-window.addEventListener('load', function () {
-  if (typeof gsap === 'undefined') return;
-  const tl = gsap.timeline({ delay: 0.1 });
-  tl.fromTo('#hero h1',
-    { opacity: 0, y: 40 },
-    { opacity: 1, y: 0, duration: 1, ease: 'power3.out' }
-  )
-  .fromTo('#hero p',
-    { opacity: 0, y: 30 },
-    { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out' },
-    '-=0.6'
-  )
-  .fromTo('#hero .social-links',
-    { opacity: 0, y: 20 },
-    { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' },
-    '-=0.6'
-  );
-});
+// Hero animation now handled by CSS (@keyframes heroFadeIn) — no GSAP needed
 
 var currentYear = new Date().getFullYear();
 document.getElementById('current-year').textContent = currentYear;
