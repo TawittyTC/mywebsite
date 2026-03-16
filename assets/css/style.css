@@ -968,7 +968,7 @@ a:hover { color: #0077ed; }
 /*--------------------------------------------------------------
 # Footer + Buttons
 --------------------------------------------------------------*/
-#footer { background: #e8e8e8; margin-top: 0; padding: 80px 0; }
+#footer { background: #f8f8f8; margin-top: 0; padding: 80px 0; }
 .btn-contact { background: #0071e3; }
 .btn-contact:hover { background: #0077ed; }
 .filter-btn { border: none; background: #f0f0f5; color: #1d1d1f; }
