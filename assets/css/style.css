@@ -548,7 +548,7 @@ button {
   position: relative;
 }
 
-/* From Uiverse.io by alexruix */
+/* Apple-style minimal loader */
 .loader {
   position: fixed;
   top: 0;
@@ -562,54 +562,19 @@ button {
   justify-content: center;
 }
 
-.loader:before {
-  content: "";
-  position: absolute;
-  bottom: calc(50% - 45px);
-  left: calc(50% - 15px);
-  height: 30px;
-  width: 30px;
+.loader::before {
+  content: '';
+  width: 28px;
+  height: 28px;
+  border: 2.5px solid #e5e5ea;
+  border-top-color: #0071e3;
   border-radius: 50%;
-  background: #2a9d8f;
-  animation: loading-bounce 0.5s ease-in-out infinite alternate;
+  animation: loader-spin 0.75s linear infinite;
   will-change: transform;
 }
 
-.loader:after {
-  content: "";
-  position: absolute;
-  left: calc(50% - 60px);
-  top: calc(50% - 45px);
-  height: 7px;
-  width: 45px;
-  border-radius: 4px;
-  box-shadow: 0 5px 0 #f2f2f2, -35px 50px 0 #f2f2f2, -70px 95px 0 #f2f2f2;
-  animation: loading-step 1s ease-in-out infinite;
-  will-change: box-shadow;
-}
-
-@keyframes loading-bounce {
-  0%   { transform: scale(1, 0.7); }
-  40%  { transform: scale(0.8, 1.2); }
-  60%  { transform: scale(1, 1); }
-  100% { bottom: 140px; }
-}
-
-@keyframes loading-step {
-  0% {
-    box-shadow:
-      0 10px 0 rgba(0, 0, 0, 0),
-      0 10px 0 #f2f2f2,
-      -35px 50px 0 #f2f2f2,
-      -70px 90px 0 #f2f2f2;
-  }
-  100% {
-    box-shadow:
-      0 10px 0 #f2f2f2,
-      -35px 50px 0 #f2f2f2,
-      -70px 90px 0 #f2f2f2,
-      -70px 90px 0 rgba(0, 0, 0, 0);
-  }
+@keyframes loader-spin {
+  to { transform: rotate(360deg); }
 }
 
 /*--------------------------------------------------------------
@@ -784,14 +749,16 @@ button {
 
 /* Project & Skill cards */
 .rf-cards-scroller-item {
-  box-shadow: none;
-  transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+  transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 #portfolio .rf-cards-scroller-item:hover {
   transform: translateY(-8px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.12);
 }
 #skill .rf-cards-scroller-item:hover {
   transform: translateY(-6px);
+  box-shadow: 0 10px 32px rgba(0,0,0,0.10);
 }
 
 /* Project tag pill */
@@ -826,27 +793,6 @@ button {
 /* Safe area inset for iPhone home bar */
 #footer {
   padding-bottom: max(80px, calc(60px + env(safe-area-inset-bottom)));
-}
-
-/*--------------------------------------------------------------
-# GitHub Stats
---------------------------------------------------------------*/
-#github-stats {
-  background: #f8f9fa;
-}
-
-.github-stats-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.5rem;
-  justify-content: center;
-  align-items: flex-start;
-}
-
-.github-stats-grid img {
-  max-width: 100%;
-  height: auto;
-  border-radius: 16px;
 }
 
 /*--------------------------------------------------------------
@@ -885,14 +831,14 @@ button {
 
 .btn-contact {
   padding: 12px 40px;
-  background: #0563bb;
+  background: #0071e3;
   color: #fff;
   border: none;
   border-radius: 28px;
   font-size: 16px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.3s ease-in-out;
   width: 100%;
 }
 
@@ -957,10 +903,11 @@ body { padding-top: 48px; }
   transition: opacity 0.2s;
   letter-spacing: -0.1px;
 }
-.apple-nav-link:hover, .apple-nav-link.active-link {
+.apple-nav-link:hover, .apple-nav-link.active-link, .apple-nav-link.active {
   opacity: 1;
   color: #1d1d1f;
   text-decoration: none;
+  font-weight: 500;
 }
 .apple-nav-hamburger {
   width: 32px; height: 32px;
@@ -1024,7 +971,7 @@ body { padding-top: 48px; }
 }
 .section-title p { font-size: 17px; color: #6e6e73; line-height: 1.6; }
 section { padding: 120px 0; }
-#skill { padding: 160px 0; }
+#skill { padding: 120px 0; }
 
 /* Section backgrounds */
 #resume, #skill, #services { background: #fff; }
@@ -1059,20 +1006,20 @@ a:hover { color: #0077ed; }
   padding: 36px;
   height: 100%;
   border: none;
-  box-shadow: none;
-  transition: transform 0.3s ease;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
 .boxWhyScg:hover {
   transform: translateY(-4px);
-  box-shadow: none;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.10);
 }
 .data-box {
   border-radius: 28px;
-  box-shadow: none;
-  transition: transform 0.3s ease;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
 .data-box:hover {
-  box-shadow: none;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.10);
   transform: translateY(-4px);
 }
 .rf-cards-scroller-item h4 { font-weight: 600; color: #1d1d1f; letter-spacing: -0.2px; padding: 16px 20px 4px; }

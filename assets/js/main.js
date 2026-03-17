@@ -43,7 +43,7 @@
   /**
    * Navbar links active state on scroll
    */
-  let navbarlinks = select("#navbar .scrollto", true);
+  let navbarlinks = select("#apple-header .scrollto", true);
   let _navRafPending = false;
   const navbarlinksActive = () => {
     if (_navRafPending) return;
@@ -88,15 +88,6 @@
     requestAnimationFrame(step);
   };
 
-
-  /**
-   * Mobile nav toggle
-   */
-  on("click", ".mobile-nav-toggle", function (e) {
-    select("body").classList.toggle("mobile-nav-active");
-    this.classList.toggle("bi-list");
-    this.classList.toggle("bi-x");
-  });
 
   /**
    * Scrool with ofset on links with a class name .scrollto
@@ -573,8 +564,9 @@ window.addEventListener('load', function() {
   }, { once: true });
 });
 
-// View Resume → slow scroll to Experience
-document.querySelector('a[href="#experience"]').addEventListener('click', function(e) {
+// View Experience → slow scroll to Experience section
+var _expLink = document.querySelector('.profile-featured-body a[href="#experience"]');
+if (_expLink) _expLink.addEventListener('click', function(e) {
   e.preventDefault();
   e.stopPropagation();
   var el = document.getElementById('experience');
