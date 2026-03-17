@@ -396,9 +396,16 @@ document.addEventListener('DOMContentLoaded', function () {
     hintObs.observe(scroller);
   }
 
-  // iOS Safari: Allow natural vertical page scroll by not intercepting vertical touches
-  // All vertical scroll events pass through to page naturally
-  // Horizontal scroll is handled by CSS overflow-x: auto
+  // Desktop (>768px): redirect wheel events to page scroll.
+  // overflow-x:hidden still creates a scroll container that captures wheel events in Chrome/Safari.
+  // Intercepting here ensures the page scrolls normally when hovering over the card scroller.
+  if (window.innerWidth > 768 && scroller) {
+    scroller.addEventListener('wheel', function(e) {
+      e.preventDefault();
+      var delta = e.deltaMode === 1 ? e.deltaY * 20 : e.deltaMode === 2 ? e.deltaY * window.innerHeight : e.deltaY;
+      window.scrollBy(0, delta);
+    }, { passive: false });
+  }
 });
 
 
@@ -529,6 +536,15 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     }, { threshold: 0.3 });
     hintObs.observe(scroller);
+  }
+
+  // Desktop (>768px): redirect wheel events to page scroll.
+  if (window.innerWidth > 768 && scroller) {
+    scroller.addEventListener('wheel', function(e) {
+      e.preventDefault();
+      var delta = e.deltaMode === 1 ? e.deltaY * 20 : e.deltaMode === 2 ? e.deltaY * window.innerHeight : e.deltaY;
+      window.scrollBy(0, delta);
+    }, { passive: false });
   }
 });
 
