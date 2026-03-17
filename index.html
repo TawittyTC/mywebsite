@@ -38,9 +38,9 @@
   <link href="assets/img/favicon.ico" rel="icon">
   <link href="assets/img/favicon.ico" rel="apple-touch-icon">
 
-  <!-- Preconnect/dns-prefetch for third-party CDNs -->
-  <link rel="dns-prefetch" href="https://consent.cookiebot.com">
-  <link rel="dns-prefetch" href="https://www.googletagmanager.com">
+  <!-- Preconnect for third-party CDNs (DNS + TCP + TLS negotiation upfront) -->
+  <link rel="preconnect" href="https://consent.cookiebot.com">
+  <link rel="preconnect" href="https://www.googletagmanager.com">
 
   <!-- Preload critical hero background image -->
   <link rel="preload" href="assets/img/hero-bg.webp" as="image" type="image/webp" fetchpriority="high">
@@ -1064,7 +1064,7 @@
   <!-- Main JS -->
   <script defer src="assets/js/main.min.js?v=1.33.0"></script>
   <!-- Service Worker: cache assets for repeat visits -->
-  <script>if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');</script>
+  <script>if('serviceWorker'in navigator){var _sw=function(){navigator.serviceWorker.register('sw.js')};'requestIdleCallback'in window?requestIdleCallback(_sw):window.addEventListener('load',_sw)}</script>
 
 </body>
 
