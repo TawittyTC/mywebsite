@@ -580,7 +580,9 @@ window.addEventListener('load', function() {
       // If scroll is primarily vertical, let the page handle it
       if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
         e.preventDefault();
-        window.scrollBy(0, e.deltaY);
+        // Scale deltaY by mode: 0=pixels, 1=lines (~40px), 2=pages
+        var px = e.deltaY * (e.deltaMode === 2 ? window.innerHeight : e.deltaMode === 1 ? 40 : 1);
+        window.scrollBy(0, px);
       }
     }, { passive: false });
   }
