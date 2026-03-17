@@ -325,7 +325,7 @@ document.addEventListener('DOMContentLoaded', function () {
   setTimeout(updateScrollerButtons, 500);
 
   // Hint animation บน mobile: เลื่อนการ์ดซ้ายแล้วกลับ วน loop ทุก 3 วิ
-  if (window.innerWidth < 768 && scroller) {
+  if (window.innerWidth <= 1024 && scroller) {
     const hintDistance = 80;
     const duration = 400;
     let userScrolling = false;
@@ -459,7 +459,7 @@ document.addEventListener('DOMContentLoaded', function () {
   window.addEventListener('load', updateButtons);
   setTimeout(updateButtons, 500);
 
-  if (window.innerWidth < 768) {
+  if (window.innerWidth <= 1024) {
     const hintDistance = 80;
     const duration = 400;
     let userScrolling = false;
@@ -565,7 +565,7 @@ document.getElementById('current-year').textContent = currentYear;
 
 // Scroll hint: nudge project cards on mobile to hint horizontal scroll
 window.addEventListener('load', function() {
-  if (window.innerWidth > 768) return;
+  if (window.innerWidth > 1024) return;
   var scroller = document.getElementById('scroller');
   if (!scroller) return;
   scroller.classList.add('scroll-hint');
