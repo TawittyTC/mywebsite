@@ -383,10 +383,17 @@ document.addEventListener('DOMContentLoaded', function () {
     scroller.addEventListener('touchstart', onUserScroll, { passive: true });
     scroller.addEventListener('scroll', onUserScroll, { passive: true });
 
-    setTimeout(function () {
-      runHint();
-      startHintLoop();
-    }, 1200);
+    // Trigger hint immediately when section scrolls into view
+    var hintStarted = false;
+    var hintObs = new IntersectionObserver(function(entries) {
+      if (entries[0].isIntersecting && !hintStarted) {
+        hintStarted = true;
+        hintObs.disconnect();
+        runHint();
+        startHintLoop();
+      }
+    }, { threshold: 0.3 });
+    hintObs.observe(scroller);
   }
 
   // iOS Safari: Allow natural vertical page scroll by not intercepting vertical touches
@@ -510,7 +517,18 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     scroller.addEventListener('touchstart', onUserScroll, { passive: true });
     scroller.addEventListener('scroll', onUserScroll, { passive: true });
-    setTimeout(function () { runHint(); startHintLoop(); }, 1200);
+
+    // Trigger hint immediately when section scrolls into view
+    var hintStarted = false;
+    var hintObs = new IntersectionObserver(function(entries) {
+      if (entries[0].isIntersecting && !hintStarted) {
+        hintStarted = true;
+        hintObs.disconnect();
+        runHint();
+        startHintLoop();
+      }
+    }, { threshold: 0.3 });
+    hintObs.observe(scroller);
   }
 });
 

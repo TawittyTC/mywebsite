@@ -506,7 +506,7 @@ button {
 }
 @media (max-width: 768px) {
   .rf-cards-scroller-overflow.scroll-hint {
-    animation: scroll-hint 1s ease-in-out 1s both;
+    animation: scroll-hint 1s ease-in-out 0s both;
   }
 }
 
