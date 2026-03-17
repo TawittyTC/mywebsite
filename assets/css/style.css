@@ -17,6 +17,7 @@ body {
 a {
   color: #0563bb;
   text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 a:hover {
@@ -97,17 +98,17 @@ a:hover {
   font-size: 64px;
   font-weight: 700;
   line-height: 56px;
-  color: #45505b;
+  color: #1d1d1f;
 }
 
 #hero p {
-  color: #45505b;
+  color: #6e6e73;
   margin: 15px 0 0 0;
   font-size: 26px;
 }
 
 #hero p span {
-  color: #0563bb;
+  color: #0071e3;
   letter-spacing: 1px;
 }
 
@@ -118,14 +119,14 @@ a:hover {
 #hero .social-links a {
   font-size: 24px;
   display: inline-block;
-  color: #45505b;
+  color: #1d1d1f;
   line-height: 1;
   margin-right: 20px;
   transition: 0.3s;
 }
 
 #hero .social-links a:hover {
-  color: #0563bb;
+  color: #0071e3;
 }
 .hero-scroll-hint {
   position: absolute;
@@ -184,7 +185,7 @@ section {
   margin-bottom: 12px;
   padding-bottom: 0;
   position: relative;
-  color: #45505b;
+  color: #6e6e73;
 }
 
 .section-title h2::before,
@@ -212,7 +213,7 @@ section {
 --------------------------------------------------------------*/
 #footer {
   background: #f8f8f8;
-  color: #3b3b3b;
+  color: #6e6e73;
   font-size: 14px;
 }
 
@@ -426,6 +427,8 @@ button {
   font: inherit;
   line-height: inherit;
   padding: 0;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .rf-cards-scroller-overflow {
@@ -661,7 +664,7 @@ button {
 }
 
 @media (max-width: 768px) {
-  .cert-img { min-height: 200px; }
+  .cert-img { min-height: 200px; padding: 10px; }
 }
 
 /* Certificate Grid Spacing */
@@ -889,7 +892,7 @@ button {
 #contact .form-label {
   display: block;
   font-weight: 500;
-  color: #45505b;
+  color: #6e6e73;
   margin-bottom: 6px;
 }
 
@@ -1136,6 +1139,7 @@ a:hover { color: #0077ed; }
   object-fit: cover;
 }
 .profile-featured-body { flex: 1; }
+.profile-bio { font-size: 16px; color: #6e6e73; margin: 0; line-height: 1.6; }
 
 @media (max-width: 576px) {
   .data-box.profile-featured {
@@ -1156,7 +1160,7 @@ a:hover { color: #0077ed; }
 /*--------------------------------------------------------------
 # Footer + Buttons
 --------------------------------------------------------------*/
-#footer { background: #f8f8f8; margin-top: 0; padding: 80px 0; }
+#footer { background: #f8f8f8; margin-top: 0; padding-top: 80px; }
 .btn-contact { background: #0071e3; }
 .btn-contact:hover { background: #0077ed; }
 .filter-btn { border: none; background: #f0f0f5; color: #1d1d1f; }
