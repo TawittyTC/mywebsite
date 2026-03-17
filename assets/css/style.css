@@ -193,7 +193,7 @@ section {
 # Footer
 --------------------------------------------------------------*/
 #footer {
-  background: #fbfbff;
+  background: #fff;
   color: #3b3b3b;
   font-size: 14px;
   text-align: center;
@@ -247,7 +247,7 @@ section {
 
 .data-box {
   border-radius: 28px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: none;
   padding: 32px;
   background-color: #fff;
   margin: 24px auto;
@@ -668,15 +668,80 @@ button {
   color: #fff;
 }
 
-/* Cert images: disable click (no modal) */
-.cert-img img {
-  pointer-events: none;
-  user-select: none;
+/* Cert card wrapper */
+.cert-card {
+  position: relative;
 }
 
-/* Project cards: add shadow so visible on gray bg */
+/* Expand button */
+.cert-expand-btn {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #fff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  line-height: 1;
+  color: #1d1d1f;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  transition: transform 0.2s ease, background 0.2s ease;
+  z-index: 2;
+}
+.cert-expand-btn:hover {
+  transform: scale(1.12);
+  background: #f0f0f5;
+}
+
+/* Lightbox overlay */
+.cert-lightbox {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0,0,0,0.85);
+  align-items: center;
+  justify-content: center;
+}
+.cert-lightbox.open {
+  display: flex;
+}
+.cert-lightbox img {
+  max-width: 92vw;
+  max-height: 92vh;
+  object-fit: contain;
+  border-radius: 8px;
+}
+.cert-lightbox-close {
+  position: fixed;
+  top: 20px;
+  right: 24px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  border: none;
+  cursor: pointer;
+  font-size: 22px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease;
+}
+.cert-lightbox-close:hover {
+  background: rgba(255,255,255,0.28);
+}
+
+/* Project cards */
 .rf-cards-scroller-item {
-  box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+  box-shadow: none;
 }
 
 /*--------------------------------------------------------------
@@ -882,13 +947,12 @@ section { padding: 120px 0; }
   background: #fff;
 }
 
-/* Subtle shadow for cards on gray background */
 #skill .data-box,
 #skill .boxWhyScg,
 #services .data-box,
 #services .boxWhyScg {
   color: #1d1d1f;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  box-shadow: none;
 }
 #hero h1 {
   font-size: clamp(40px, 6vw, 72px);
@@ -918,15 +982,15 @@ a:hover { color: #0077ed; }
 }
 .boxWhyScg:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.10);
+  box-shadow: none;
 }
 .data-box {
   border-radius: 28px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: none;
+  transition: transform 0.3s ease;
 }
 .data-box:hover {
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  box-shadow: none;
   transform: translateY(-2px);
 }
 .rf-cards-scroller-item h4 { font-weight: 600; color: #1d1d1f; letter-spacing: -0.2px; }
@@ -970,7 +1034,7 @@ a:hover { color: #0077ed; }
 /*--------------------------------------------------------------
 # Footer + Buttons
 --------------------------------------------------------------*/
-#footer { background: #f8f8f8; margin-top: 0; padding: 80px 0; }
+#footer { background: #fff; margin-top: 0; padding: 80px 0; }
 .btn-contact { background: #0071e3; }
 .btn-contact:hover { background: #0077ed; }
 .filter-btn { border: none; background: #f0f0f5; color: #1d1d1f; }

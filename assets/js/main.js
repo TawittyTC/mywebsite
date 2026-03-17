@@ -206,6 +206,40 @@ document.addEventListener("DOMContentLoaded", function () {
   onScroll(); // Run the function on page load
 });
 
+// Cert lightbox
+(function () {
+  const lightbox = document.createElement("div");
+  lightbox.className = "cert-lightbox";
+  const lbImg = document.createElement("img");
+  const closeBtn = document.createElement("button");
+  closeBtn.className = "cert-lightbox-close";
+  closeBtn.setAttribute("aria-label", "Close");
+  closeBtn.innerHTML = "&#x2715;";
+  lightbox.appendChild(lbImg);
+  lightbox.appendChild(closeBtn);
+  document.body.appendChild(lightbox);
+
+  function openLightbox(src, alt) {
+    lbImg.src = src;
+    lbImg.alt = alt;
+    lightbox.classList.add("open");
+    document.body.style.overflow = "hidden";
+  }
+  function closeLightbox() {
+    lightbox.classList.remove("open");
+    document.body.style.overflow = "";
+  }
+  closeBtn.addEventListener("click", closeLightbox);
+  lightbox.addEventListener("click", function (e) {
+    if (e.target === lightbox) closeLightbox();
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") closeLightbox();
+  });
+
+  window._certLightboxOpen = openLightbox;
+})();
+
 // Load cert images only when section scrolls into view (performance)
 document.addEventListener("DOMContentLoaded", function () {
   const imagesList = document.getElementById("images-list");
@@ -217,16 +251,29 @@ document.addEventListener("DOMContentLoaded", function () {
     for (let i = 1; i <= 31; i++) {
       const colDiv = document.createElement("div");
       colDiv.classList.add("col-6", "col-lg-4", "mb-5");
+      const card = document.createElement("div");
+      card.classList.add("cert-card");
       const wrapper = document.createElement("div");
       wrapper.classList.add("cert-img");
       const imgElement = document.createElement("img");
-      imgElement.src = `assets/img/certificate/img-${i}.avif`;
+      const src = `assets/img/certificate/img-${i}.avif`;
+      const alt = "Tanapol Certificate " + i;
+      imgElement.src = src;
       imgElement.className = "img-fluid";
-      imgElement.alt = "Tanapol Certificate " + i;
+      imgElement.alt = alt;
       imgElement.loading = "lazy";
       imgElement.draggable = false;
+      const expandBtn = document.createElement("button");
+      expandBtn.className = "cert-expand-btn";
+      expandBtn.setAttribute("aria-label", "View certificate fullscreen");
+      expandBtn.innerHTML = "+";
+      expandBtn.addEventListener("click", function () {
+        window._certLightboxOpen(src, alt);
+      });
       wrapper.appendChild(imgElement);
-      colDiv.appendChild(wrapper);
+      card.appendChild(wrapper);
+      card.appendChild(expandBtn);
+      colDiv.appendChild(card);
       imagesList.appendChild(colDiv);
     }
   }
