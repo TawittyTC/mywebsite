@@ -472,19 +472,11 @@ button {
   }
 }
 
-/* Desktop: always show arrows (override JS inline styles & :disabled specificity) */
+/* Desktop: show active arrows (disabled = hidden via base rule) */
 @media (min-width: 769px) {
-  .paddlenav-arrow,
-  .paddlenav-arrow.disabled,
-  .paddlenav-arrow:disabled {
+  .paddlenav-arrow:not(:disabled):not(.disabled) {
     visibility: visible !important;
     opacity: 1 !important;
-    pointer-events: auto !important;
-  }
-  .paddlenav-arrow:disabled,
-  .paddlenav-arrow.disabled {
-    opacity: 0.3 !important;
-    pointer-events: none !important;
   }
 }
 
