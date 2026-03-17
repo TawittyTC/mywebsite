@@ -613,8 +613,9 @@ button {
   overflow: hidden;
   width: 100%;
   min-height: 280px;
-  border-radius: 4px;
+  border-radius: 0;
   background-color: transparent;
+  padding: 12px;
 }
 
 .cert-img img {
@@ -673,7 +674,7 @@ button {
 .cert-card {
   position: relative;
   background: #f5f5f7;
-  border-radius: 12px;
+  border-radius: 18px;
   overflow: hidden;
 }
 
