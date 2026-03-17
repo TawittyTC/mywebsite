@@ -30,12 +30,19 @@ a:hover {
 --------------------------------------------------------------*/
 
 /*--------------------------------------------------------------
-# Disable aos animation delay on mobile devices
+# Scroll fade-up (replaces AOS library — native IntersectionObserver)
 --------------------------------------------------------------*/
-@media screen and (max-width: 768px) {
-  [data-aos-delay] {
-    transition-delay: 0 !important;
-  }
+[data-aos="fade-up"] {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+}
+[data-aos="fade-up"].aos-animate {
+  opacity: 1;
+  transform: translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-aos="fade-up"] { opacity: 1; transform: none; transition: none; }
 }
 
 

@@ -143,31 +143,39 @@
   }
 
   /**
-   * Hero type effect
+   * Hero type effect — native (replaces Typed.js, saves 11KB)
    */
-  const typed = select(".typed");
-  if (typed) {
-    let typed_strings = typed.getAttribute("data-typed-items");
-    typed_strings = typed_strings.split(",");
-    new Typed(".typed", {
-      strings: typed_strings,
-      loop: true,
-      typeSpeed: 100,
-      backSpeed: 50,
-      backDelay: 2000,
-    });
+  const typedEl = select(".typed");
+  if (typedEl) {
+    const items = typedEl.getAttribute("data-typed-items").split(",").map(s => s.trim());
+    let i = 0, j = 0, deleting = false;
+    function typeTick() {
+      const cur = items[i];
+      typedEl.textContent = cur.slice(0, j);
+      if (!deleting) {
+        j++;
+        if (j > cur.length) { deleting = true; setTimeout(typeTick, 2000); return; }
+      } else {
+        j--;
+        if (j < 0) { j = 0; deleting = false; i = (i + 1) % items.length; }
+      }
+      setTimeout(typeTick, deleting ? 50 : 100);
+    }
+    typeTick();
   }
 
   /**
-   * Animation on scroll — init at DOMContentLoaded (deferred scripts ready by then)
+   * Scroll fade-up — native IntersectionObserver (replaces AOS, saves 14KB)
    */
   document.addEventListener("DOMContentLoaded", () => {
-    AOS.init({
-      duration: 500,
-      easing: "ease-in-out",
-      once: true,
-      mirror: false,
-    });
+    const aosEls = document.querySelectorAll('[data-aos]');
+    if (!aosEls.length) return;
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('aos-animate'); obs.unobserve(e.target); }
+      });
+    }, { threshold: 0.08 });
+    aosEls.forEach(el => obs.observe(el));
   });
 
 })();

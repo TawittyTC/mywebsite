@@ -49,13 +49,13 @@
   <!-- Preload critical hero background image -->
   <link rel="preload" href="assets/img/hero-bg.avif" as="image" fetchpriority="high">
 
-  <!-- Google Fonts async (non-blocking) -->
+  <!-- Google Fonts async (non-blocking) — only 3 weights needed -->
   <link rel="preload"
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+Thai:wght@400;500;600&display=swap"
     as="style" onload="this.onload=null;this.rel='stylesheet'">
   <noscript>
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+Thai:wght@400;500;600&display=swap"
       rel="stylesheet">
   </noscript>
 
@@ -398,11 +398,6 @@
     <link href="assets/css/style.min.css?v=1.31.0" rel="stylesheet">
   </noscript>
 
-  <!-- Non-critical vendor CSS: loaded async -->
-  <link rel="preload" href="assets/vendor/aos/aos.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript>
-    <link href="assets/vendor/aos/aos.css" rel="stylesheet">
-  </noscript>
 
 
   <!-- Structured Data: Person -->
@@ -467,9 +462,7 @@
   </script>
 
   <!-- Preload deferred JS to start downloading before parser reaches script tags -->
-  <link rel="preload" href="assets/vendor/aos/aos.js" as="script">
-  <link rel="preload" href="assets/vendor/typed.js/typed.min.js" as="script">
-  <link rel="preload" href="assets/js/main.min.js?v=1.31.0" as="script">
+  <link rel="preload" href="assets/js/main.min.js?v=1.32.0" as="script">
 
   <script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="233b92be-5a2d-492b-b093-9c3ed14c9063"
     type="text/javascript" async></script>
@@ -1080,11 +1073,8 @@
 
   </footer><!-- End Footer -->
 
-  <!-- Vendor JS Files -->
-  <script defer src="assets/vendor/aos/aos.js"></script>
-  <script defer src="assets/vendor/typed.js/typed.min.js"></script>
-  <!-- Template Main JS File -->
-  <script defer src="assets/js/main.min.js?v=1.31.0"></script>
+  <!-- Main JS -->
+  <script defer src="assets/js/main.min.js?v=1.32.0"></script>
 
 </body>
 
