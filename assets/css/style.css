@@ -630,14 +630,23 @@ button {
   .cert-img { min-height: 200px; padding: 10px; }
 }
 
-/* Certificate Grid — Bootstrap classes added dynamically by JS (PurgeCSS safelist) */
-.col-6 { flex: 0 0 auto; width: 50%; }
-@media (min-width: 768px) { .col-md-4 { flex: 0 0 auto; width: 33.33333%; } }
-
-/* Certificate Grid Spacing */
+/* Certificate Grid — CSS Grid (bypasses Bootstrap col system entirely) */
+.images-list {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  padding: 0 0.75rem;
+}
+@media (min-width: 768px) {
+  .images-list { grid-template-columns: repeat(3, 1fr); }
+}
+/* Reset Bootstrap col padding — grid gap handles spacing */
 .images-list > div {
-  padding-left: 0.75rem;
-  padding-right: 0.75rem;
+  width: 100% !important;
+  max-width: 100% !important;
+  flex: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
 /* Performance: skip rendering off-screen sections */
