@@ -130,7 +130,7 @@ a:hover {
 }
 .hero-scroll-hint {
   position: absolute;
-  bottom: 56px;
+  bottom: 80px;
   left: 50%;
   transform: translateX(-50%);
   color: #1d1d1f;
