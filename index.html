@@ -38,10 +38,6 @@
   <link href="assets/img/favicon.ico" rel="icon">
   <link href="assets/img/favicon.ico" rel="apple-touch-icon">
 
-  <!-- Preconnect to Google Fonts for faster loading -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
   <!-- Preconnect/dns-prefetch for third-party CDNs -->
   <link rel="dns-prefetch" href="https://consent.cookiebot.com">
   <link rel="dns-prefetch" href="https://www.googletagmanager.com">
@@ -49,15 +45,10 @@
   <!-- Preload critical hero background image -->
   <link rel="preload" href="assets/img/hero-bg.webp" as="image" type="image/webp" fetchpriority="high">
 
-  <!-- Google Fonts async (non-blocking) — only 3 weights needed -->
-  <link rel="preload"
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+Thai:wght@400;500;600&display=swap"
-    as="style" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+Thai:wght@400;500;600&display=swap"
-      rel="stylesheet">
-  </noscript>
+  <!-- Self-hosted fonts — no external DNS lookup -->
+  <link rel="preload" href="assets/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/notosansthai-thai.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="assets/fonts/fonts.css">
 
   <!-- Critical CSS inlined: hero renders instantly, zero blocking requests -->
   <style>
