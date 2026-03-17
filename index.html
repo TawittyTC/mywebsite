@@ -47,7 +47,7 @@
   <link rel="dns-prefetch" href="https://www.googletagmanager.com">
 
   <!-- Preload critical hero background image -->
-  <link rel="preload" href="assets/img/hero-bg.avif" as="image" fetchpriority="high">
+  <link rel="preload" href="assets/img/hero-bg.webp" as="image" type="image/webp" fetchpriority="high">
 
   <!-- Google Fonts async (non-blocking) — only 3 weights needed -->
   <link rel="preload"
@@ -254,7 +254,7 @@
     }
 
     #hero .fallback-background {
-      background: url('assets/img/hero-bg.avif') no-repeat center center;
+      background: url('assets/img/hero-bg.webp') no-repeat center center;
       background-size: cover;
       position: absolute;
       top: 0;
@@ -1075,6 +1075,8 @@
 
   <!-- Main JS -->
   <script defer src="assets/js/main.min.js?v=1.32.0"></script>
+  <!-- Service Worker: cache assets for repeat visits -->
+  <script>if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');</script>
 
 </body>
 
