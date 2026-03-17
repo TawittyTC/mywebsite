@@ -193,7 +193,7 @@ section {
 # Footer
 --------------------------------------------------------------*/
 #footer {
-  background: #fff;
+  background: #f8f8f8;
   color: #3b3b3b;
   font-size: 14px;
   text-align: center;
@@ -437,7 +437,7 @@ button {
   margin-right: 40px;
   border-radius: 28px;
   box-shadow: none;
-  background-color: #f5f5f7;
+  background-color: #fff;
   padding: 0;
   overflow: hidden;
 }
@@ -934,27 +934,16 @@ body { padding-top: 48px; }
 .section-title p { font-size: 17px; color: #6e6e73; line-height: 1.6; }
 section { padding: 120px 0; }
 
-/* Alternating backgrounds: experience=white, skill=gray, portfolio=white, certificates=gray */
-#resume, #skill, #services, #contact { background: #f8f8f8; }
-#portfolio { background: #fff; }
+/* Section backgrounds */
+#resume, #skill, #services { background: #fff; }
+#experience, #portfolio, #contact { background: #f8f8f8; }
 
-/* White cards on gray sections */
-#resume .data-box,
-#skill .data-box,
-#skill .boxWhyScg,
-#services .data-box,
-#services .boxWhyScg,
-#contact .data-box {
-  background: #fff;
-}
-
-#skill .data-box,
-#skill .boxWhyScg,
-#services .data-box,
-#services .boxWhyScg {
-  color: #1d1d1f;
-  box-shadow: none;
-}
+/* Card colors per section */
+#resume .data-box { background: #f5f5f7; }
+#experience .data-box { background: #fff; }
+#skill .boxWhyScg { background: #f5f5f7; color: #1d1d1f; }
+#services .data-box, #services .boxWhyScg { background: #fff; color: #1d1d1f; }
+#contact .data-box { background: #fff; }
 #hero h1 {
   font-size: clamp(40px, 6vw, 72px);
   font-weight: 700;
@@ -1035,7 +1024,7 @@ a:hover { color: #0077ed; }
 /*--------------------------------------------------------------
 # Footer + Buttons
 --------------------------------------------------------------*/
-#footer { background: #fff; margin-top: 0; padding: 80px 0; }
+#footer { background: #f8f8f8; margin-top: 0; padding: 80px 0; }
 .btn-contact { background: #0071e3; }
 .btn-contact:hover { background: #0077ed; }
 .filter-btn { border: none; background: #f0f0f5; color: #1d1d1f; }
