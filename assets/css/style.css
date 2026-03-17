@@ -513,7 +513,7 @@ button {
 @media (min-width: 768px) and (max-width: 1024px) {
   .rf-cards-scroller-overflow {
     padding: 20px 0;
-    overflow-x: auto;
+    overflow-x: hidden; /* arrows handle nav; hidden lets wheel events pass to page */
   }
 
   .rf-cards-scroller-item {
@@ -529,7 +529,7 @@ button {
 @media (min-width: 1024px) {
   .rf-cards-scroller-overflow {
     padding: 30px 0;
-    overflow-x: auto;
+    overflow-x: hidden; /* arrows handle nav; hidden lets wheel events pass to page */
   }
 
   .rf-cards-scroller-item {

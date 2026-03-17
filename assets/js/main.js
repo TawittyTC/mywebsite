@@ -572,25 +572,6 @@ window.addEventListener('load', function() {
   }, { once: true });
 });
 
-// Desktop: redirect vertical wheel events over card scrollers to the page
-// Fixes: mouse wheel doesn't scroll the page when hovering over horizontal card scroller
-(function() {
-  function attachWheelFix(el) {
-    el.addEventListener('wheel', function(e) {
-      // If scroll is primarily vertical, let the page handle it
-      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-        e.preventDefault();
-        // Scale deltaY by mode: 0=pixels, 1=lines (~40px), 2=pages
-        var px = e.deltaY * (e.deltaMode === 2 ? window.innerHeight : e.deltaMode === 1 ? 40 : 1);
-        window.scrollBy(0, px);
-      }
-    }, { passive: false });
-  }
-  document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.rf-cards-scroller-overflow').forEach(attachWheelFix);
-  });
-})();
-
 // View Experience → slow scroll to Experience section
 var _expLink = document.querySelector('.profile-featured-body a[href="#experience"]');
 if (_expLink) _expLink.addEventListener('click', function(e) {
