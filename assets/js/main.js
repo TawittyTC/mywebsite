@@ -37,27 +37,33 @@
    * Easy on scroll event listener
    */
   const onscroll = (el, listener) => {
-    el.addEventListener("scroll", listener);
+    el.addEventListener("scroll", listener, { passive: true });
   };
 
   /**
    * Navbar links active state on scroll
    */
   let navbarlinks = select("#navbar .scrollto", true);
+  let _navRafPending = false;
   const navbarlinksActive = () => {
-    let position = window.scrollY + 200;
-    navbarlinks.forEach((navbarlink) => {
-      if (!navbarlink.hash) return;
-      let section = select(navbarlink.hash);
-      if (!section) return;
-      if (
-        position >= section.offsetTop &&
-        position <= section.offsetTop + section.offsetHeight
-      ) {
-        navbarlink.classList.add("active");
-      } else {
-        navbarlink.classList.remove("active");
-      }
+    if (_navRafPending) return;
+    _navRafPending = true;
+    requestAnimationFrame(() => {
+      _navRafPending = false;
+      let position = window.scrollY + 200;
+      navbarlinks.forEach((navbarlink) => {
+        if (!navbarlink.hash) return;
+        let section = select(navbarlink.hash);
+        if (!section) return;
+        if (
+          position >= section.offsetTop &&
+          position <= section.offsetTop + section.offsetHeight
+        ) {
+          navbarlink.classList.add("active");
+        } else {
+          navbarlink.classList.remove("active");
+        }
+      });
     });
   };
   window.addEventListener("load", navbarlinksActive);
@@ -179,18 +185,24 @@
 document.addEventListener("DOMContentLoaded", function () {
   const elements = document.querySelectorAll(".fade");
   const offset = 100; // Adjust this value based on when you want the animation to start
+  let _fadeRafPending = false;
 
   function onScroll() {
-    elements.forEach((el, index) => {
-      if (el.getBoundingClientRect().top < window.innerHeight - offset) {
-        setTimeout(() => {
-          el.classList.add("show");
-        }, index * 50); // Adjust the delay as needed
-      }
+    if (_fadeRafPending) return;
+    _fadeRafPending = true;
+    requestAnimationFrame(() => {
+      _fadeRafPending = false;
+      elements.forEach((el, index) => {
+        if (el.getBoundingClientRect().top < window.innerHeight - offset) {
+          setTimeout(() => {
+            el.classList.add("show");
+          }, index * 50); // Adjust the delay as needed
+        }
+      });
     });
   }
 
-  window.addEventListener("scroll", onScroll);
+  window.addEventListener("scroll", onScroll, { passive: true });
   onScroll(); // Run the function on page load
 });
 
@@ -202,7 +214,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function buildCerts() {
     if (imagesList.dataset.loaded) return;
     imagesList.dataset.loaded = "1";
-    for (let i = 1; i <= 29; i++) {
+    for (let i = 1; i <= 30; i++) {
       const colDiv = document.createElement("div");
       colDiv.classList.add("col-6", "col-lg-4", "mb-5");
       const wrapper = document.createElement("div");
@@ -271,7 +283,7 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   // อัปเดตปุ่มเมื่อ scroll
-  scroller.addEventListener('scroll', updateScrollerButtons);
+  scroller.addEventListener('scroll', updateScrollerButtons, { passive: true });
   window.addEventListener('load', updateScrollerButtons); // เช็กตอนโหลดหน้า
 
   // เช็กสถานะปุ่มทันทีหลังจาก DOM loaded
