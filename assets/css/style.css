@@ -614,7 +614,7 @@ button {
   width: 100%;
   min-height: 280px;
   border-radius: 4px;
-  background-color: #ffffff;
+  background-color: transparent;
 }
 
 .cert-img img {
@@ -672,6 +672,9 @@ button {
 /* Cert card wrapper */
 .cert-card {
   position: relative;
+  background: #f5f5f7;
+  border-radius: 12px;
+  overflow: hidden;
 }
 
 /* Expand button */
