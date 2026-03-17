@@ -130,11 +130,11 @@ a:hover {
 }
 .hero-scroll-hint {
   position: absolute;
-  bottom: 32px;
+  bottom: 56px;
   left: 50%;
   transform: translateX(-50%);
   color: #1d1d1f;
-  opacity: 0.45;
+  opacity: 0.6;
   animation: hero-bounce 2.2s ease-in-out infinite;
   pointer-events: none;
 }
