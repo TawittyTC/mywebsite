@@ -249,7 +249,7 @@ document.addEventListener("DOMContentLoaded", function () {
     imagesList.dataset.loaded = "1";
     for (let i = 1; i <= 31; i++) {
       const colDiv = document.createElement("div");
-      colDiv.classList.add("col-6", "col-lg-4", "mb-5");
+      colDiv.classList.add("col-6", "col-md-4", "mb-5");
       const card = document.createElement("div");
       card.classList.add("cert-card");
       const wrapper = document.createElement("div");
