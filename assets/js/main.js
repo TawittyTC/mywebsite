@@ -247,9 +247,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function buildCerts() {
     if (imagesList.dataset.loaded) return;
     imagesList.dataset.loaded = "1";
-    // Custom order: img-9, img-10, img-13 first, then remaining in sequence
-    const order = [9, 10, 13, 1, 2, 3, 4, 5, 6, 7, 8, 11, 12, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31];
-    for (const i of order) {
+    for (let i = 1; i <= 31; i++) {
       const colDiv = document.createElement("div");
       colDiv.classList.add("col-6", "col-md-4", "mb-5");
       const card = document.createElement("div");
