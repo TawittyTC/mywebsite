@@ -297,26 +297,10 @@ document.addEventListener('DOMContentLoaded', function () {
   function updateScrollerButtons() {
     const scrollLeft = scroller.scrollLeft;
     const maxScrollLeft = scroller.scrollWidth - scroller.clientWidth;
-
-    if (scrollLeft <= 0) {
-      prevBtn.disabled = true;
-      prevBtn.classList.add('disabled');
-      prevBtn.style.visibility = 'hidden';
-    } else {
-      prevBtn.disabled = false;
-      prevBtn.classList.remove('disabled');
-      prevBtn.style.visibility = 'visible';
-    }
-
-    if (scrollLeft >= maxScrollLeft - 1) {
-      nextBtn.disabled = true;
-      nextBtn.classList.add('disabled');
-      nextBtn.style.visibility = 'hidden';
-    } else {
-      nextBtn.disabled = false;
-      nextBtn.classList.remove('disabled');
-      nextBtn.style.visibility = 'visible';
-    }
+    prevBtn.disabled = scrollLeft <= 0;
+    prevBtn.classList.toggle('disabled', scrollLeft <= 0);
+    nextBtn.disabled = scrollLeft >= maxScrollLeft - 1;
+    nextBtn.classList.toggle('disabled', scrollLeft >= maxScrollLeft - 1);
   }
 
   // เมื่อกดปุ่ม "Previous" เลื่อนกลับไป 1 ช่อง
@@ -437,10 +421,10 @@ document.addEventListener('DOMContentLoaded', function () {
           const maxScrollLeft = scroller.scrollWidth - scroller.clientWidth;
           const prevBtn = document.querySelector('.paddlenav-arrow-previous');
           const nextBtn = document.querySelector('.paddlenav-arrow-next');
-          if (prevBtn) { prevBtn.disabled = true; prevBtn.style.visibility = 'hidden'; }
+          if (prevBtn) { prevBtn.disabled = true; prevBtn.classList.add('disabled'); }
           if (nextBtn) {
             nextBtn.disabled = maxScrollLeft <= 0;
-            nextBtn.style.visibility = maxScrollLeft <= 0 ? 'hidden' : 'visible';
+            nextBtn.classList.toggle('disabled', maxScrollLeft <= 0);
           }
         }, 100);
       }
@@ -459,9 +443,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const scrollLeft = scroller.scrollLeft;
     const maxScrollLeft = scroller.scrollWidth - scroller.clientWidth;
     prevBtn.disabled = scrollLeft <= 0;
-    prevBtn.style.visibility = scrollLeft <= 0 ? 'hidden' : 'visible';
+    prevBtn.classList.toggle('disabled', scrollLeft <= 0);
     nextBtn.disabled = scrollLeft >= maxScrollLeft - 1;
-    nextBtn.style.visibility = scrollLeft >= maxScrollLeft - 1 ? 'hidden' : 'visible';
+    nextBtn.classList.toggle('disabled', scrollLeft >= maxScrollLeft - 1);
   }
 
   prevBtn.addEventListener('click', function () {
