@@ -214,7 +214,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function buildCerts() {
     if (imagesList.dataset.loaded) return;
     imagesList.dataset.loaded = "1";
-    for (let i = 1; i <= 30; i++) {
+    for (let i = 1; i <= 31; i++) {
       const colDiv = document.createElement("div");
       colDiv.classList.add("col-6", "col-lg-4", "mb-5");
       const wrapper = document.createElement("div");
