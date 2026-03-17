@@ -167,7 +167,7 @@ section {
 }
 
 /* Performance: skip rendering off-screen sections until needed */
-#resume, #skill, #portfolio, #certificates {
+#resume, #skill, #portfolio, #certificates, #experience {
   content-visibility: auto;
   contain-intrinsic-size: 0 800px;
 }
