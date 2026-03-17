@@ -807,20 +807,7 @@ button {
   letter-spacing: 0.1px;
 }
 
-/* Project CTA */
-.project-cta {
-  display: block;
-  padding: 6px 20px 22px;
-  color: #0071e3;
-  font-size: 15px;
-  font-weight: 500;
-  letter-spacing: -0.1px;
-  transition: letter-spacing 0.2s ease;
-  cursor: default;
-}
-.rf-cards-scroller-item:hover .project-cta {
-  letter-spacing: 0.3px;
-}
+
 
 /* Mobile: active tap feedback */
 @media (max-width: 768px) {
