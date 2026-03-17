@@ -957,6 +957,7 @@ body { padding-top: 48px; }
 }
 .section-title p { font-size: 17px; color: #6e6e73; line-height: 1.6; }
 section { padding: 120px 0; }
+#skill { padding: 160px 0; }
 
 /* Section backgrounds */
 #resume, #skill, #services { background: #fff; }
