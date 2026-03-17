@@ -385,10 +385,10 @@
     <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   </noscript>
 
-  <link rel="preload" href="assets/css/style.min.css?v=1.15.0" as="style"
+  <link rel="preload" href="assets/css/style.min.css?v=1.16.0" as="style"
     onload="this.onload=null;this.rel='stylesheet'">
   <noscript>
-    <link href="assets/css/style.min.css?v=1.15.0" rel="stylesheet">
+    <link href="assets/css/style.min.css?v=1.16.0" rel="stylesheet">
   </noscript>
 
   <!-- Non-critical vendor CSS: loaded async -->
@@ -462,7 +462,7 @@
   <!-- Preload deferred JS to start downloading before parser reaches script tags -->
   <link rel="preload" href="assets/vendor/aos/aos.js" as="script">
   <link rel="preload" href="assets/vendor/typed.js/typed.min.js" as="script">
-  <link rel="preload" href="assets/js/main.min.js?v=1.15.0" as="script">
+  <link rel="preload" href="assets/js/main.min.js?v=1.16.0" as="script">
 
   <script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="233b92be-5a2d-492b-b093-9c3ed14c9063"
     type="text/javascript" async></script>
@@ -819,96 +819,65 @@
         <h2>Skills</h2>
         <p>Technologies and tools I work with.</p>
       </div>
-      <div class="container">
-        <div class="row p-2">
-          <div class="col-lg-4 col-md-6 pt-3 mb-5 fade">
-            <div class="boxWhyScg">
-              <p class="icon text-center">
-                <img src="assets/icon/img16.webp" class="w-75 h-auto text-center" alt="Web Design skill icon"
-                  loading="lazy" decoding="async">
-              </p>
-              <div class="title pb-2 h3">Web Design</div>
-              <ul class="fw-light">
-                <li>UX/UI Design</li>
-                <li>Graphic Design</li>
-                <li>Responsive Design</li>
-              </ul>
-            </div>
+
+      <div class="rf-cards-scroller fade">
+        <div class="rf-cards-scroller-overflow" id="skill-scroller">
+
+          <div class="rf-cards-scroller-item">
+            <img src="assets/icon/img16.webp" class="skill-icon" alt="Web Design skill icon" loading="lazy" decoding="async">
+            <div class="title h3">Web Design</div>
+            <p class="skill-desc fw-light">UX/UI, Graphic &amp; Responsive Design</p>
           </div>
-          <div class="col-lg-4 col-md-6 pt-3 mb-5 fade">
-            <div class="boxWhyScg">
-              <p class="icon text-center">
-                <img src="assets/icon/img1.webp" class="w-75 h-auto text-center" alt="Web Development skill icon"
-                  loading="lazy" decoding="async">
-              </p>
-              <div class="title pb-2 h3">Web Development</div>
-              <ul class="fw-light">
-                <li>Front-end Development</li>
-                <li>Back-end Development</li>
-                <li>Database Management</li>
-                <li>API Integration</li>
-              </ul>
-            </div>
+
+          <div class="rf-cards-scroller-item">
+            <img src="assets/icon/img1.webp" class="skill-icon" alt="Web Development skill icon" loading="lazy" decoding="async">
+            <div class="title h3">Web Development</div>
+            <p class="skill-desc fw-light">Full-stack from front-end to back-end APIs and databases</p>
           </div>
-          <div class="col-lg-4 col-md-6 pt-3 mb-5 fade">
-            <div class="boxWhyScg">
-              <p class="icon text-center">
-                <img src="assets/icon/img2.webp" class="w-75 h-auto text-center" alt="Web Security skill icon"
-                  loading="lazy" decoding="async">
-              </p>
-              <div class="title pb-2 h3">Web Security</div>
-              <ul class="fw-light">
-                <li>Web Security: Cross-Site Scripting (XSS), SQL Injection, และ Cross-Site Request Forgery (CSRF)</li>
-                <li>SSL/TLS Configuration</li>
-              </ul>
-            </div>
+
+          <div class="rf-cards-scroller-item">
+            <img src="assets/icon/img2.webp" class="skill-icon" alt="Web Security skill icon" loading="lazy" decoding="async">
+            <div class="title h3">Web Security</div>
+            <p class="skill-desc fw-light">XSS, SQL Injection, CSRF prevention &amp; SSL/TLS configuration</p>
           </div>
-          <div class="col-lg-4 col-md-6 pt-3 mb-5 fade">
-            <div class="boxWhyScg">
-              <p class="icon text-center">
-                <img src="assets/icon/img7.webp" class="w-75 h-auto text-center"
-                  alt="Version Control Systems skill icon" loading="lazy" decoding="async">
-              </p>
-              <div class="title pb-2 h3">Version Control Systems</div>
-              <ul class="fw-light">
-                <li>Git</li>
-                <li>Subversion</li>
-                <li>Mercurial</li>
-              </ul>
-            </div>
+
+          <div class="rf-cards-scroller-item">
+            <img src="assets/icon/img7.webp" class="skill-icon" alt="Version Control skill icon" loading="lazy" decoding="async">
+            <div class="title h3">Version Control</div>
+            <p class="skill-desc fw-light">Git, Subversion &amp; Mercurial for source code management</p>
           </div>
-          <div class="col-lg-4 col-md-6 pt-3 mb-5 fade">
-            <div class="boxWhyScg">
-              <p class="icon text-center">
-                <img src="assets/icon/img4.webp" class="w-75 h-auto text-center"
-                  alt="Learning and Troubleshooting skill icon" loading="lazy" decoding="async">
-              </p>
-              <div class="title pb-2 h3">Learning and Troubleshooting</div>
-              <ul class="fw-light">
-                <li>Fast Learning</li>
-                <li>Problem Solving</li>
-                <li>Testing and Debugging</li>
-                <li>Utilizing Development Tools: IDEs (Integrated Development Environments), Debugging Tools, Browser
-                  Developer Tools</li>
-              </ul>
-            </div>
+
+          <div class="rf-cards-scroller-item">
+            <img src="assets/icon/img4.webp" class="skill-icon" alt="Problem Solving skill icon" loading="lazy" decoding="async">
+            <div class="title h3">Problem Solving</div>
+            <p class="skill-desc fw-light">Fast learning, debugging &amp; utilizing modern developer tools</p>
           </div>
-          <div class="col-lg-4 col-md-6 pt-3 mb-5 fade">
-            <div class="boxWhyScg p-2">
-              <p class="icon text-center">
-                <img src="assets/icon/img3.webp" class="w-75 h-auto text-center" alt="Project Management skill icon"
-                  loading="lazy" decoding="async">
-              </p>
-              <div class="title pb-2 h3">Project Management</div>
-              <ul class="fw-light">
-                <li>Project Initiation</li>
-                <li>Project Planning</li>
-                <li>Project Execution</li>
-                <li>Project Performance</li>
-                <li>Project Closure</li>
-              </ul>
-            </div>
+
+          <div class="rf-cards-scroller-item">
+            <img src="assets/icon/img3.webp" class="skill-icon" alt="Project Management skill icon" loading="lazy" decoding="async">
+            <div class="title h3">Project Management</div>
+            <p class="skill-desc fw-light">End-to-end delivery from initiation through closure</p>
           </div>
+
+        </div>
+
+        <div class="paddlenav paddlenav-alpha paddlenav-framed paddlenav-elevated">
+          <button type="button" class="paddlenav-arrow skill-paddlenav-arrow-previous" aria-label="Previous Skill">
+            <span>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36">
+                <path d="M21.559,12.062 L15.618,17.984 L21.5221,23.944 C22.105,24.533 22.1021,25.482 21.5131,26.065 C21.2211,26.355 20.8391,26.4999987 20.4571,26.4999987 C20.0711,26.4999987 19.6851,26.352 19.3921,26.056 L12.4351,19.034 C11.8531,18.446 11.8551,17.4999987 12.4411,16.916 L19.4411,9.938 C20.0261,9.353 20.9781,9.354 21.5621,9.941 C22.1471,10.528 22.1451,11.478 21.5591,12.062 L21.559,12.062 Z"></path>
+              </svg>
+            </span>
+            <span class="visuallyhidden"></span>
+          </button>
+          <button type="button" class="paddlenav-arrow skill-paddlenav-arrow-next" aria-label="Next Skill">
+            <span>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36">
+                <path d="M23.5587,16.916 C24.1447,17.4999987 24.1467,18.446 23.5647,19.034 L16.6077,26.056 C16.3147,26.352 15.9287,26.4999987 15.5427,26.4999987 C15.1607,26.4999987 14.7787,26.355 14.4867,26.065 C13.8977,25.482 13.8947,24.533 14.4777,23.944 L20.3818,17.984 L14.4408,12.062 C13.8548,11.478 13.8528,10.5279 14.4378,9.941 C15.0218,9.354 15.9738,9.353 16.5588,9.938 L23.5588,16.916 L23.5587,16.916 Z"></path>
+              </svg>
+            </span>
+            <span class="visuallyhidden"></span>
+          </button>
         </div>
       </div>
     </div>
@@ -932,7 +901,7 @@
       </div>
 
       <!-- Project Scroller Wrapper -->
-      <div class="rf-cards-scoller fade">
+      <div class="rf-cards-scroller fade">
         <div class="rf-cards-scroller-overflow" id="scroller">
           <!-- Project 1 -->
           <div class="rf-cards-scroller-item" role="region" aria-labelledby="project1-title" data-tech="iot">
@@ -1104,7 +1073,7 @@
   <script defer src="assets/vendor/aos/aos.js"></script>
   <script defer src="assets/vendor/typed.js/typed.min.js"></script>
   <!-- Template Main JS File -->
-  <script defer src="assets/js/main.min.js?v=1.15.0"></script>
+  <script defer src="assets/js/main.min.js?v=1.16.0"></script>
 
 </body>
 

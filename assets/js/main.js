@@ -448,6 +448,89 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 });
 
+// Skill Scroller
+document.addEventListener('DOMContentLoaded', function () {
+  const prevBtn = document.querySelector('.skill-paddlenav-arrow-previous');
+  const nextBtn = document.querySelector('.skill-paddlenav-arrow-next');
+  const scroller = document.getElementById('skill-scroller');
+  if (!prevBtn || !nextBtn || !scroller) return;
+
+  function updateButtons() {
+    const scrollLeft = scroller.scrollLeft;
+    const maxScrollLeft = scroller.scrollWidth - scroller.clientWidth;
+    prevBtn.disabled = scrollLeft <= 0;
+    prevBtn.style.visibility = scrollLeft <= 0 ? 'hidden' : 'visible';
+    nextBtn.disabled = scrollLeft >= maxScrollLeft - 1;
+    nextBtn.style.visibility = scrollLeft >= maxScrollLeft - 1 ? 'hidden' : 'visible';
+  }
+
+  prevBtn.addEventListener('click', function () {
+    scroller.scrollBy({ left: -300, behavior: 'smooth' });
+  });
+  nextBtn.addEventListener('click', function () {
+    scroller.scrollBy({ left: 300, behavior: 'smooth' });
+  });
+  scroller.addEventListener('scroll', updateButtons, { passive: true });
+  window.addEventListener('load', updateButtons);
+  setTimeout(updateButtons, 500);
+
+  if (window.innerWidth < 768) {
+    const hintDistance = 80;
+    const duration = 400;
+    let userScrolling = false;
+    let isAnimating = false;
+    let scrollEndTimer = null;
+    let hintInterval = null;
+
+    function easeInOut(t) {
+      return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+    }
+    function runHint() {
+      if (userScrolling || isAnimating) return;
+      const maxScrollLeft = scroller.scrollWidth - scroller.clientWidth;
+      const atRightEnd = scroller.scrollLeft >= maxScrollLeft - 1;
+      const dir = atRightEnd ? -1 : 1;
+      isAnimating = true;
+      const baseScroll = scroller.scrollLeft;
+      const fwdStart = performance.now();
+      function forward(ts) {
+        if (userScrolling) { isAnimating = false; return; }
+        const p = Math.min((ts - fwdStart) / duration, 1);
+        scroller.scrollLeft = baseScroll + dir * hintDistance * easeInOut(p);
+        if (p < 1) { requestAnimationFrame(forward); return; }
+        const bkStart = performance.now();
+        function back(ts2) {
+          if (userScrolling) { isAnimating = false; return; }
+          const p2 = Math.min((ts2 - bkStart) / duration, 1);
+          scroller.scrollLeft = baseScroll + dir * hintDistance * (1 - easeInOut(p2));
+          if (p2 < 1) { requestAnimationFrame(back); return; }
+          isAnimating = false;
+        }
+        requestAnimationFrame(back);
+      }
+      requestAnimationFrame(forward);
+    }
+    function startHintLoop() {
+      clearInterval(hintInterval);
+      hintInterval = setInterval(runHint, 3000);
+    }
+    function onUserScroll() {
+      if (isAnimating) return;
+      userScrolling = true;
+      clearInterval(hintInterval);
+      hintInterval = null;
+      clearTimeout(scrollEndTimer);
+      scrollEndTimer = setTimeout(function () {
+        userScrolling = false;
+        startHintLoop();
+      }, 7000);
+    }
+    scroller.addEventListener('touchstart', onUserScroll, { passive: true });
+    scroller.addEventListener('scroll', onUserScroll, { passive: true });
+    setTimeout(function () { runHint(); startHintLoop(); }, 1200);
+  }
+});
+
 // Contact Form
 document.addEventListener('DOMContentLoaded', function () {
   const form = document.getElementById('contact-form');
