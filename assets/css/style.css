@@ -868,23 +868,25 @@ body { padding-top: 48px; }
 .section-title p { font-size: 17px; color: #6e6e73; line-height: 1.6; }
 section { padding: 120px 0; }
 
-/* Alternating backgrounds: Gray/White pattern */
-#resume, #portfolio, #contact { background: #f8f8f8; }
-#skill, #services { background: #fff; }
+/* Alternating backgrounds: experience=white, skill=gray, portfolio=white, certificates=gray */
+#resume, #skill, #services, #contact { background: #f8f8f8; }
+#portfolio { background: #fff; }
 
-/* Explicit white cards on gray sections */
+/* White cards on gray sections */
 #resume .data-box,
-#portfolio .data-box,
+#skill .data-box,
+#skill .boxWhyScg,
+#services .data-box,
+#services .boxWhyScg,
 #contact .data-box {
   background: #fff;
 }
 
-/* White cards with subtle shadows for white background sections */
+/* Subtle shadow for cards on gray background */
 #skill .data-box,
 #skill .boxWhyScg,
 #services .data-box,
 #services .boxWhyScg {
-  background: #fff;
   color: #1d1d1f;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
 }
