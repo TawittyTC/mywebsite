@@ -628,7 +628,7 @@ button {
 }
 
 @media (max-width: 768px) {
-  .cert-img { min-height: 200px; padding: 10px; }
+  .cert-img { min-height: unset; padding: 10px; }
 }
 
 /* Certificate Grid — CSS Grid (bypasses Bootstrap col system entirely) */
