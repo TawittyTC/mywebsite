@@ -685,7 +685,7 @@ button {
   color: #fff;
 }
 
-/* Certificate caption label */
+/* Certificate caption label — below image (short certs with gray space) */
 .cert-label {
   font-size: 12px;
   color: #6e6e73;
@@ -693,6 +693,23 @@ button {
   text-align: center;
   letter-spacing: 0.01em;
   padding: 0 16px 14px;
+}
+
+/* Certificate caption label — frosted glass overlay (tall certs 1–4) */
+.cert-label--overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 8px 40px 10px 16px; /* right padding clears the expand button */
+  background: rgba(255, 255, 255, 0.65);
+  -webkit-backdrop-filter: blur(14px) saturate(1.8);
+  backdrop-filter: blur(14px) saturate(1.8);
+  font-size: 12px;
+  color: #1d1d1f;
+  font-weight: 500;
+  text-align: center;
+  letter-spacing: 0.01em;
 }
 
 /* Cert card wrapper */
