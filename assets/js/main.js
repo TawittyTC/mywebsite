@@ -269,19 +269,8 @@ document.addEventListener("DOMContentLoaded", function () {
       expandBtn.addEventListener("click", function () {
         window._certLightboxOpen(src, alt);
       });
-      const label = document.createElement("div");
-      label.textContent = "Certificate · " + String(i).padStart(2, "0");
       wrapper.appendChild(imgElement);
       card.appendChild(wrapper);
-      if (i <= 4) {
-        // Tall certs: frosted glass overlay on image
-        label.className = "cert-label--overlay";
-        card.appendChild(label);
-      } else {
-        // Other certs: caption in gray space below image
-        label.className = "cert-label";
-        card.appendChild(label);
-      }
       card.appendChild(expandBtn);
       colDiv.appendChild(card);
       imagesList.appendChild(colDiv);

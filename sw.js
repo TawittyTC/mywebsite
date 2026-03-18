@@ -1,11 +1,11 @@
-const CACHE = 'v9';
+const CACHE = 'v10';
 const PRECACHE = [
   './',
-  'assets/css/style.min.css?v=1.37.0',
+  'assets/css/style.min.css?v=1.38.0',
   'assets/fonts/inter-latin.woff2',
   'assets/fonts/notosansthai-thai.woff2',
   'assets/fonts/notosansthai-latin.woff2',
-  'assets/js/main.min.js?v=1.36.0',
+  'assets/js/main.min.js?v=1.37.0',
   'assets/img/hero-bg.webp',
   'assets/img/img01.avif',
 ];
