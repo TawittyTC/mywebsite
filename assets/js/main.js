@@ -269,8 +269,12 @@ document.addEventListener("DOMContentLoaded", function () {
       expandBtn.addEventListener("click", function () {
         window._certLightboxOpen(src, alt);
       });
+      const label = document.createElement("div");
+      label.className = "cert-label";
+      label.textContent = "Certificate · " + String(i).padStart(2, "0");
       wrapper.appendChild(imgElement);
       card.appendChild(wrapper);
+      card.appendChild(label);
       card.appendChild(expandBtn);
       colDiv.appendChild(card);
       imagesList.appendChild(colDiv);
