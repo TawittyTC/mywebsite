@@ -613,7 +613,6 @@ button {
 .cert-img {
   overflow: hidden;
   width: 100%;
-  min-height: 280px;
   border-radius: 0;
   background-color: transparent;
   padding: 24px;
@@ -628,7 +627,7 @@ button {
 }
 
 @media (max-width: 768px) {
-  .cert-img { min-height: unset; padding: 10px; }
+  .cert-img { padding: 10px; }
 }
 
 /* Certificate Grid — CSS Grid (bypasses Bootstrap col system entirely) */
