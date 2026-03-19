@@ -105,22 +105,7 @@ a:hover {
   letter-spacing: 1px;
 }
 
-#hero .social-links {
-  margin-top: 30px;
-}
 
-#hero .social-links a {
-  font-size: 24px;
-  display: inline-block;
-  color: #1d1d1f;
-  line-height: 1;
-  margin-right: 20px;
-  transition: 0.3s;
-}
-
-#hero .social-links a:hover {
-  color: #0071e3;
-}
 .hero-scroll-hint {
   position: absolute;
   bottom: 80px;
@@ -210,12 +195,6 @@ section {
   font-size: 14px;
 }
 
-.social-links .github i,
-.social-links .linkedin i,
-.social-links .facebook i,
-.social-links .instagram i {
-  font-size: 50px;
-}
 
 * {
   font-style: normal !important;
@@ -903,8 +882,6 @@ section { padding: 270px 0; }
 }
 #hero p { color: #6e6e73; font-size: clamp(20px, 2.5vw, 28px); font-family: inherit; margin-top: 24px; }
 #hero p span { color: #0071e3; letter-spacing: normal; }
-#hero .social-links a { color: #1d1d1f; }
-#hero .social-links a:hover { color: #0071e3; }
 @media (max-width: 735px) {
   #hero h1 {
     letter-spacing: -2px;
@@ -1058,13 +1035,6 @@ h1, h2, h3, h4, h5, h6 { color: #111111; }
   display: inline-flex;
   align-items: center;
 }
-#hero .social-links a {
-  min-width: 44px;
-  min-height: 44px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
 .paddlenav-arrow { min-width: 44px; min-height: 44px; }
 
 /* ── Transitions: 250–400ms ease-in-out (Apple HIG) ── */
@@ -1123,7 +1093,6 @@ select:focus-visible {
   transition: color 0.3s ease-in-out;
 }
 .footer-social a:hover { color: #0071e3; }
-#hero .social-links a:hover .social-icon { color: #0071e3; transform: scale(1.1); }
 
 /* ── Mobile: iOS input zoom fix (font-size ≥ 16px prevents auto-zoom) ── */
 @media (max-width: 768px) {
