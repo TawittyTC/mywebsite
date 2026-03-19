@@ -577,16 +577,29 @@ document.addEventListener('DOMContentLoaded', function () {
   const mobileMenu = document.getElementById('apple-nav-mobile');
   if (!hamburger || !mobileMenu) return;
 
+  let isOpen = false;
+
+  function triggerAnim(suffix) {
+    ['top', 'bottom'].forEach(part => {
+      const el = document.getElementById('globalnav-anim-menutrigger-bread-' + part + '-' + suffix);
+      if (el) el.beginElement();
+    });
+  }
+
+  function close() {
+    isOpen = false;
+    mobileMenu.classList.remove('open');
+    triggerAnim('close');
+  }
+
   hamburger.addEventListener('click', function () {
-    this.classList.toggle('open');
-    mobileMenu.classList.toggle('open');
+    isOpen = !isOpen;
+    mobileMenu.classList.toggle('open', isOpen);
+    triggerAnim(isOpen ? 'open' : 'close');
   });
 
   mobileMenu.querySelectorAll('a').forEach(link => {
-    link.addEventListener('click', () => {
-      hamburger.classList.remove('open');
-      mobileMenu.classList.remove('open');
-    });
+    link.addEventListener('click', close);
   });
 });
 

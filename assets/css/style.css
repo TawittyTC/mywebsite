@@ -919,22 +919,12 @@ body { padding-top: 48px; }
   text-decoration: none;
   font-weight: 500;
 }
-.apple-nav-hamburger {
-  width: 32px; height: 32px;
-  display: flex; flex-direction: column;
-  justify-content: center; align-items: center;
-  gap: 5px; background: transparent; border: none; cursor: pointer; padding: 0;
+.globalnav-menutrigger-button {
+  width: 44px; height: 44px;
+  display: flex; align-items: center; justify-content: center;
+  background: transparent; border: none; cursor: pointer; padding: 0;
+  color: #1d1d1f;
 }
-.apple-nav-hamburger span {
-  display: block;
-  width: 26px; height: 2.5px;
-  background: #aeaeb2;
-  border-radius: 4px;
-  transition: all 0.3s ease;
-  transform-origin: center;
-}
-.apple-nav-hamburger.open span:nth-child(1) { transform: translateY(3.75px) rotate(45deg); }
-.apple-nav-hamburger.open span:nth-child(2) { transform: translateY(-3.75px) rotate(-45deg); }
 .apple-nav-mobile {
   display: none;
   position: absolute;
