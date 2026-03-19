@@ -980,8 +980,8 @@ body { padding-top: 48px; }
   padding-bottom: 0;
 }
 .section-title p { font-size: 17px; color: #6e6e73; line-height: 1.6; }
-section { padding: 220px 0; }
-#skill { padding: 220px 0; }
+section { padding: 270px 0; }
+#skill { padding: 270px 0; }
 
 /* Section backgrounds */
 #resume, #skill, #certificates { background: #fff; }
@@ -1142,7 +1142,7 @@ h1, h2, h3, h4, h5, h6 { color: #111111; }
 /* Mobile <735px: 32px / 600 / +0.004em / 1.125 */
 @media (max-width: 735px) {
   .section-title h2 { font-size: 32px; letter-spacing: 0.004em; line-height: 1.125; }
-  section { padding: 140px 0; }
+  section { padding: 190px 0; }
   .section-title { padding-bottom: 32px; }
 }
 
