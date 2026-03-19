@@ -932,9 +932,8 @@ body { padding-top: 48px; }
   transition: all 0.3s ease;
   transform-origin: center;
 }
-.apple-nav-hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
-.apple-nav-hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
-.apple-nav-hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+.apple-nav-hamburger.open span:nth-child(1) { transform: translateY(3.25px) rotate(45deg); }
+.apple-nav-hamburger.open span:nth-child(2) { transform: translateY(-3.25px) rotate(-45deg); }
 .apple-nav-mobile {
   display: none;
   position: absolute;
