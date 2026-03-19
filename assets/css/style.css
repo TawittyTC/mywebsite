@@ -927,13 +927,14 @@ body { padding-top: 48px; }
 }
 .apple-nav-hamburger span {
   display: block;
-  width: 18px; height: 1.5px;
+  width: 22px; height: 2px;
   background: #1d1d1f;
+  border-radius: 2px;
   transition: all 0.3s ease;
   transform-origin: center;
 }
-.apple-nav-hamburger.open span:nth-child(1) { transform: translateY(3.25px) rotate(45deg); }
-.apple-nav-hamburger.open span:nth-child(2) { transform: translateY(-3.25px) rotate(-45deg); }
+.apple-nav-hamburger.open span:nth-child(1) { transform: translateY(3.5px) rotate(45deg); }
+.apple-nav-hamburger.open span:nth-child(2) { transform: translateY(-3.5px) rotate(-45deg); }
 .apple-nav-mobile {
   display: none;
   position: absolute;
