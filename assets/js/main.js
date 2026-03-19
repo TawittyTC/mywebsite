@@ -34,43 +34,7 @@
   };
 
   /**
-   * Easy on scroll event listener
-   */
-  const onscroll = (el, listener) => {
-    el.addEventListener("scroll", listener, { passive: true });
-  };
-
-  /**
-   * Navbar links active state on scroll
-   */
-  let navbarlinks = select("#apple-header .scrollto", true);
-  let _navRafPending = false;
-  const navbarlinksActive = () => {
-    if (_navRafPending) return;
-    _navRafPending = true;
-    requestAnimationFrame(() => {
-      _navRafPending = false;
-      let position = window.scrollY + 200;
-      navbarlinks.forEach((navbarlink) => {
-        if (!navbarlink.hash) return;
-        let section = select(navbarlink.hash);
-        if (!section) return;
-        if (
-          position >= section.offsetTop &&
-          position <= section.offsetTop + section.offsetHeight
-        ) {
-          navbarlink.classList.add("active");
-        } else {
-          navbarlink.classList.remove("active");
-        }
-      });
-    });
-  };
-  window.addEventListener("load", navbarlinksActive);
-  onscroll(document, navbarlinksActive);
-
-  /**
-   * Scrolls to an element with header offset
+   * Scrolls to an element with offset
    */
   const scrollto = (el, duration = 600) => {
     let element = select(el);
@@ -98,14 +62,6 @@
     function (e) {
       if (select(this.hash)) {
         e.preventDefault();
-
-        let body = select("body");
-        if (body.classList.contains("mobile-nav-active")) {
-          body.classList.remove("mobile-nav-active");
-          let navbarToggle = select(".mobile-nav-toggle");
-          navbarToggle.classList.toggle("bi-list");
-          navbarToggle.classList.toggle("bi-x");
-        }
         scrollto(this.hash);
       }
     },
@@ -571,37 +527,6 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 });
 
-// Apple Navigation
-document.addEventListener('DOMContentLoaded', function () {
-  const hamburger = document.getElementById('apple-nav-toggle');
-  const mobileMenu = document.getElementById('apple-nav-mobile');
-  if (!hamburger || !mobileMenu) return;
-
-  let isOpen = false;
-
-  function triggerAnim(suffix) {
-    ['top', 'bottom'].forEach(part => {
-      const el = document.getElementById('globalnav-anim-menutrigger-bread-' + part + '-' + suffix);
-      if (el) el.beginElement();
-    });
-  }
-
-  function close() {
-    isOpen = false;
-    mobileMenu.classList.remove('open');
-    triggerAnim('close');
-  }
-
-  hamburger.addEventListener('click', function () {
-    isOpen = !isOpen;
-    mobileMenu.classList.toggle('open', isOpen);
-    triggerAnim(isOpen ? 'open' : 'close');
-  });
-
-  mobileMenu.querySelectorAll('a').forEach(link => {
-    link.addEventListener('click', close);
-  });
-});
 
 // Hero animation now handled by CSS (@keyframes heroFadeIn) — no GSAP needed
 

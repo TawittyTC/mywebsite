@@ -85,11 +85,6 @@ a:hover {
   filter: blur(5px);
 }
 
-@media (min-width: 992px) {
-  #hero {
-    padding-left: 160px;
-  }
-}
 
 #hero h1 {
   margin: 0;
@@ -868,90 +863,6 @@ button {
 # Apple Design System
 ==============================================================*/
 
-/* Body offset for Apple nav */
-body { padding-top: 48px; }
-
-/* Remove old hero desktop padding */
-@media (min-width: 992px) { #hero { padding-left: 0; } }
-
-/*--------------------------------------------------------------
-# Apple Navigation
---------------------------------------------------------------*/
-#apple-header {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 9999;
-  height: 48px;
-  background: rgba(255, 255, 255, 0.85);
-  -webkit-backdrop-filter: saturate(180%) blur(20px);
-  backdrop-filter: saturate(180%) blur(20px);
-}
-.apple-nav-inner {
-  max-width: 1200px;
-  margin: 0 auto;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 22px;
-}
-.apple-nav-logo {
-  font-size: 15px;
-  font-weight: 600;
-  color: #1d1d1f;
-  text-decoration: none;
-  letter-spacing: -0.3px;
-}
-.apple-nav-logo:hover { color: #1d1d1f; text-decoration: none; }
-.apple-nav-accent { color: #0071e3; }
-.apple-nav-links { display: flex; gap: 24px; align-items: center; }
-.apple-nav-link {
-  font-size: 13px;
-  color: #1d1d1f;
-  text-decoration: none;
-  opacity: 0.8;
-  transition: opacity 0.2s;
-  letter-spacing: -0.1px;
-}
-.apple-nav-link:hover, .apple-nav-link.active-link, .apple-nav-link.active {
-  opacity: 1;
-  color: #1d1d1f;
-  text-decoration: none;
-  font-weight: 500;
-}
-.globalnav-menutrigger-button {
-  width: 44px; height: 44px;
-  display: flex; align-items: center; justify-content: center;
-  background: transparent; border: none; cursor: pointer; padding: 0;
-  color: #1d1d1f;
-}
-.apple-nav-mobile {
-  display: none;
-  position: absolute;
-  top: 48px; left: 0; right: 0;
-  background: rgba(255, 255, 255, 0.97);
-  -webkit-backdrop-filter: blur(20px);
-  backdrop-filter: blur(20px);
-  padding: 0 24px;
-  flex-direction: column;
-}
-.apple-nav-mobile.open { display: flex; }
-.apple-nav-mobile a {
-  padding: 14px 0;
-  font-size: 17px;
-  color: #1d1d1f;
-  text-decoration: none;
-  transition: color 0.2s;
-}
-.apple-nav-mobile a:hover { color: #0071e3; text-decoration: none; }
-.apple-nav-mobile a + a {
-  border-top: 1px solid rgba(0,0,0,0.07);
-}
-.apple-nav-mobile a:active {
-  background: rgba(0,0,0,0.04);
-  margin: 0 -24px;
-  padding: 14px 24px;
-}
 
 /*--------------------------------------------------------------
 # Apple Colors + Typography
@@ -1147,12 +1058,6 @@ h1, h2, h3, h4, h5, h6 { color: #111111; }
   display: inline-flex;
   align-items: center;
 }
-.apple-nav-hamburger { width: 44px; height: 44px; }
-.apple-nav-link {
-  min-height: 44px;
-  display: inline-flex;
-  align-items: center;
-}
 #hero .social-links a {
   min-width: 44px;
   min-height: 44px;
@@ -1168,8 +1073,6 @@ h1, h2, h3, h4, h5, h6 { color: #111111; }
 .rf-cards-scroller-item,
 .filter-btn,
 .btn-contact,
-.apple-nav-link,
-.apple-nav-logo,
 #contact .form-control {
   transition-timing-function: ease-in-out;
   transition-duration: 0.3s;
