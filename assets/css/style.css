@@ -667,12 +667,12 @@ button {
 }
 
 .filter-btn {
-  padding: 8px 22px;
+  padding: 12px 28px;
   border: none;
   border-radius: 28px;
   background: #f0f0f5;
   color: #1d1d1f;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -840,12 +840,12 @@ button {
 }
 
 .btn-contact {
-  padding: 12px 40px;
+  padding: 18px 48px;
   background: #0071e3;
   color: #fff;
   border: none;
   border-radius: 28px;
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease-in-out;
@@ -980,8 +980,8 @@ body { padding-top: 48px; }
   padding-bottom: 0;
 }
 .section-title p { font-size: 17px; color: #6e6e73; line-height: 1.6; }
-section { padding: 120px 0; }
-#skill { padding: 120px 0; }
+section { padding: 220px 0; }
+#skill { padding: 220px 0; }
 
 /* Section backgrounds */
 #resume, #skill, #certificates { background: #fff; }
@@ -1142,8 +1142,8 @@ h1, h2, h3, h4, h5, h6 { color: #111111; }
 /* Mobile <735px: 32px / 600 / +0.004em / 1.125 */
 @media (max-width: 735px) {
   .section-title h2 { font-size: 32px; letter-spacing: 0.004em; line-height: 1.125; }
-  section { padding: 60px 0; }
-  .section-title { padding-bottom: 24px; }
+  section { padding: 140px 0; }
+  .section-title { padding-bottom: 32px; }
 }
 
 /* ── Touch Targets: 44×44px minimum (Apple HIG) ── */
