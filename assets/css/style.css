@@ -994,16 +994,21 @@ section { padding: 270px 0; }
 #certificates .data-box, #certificates .boxWhyScg { background: #fff; color: #1d1d1f; }
 #contact .data-box { background: #fff; }
 #hero h1 {
-  font-size: clamp(40px, 6vw, 72px);
+  font-size: clamp(56px, 9vw, 128px);
   font-weight: 700;
-  letter-spacing: -1.5px;
-  line-height: 1.05;
+  letter-spacing: -4px;
+  line-height: 0.97;
   color: #1d1d1f;
 }
-#hero p { color: #6e6e73; font-size: clamp(18px, 2.5vw, 24px); font-family: inherit; }
+#hero p { color: #6e6e73; font-size: clamp(20px, 2.5vw, 28px); font-family: inherit; margin-top: 24px; }
 #hero p span { color: #0071e3; letter-spacing: normal; }
 #hero .social-links a { color: #1d1d1f; }
 #hero .social-links a:hover { color: #0071e3; }
+@media (max-width: 735px) {
+  #hero h1 {
+    letter-spacing: -2px;
+  }
+}
 a { color: #0071e3; }
 a:hover { color: #0077ed; }
 
