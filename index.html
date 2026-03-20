@@ -266,15 +266,16 @@
     .exp-toggle.hint svg{animation:exp-hint .45s ease-in-out 2}
 
     /* Experience Apple-style cards */
-    #experience .data-box[data-exp]{cursor:pointer;position:relative}
+    #experience .data-box[data-exp]{cursor:pointer;position:relative;border-left:4px solid #0071e3;transition:transform .3s cubic-bezier(.25,.46,.45,.94),box-shadow .3s ease}
+    #experience .data-box[data-exp]:hover{transform:translateY(-4px);box-shadow:0 24px 64px rgba(0,0,0,.13)}
     .exp-card-cta{position:absolute;bottom:20px;right:20px;display:flex;align-items:center;gap:8px;pointer-events:none}
-    .exp-card-cta-label{font-size:12px;font-weight:500;color:#6e6e73;transition:color .2s}
-    #experience .data-box[data-exp]:hover .exp-card-cta-label{color:#1d1d1f}
-    .exp-card-btn{width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.06);display:flex;align-items:center;justify-content:center;transition:background .2s,transform .2s;flex-shrink:0}
-    #experience .data-box[data-exp]:hover .exp-card-btn{background:rgba(0,0,0,.12);transform:scale(1.08)}
-    .exp-card-btn svg{width:20px;height:20px;fill:#1d1d1f}
-    @keyframes card-btn-hint{0%,100%{transform:scale(1)}45%{transform:scale(1.35)}}
-    .exp-card-btn.hint{animation:card-btn-hint .55s ease-in-out 2}
+    .exp-card-cta-label{font-size:13px;font-weight:500;color:#0071e3;transition:opacity .2s}
+    #experience .data-box[data-exp]:hover .exp-card-cta-label{opacity:.8}
+    .exp-card-btn{width:40px;height:40px;border-radius:50%;background:rgba(0,113,227,.1);display:flex;align-items:center;justify-content:center;transition:background .2s,transform .2s;flex-shrink:0}
+    #experience .data-box[data-exp]:hover .exp-card-btn{background:rgba(0,113,227,.18);transform:scale(1.1)}
+    .exp-card-btn svg{width:20px;height:20px;fill:#0071e3}
+    @keyframes card-btn-hint{0%{transform:scale(1)}10%{transform:scale(1.4)}20%,100%{transform:scale(1)}}
+    .exp-card-btn.hint-loop{animation:card-btn-hint 3s ease-in-out infinite}
 
     /* Experience details modal */
     .exp-lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.25);backdrop-filter:blur(20px) saturate(1.8);-webkit-backdrop-filter:blur(20px) saturate(1.8);z-index:9999;align-items:center;justify-content:center;padding:20px;box-sizing:border-box}
@@ -299,9 +300,9 @@
     @keyframes chip-hint{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
     .exp-filter-chip.hint{animation:chip-hint .38s ease-in-out}
     /* Client sections */
-    .exp-client-section{margin-bottom:22px;padding-left:14px;border-left:3px solid #f0f0f5;transition:border-color .2s}
+    .exp-client-section{margin-top:24px;margin-bottom:28px;padding-left:16px;border-left:3px solid #f0f0f5;transition:border-color .2s}
     .exp-client-section:hover{border-left-color:#0071e3}
-    .exp-client-section-header{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+    .exp-client-section-header{display:flex;align-items:center;gap:8px;margin-bottom:12px}
     .exp-client-section-header img{width:22px;height:22px;object-fit:contain;border-radius:5px;flex-shrink:0}
     .exp-client-section-header h3{font-size:15px;font-weight:600;color:#1d1d1f;margin:0}
     .exp-client-section-header .exp-client-tag{font-size:11px;font-weight:500;color:#6e6e73;background:#f5f5f7;border-radius:6px;padding:2px 8px;margin-left:auto;flex-shrink:0}
@@ -402,7 +403,7 @@
   </script>
 
   <!-- Preload deferred JS to start downloading before parser reaches script tags -->
-  <link rel="preload" href="assets/js/main.min.js?v=1.44.0" as="script">
+  <link rel="preload" href="assets/js/main.min.js?v=1.45.0" as="script">
 
   <script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="233b92be-5a2d-492b-b093-9c3ed14c9063"
     type="text/javascript" async></script>
@@ -966,7 +967,7 @@
   </footer><!-- End Footer -->
 
   <!-- Main JS -->
-  <script defer src="assets/js/main.min.js?v=1.44.0"></script>
+  <script defer src="assets/js/main.min.js?v=1.45.0"></script>
   <!-- Service Worker: cache assets for repeat visits -->
   <script>if('serviceWorker'in navigator){var _sw=function(){navigator.serviceWorker.register('sw.js')};'requestIdleCallback'in window?requestIdleCallback(_sw):window.addEventListener('load',_sw)}</script>
 
@@ -984,7 +985,7 @@
       <div class="exp-modal-period">June 2024 – Present</div>
       <div class="exp-modal-tech">
         <span>PHP</span><span>Python</span><span>Flask</span><span>React</span><span>JavaScript</span>
-        <span>MySQL</span><span>Asterisk PBX</span><span>AWS</span><span>Redis</span>
+        <span>MySQL</span><span>Asterisk PBX</span><span>AWS</span>
         <span>LINE OA API</span><span>GPT API</span><span>Gemini API</span><span>REST APIs</span>
       </div>
     </div>
@@ -1013,9 +1014,27 @@
         <button class="exp-filter-chip" data-filter="kasikorn">Kasikorn Carabao</button>
         <button class="exp-filter-chip" data-filter="happy">Happy Products</button>
         <button class="exp-filter-chip" data-filter="vietjet">VietJet Air</button>
-        <button class="exp-filter-chip" data-filter="artelie">Artelie</button>
+        <button class="exp-filter-chip" data-filter="artelia">Artelia</button>
         <button class="exp-filter-chip" data-filter="livplus">LivPlus</button>
         <button class="exp-filter-chip" data-filter="digiserve">Digiserve</button>
+        <button class="exp-filter-chip" data-filter="thaivan">Thaivan</button>
+        <button class="exp-filter-chip" data-filter="netbay">Netbay</button>
+        <button class="exp-filter-chip" data-filter="inchcape">Inchcape</button>
+        <button class="exp-filter-chip" data-filter="oto">OTO</button>
+        <button class="exp-filter-chip" data-filter="nova">Nova</button>
+        <button class="exp-filter-chip" data-filter="isv">ISV</button>
+        <button class="exp-filter-chip" data-filter="qprime">Qprime</button>
+        <button class="exp-filter-chip" data-filter="rabbitcard">Rabbitcard</button>
+        <button class="exp-filter-chip" data-filter="mvmall">MVmall</button>
+        <button class="exp-filter-chip" data-filter="ishopping">iShopping</button>
+        <button class="exp-filter-chip" data-filter="3bissfix">3Bissfix</button>
+        <button class="exp-filter-chip" data-filter="bcm">BCM</button>
+        <button class="exp-filter-chip" data-filter="mediviss">Mediviss</button>
+        <button class="exp-filter-chip" data-filter="yunnomori">Yunnomori</button>
+        <button class="exp-filter-chip" data-filter="kijsiri">N&amp;S / Kijsiri</button>
+        <button class="exp-filter-chip" data-filter="dpah">dp a&amp;h</button>
+        <button class="exp-filter-chip" data-filter="drorn">Dr.Orn</button>
+        <button class="exp-filter-chip" data-filter="sbl">SBL</button>
         <button class="exp-filter-chip" data-filter="general">R&amp;D &amp; Infra</button>
       </div>
 
@@ -1037,7 +1056,7 @@
       <div class="exp-client-section" data-client="kasikorn">
         <div class="exp-client-section-header">
           <img src="https://logo.clearbit.com/kasikornbank.com" alt="" onerror="this.style.display='none'">
-          <h3>Kasikorn Carabao</h3>
+          <h3>Kasikorn Carabao (KBAO)</h3>
           <span class="exp-client-tag">Sales Campaign CRM</span>
         </div>
         <ul>
@@ -1051,7 +1070,7 @@
 
       <div class="exp-client-section" data-client="happy">
         <div class="exp-client-section-header">
-          <h3>Happy Products &amp; Services Co., Ltd.</h3>
+          <h3>Happy Products &amp; Services (tnews &amp; shopping)</h3>
           <span class="exp-client-tag">End-to-End CRM</span>
         </div>
         <ul>
@@ -1077,9 +1096,9 @@
         </ul>
       </div>
 
-      <div class="exp-client-section" data-client="artelie">
+      <div class="exp-client-section" data-client="artelia">
         <div class="exp-client-section-header">
-          <h3>Artelie</h3>
+          <h3>Artelia</h3>
           <span class="exp-client-tag">Operations Dashboard</span>
         </div>
         <ul>
@@ -1116,6 +1135,224 @@
         </ul>
       </div>
 
+      <div class="exp-client-section" data-client="thaivan">
+        <div class="exp-client-section-header">
+          <h3>Thaivan</h3>
+          <span class="exp-client-tag">Contact Center Analytics</span>
+        </div>
+        <ul>
+          <li>Built a contact center performance analytics platform integrating Asterisk CDR and queuelog data sources.</li>
+          <li>Real-time agent monitoring dashboard with queue status, SLA tracking, and instant supervisor alerts for breach events.</li>
+          <li>Automated daily performance report generation and scheduled delivery to management via email.</li>
+        </ul>
+      </div>
+
+      <div class="exp-client-section" data-client="netbay">
+        <div class="exp-client-section-header">
+          <h3>Netbay</h3>
+          <span class="exp-client-tag">IT Services CRM</span>
+        </div>
+        <ul>
+          <li>Developed a service request and ticket management CRM for IT service operations — logging, categorizing, and tracking all customer support requests from intake to resolution.</li>
+          <li>SLA-based escalation rules with automated alerts when tickets approach or breach agreed response times.</li>
+          <li>Linked Asterisk CDR to ticket records for full call-to-resolution audit trails and agent accountability reporting.</li>
+        </ul>
+      </div>
+
+      <div class="exp-client-section" data-client="inchcape">
+        <div class="exp-client-section-header">
+          <img src="https://logo.clearbit.com/inchcape.com" alt="" onerror="this.style.display='none'">
+          <h3>Inchcape</h3>
+          <span class="exp-client-tag">Automotive Sales CRM</span>
+        </div>
+        <ul>
+          <li>Built a vehicle sales CRM covering the full buyer journey: lead capture → test drive scheduling → negotiation → purchase → after-sales follow-up.</li>
+          <li>Integrated <strong>LINE OA</strong> for automated test drive confirmations, service reminders, and post-purchase satisfaction follow-ups.</li>
+          <li>Agent performance dashboards with lead conversion rates, pipeline stage breakdowns, and CDR-linked call history per customer profile.</li>
+        </ul>
+      </div>
+
+      <div class="exp-client-section" data-client="oto">
+        <div class="exp-client-section-header">
+          <h3>OTO</h3>
+          <span class="exp-client-tag">Vehicle Finance CRM</span>
+        </div>
+        <ul>
+          <li>Developed a CRM for vehicle financing operations — managing loan applications, document collection, credit review stages, and approval workflows.</li>
+          <li>Automated follow-up sequences for incomplete applications and upcoming payment due dates via LINE OA and outbound call queues.</li>
+          <li>Asterisk CDR integration linking all call records to customer loan files for complete interaction history and compliance audit trails.</li>
+        </ul>
+      </div>
+
+      <div class="exp-client-section" data-client="nova">
+        <div class="exp-client-section-header">
+          <h3>Nova</h3>
+          <span class="exp-client-tag">Operations &amp; Reporting</span>
+        </div>
+        <ul>
+          <li>Contact center operations dashboard with real-time queue monitoring, agent availability tracking, and SLA compliance metrics.</li>
+          <li>Automated scheduled reporting: daily summary exports covering call volumes, agent performance, and SLA adherence delivered to management.</li>
+          <li>CDR-powered historical analytics with drill-down by date range, queue, and individual agent.</li>
+        </ul>
+      </div>
+
+      <div class="exp-client-section" data-client="isv">
+        <div class="exp-client-section-header">
+          <h3>ISV</h3>
+          <span class="exp-client-tag">Sales Pipeline CRM</span>
+        </div>
+        <ul>
+          <li>Developed a sales pipeline CRM with multi-stage lead management, assignment rules, and follow-up task automation.</li>
+          <li>LINE OA integration for automated outreach sequences triggered by lead status changes and scheduled follow-up intervals.</li>
+          <li>Reporting dashboard for supervisors: conversion rates, pipeline stage distribution, agent activity, and pending follow-up counts.</li>
+        </ul>
+      </div>
+
+      <div class="exp-client-section" data-client="qprime">
+        <div class="exp-client-section-header">
+          <h3>Qprime</h3>
+          <span class="exp-client-tag">Real Estate CRM</span>
+        </div>
+        <ul>
+          <li>Built a real estate sales CRM covering lead capture from multiple channels (web, LINE, phone) through to site visit scheduling, negotiation, and closing.</li>
+          <li>Automated follow-up workflows: property inquiry responses, site visit reminders, and post-visit interest scoring — all coordinated via LINE OA.</li>
+          <li>Agent dashboards with lead source attribution, pipeline stage tracking, and conversion rate analytics per project and unit type.</li>
+        </ul>
+      </div>
+
+      <div class="exp-client-section" data-client="rabbitcard">
+        <div class="exp-client-section-header">
+          <img src="https://logo.clearbit.com/rabbit.co.th" alt="" onerror="this.style.display='none'">
+          <h3>Rabbitcard</h3>
+          <span class="exp-client-tag">Fintech Customer Service</span>
+        </div>
+        <ul>
+          <li>Built an IVR system for self-service card operations: balance inquiry, transaction history, and card activation via DTMF with live backend API integration.</li>
+          <li>Contact center analytics dashboard tracking call volumes, IVR self-service completion rates, and agent escalation breakdowns.</li>
+          <li>Automated customer service reporting with SLA tracking and peak-hour volume analysis for workforce planning.</li>
+        </ul>
+      </div>
+
+      <div class="exp-client-section" data-client="mvmall">
+        <div class="exp-client-section-header">
+          <h3>MVmall</h3>
+          <span class="exp-client-tag">E-Commerce CRM</span>
+        </div>
+        <ul>
+          <li>Developed a customer service CRM for e-commerce operations — managing order inquiries, complaints, returns, and delivery dispute resolution.</li>
+          <li>Integrated LINE OA for proactive order status updates and post-purchase follow-up satisfaction surveys.</li>
+          <li>Ticket SLA tracking with escalation paths for unresolved complaints, ensuring customer-facing resolution targets are met.</li>
+        </ul>
+      </div>
+
+      <div class="exp-client-section" data-client="ishopping">
+        <div class="exp-client-section-header">
+          <h3>iShopping</h3>
+          <span class="exp-client-tag">E-Commerce Support CRM</span>
+        </div>
+        <ul>
+          <li>Built a customer support CRM for a TV shopping platform — handling inbound order inquiries, return requests, and product complaint logging.</li>
+          <li>Automated order status notifications and return status updates delivered to customers via LINE OA.</li>
+          <li>Agent productivity dashboard: tickets per agent, average resolution time, and SLA compliance rate across support queues.</li>
+        </ul>
+      </div>
+
+      <div class="exp-client-section" data-client="3bissfix">
+        <div class="exp-client-section-header">
+          <h3>3Bissfix</h3>
+          <span class="exp-client-tag">Field Service CRM</span>
+        </div>
+        <ul>
+          <li>Developed a field service management CRM for property repair and maintenance operations — job intake, technician dispatch, progress tracking, and completion sign-off.</li>
+          <li>Customer notification workflow via LINE OA: job confirmation, technician dispatch alerts, and post-service satisfaction follow-up.</li>
+          <li>Operations dashboard with job queue status, technician utilization rates, and SLA compliance for service completion windows.</li>
+        </ul>
+      </div>
+
+      <div class="exp-client-section" data-client="bcm">
+        <div class="exp-client-section-header">
+          <h3>BCM</h3>
+          <span class="exp-client-tag">Contact Center Reporting</span>
+        </div>
+        <ul>
+          <li>Built a contact center performance reporting system aggregating CDR and queuelog data into executive-level dashboards.</li>
+          <li>Automated multi-frequency report delivery (daily, weekly, monthly) to management and client stakeholders with configurable distribution lists.</li>
+          <li>SLA compliance tracking with trend analysis and drill-down capability by queue, agent group, and time period.</li>
+        </ul>
+      </div>
+
+      <div class="exp-client-section" data-client="mediviss">
+        <div class="exp-client-section-header">
+          <h3>Mediviss</h3>
+          <span class="exp-client-tag">Healthcare CRM</span>
+        </div>
+        <ul>
+          <li>Developed a patient CRM for medical services — managing appointment bookings, doctor-patient assignments, and follow-up care scheduling.</li>
+          <li>Automated appointment reminders and health check-up recall notifications via LINE OA, reducing missed appointments.</li>
+          <li>Integrated Asterisk CDR linking all patient call interactions to their CRM profile for complete care history visibility.</li>
+        </ul>
+      </div>
+
+      <div class="exp-client-section" data-client="yunnomori">
+        <div class="exp-client-section-header">
+          <h3>Yunnomori</h3>
+          <span class="exp-client-tag">Hospitality CRM</span>
+        </div>
+        <ul>
+          <li>Built a reservation and guest inquiry management CRM for a Japanese hot spring resort brand operating in Thailand.</li>
+          <li>LINE OA integration for booking confirmation, pre-arrival instructions, and post-stay satisfaction surveys.</li>
+          <li>Centralized guest interaction history across channels (phone, LINE, web) enabling personalized service and targeted promotional outreach.</li>
+        </ul>
+      </div>
+
+      <div class="exp-client-section" data-client="kijsiri">
+        <div class="exp-client-section-header">
+          <h3>N&amp;S / Kijsiri</h3>
+          <span class="exp-client-tag">Real Estate CRM</span>
+        </div>
+        <ul>
+          <li>Developed a property sales CRM for a real estate developer — managing buyer leads, site visit scheduling, and purchase negotiation workflows.</li>
+          <li>Automated LINE OA follow-up sequences for prospective buyers at each pipeline stage: interest confirmation, site visit reminders, and post-visit proposals.</li>
+          <li>Agent performance dashboard with lead source tracking, pipeline stage distribution, and conversion rate analytics per project.</li>
+        </ul>
+      </div>
+
+      <div class="exp-client-section" data-client="dpah">
+        <div class="exp-client-section-header">
+          <h3>dp a&amp;h (Accident &amp; Health)</h3>
+          <span class="exp-client-tag">Insurance CRM</span>
+        </div>
+        <ul>
+          <li>Built a CRM for accident &amp; health insurance sales — managing policy inquiries, quotation workflows, and agent-assigned follow-up tasks.</li>
+          <li>Automated policy renewal reminders and lapse-prevention follow-up campaigns delivered via LINE OA and scheduled outbound call queues.</li>
+          <li>Claim inquiry IVR: policyholders can check claim status and submission requirements via self-service DTMF before agent escalation.</li>
+        </ul>
+      </div>
+
+      <div class="exp-client-section" data-client="drorn">
+        <div class="exp-client-section-header">
+          <h3>Dr.Orn Clinic</h3>
+          <span class="exp-client-tag">Medical Appointment CRM</span>
+        </div>
+        <ul>
+          <li>Developed a patient appointment management CRM for a medical clinic — scheduling, doctor assignment, and follow-up care coordination.</li>
+          <li>Automated appointment reminders and post-consultation follow-up via LINE OA, reducing no-show rates and improving patient experience.</li>
+          <li>Asterisk CDR integration linking patient call history to profiles, giving clinic staff full context before each interaction.</li>
+        </ul>
+      </div>
+
+      <div class="exp-client-section" data-client="sbl">
+        <div class="exp-client-section-header">
+          <h3>SBL</h3>
+          <span class="exp-client-tag">Financial Services CRM</span>
+        </div>
+        <ul>
+          <li>Built a customer service CRM for financial services operations — managing inbound inquiries, case tracking, and resolution workflows with full audit trail.</li>
+          <li>Contact center analytics dashboard: call volume trends, agent handling time, and SLA compliance metrics for operations management.</li>
+          <li>Automated daily performance reports and CDR-based agent activity summaries delivered to supervisors on schedule.</li>
+        </ul>
+      </div>
+
       <div class="exp-client-section" data-client="general">
         <div class="exp-client-section-header">
           <h3>AI Pipeline Research &amp; Infrastructure</h3>
@@ -1127,7 +1364,7 @@
           <li>Used <strong>GPT (OpenAI)</strong> and <strong>Gemini (Google)</strong> as the core LLM reasoning layer for intent classification, dialogue management, and response generation.</li>
           <li>Leveraged <strong>Claude</strong> throughout R&amp;D: synthesizing technical papers, evaluating tradeoffs, designing prompt strategies, and accelerating product decisions.</li>
           <li>Post-call AI features: smart summarization, sentiment tagging, and automated follow-up action suggestions surfaced to agents after each call.</li>
-          <li>All production systems on <strong>AWS</strong> (EC2, S3, RDS) with auto-scaling and deployment automation. OWASP security, Redis caching, and SQL optimization across all client platforms.</li>
+          <li>All production systems on <strong>AWS</strong> (EC2, S3, RDS) with auto-scaling, deployment automation, OWASP security practices, and SQL optimization across all client platforms.</li>
         </ul>
       </div>
     </div>

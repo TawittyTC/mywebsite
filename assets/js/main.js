@@ -273,12 +273,7 @@ document.addEventListener('DOMContentLoaded', function () {
       entries.forEach(function (entry) {
         if (!entry.isIntersecting) return;
         var btn = entry.target.querySelector('.exp-card-btn');
-        if (btn) {
-          setTimeout(function () {
-            btn.classList.add('hint');
-            btn.addEventListener('animationend', function () { btn.classList.remove('hint'); }, { once: true });
-          }, 300);
-        }
+        if (btn) btn.classList.add('hint-loop');
         cardObs.unobserve(entry.target);
       });
     }, { threshold: 0.5 });
