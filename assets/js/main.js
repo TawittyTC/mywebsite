@@ -228,6 +228,34 @@ document.addEventListener("DOMContentLoaded", function () {
     inner.appendChild(content);
     lightbox.classList.add('open');
     document.body.style.overflow = 'hidden';
+
+    // Initialize client filter chips
+    var chips = inner.querySelectorAll('.exp-filter-chip');
+    var sections = inner.querySelectorAll('.exp-client-section');
+    if (chips.length && sections.length) {
+      chips.forEach(function (chip) {
+        chip.addEventListener('click', function () {
+          var filter = chip.dataset.filter;
+          chips.forEach(function (c) { c.classList.remove('active'); });
+          chip.classList.add('active');
+          sections.forEach(function (s) {
+            s.style.display = (filter === 'all' || s.dataset.client === filter) ? '' : 'none';
+          });
+        });
+      });
+      // Hint animation: bounce non-"All" chips after modal opens
+      setTimeout(function () {
+        var delay = 0;
+        chips.forEach(function (chip) {
+          if (chip.dataset.filter === 'all') return;
+          setTimeout(function () {
+            chip.classList.add('hint');
+            chip.addEventListener('animationend', function () { chip.classList.remove('hint'); }, { once: true });
+          }, delay);
+          delay += 70;
+        });
+      }, 450);
+    }
   };
 })();
 
@@ -238,6 +266,26 @@ document.addEventListener('DOMContentLoaded', function () {
       if (tmpl) window._expLightboxOpen(tmpl.innerHTML);
     });
   });
+
+  // Card hint: pulse the "+" button when card scrolls into view
+  if ('IntersectionObserver' in window) {
+    var cardObs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        var btn = entry.target.querySelector('.exp-card-btn');
+        if (btn) {
+          setTimeout(function () {
+            btn.classList.add('hint');
+            btn.addEventListener('animationend', function () { btn.classList.remove('hint'); }, { once: true });
+          }, 300);
+        }
+        cardObs.unobserve(entry.target);
+      });
+    }, { threshold: 0.5 });
+    document.querySelectorAll('#experience .data-box[data-exp]').forEach(function (card) {
+      cardObs.observe(card);
+    });
+  }
 });
 
 // Load cert images only when section scrolls into view (performance)
@@ -267,7 +315,12 @@ document.addEventListener("DOMContentLoaded", function () {
       expandBtn.className = "cert-expand-btn";
       expandBtn.setAttribute("aria-label", "View certificate fullscreen");
       expandBtn.innerHTML = "+";
-      expandBtn.addEventListener("click", function () {
+      expandBtn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        window._certLightboxOpen(src, alt);
+      });
+      card.style.cursor = "pointer";
+      card.addEventListener("click", function () {
         window._certLightboxOpen(src, alt);
       });
       wrapper.appendChild(imgElement);
