@@ -255,6 +255,16 @@
     #hero h1 { animation: heroFadeIn 1s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both; }
     #hero p  { animation: heroFadeIn 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both; }
 
+    /* Experience expand/collapse */
+    .exp-body{overflow:hidden;max-height:100px;transition:max-height .4s cubic-bezier(.4,0,.2,1);-webkit-mask-image:linear-gradient(to bottom,#000 40%,transparent 100%);mask-image:linear-gradient(to bottom,#000 40%,transparent 100%)}
+    .exp-body.open{max-height:1000px;-webkit-mask-image:none;mask-image:none}
+    .exp-toggle{display:inline-flex;align-items:center;gap:5px;background:none;border:none;cursor:pointer;color:#0071e3;font-size:13px;font-weight:500;padding:4px 0 2px;transition:opacity .2s}
+    .exp-toggle:hover{opacity:.75}
+    .exp-toggle svg{transition:transform .35s cubic-bezier(.4,0,.2,1);flex-shrink:0}
+    .exp-toggle.open svg{transform:rotate(180deg)}
+    @keyframes exp-hint{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
+    .exp-toggle.hint svg{animation:exp-hint .45s ease-in-out 2}
+
     /* Apple HIG: Reduce Motion */
     @media(prefers-reduced-motion:reduce) {
 
@@ -339,7 +349,7 @@
   </script>
 
   <!-- Preload deferred JS to start downloading before parser reaches script tags -->
-  <link rel="preload" href="assets/js/main.min.js?v=1.40.0" as="script">
+  <link rel="preload" href="assets/js/main.min.js?v=1.41.0" as="script">
 
   <script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="233b92be-5a2d-492b-b093-9c3ed14c9063"
     type="text/javascript" async></script>
@@ -565,28 +575,32 @@
                   <img src="assets/img/protollcall-logo.avif" alt="Protollcall Advance Service"
                     class="company-logo company-logo--lg" loading="lazy" decoding="async" width="320" height="211">
                 </div>
-                <p class="fw-light mt-3">
-                <ul class="fw-light">
-                  <li>Developed and maintained fully customized CRM systems tailored to the specific business needs of
-                    each client.</li>
-                  <li>Responsible for the full development cycle, including planning, design, implementation, testing,
-                    deployment, and long-term support.</li>
-                  <li>Delivered successful CRM solutions for Bangkok Hospital Chiang Mai, Kasikorn Carabao, Happy
-                    Products and Services Co., Ltd., and numerous other clients.</li>
-                  <li>Specialized in delivering 100% tailor-made CRM solutions aligned with each organization’s
-                    operational workflows and customer engagement goals.</li>
-                  <li>Handled ongoing system improvements, issue resolution, feature enhancements, and system
-                    maintenance to ensure high performance and reliability.</li>
-                  <li>Researched and developed an AI-powered voice pipeline integrating ASR (Automatic Speech
-                    Recognition), LLM (Large Language Model), and TTS (Text-to-Speech) to enable intelligent
-                    call-handling automation.</li>
-                  <li>Built and shipped AI-integrated products leveraging Claude and modern AI APIs, accelerating
-                    business automation and internal tooling for clients.</li>
-                  <li>Developed and maintained telephone system integrations, including call queue reporting via
-                    queuelog, CDR data management through asteriskcdrdb, and custom call analytics dashboards for
-                    operational monitoring.</li>
-                </ul>
-                </p>
+                <div class="exp-body mt-3">
+                  <ul class="fw-light">
+                    <li>Developed and maintained fully customized CRM systems tailored to the specific business needs of
+                      each client.</li>
+                    <li>Responsible for the full development cycle, including planning, design, implementation, testing,
+                      deployment, and long-term support.</li>
+                    <li>Delivered successful CRM solutions for Bangkok Hospital Chiang Mai, Kasikorn Carabao, Happy
+                      Products and Services Co., Ltd., and numerous other clients.</li>
+                    <li>Specialized in delivering 100% tailor-made CRM solutions aligned with each organization’s
+                      operational workflows and customer engagement goals.</li>
+                    <li>Handled ongoing system improvements, issue resolution, feature enhancements, and system
+                      maintenance to ensure high performance and reliability.</li>
+                    <li>Researched and developed an AI-powered voice pipeline integrating ASR (Automatic Speech
+                      Recognition), LLM (Large Language Model), and TTS (Text-to-Speech) to enable intelligent
+                      call-handling automation.</li>
+                    <li>Built and shipped AI-integrated products leveraging Claude and modern AI APIs, accelerating
+                      business automation and internal tooling for clients.</li>
+                    <li>Developed and maintained telephone system integrations, including call queue reporting via
+                      queuelog, CDR data management through asteriskcdrdb, and custom call analytics dashboards for
+                      operational monitoring.</li>
+                  </ul>
+                </div>
+                <button class="exp-toggle" aria-expanded="false">
+                  <span class="exp-lbl">See more</span>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
               </div>
             </div>
           </div>
@@ -602,15 +616,19 @@
                   <img src="assets/img/scg-logo.avif" alt="SCG The Siam Cement Group" class="company-logo"
                     loading="lazy" decoding="async" width="320" height="113">
                 </div>
-                <p class="fw-light mt-3">
-                <ul class="fw-light">
-                  <li>Successfully completed 4 internal projects for the organization</li>
-                  <li>Project Booking – Internal reservation system</li>
-                  <li>Project Ref Number – Reference code generation tool</li>
-                  <li>Project Job South – Job management system for southern region</li>
-                  <li>Project Family Day Shop – Online shop for company event participation</li>
-                </ul>
-                </p>
+                <div class="exp-body mt-3">
+                  <ul class="fw-light">
+                    <li>Successfully completed 4 internal projects for the organization</li>
+                    <li>Project Booking – Internal reservation system</li>
+                    <li>Project Ref Number – Reference code generation tool</li>
+                    <li>Project Job South – Job management system for southern region</li>
+                    <li>Project Family Day Shop – Online shop for company event participation</li>
+                  </ul>
+                </div>
+                <button class="exp-toggle" aria-expanded="false">
+                  <span class="exp-lbl">See more</span>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
               </div>
             </div>
           </div>
@@ -627,13 +645,17 @@
                   <img src="assets/img/scg-logo.avif" alt="SCG The Siam Cement Group" class="company-logo"
                     loading="lazy" decoding="async" width="320" height="113">
                 </div>
-                <p class="fw-light mt-3">
-                    <ul class="fw-light">
-                      <li>Delivered 2 internal business solutions:</li>
-                      <li>Project License – System for managing license requests</li>
-                      <li>Project Assets – Asset management platform for internal tracking</li>
-                    </ul>
-                </p>
+                <div class="exp-body mt-3">
+                  <ul class="fw-light">
+                    <li>Delivered 2 internal business solutions:</li>
+                    <li>Project License – System for managing license requests</li>
+                    <li>Project Assets – Asset management platform for internal tracking</li>
+                  </ul>
+                </div>
+                <button class="exp-toggle" aria-expanded="false">
+                  <span class="exp-lbl">See more</span>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
               </div>
             </div>
           </div>
@@ -648,12 +670,16 @@
                   </div>
                   <img src="assets/img/advice-logo.avif" alt="Advice IT Infinite" class="company-logo" loading="lazy" decoding="async" width="320" height="94">
                 </div>
-                <p class="fw-light mt-3">
-                    <ul class="fw-light">
-                      <li>Repaired and maintained over 5 laptops and 2 desktop computers daily.</li>
-                      <li>Provided technical support and consultation to more than 10 customers per day.</li>
-                    </ul>
-                </p>
+                <div class="exp-body mt-3">
+                  <ul class="fw-light">
+                    <li>Repaired and maintained over 5 laptops and 2 desktop computers daily.</li>
+                    <li>Provided technical support and consultation to more than 10 customers per day.</li>
+                  </ul>
+                </div>
+                <button class="exp-toggle" aria-expanded="false">
+                  <span class="exp-lbl">See more</span>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
               </div>
             </div>
           </div>
@@ -919,7 +945,7 @@
   </footer><!-- End Footer -->
 
   <!-- Main JS -->
-  <script defer src="assets/js/main.min.js?v=1.40.0"></script>
+  <script defer src="assets/js/main.min.js?v=1.41.0"></script>
   <!-- Service Worker: cache assets for repeat visits -->
   <script>if('serviceWorker'in navigator){var _sw=function(){navigator.serviceWorker.register('sw.js')};'requestIdleCallback'in window?requestIdleCallback(_sw):window.addEventListener('load',_sw)}</script>
 

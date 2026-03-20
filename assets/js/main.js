@@ -565,4 +565,45 @@ if (_expLink) _expLink.addEventListener('click', function(e) {
   requestAnimationFrame(step);
 });
 
+// Experience expand/collapse
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('.exp-body').forEach(function (body) {
+    var btn = body.nextElementSibling;
+    if (!btn || !btn.classList.contains('exp-toggle')) return;
+    // If content fits within max-height, remove restriction and hide button
+    if (body.scrollHeight <= 105) {
+      body.style.maxHeight = 'none';
+      body.style.maskImage = 'none';
+      body.style.webkitMaskImage = 'none';
+      btn.hidden = true;
+      return;
+    }
+    btn.addEventListener('click', function () {
+      var open = body.classList.toggle('open');
+      btn.classList.toggle('open', open);
+      btn.setAttribute('aria-expanded', String(open));
+      btn.querySelector('.exp-lbl').textContent = open ? 'See less' : 'See more';
+    });
+  });
+
+  // Hint animation: bounce chevron when card first enters viewport
+  if ('IntersectionObserver' in window) {
+    var hintObs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        var btn = entry.target.querySelector('.exp-toggle:not([hidden])');
+        if (btn && !btn.classList.contains('open')) {
+          btn.classList.add('hint');
+          btn.addEventListener('animationend', function () {
+            btn.classList.remove('hint');
+          }, { once: true });
+        }
+        hintObs.unobserve(entry.target);
+      });
+    }, { threshold: 0.5 });
+    document.querySelectorAll('#experience .data-box').forEach(function (box) {
+      hintObs.observe(box);
+    });
+  }
+});
 
