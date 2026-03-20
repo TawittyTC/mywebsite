@@ -47,6 +47,8 @@
 
   <!-- Self-hosted fonts — no external DNS lookup -->
   <link rel="preload" href="assets/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/notosansthai-thai.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/notosansthai-latin.woff2" as="font" type="font/woff2" crossorigin>
 
   <!-- Critical CSS inlined: hero renders instantly, zero blocking requests -->
   <style>
@@ -337,7 +339,7 @@
   </script>
 
   <!-- Preload deferred JS to start downloading before parser reaches script tags -->
-  <link rel="preload" href="assets/js/main.min.js?v=1.39.0" as="script">
+  <link rel="preload" href="assets/js/main.min.js?v=1.40.0" as="script">
 
   <script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="233b92be-5a2d-492b-b093-9c3ed14c9063"
     type="text/javascript" async></script>
@@ -397,7 +399,7 @@
             <div class="col-lg-12 mx-auto">
               <div class="data-box profile-featured">
                 <div class="profile-featured-img">
-                  <img src="assets/img/img01.avif" alt="Tanapol Chamnanhan" loading="lazy" decoding="async" width="520" height="520">
+                  <img src="assets/img/img01.avif" alt="Tanapol Chamnanhan" fetchpriority="high" decoding="sync" width="520" height="520">
                 </div>
                 <div class="profile-featured-body">
                   <div class="h2" style="margin: 0 0 16px 0; color: #000000;">Tanapol Chamnanhan</div>
@@ -909,7 +911,7 @@
   </footer><!-- End Footer -->
 
   <!-- Main JS -->
-  <script defer src="assets/js/main.min.js?v=1.39.0"></script>
+  <script defer src="assets/js/main.min.js?v=1.40.0"></script>
   <!-- Service Worker: cache assets for repeat visits -->
   <script>if('serviceWorker'in navigator){var _sw=function(){navigator.serviceWorker.register('sw.js')};'requestIdleCallback'in window?requestIdleCallback(_sw):window.addEventListener('load',_sw)}</script>
 
