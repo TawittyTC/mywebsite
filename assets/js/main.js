@@ -232,9 +232,9 @@ document.addEventListener("DOMContentLoaded", function () {
 })();
 
 document.addEventListener('DOMContentLoaded', function () {
-  document.querySelectorAll('.exp-details-btn[data-exp]').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      var tmpl = document.getElementById('exp-' + btn.dataset.exp);
+  document.querySelectorAll('#experience .data-box[data-exp]').forEach(function (card) {
+    card.addEventListener('click', function () {
+      var tmpl = document.getElementById('exp-' + card.dataset.exp);
       if (tmpl) window._expLightboxOpen(tmpl.innerHTML);
     });
   });

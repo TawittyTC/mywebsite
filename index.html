@@ -265,23 +265,30 @@
     @keyframes exp-hint{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
     .exp-toggle.hint svg{animation:exp-hint .45s ease-in-out 2}
 
+    /* Experience Apple-style cards */
+    #experience .data-box[data-exp]{cursor:pointer;position:relative}
+    .exp-card-btn{position:absolute;bottom:20px;right:20px;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.06);display:flex;align-items:center;justify-content:center;transition:background .2s,transform .2s;pointer-events:none}
+    #experience .data-box[data-exp]:hover .exp-card-btn{background:rgba(0,0,0,.12);transform:scale(1.08)}
+    .exp-card-btn svg{width:20px;height:20px;fill:#1d1d1f}
+
     /* Experience details modal */
-    .exp-details-btn{display:inline-flex;align-items:center;gap:6px;background:none;border:1.5px solid #0071e3;border-radius:20px;cursor:pointer;color:#0071e3;font-size:13px;font-weight:500;padding:5px 14px;margin-top:8px;transition:background .2s,color .2s}
-    .exp-details-btn:hover{background:#0071e3;color:#fff}
-    .exp-lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;align-items:center;justify-content:center;padding:20px;box-sizing:border-box}
+    .exp-lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.25);backdrop-filter:blur(20px) saturate(1.8);-webkit-backdrop-filter:blur(20px) saturate(1.8);z-index:9999;align-items:center;justify-content:center;padding:20px;box-sizing:border-box}
     .exp-lightbox.open{display:flex}
-    .exp-lightbox-inner{background:#fff;border-radius:16px;max-width:720px;width:100%;max-height:88vh;overflow-y:auto;padding:36px 40px;position:relative;box-shadow:0 24px 64px rgba(0,0,0,.18)}
-    .exp-lightbox-close{position:sticky;top:0;float:right;background:rgba(240,240,245,.9);border:none;border-radius:50%;width:32px;height:32px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;margin-bottom:8px}
-    .exp-lightbox-close:hover{background:#e0e0e8}
+    .exp-lightbox-inner{background:rgba(255,255,255,.97);border-radius:20px;max-width:740px;width:100%;max-height:88vh;overflow-y:auto;padding:36px 40px;position:relative;box-shadow:0 32px 80px rgba(0,0,0,.22)}
+    .exp-lightbox-close{position:sticky;top:0;float:right;background:rgba(232,232,237,.9);border:none;border-radius:50%;width:32px;height:32px;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;margin-bottom:8px;color:#1d1d1f}
+    .exp-lightbox-close:hover{background:#d8d8df}
     .exp-modal-header{margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid #e5e5e7}
-    .exp-modal-title{font-size:22px;font-weight:600;color:#1d1d1f;margin-bottom:4px}
+    .exp-modal-title{font-size:24px;font-weight:700;color:#1d1d1f;margin-bottom:3px;letter-spacing:-.3px}
     .exp-modal-subtitle{font-size:14px;color:#6e6e73}
+    .exp-modal-clients{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0 0}
+    .exp-modal-client{display:flex;align-items:center;gap:7px;background:#f5f5f7;border-radius:10px;padding:6px 12px;font-size:12px;font-weight:500;color:#1d1d1f}
+    .exp-modal-client img{width:20px;height:20px;object-fit:contain;border-radius:4px}
     .exp-modal-section{margin-bottom:22px}
-    .exp-modal-section h3{font-size:13px;font-weight:600;color:#0071e3;margin:0 0 8px;text-transform:uppercase;letter-spacing:.4px}
+    .exp-modal-section h3{font-size:11px;font-weight:600;color:#6e6e73;margin:0 0 10px;text-transform:uppercase;letter-spacing:.8px}
     .exp-modal-section ul{margin:0;padding-left:18px;font-size:14px;line-height:1.65;color:#3a3a3c}
-    .exp-modal-section li{margin-bottom:5px}
-    .exp-modal-section li strong{color:#1d1d1f}
-    @media(max-width:600px){.exp-lightbox-inner{padding:24px 18px}}
+    .exp-modal-section li{margin-bottom:6px}
+    .exp-modal-section li strong{color:#1d1d1f;font-weight:600}
+    @media(max-width:600px){.exp-lightbox-inner{padding:24px 18px}.exp-modal-title{font-size:20px}}
 
     /* Apple HIG: Reduce Motion */
     @media(prefers-reduced-motion:reduce) {
@@ -367,7 +374,7 @@
   </script>
 
   <!-- Preload deferred JS to start downloading before parser reaches script tags -->
-  <link rel="preload" href="assets/js/main.min.js?v=1.42.0" as="script">
+  <link rel="preload" href="assets/js/main.min.js?v=1.43.0" as="script">
 
   <script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="233b92be-5a2d-492b-b093-9c3ed14c9063"
     type="text/javascript" async></script>
@@ -583,7 +590,7 @@
         <div class="col-lg-12">
           <div class="row">
             <div class="col-md-12">
-              <div class="data-box">
+              <div class="data-box" data-exp="protollcall">
                 <div class="d-flex justify-content-between align-items-start gap-3">
                   <div>
                     <div class="mt-3 h2">Full Stack Developer</div>
@@ -593,21 +600,16 @@
                   <img src="assets/img/protollcall-logo.avif" alt="Protollcall Advance Service"
                     class="company-logo company-logo--lg" loading="lazy" decoding="async" width="320" height="211">
                 </div>
-                <div class="mt-3">
-                  <ul class="fw-light">
-                    <li>Designed and delivered fully tailor-made CRM systems for enterprise clients across healthcare, finance, and retail — handling the entire SDLC from architecture to long-term support.</li>
-                    <li>Integrated Asterisk PBX telephony with CRM platforms; built call queue reporting (queuelog), CDR analytics (asteriskcdrdb), and real-time operations dashboards.</li>
-                    <li>Researched and prototyped an end-to-end AI voice pipeline (ASR → LLM → TTS) and shipped Claude-integrated products for business automation.</li>
-                    <li>Developed multilingual IVR systems, cloud deployments (AWS), and real-time dashboards for clients including Artelie, LivPlus, Digiserve, and VietJet Air.</li>
-                  </ul>
+                <p class="fw-light mt-3 mb-4">Built tailor-made CRM systems, Asterisk telephony integrations, multilingual IVR, and AI-powered pipelines for enterprise clients across Thailand and Southeast Asia.</p>
+                <div class="exp-card-btn" aria-hidden="true">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z"/></svg>
                 </div>
-                <button class="exp-details-btn" data-exp="protollcall">View Full Experience →</button>
               </div>
             </div>
           </div>
           <div class="row">
             <div class="col-md-12">
-              <div class="data-box">
+              <div class="data-box" data-exp="scg-2">
                 <div class="d-flex justify-content-between align-items-start gap-3">
                   <div>
                     <div class="mt-3 h2">Full Stack Developer Intern</div>
@@ -617,26 +619,17 @@
                   <img src="assets/img/scg-logo.avif" alt="SCG The Siam Cement Group" class="company-logo"
                     loading="lazy" decoding="async" width="320" height="113">
                 </div>
-                <div class="exp-body mt-3">
-                  <ul class="fw-light">
-                    <li>Successfully completed 4 internal projects for the organization</li>
-                    <li>Project Booking – Internal reservation system</li>
-                    <li>Project Ref Number – Reference code generation tool</li>
-                    <li>Project Job South – Job management system for southern region</li>
-                    <li>Project Family Day Shop – Online shop for company event participation</li>
-                  </ul>
+                <p class="fw-light mt-3 mb-4">Delivered 4 internal full-stack web applications for SCG — spanning reservations, reference tracking, regional job management, and an event e-commerce platform.</p>
+                <div class="exp-card-btn" aria-hidden="true">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z"/></svg>
                 </div>
-                <button class="exp-toggle" aria-expanded="false">
-                  <span class="exp-lbl">See more</span>
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
-                </button>
               </div>
             </div>
           </div>
 
           <div class="row">
             <div class="col-md-12">
-              <div class="data-box">
+              <div class="data-box" data-exp="scg-1">
                 <div class="d-flex justify-content-between align-items-start gap-3">
                   <div>
                     <div class="mt-3 h2">Full Stack Developer Intern</div>
@@ -646,23 +639,16 @@
                   <img src="assets/img/scg-logo.avif" alt="SCG The Siam Cement Group" class="company-logo"
                     loading="lazy" decoding="async" width="320" height="113">
                 </div>
-                <div class="exp-body mt-3">
-                  <ul class="fw-light">
-                    <li>Delivered 2 internal business solutions:</li>
-                    <li>Project License – System for managing license requests</li>
-                    <li>Project Assets – Asset management platform for internal tracking</li>
-                  </ul>
+                <p class="fw-light mt-3 mb-4">Developed 2 internal business platforms for SCG — a software license request management system and a company-wide asset tracking platform.</p>
+                <div class="exp-card-btn" aria-hidden="true">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z"/></svg>
                 </div>
-                <button class="exp-toggle" aria-expanded="false">
-                  <span class="exp-lbl">See more</span>
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
-                </button>
               </div>
             </div>
           </div>
           <div class="row">
             <div class="col-md-12">
-              <div class="data-box">
+              <div class="data-box" data-exp="advice">
                 <div class="d-flex justify-content-between align-items-start gap-3">
                   <div>
                     <div class="mt-3 h2">Computer Technician Intern</div>
@@ -671,16 +657,10 @@
                   </div>
                   <img src="assets/img/advice-logo.avif" alt="Advice IT Infinite" class="company-logo" loading="lazy" decoding="async" width="320" height="94">
                 </div>
-                <div class="exp-body mt-3">
-                  <ul class="fw-light">
-                    <li>Repaired and maintained over 5 laptops and 2 desktop computers daily.</li>
-                    <li>Provided technical support and consultation to more than 10 customers per day.</li>
-                  </ul>
+                <p class="fw-light mt-3 mb-4">Provided hands-on hardware repair and customer-facing technical support at one of Thailand's largest IT retail chains — servicing 5+ devices and 10+ customers daily.</p>
+                <div class="exp-card-btn" aria-hidden="true">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z"/></svg>
                 </div>
-                <button class="exp-toggle" aria-expanded="false">
-                  <span class="exp-lbl">See more</span>
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
-                </button>
               </div>
             </div>
           </div>
@@ -946,88 +926,265 @@
   </footer><!-- End Footer -->
 
   <!-- Main JS -->
-  <script defer src="assets/js/main.min.js?v=1.42.0"></script>
+  <script defer src="assets/js/main.min.js?v=1.43.0"></script>
   <!-- Service Worker: cache assets for repeat visits -->
   <script>if('serviceWorker'in navigator){var _sw=function(){navigator.serviceWorker.register('sw.js')};'requestIdleCallback'in window?requestIdleCallback(_sw):window.addEventListener('load',_sw)}</script>
 
-  <!-- Experience detail modal content -->
+  <!-- Experience detail modal content — Protollcall -->
   <template id="exp-protollcall">
     <div class="exp-modal-header">
       <div class="exp-modal-title">Full Stack Developer</div>
       <div class="exp-modal-subtitle">Protollcall Advance Service Co., Ltd. &nbsp;·&nbsp; June 2024 – Present</div>
+      <div class="exp-modal-clients">
+        <span class="exp-modal-client"><img src="https://logo.clearbit.com/bangkokhospital.com" alt="" onerror="this.style.display='none'">Bangkok Hospital</span>
+        <span class="exp-modal-client"><img src="https://logo.clearbit.com/kasikornbank.com" alt="" onerror="this.style.display='none'">Kasikorn Carabao</span>
+        <span class="exp-modal-client"><img src="https://logo.clearbit.com/vietjetair.com" alt="" onerror="this.style.display='none'">VietJet Air</span>
+        <span class="exp-modal-client">Artelie</span>
+        <span class="exp-modal-client">LivPlus</span>
+        <span class="exp-modal-client">Digiserve</span>
+        <span class="exp-modal-client">Happy Products</span>
+      </div>
     </div>
 
     <div class="exp-modal-section">
       <h3>CRM Systems Development</h3>
       <ul>
-        <li>Designed and developed fully tailor-made CRM platforms for enterprise clients from scratch, owning the entire SDLC: requirements gathering, system architecture, frontend (React/PHP), backend (Python/Flask/PHP), database design, deployment, and long-term maintenance.</li>
-        <li>Delivered production CRM systems for <strong>Bangkok Hospital Chiang Mai</strong>, <strong>Kasikorn Carabao</strong>, <strong>Happy Products and Services Co., Ltd.</strong>, and multiple other clients across healthcare, finance, retail, and services sectors.</li>
-        <li>Implemented complex modules including contact management, sales pipeline, task assignment, follow-up scheduling, SLA tracking, and automated notifications.</li>
-        <li>Built role-based access control (RBAC) and multi-tenant configurations to support diverse organizational structures across client deployments.</li>
-        <li>Developed REST API integration layers connecting CRM platforms with clients' existing systems, payment gateways, and third-party data sources via webhooks and OAuth 2.0.</li>
-        <li>Handled ongoing system improvements, bug resolution, feature enhancements, and performance maintenance to ensure high reliability for production environments.</li>
+        <li>Designed and built fully tailor-made CRM platforms from zero for enterprise clients — owning the complete SDLC: requirements analysis, system architecture, UI/UX design, frontend (React, PHP), backend (Python/Flask, PHP), database design, cloud deployment, and ongoing maintenance.</li>
+        <li>Delivered production CRM systems for <strong>Bangkok Hospital Chiang Mai</strong> (patient follow-up, appointment coordination), <strong>Kasikorn Carabao</strong> (sales campaign CRM), <strong>Happy Products and Services Co., Ltd.</strong> (end-to-end leads-to-support pipeline), and multiple other enterprise clients.</li>
+        <li>Implemented sophisticated modules: contact and account management, multi-stage sales pipeline, task and activity tracking, SLA monitoring, automated follow-up reminders, and real-time notification systems.</li>
+        <li>Architected multi-tenant and role-based access control (RBAC) systems with fine-grained permission layers, enabling different access levels across managers, agents, and external users within the same platform.</li>
+        <li>Built dynamic form builders, custom field configuration tools, and workflow automation engines to let clients configure the CRM to their own processes without code changes.</li>
+        <li>Developed RESTful API integration layers and webhook systems connecting CRM platforms with clients' existing ERP/POS systems, payment gateways, LINE OA, SMS providers, and third-party data sources.</li>
+        <li>Managed long-term client relationships including requirement refinement, iterative feature delivery, hotfix deployments, and post-launch performance tuning to ensure stability in production.</li>
       </ul>
     </div>
 
     <div class="exp-modal-section">
       <h3>Telephony & PBX System Integration</h3>
       <ul>
-        <li>Integrated Asterisk PBX telephony infrastructure with CRM and reporting systems, enabling real-time call data synchronization across platforms.</li>
-        <li>Built custom call queue reporting systems querying Asterisk's <strong>queuelog</strong> database — extracting and aggregating agent performance metrics, average wait times, abandon rates, and SLA compliance reports.</li>
-        <li>Developed CDR (Call Detail Record) analytics pipelines via <strong>asteriskcdrdb</strong>, providing per-agent, per-campaign, and per-queue call breakdowns for management reporting.</li>
-        <li>Created real-time call analytics dashboards for operations teams, displaying live queue status, agent availability, and historical trend reports with drill-down capability.</li>
-        <li>Implemented automated call report exports (daily, weekly, monthly) in PDF and Excel formats delivered via scheduled jobs and email distribution.</li>
+        <li>Integrated <strong>Asterisk PBX</strong> telephony infrastructure directly with CRM platforms, enabling real-time call data synchronization — matching incoming/outgoing calls to customer records automatically.</li>
+        <li>Built custom call queue reporting pipelines querying Asterisk's <strong>queuelog</strong> table — extracting, aggregating, and presenting per-queue metrics: average wait time, service level, abandon rate, and agent talk time across any date range.</li>
+        <li>Developed CDR (Call Detail Record) analytics systems via <strong>asteriskcdrdb</strong> — providing drill-down per-agent, per-DID, per-campaign, and per-time-slot breakdowns for management review.</li>
+        <li>Created real-time live dashboard views showing active queue depth, agent statuses (available, on-call, ACW, offline), and live SLA adherence counters.</li>
+        <li>Built automated scheduled report generation and delivery — daily, weekly, and monthly call summaries exported to PDF and Excel, then dispatched via email to defined distribution lists.</li>
+        <li>Implemented call tagging, disposition code recording, and post-call note systems allowing agents to annotate calls within the CRM immediately after each interaction.</li>
       </ul>
     </div>
 
     <div class="exp-modal-section">
       <h3>IVR System Development</h3>
       <ul>
-        <li>Designed and developed multilingual IVR (Interactive Voice Response) systems, including a production deployment for <strong>VietJet Air</strong> supporting Thai and English languages.</li>
-        <li>Built IVR call flows integrated with backend APIs to dynamically serve caller-specific information including flight status, booking details, and account lookups.</li>
-        <li>Implemented TTS (Text-to-Speech) prompt generation for dynamic voice responses within IVR dialplan flows.</li>
-        <li>Tested and optimized IVR dialplan logic in Asterisk AGI/ARI for low-latency, high-availability call handling under production traffic conditions.</li>
+        <li>Designed and developed a production multilingual IVR (Interactive Voice Response) system for <strong>VietJet Air</strong>, supporting Thai and English language menus with dynamic prompt selection based on caller language preference.</li>
+        <li>Built IVR call flows in Asterisk AGI/ARI that query live backend APIs to serve caller-specific dynamic information — flight status by booking reference, baggage allowance, and refund policy details.</li>
+        <li>Implemented TTS (Text-to-Speech) integration for generating dynamic voice prompts from real-time data — no need to re-record audio for every data change.</li>
+        <li>Engineered DTMF input handling, caller intent routing, and escalation paths to live agents with context handoff (caller's selected language and journey pre-populated for the agent).</li>
+        <li>Load-tested and optimized Asterisk dialplan logic for low-latency, concurrent multi-call IVR handling; ensured graceful error fallback for API timeout and no-input scenarios.</li>
       </ul>
     </div>
 
     <div class="exp-modal-section">
       <h3>Dashboard & Business Analytics</h3>
       <ul>
-        <li>Developed real-time operational dashboards for clients including <strong>Artelie</strong>, <strong>LivPlus</strong>, and <strong>Digiserve</strong>, enabling management teams to monitor KPIs, agent productivity, and customer engagement metrics.</li>
-        <li>Built data visualization components for call center performance, CRM activity trends, customer journey analytics, and sales funnel reporting.</li>
-        <li>Designed and optimized SQL queries for large-scale reporting across millions of CDR and CRM records, significantly reducing report generation time.</li>
-        <li>Integrated dashboard systems with third-party BI tools and automated export pipelines for downstream stakeholder analysis.</li>
+        <li>Developed real-time operational dashboards for <strong>Artelie</strong>, <strong>LivPlus</strong>, and <strong>Digiserve</strong> — giving management teams live visibility into agent productivity, call volume trends, SLA compliance, and customer engagement KPIs.</li>
+        <li>Built interactive data visualization components with chart libraries — bar/line/pie charts for historical trend analysis, heatmaps for peak hour patterns, and leaderboard widgets for agent performance rankings.</li>
+        <li>Designed and optimized complex SQL queries and stored procedures for large-scale aggregation across millions of CDR and CRM records; used query optimization, indexing strategies, and data pre-aggregation to achieve sub-second report loads.</li>
+        <li>Implemented date-range filtering, multi-dimension drill-down, and exportable report features (PDF/Excel/CSV) within all dashboard tools.</li>
+        <li>Integrated dashboards with automated alerting systems — thresholds for queue wait times and SLA breaches triggering instant notifications to supervisors via LINE and email.</li>
       </ul>
     </div>
 
     <div class="exp-modal-section">
-      <h3>AI Research & Product Development</h3>
+      <h3>AI Research & Pipeline Development</h3>
       <ul>
-        <li>Researched and prototyped an end-to-end AI voice pipeline: <strong>ASR (Automatic Speech Recognition) → LLM (Large Language Model) → TTS (Text-to-Speech)</strong>, targeting intelligent call-handling automation for contact center use cases.</li>
-        <li>Evaluated and integrated ASR engines for Thai and English speech transcription with real-time streaming capability and noise handling.</li>
-        <li>Integrated <strong>Claude (Anthropic)</strong> as the LLM reasoning layer for intent detection, response generation, context-aware dialogue management, and call summarization.</li>
-        <li>Built and shipped AI-integrated products leveraging Claude's API, accelerating business automation workflows and internal tooling for enterprise clients.</li>
-        <li>Developed AI-assisted CRM features including smart call summarization, sentiment analysis tagging, and automated follow-up suggestions generated post-call.</li>
-        <li>Contributed to product strategy and technical roadmap for AI-powered contact center solutions targeting enterprise clients in Thailand and Southeast Asia.</li>
+        <li>Researched and prototyped an end-to-end intelligent voice automation pipeline: <strong>ASR (Automatic Speech Recognition) → LLM (Large Language Model) → TTS (Text-to-Speech)</strong> — targeting automated call handling for contact center use cases in Thai and English.</li>
+        <li>Evaluated and benchmarked multiple ASR engines for real-time Thai/English transcription accuracy, latency, noise tolerance, and streaming capability — selecting and integrating the best fit for production requirements.</li>
+        <li>Used <strong>GPT (OpenAI)</strong> and <strong>Gemini (Google)</strong> as the core LLM reasoning layer — handling intent classification, context-aware response generation, dialogue state management, and entity extraction from transcribed speech.</li>
+        <li>Integrated TTS synthesis for generating natural, low-latency audio responses from LLM output, completing the voice automation loop.</li>
+        <li>Leveraged <strong>Claude</strong> extensively during the research phase — using it to synthesize technical documentation, evaluate architectural tradeoffs, draft prompt strategies, and accelerate product decisions throughout the R&amp;D process.</li>
+        <li>Developed AI-assisted CRM features: post-call smart summarization (auto-generating structured call notes), sentiment tagging, and automated follow-up action suggestions surfaced to agents after each call.</li>
+        <li>Contributed to the product roadmap for AI-powered contact center automation targeting enterprise clients in Thailand and Southeast Asia.</li>
       </ul>
     </div>
 
     <div class="exp-modal-section">
       <h3>Cloud, API & Infrastructure</h3>
       <ul>
-        <li>Deployed and managed applications on <strong>AWS</strong> infrastructure (EC2, S3, RDS), configuring environments for staging and production with automated deployment pipelines.</li>
-        <li>Integrated third-party APIs including payment gateways, SMS/messaging providers, LINE OA, and external CRM data sources.</li>
-        <li>Built webhook systems for real-time event-driven data synchronization between internal platforms and external client systems.</li>
-        <li>Implemented OAuth 2.0, API key management, and secure credential handling for all third-party integrations.</li>
+        <li>Deployed and operated production applications on <strong>AWS</strong> (EC2, S3, RDS, CloudFront) — managing environment configuration, auto-scaling groups, and deployment automation scripts.</li>
+        <li>Integrated diverse third-party services: payment gateways, SMS/OTP providers, LINE Official Account Messaging API, email delivery platforms, and external data feed APIs.</li>
+        <li>Built robust webhook receiver systems for real-time inbound event processing from external platforms, with idempotency handling, retry logic, and dead-letter queue management.</li>
+        <li>Managed OAuth 2.0 authorization flows, API key vaulting, and JWT-based session systems across all client integrations.</li>
       </ul>
     </div>
 
     <div class="exp-modal-section">
       <h3>Security & Performance</h3>
       <ul>
-        <li>Implemented security best practices across all systems: parameterized queries (SQL injection prevention), XSS protection, CSRF token validation, and encrypted data storage.</li>
-        <li>Conducted performance audits and optimization — database indexing, query optimization, server-side caching, and frontend asset optimization.</li>
-        <li>Managed authentication flows, server-side session handling, role-based permissions, and audit logging for compliance and traceability requirements.</li>
+        <li>Applied OWASP-aligned security practices across all systems: parameterized queries and prepared statements (SQL injection prevention), output encoding (XSS prevention), CSRF token validation, and bcrypt password hashing.</li>
+        <li>Conducted regular performance profiling — identifying N+1 query patterns, adding database indexes, introducing Redis caching for hot data, and lazy-loading heavy UI components to optimize perceived load time.</li>
+        <li>Implemented server-side session management, audit logging of sensitive actions, and IP-based rate limiting to support compliance and traceability requirements for enterprise clients.</li>
+        <li>Set up SSL/TLS certificate management, HTTP security headers (HSTS, X-Frame-Options, CSP), and automated certificate renewal across all client deployments.</li>
+      </ul>
+    </div>
+  </template>
+
+  <!-- Experience detail modal content — SCG Intern (Dec 2023 – Mar 2024) -->
+  <template id="exp-scg-2">
+    <div class="exp-modal-header">
+      <div class="exp-modal-title">Full Stack Developer Intern</div>
+      <div class="exp-modal-subtitle">The Siam Cement Group (SCG) &nbsp;·&nbsp; December 2023 – March 2024</div>
+      <div class="exp-modal-clients">
+        <span class="exp-modal-client"><img src="https://logo.clearbit.com/scg.com" alt="" onerror="this.style.display='none'">SCG Group</span>
+      </div>
+    </div>
+
+    <div class="exp-modal-section">
+      <h3>Overview</h3>
+      <ul>
+        <li>Completed a second internship at one of Thailand's largest conglomerates (SCG), contributing to 4 full-stack internal web application projects across different business units.</li>
+        <li>Worked across the full development lifecycle — from requirements gathering with internal stakeholders through to implementation, testing, and handover — delivering each project within the internship period.</li>
+        <li>Developed a strong understanding of enterprise software development practices, internal system design patterns, and cross-team collaboration in a large corporate environment.</li>
+      </ul>
+    </div>
+
+    <div class="exp-modal-section">
+      <h3>Project Booking — Internal Reservation System</h3>
+      <ul>
+        <li>Built a full-featured internal booking and reservation management system for SCG, allowing employees to reserve meeting rooms, company vehicles, equipment, and shared facilities.</li>
+        <li>Implemented calendar views, time-slot conflict detection, approval workflows, and automated confirmation notifications via email.</li>
+        <li>Designed the admin panel for managing resource inventory, configuring booking rules (max duration, advance booking windows), and reviewing approval queues.</li>
+      </ul>
+    </div>
+
+    <div class="exp-modal-section">
+      <h3>Project Ref Number — Reference Code Generation Tool</h3>
+      <ul>
+        <li>Developed an internal reference code generation and tracking system for managing document reference numbers across SCG business units.</li>
+        <li>Implemented configurable prefix/suffix rules, sequential numbering with padding, and category-based series to support multiple document types across departments.</li>
+        <li>Built search and audit history features allowing staff to trace the lifecycle and usage of any reference code.</li>
+      </ul>
+    </div>
+
+    <div class="exp-modal-section">
+      <h3>Project Job South — Regional Job Management System</h3>
+      <ul>
+        <li>Developed a job tracking and management system for SCG's southern region operations — enabling regional managers to create, assign, monitor, and close field jobs.</li>
+        <li>Implemented job status workflows (open → assigned → in-progress → completed/cancelled), with real-time status updates and job history logging.</li>
+        <li>Built reporting views for regional operations summaries, job completion rates, and workload distribution across teams.</li>
+      </ul>
+    </div>
+
+    <div class="exp-modal-section">
+      <h3>Project Family Day Shop — Event E-Commerce Platform</h3>
+      <ul>
+        <li>Developed an internal online shop for SCG's annual Family Day company event — allowing employees to browse, select, and purchase participation packages, merchandise, and activity slots.</li>
+        <li>Implemented a product catalog with stock management, a shopping cart, order placement, and payment confirmation flow.</li>
+        <li>Built an admin dashboard for event organizers to manage product listings, track orders, and monitor inventory in real time during the event period.</li>
+      </ul>
+    </div>
+
+    <div class="exp-modal-section">
+      <h3>Technical Stack & Skills Applied</h3>
+      <ul>
+        <li>Built all projects using PHP/Laravel (backend), MySQL (database), and Bootstrap + vanilla JS (frontend).</li>
+        <li>Applied MVC architecture, form validation, CSRF protection, and user authentication across all systems.</li>
+        <li>Practiced Git-based version control, code review participation, and Agile sprint methodology within the internship team.</li>
+      </ul>
+    </div>
+  </template>
+
+  <!-- Experience detail modal content — SCG Intern (Apr 2023 – Jul 2023) -->
+  <template id="exp-scg-1">
+    <div class="exp-modal-header">
+      <div class="exp-modal-title">Full Stack Developer Intern</div>
+      <div class="exp-modal-subtitle">The Siam Cement Group (SCG) &nbsp;·&nbsp; April 2023 – July 2023</div>
+      <div class="exp-modal-clients">
+        <span class="exp-modal-client"><img src="https://logo.clearbit.com/scg.com" alt="" onerror="this.style.display='none'">SCG Group</span>
+      </div>
+    </div>
+
+    <div class="exp-modal-section">
+      <h3>Overview</h3>
+      <ul>
+        <li>Completed my first internship at SCG, one of Southeast Asia's largest industrial conglomerates — gaining foundational enterprise software development experience by delivering 2 internal business platform projects.</li>
+        <li>Collaborated with internal business stakeholders to gather requirements, translate them into technical specifications, and deliver working systems on schedule.</li>
+      </ul>
+    </div>
+
+    <div class="exp-modal-section">
+      <h3>Project License — Software License Management System</h3>
+      <ul>
+        <li>Designed and built an internal system for SCG employees to submit, track, and manage software license requests across the organization.</li>
+        <li>Implemented multi-step request and approval workflows — employees submit license requests, which route to IT managers for review, then to procurement for purchasing, and finally back to the requester with license assignment details.</li>
+        <li>Built an admin dashboard for IT teams to manage the software catalog (available licenses, vendor details, renewal dates, seat counts) and monitor active license utilization.</li>
+        <li>Implemented automated email notifications at each workflow stage to keep requesters and approvers informed without manual follow-up.</li>
+        <li>Developed reporting views showing license usage rates, upcoming renewal deadlines, and cost allocation by department.</li>
+      </ul>
+    </div>
+
+    <div class="exp-modal-section">
+      <h3>Project Assets — Enterprise Asset Management Platform</h3>
+      <ul>
+        <li>Built a company-wide IT and physical asset tracking platform for SCG — enabling teams to register, assign, transfer, and retire company assets (laptops, monitors, phones, furniture, etc.).</li>
+        <li>Implemented asset lifecycle management: procurement → assignment to employee → transfer between departments → maintenance records → disposal with audit trail.</li>
+        <li>Developed a barcode/QR-code based asset lookup system, allowing inventory staff to quickly scan assets and retrieve full ownership and maintenance history.</li>
+        <li>Built department-level and company-wide asset inventory reports showing asset counts, condition status, age distribution, and depreciation tracking.</li>
+        <li>Designed check-out/check-in workflows for shared assets (e.g., projectors, cameras) with availability calendars and reservation queues.</li>
+      </ul>
+    </div>
+
+    <div class="exp-modal-section">
+      <h3>Technical Stack & Skills Applied</h3>
+      <ul>
+        <li>Developed both projects using PHP/Laravel (backend), MySQL (database), and Bootstrap + JavaScript (frontend).</li>
+        <li>Implemented MVC patterns, database migrations, Eloquent ORM relationships, and RESTful routing.</li>
+        <li>Gained hands-on experience with enterprise requirements, stakeholder communication, and software delivery in a structured corporate environment.</li>
+      </ul>
+    </div>
+  </template>
+
+  <!-- Experience detail modal content — Advice IT -->
+  <template id="exp-advice">
+    <div class="exp-modal-header">
+      <div class="exp-modal-title">Computer Technician Intern</div>
+      <div class="exp-modal-subtitle">Advice IT Infinite Co., Ltd. &nbsp;·&nbsp; September 2019 – December 2019</div>
+      <div class="exp-modal-clients">
+        <span class="exp-modal-client"><img src="https://logo.clearbit.com/advice.co.th" alt="" onerror="this.style.display='none'">Advice IT Infinite</span>
+      </div>
+    </div>
+
+    <div class="exp-modal-section">
+      <h3>Overview</h3>
+      <ul>
+        <li>Completed a hands-on hardware and technical support internship at Advice IT Infinite — one of Thailand's largest computer and IT retail chains — gaining foundational experience in device diagnostics, repair, and customer-facing technical consultation.</li>
+        <li>Operated in a high-volume retail service environment, managing a continuous queue of customer devices and support requests across each working day.</li>
+      </ul>
+    </div>
+
+    <div class="exp-modal-section">
+      <h3>Hardware Repair & Maintenance</h3>
+      <ul>
+        <li>Diagnosed and repaired 5+ laptops and 2+ desktop computers daily across a wide range of hardware failures — including motherboard issues, HDD/SSD replacements, RAM failures, overheating and thermal paste degradation, display panel faults, and keyboard/trackpad replacements.</li>
+        <li>Performed OS installations and clean reinstalls (Windows 10/7), driver updates, BIOS configuration, and post-repair hardware testing to ensure devices passed all functional checks before return to customers.</li>
+        <li>Conducted software troubleshooting including malware removal, system cleanup, performance tuning, and data backup/recovery from failing storage devices.</li>
+        <li>Managed repair job ticketing — logging device intake, fault descriptions, parts ordered, repair steps taken, and completion status for each job.</li>
+      </ul>
+    </div>
+
+    <div class="exp-modal-section">
+      <h3>Customer Technical Support & Consultation</h3>
+      <ul>
+        <li>Provided direct technical consultation to 10+ customers daily at the store's service counter — diagnosing symptoms, explaining repair options and costs, and recommending upgrade or replacement solutions based on device condition and customer budget.</li>
+        <li>Advised customers on product selection (laptops, desktops, peripherals, accessories) — matching technical specifications to use-case requirements for students, home users, and small business owners.</li>
+        <li>Handled customer expectations and communication around repair timelines, warranty claims, and data recovery risks — building trust through clear and honest technical communication.</li>
+      </ul>
+    </div>
+
+    <div class="exp-modal-section">
+      <h3>Skills Developed</h3>
+      <ul>
+        <li>Built strong foundational knowledge of computer hardware architecture, component compatibility, and diagnostic methodology — skills that continue to inform my software engineering work today.</li>
+        <li>Developed customer communication and technical explanation skills — translating complex hardware issues into clear, jargon-free explanations for non-technical users.</li>
+        <li>Gained experience working under time pressure in a high-volume service environment, managing multiple concurrent repair jobs and customer interactions efficiently.</li>
       </ul>
     </div>
   </template>
