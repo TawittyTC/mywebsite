@@ -195,6 +195,51 @@ document.addEventListener("DOMContentLoaded", function () {
   window._certLightboxOpen = openLightbox;
 })();
 
+// Experience details lightbox (text modal)
+(function () {
+  const lightbox = document.createElement('div');
+  lightbox.className = 'exp-lightbox';
+  const inner = document.createElement('div');
+  inner.className = 'exp-lightbox-inner';
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'exp-lightbox-close';
+  closeBtn.setAttribute('aria-label', 'Close');
+  closeBtn.innerHTML = '&#x2715;';
+  inner.appendChild(closeBtn);
+  lightbox.appendChild(inner);
+  document.body.appendChild(lightbox);
+
+  function closeExp() {
+    lightbox.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  closeBtn.addEventListener('click', closeExp);
+  lightbox.addEventListener('click', function (e) {
+    if (e.target === lightbox) closeExp();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeExp();
+  });
+
+  window._expLightboxOpen = function (html) {
+    while (inner.children.length > 1) inner.removeChild(inner.lastChild);
+    const content = document.createElement('div');
+    content.innerHTML = html;
+    inner.appendChild(content);
+    lightbox.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  };
+})();
+
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('.exp-details-btn[data-exp]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var tmpl = document.getElementById('exp-' + btn.dataset.exp);
+      if (tmpl) window._expLightboxOpen(tmpl.innerHTML);
+    });
+  });
+});
+
 // Load cert images only when section scrolls into view (performance)
 document.addEventListener("DOMContentLoaded", function () {
   const imagesList = document.getElementById("images-list");
