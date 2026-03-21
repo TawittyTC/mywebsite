@@ -41,6 +41,7 @@
   <!-- Preconnect for third-party CDNs (DNS + TCP + TLS negotiation upfront) -->
   <link rel="preconnect" href="https://consent.cookiebot.com">
   <link rel="preconnect" href="https://www.googletagmanager.com">
+  <link rel="preconnect" href="https://logo.clearbit.com">
   <link rel="dns-prefetch" href="https://logo.clearbit.com">
 
   <!-- Preload critical hero background image -->
@@ -985,25 +986,26 @@
       </div>
       <div class="exp-modal-period">June 2024 – Present</div>
       <div class="exp-modal-tech">
-        <span>PHP</span><span>Python</span><span>Flask</span><span>React</span><span>JavaScript</span>
-        <span>MySQL</span><span>Asterisk PBX</span><span>AWS</span>
-        <span>LINE OA API</span><span>GPT API</span><span>Gemini API</span><span>REST APIs</span>
+        <span>PHP</span><span>MySQL</span><span>JavaScript</span><span>jQuery</span><span>HTML5/CSS3</span>
+        <span>RESTful API</span><span>OWASP Security</span><span>Git</span><span>Docker</span>
+        <span>AJAX</span><span>JSON</span><span>Bootstrap</span><span>DataTables</span><span>Select2</span>
+        <span>Moment.js</span><span>Bootstrap Datetimepicker</span><span>FontAwesome</span><span>Chart.js</span>
+        <span>PhpSpreadsheet</span><span>OAuth2</span><span>Webhook</span><span>LINE Messaging API</span>
       </div>
     </div>
 
     <div class="exp-modal-section">
       <h3>Role Overview</h3>
-      <p class="exp-modal-overview">Sole full-stack developer responsible for designing and shipping tailor-made enterprise software for Protollcall's clients — spanning CRM systems, telephony integrations, IVR, AI research, and real-time analytics across multiple concurrent client engagements in Thailand and Southeast Asia.</p>
+      <p class="exp-modal-overview">Architected and deployed customized CRM solutions for 10+ enterprise clients across Healthcare, Finance, Insurance, and E-Commerce industries. Served as sole full-stack developer managing the complete SDLC — from requirements through deployment and ongoing maintenance — across multiple concurrent client engagements.</p>
     </div>
 
     <div class="exp-modal-section">
       <h3>Responsibilities</h3>
       <ul>
-        <li>Own the full SDLC for each client project: requirements gathering, system architecture, UI/UX, frontend and backend implementation, deployment, and long-term maintenance.</li>
-        <li>Integrate Asterisk PBX with CRM platforms — syncing CDR records, building queuelog-based reporting, and delivering real-time call analytics dashboards.</li>
-        <li>Design and develop IVR call flows with TTS integration and live API backend connectivity.</li>
-        <li>Research and prototype AI voice pipeline (ASR → LLM → TTS) using GPT and Gemini; use Claude as a research and product strategy tool throughout R&amp;D.</li>
-        <li>Deploy and maintain AWS infrastructure (EC2, S3, RDS); integrate third-party APIs and enforce security best practices across all systems.</li>
+        <li>End-to-End Development: Architected and deployed customized CRM solutions for 10+ enterprise clients (Healthcare, Finance, Insurance), handling the full lifecycle from requirements gathering to production deployment.</li>
+        <li>High-Volume Delivery: Successfully delivered and maintained 60+ customization tickets, ranging from UI/UX enhancements to complex backend logic and database optimization.</li>
+        <li>Security Implementation: Hardened system security according to OWASP guidelines — patched XSS vulnerabilities, enforced HSTS, and secured session management — for public company clients including Netbay.</li>
+        <li>API Integration: Engineered RESTful APIs and Webhooks for real-time data synchronization between CRM systems, warehouse platforms, and 3rd-party services (LINE Notify, Telegram, KBAOBOT).</li>
       </ul>
     </div>
 
@@ -1036,6 +1038,9 @@
         <button class="exp-filter-chip" data-filter="drorn">Or The Medical</button>
         <button class="exp-filter-chip" data-filter="sbl">SBL Leasing</button>
         <button class="exp-filter-chip" data-filter="general">R&amp;D &amp; Infra</button>
+        <button class="exp-filter-chip" data-filter="genie">Genie Properties</button>
+        <button class="exp-filter-chip" data-filter="isuzu">Isuzu Thailand</button>
+        <button class="exp-filter-chip" data-filter="maneydaeng">มณีแดง</button>
       </div>
 
       <div class="exp-client-section" data-client="bkk-hosp">
@@ -1046,10 +1051,8 @@
         </div>
         <ul>
           <li>Built a full-stack patient relationship CRM — patient database, appointment scheduling with conflict detection, and automated follow-up reminder sequences.</li>
-          <li>Integrated <strong>LINE OA</strong> for automated appointment reminders and post-visit satisfaction follow-up, reducing no-show rates and manual staff workload.</li>
-          <li>Implemented <strong>RBAC</strong> with role layers for doctors, nurses, admin, and front-desk staff — each role scoped to relevant data only.</li>
-          <li>Linked Asterisk CDR records to patient profiles — giving agents full call interaction history on every patient screen.</li>
-          <li>Built coordinator dashboards: follow-up completion rates, appointment volumes by department, and patient lifecycle stage tracking.</li>
+          <li>Developed "IV Team Request System" — real-time IV team dispatch requests with instant notifications delivered via LINE and Telegram API to on-duty nursing staff.</li>
+          <li>Integrated Asterisk CDR linking all patient call interactions to their CRM profile for complete care history visibility.</li>
         </ul>
       </div>
 
@@ -1060,11 +1063,11 @@
           <span class="exp-client-tag">Sales Campaign CRM</span>
         </div>
         <ul>
-          <li>Developed a CRM for managing campaign customers and coordinating sales agent activity across multiple promotional campaigns.</li>
-          <li>Multi-step sales pipeline with lead assignment rules, agent task queues, follow-up scheduling, and status tracking per campaign.</li>
-          <li>Integrated Asterisk CDR — automatically linking call records to customer accounts and showing full call history within CRM.</li>
-          <li>Built <strong>queuelog</strong>-powered agent performance dashboards: per-agent call counts, talk time, wrap-up time, and campaign conversion rates.</li>
-          <li>Automated daily and weekly performance report exports (PDF/Excel) delivered to campaign managers via email.</li>
+          <li>Built high-performance dashboards for Call Productivity, Collection Performance, FCR by Area, and Agent Performance — processing daily massive CDR datasets with optimized SQL queries.</li>
+          <li>Developed LINE image sending in Collection module — UI button for image upload, AKSK key management, OBS Object Storage integration, and encrypted credential storage.</li>
+          <li>Integrated KBAOBOT: real-time chat history sync, ticket-status API, agent-transfer notifications, and UID-based customer lookup in Social menu.</li>
+          <li>Implemented scheduled crontab for monthly data import with corrected date logic; fixed import conditions and deployed to production overnight to meet billing deadlines.</li>
+          <li>Added CSV export to reports and generated secure access link for Report Agent Login-Logout (billing use only).</li>
         </ul>
       </div>
 
@@ -1075,18 +1078,19 @@
           <span class="exp-client-tag">End-to-End CRM</span>
         </div>
         <ul>
-          <li>Delivered a comprehensive CRM covering the full customer lifecycle: lead intake (web, LINE, phone) → sales pipeline → conversion → after-sales support ticketing.</li>
-          <li>Multi-source lead intake with automatic routing to the right sales agent based on source, region, and product category.</li>
-          <li>Automated follow-up scheduling: contract renewal reminders, overdue task alerts, and SLA escalation paths with supervisor notification.</li>
-          <li>Post-sale support ticketing with SLA tracking, escalation rules, resolution logging, and customer satisfaction survey triggers.</li>
-          <li>Customer 360° profile consolidating all interactions (calls, LINE, email, tickets, purchase history) in a single view.</li>
+          <li>Built full end-to-end CRM for TV shopping operations — managing airtime scheduling, purchase orders, product catalog, and telesales agent workflows.</li>
+          <li>Developed "Warehouse API Integration" — real-time stock quantity sync with warehouse system; Out-of-Stock popup alerts during order placement with configurable override option.</li>
+          <li>Built "Product Lock" system — prevents incompatible products from being sold together; configurable lock/unlock rules with item code mapping and bulk management UI.</li>
+          <li>Implemented Abandon Call management, Lead Filter workflows, and Auto Report Email delivery for daily/weekly operations summaries.</li>
+          <li>Built agent group management: Supervisor assigns agents by group (Telesales1/Telesales2) with auto-prefix routing and multi-group campaign support.</li>
+          <li>Developed audit log system for all admin menu actions (create/edit/delete/update) for compliance tracking.</li>
         </ul>
       </div>
 
       <div class="exp-client-section" data-client="vietjet">
         <div class="exp-client-section-header">
           <img src="https://logo.clearbit.com/vietjetair.com" alt="" onerror="this.style.display='none'">
-          <h3>Thai VietJet Air Joint Stock Co., Ltd.</h3>
+          <h3>Thai VietJet Air Joint Stock Co., Ltd. <span style="font-weight:400;color:#6e6e73">(VietJet)</span></h3>
           <span class="exp-client-tag">Multilingual IVR System</span>
         </div>
         <ul>
@@ -1104,17 +1108,17 @@
           <span class="exp-client-tag">Operations Dashboard</span>
         </div>
         <ul>
-          <li>Real-time contact center dashboard: live queue depth, agent status (available / on-call / ACW / offline), and live SLA adherence counters.</li>
-          <li>Historical analytics: hourly/daily call volume trends, average handling time (AHT), first-call resolution (FCR) rate — drill-down by queue, agent, and time period.</li>
-          <li>Configurable SLA breach and queue spike alerts triggering instant LINE and email notifications to supervisors.</li>
-          <li>Agent leaderboard widget and comparative performance views supporting supervisor coaching and shift planning.</li>
+          <li>Built real-time contact center dashboard with live queue depth, agent status, and SLA adherence counters; configurable alerts via LINE and email for queue spikes and SLA breaches.</li>
+          <li>Developed 4 Historical Reports: Call Center Performance (In-Out hrs, YTD), Performance per Agent, and Agent Performance — with queue/agent filters and time-range selection.</li>
+          <li>Built KPI target comparison dashboard: configurable targets for Answer &lt;30s %, Abandoned Calls %, and Call Answered %; displayed as visual comparison against actuals.</li>
+          <li>Monthly/YTD overview tables (Call Offered, Answered, Abandoned, Avg Wait/Talk times), queue statistics, agent statistics, and YTD bar chart with export capability.</li>
         </ul>
       </div>
 
       <div class="exp-client-section" data-client="livplus">
         <div class="exp-client-section-header">
           <img src="https://logo.clearbit.com/livplus.co.th" alt="" onerror="this.style.display='none'">
-          <h3>LivPlus Health Solution Co., Ltd.</h3>
+          <h3>LivPlus Health Solution Co., Ltd. <span style="font-weight:400;color:#6e6e73">(LivPlus)</span></h3>
           <span class="exp-client-tag">Analytics &amp; Scheduled Reports</span>
         </div>
         <ul>
@@ -1128,7 +1132,7 @@
       <div class="exp-client-section" data-client="digiserve">
         <div class="exp-client-section-header">
           <img src="https://logo.clearbit.com/digiserve.co.th" alt="" onerror="this.style.display='none'">
-          <h3>Digiserve Corporation Co., Ltd.</h3>
+          <h3>Digiserve Corporation Co., Ltd. <span style="font-weight:400;color:#6e6e73">(Digiserve)</span></h3>
           <span class="exp-client-tag">Customer Analytics</span>
         </div>
         <ul>
@@ -1145,22 +1149,24 @@
           <span class="exp-client-tag">Contact Center Analytics</span>
         </div>
         <ul>
-          <li>Built a contact center performance analytics platform integrating Asterisk CDR and queuelog data sources.</li>
-          <li>Real-time agent monitoring dashboard with queue status, SLA tracking, and instant supervisor alerts for breach events.</li>
-          <li>Automated daily performance report generation and scheduled delivery to management via email.</li>
+          <li>Built contact center performance analytics platform integrating Asterisk CDR and queuelog data sources with real-time agent monitoring and SLA tracking.</li>
+          <li>Added configurable Dropdown Lists (Problem Summary Category, Solution Summary Category) to ticket case recording form.</li>
+          <li>Added ticket type/category field; relabeled customer profile fields to merchant-specific terminology (Merchant Name, TID, EDC S/N, Merchant Province) for payment terminal support use case.</li>
         </ul>
       </div>
 
       <div class="exp-client-section" data-client="netbay">
         <div class="exp-client-section-header">
           <img src="https://logo.clearbit.com/netbay.co.th" alt="" onerror="this.style.display='none'">
-          <h3>Netbay Public Company Limited</h3>
+          <h3>Netbay Public Company Limited <span style="font-weight:400;color:#6e6e73">(Netbay)</span></h3>
           <span class="exp-client-tag">IT Services CRM</span>
         </div>
         <ul>
-          <li>Developed a service request and ticket management CRM for IT service operations — logging, categorizing, and tracking all customer support requests from intake to resolution.</li>
-          <li>SLA-based escalation rules with automated alerts when tickets approach or breach agreed response times.</li>
-          <li>Linked Asterisk CDR to ticket records for full call-to-resolution audit trails and agent accountability reporting.</li>
+          <li>Developed service request and ticket management CRM — logging, categorizing, and tracking all customer support requests from intake to resolution with SLA-based escalation.</li>
+          <li>Built Abandon Call and Callback management menus — agents can log, stamp, and track callback attempts with timestamps and agent ID.</li>
+          <li>Added 5 analytics reports covering call volumes, agent performance, and queue metrics; enhanced report filtering and graph display per client specifications.</li>
+          <li>Hardened security: implemented Password Policy (8+ chars, complexity rules, no username match), Account Lockout after 3 failed attempts, force-change on first login; patched HSTS, HTTP TRACE, PHP exposure, and jQuery XSS vulnerabilities.</li>
+          <li>Built Emergency Announcement toggle — allows client to independently enable/disable emergency broadcast audio without developer intervention.</li>
         </ul>
       </div>
 
@@ -1171,9 +1177,9 @@
           <span class="exp-client-tag">Automotive Sales CRM</span>
         </div>
         <ul>
-          <li>Built a vehicle sales CRM covering the full buyer journey: lead capture → test drive scheduling → negotiation → purchase → after-sales follow-up.</li>
-          <li>Integrated <strong>LINE OA</strong> for automated test drive confirmations, service reminders, and post-purchase satisfaction follow-ups.</li>
-          <li>Agent performance dashboards with lead conversion rates, pipeline stage breakdowns, and CDR-linked call history per customer profile.</li>
+          <li>Built vehicle sales CRM covering the full buyer journey: lead capture → test drive scheduling → negotiation → purchase → after-sales follow-up with LINE OA automation.</li>
+          <li>Added calllist_status field to tbl_project_result; extended Status and Calling Status details on CRM for richer call disposition tracking.</li>
+          <li>Added filter for status types (Close, In Progress, etc.) in Case Detail report for improved operations review.</li>
         </ul>
       </div>
 
@@ -1184,9 +1190,10 @@
           <span class="exp-client-tag">Vehicle Finance CRM</span>
         </div>
         <ul>
-          <li>Developed a CRM for vehicle financing operations — managing loan applications, document collection, credit review stages, and approval workflows.</li>
-          <li>Automated follow-up sequences for incomplete applications and upcoming payment due dates via LINE OA and outbound call queues.</li>
-          <li>Asterisk CDR integration linking all call records to customer loan files for complete interaction history and compliance audit trails.</li>
+          <li>Developed vehicle financing CRM — managing loan applications, document collection, credit review stages, and approval workflows with full audit trail.</li>
+          <li>Built lead redistribution logic: new agents can be added to active projects and assigned uncalled numbers, while already-recorded entries remain fixed to original agents.</li>
+          <li>Added bulk view-list selection (multi-agent), owner change functionality, and export button for outbound call management.</li>
+          <li>Automated follow-up sequences for incomplete applications and payment due dates via LINE OA and outbound call queues.</li>
         </ul>
       </div>
 
@@ -1198,8 +1205,8 @@
         </div>
         <ul>
           <li>Contact center operations dashboard with real-time queue monitoring, agent availability tracking, and SLA compliance metrics.</li>
-          <li>Automated scheduled reporting: daily summary exports covering call volumes, agent performance, and SLA adherence delivered to management.</li>
-          <li>CDR-powered historical analytics with drill-down by date range, queue, and individual agent.</li>
+          <li>Added employee code and position columns to Sales Performance by Employee report; restricted SuperAgent role from editing their own permissions.</li>
+          <li>Developed file import system for bulk data ingestion; added customer code column to Service Search page with export support.</li>
         </ul>
       </div>
 
@@ -1210,9 +1217,10 @@
           <span class="exp-client-tag">Sales Pipeline CRM</span>
         </div>
         <ul>
-          <li>Developed a sales pipeline CRM with multi-stage lead management, assignment rules, and follow-up task automation.</li>
-          <li>LINE OA integration for automated outreach sequences triggered by lead status changes and scheduled follow-up intervals.</li>
-          <li>Reporting dashboard for supervisors: conversion rates, pipeline stage distribution, agent activity, and pending follow-up counts.</li>
+          <li>Delivered full insurance CRM customization — sales pipeline with multi-stage lead management, assignment rules, and follow-up task automation.</li>
+          <li>Developed duplicate lead detection system for agents; built policy expiry alert automation and outbound follow-up call scheduling for new customer acquisition.</li>
+          <li>Implemented CTI popup integration with PhoneLite softphone — agents receive screen-pop with caller context on incoming/outgoing calls; extension status control via Webphone for break/ACW reporting.</li>
+          <li>Built configurable lead distribution with count-based allocation rules; added bulk policy assignment checkboxes, Call Status column on policy page, and Created-by tracking for supervisor oversight.</li>
         </ul>
       </div>
 
@@ -1223,9 +1231,10 @@
           <span class="exp-client-tag">Real Estate CRM</span>
         </div>
         <ul>
-          <li>Built a real estate sales CRM covering lead capture from multiple channels (web, LINE, phone) through to site visit scheduling, negotiation, and closing.</li>
-          <li>Automated follow-up workflows: property inquiry responses, site visit reminders, and post-visit interest scoring — all coordinated via LINE OA.</li>
-          <li>Agent dashboards with lead source attribution, pipeline stage tracking, and conversion rate analytics per project and unit type.</li>
+          <li>Built real estate sales CRM covering lead capture through site visit scheduling, negotiation, and closing — with LINE OA automated follow-up at each pipeline stage.</li>
+          <li>Customized case management view: removed unused columns (popup phone, contact channel, created date), added surgery date, SO status, consultation date, and customer name columns with sort controls.</li>
+          <li>Implemented case notification page with assignment-date-based sort, newest-first default ordering, and column parity with the main case list.</li>
+          <li>Updated field type for surgery date from Datetime to Date-only; restricted phone number visibility in all reports for DATA permission level (id 7).</li>
         </ul>
       </div>
 
@@ -1236,9 +1245,9 @@
           <span class="exp-client-tag">Fintech Customer Service</span>
         </div>
         <ul>
-          <li>Built an IVR system for self-service card operations: balance inquiry, transaction history, and card activation via DTMF with live backend API integration.</li>
-          <li>Contact center analytics dashboard tracking call volumes, IVR self-service completion rates, and agent escalation breakdowns.</li>
-          <li>Automated customer service reporting with SLA tracking and peak-hour volume analysis for workforce planning.</li>
+          <li>Built IVR for self-service card operations: balance inquiry, transaction history, and card activation via DTMF with live backend API integration.</li>
+          <li>Customized Report Blacklist/Unblacklist (Report #8) to include customer ID Card data alongside phone number for compliance tracking.</li>
+          <li>Contact center analytics dashboard tracking call volumes, IVR self-service completion rates, and agent escalation breakdowns with SLA tracking.</li>
         </ul>
       </div>
 
@@ -1249,21 +1258,21 @@
           <span class="exp-client-tag">E-Commerce CRM</span>
         </div>
         <ul>
-          <li>Developed a customer service CRM for e-commerce operations — managing order inquiries, complaints, returns, and delivery dispute resolution.</li>
-          <li>Integrated LINE OA for proactive order status updates and post-purchase follow-up satisfaction surveys.</li>
-          <li>Ticket SLA tracking with escalation paths for unresolved complaints, ensuring customer-facing resolution targets are met.</li>
+          <li>Developed customer service CRM for e-commerce operations — managing order inquiries, complaints, returns, and delivery dispute resolution with SLA tracking.</li>
+          <li>Fixed Outbound Project Detail report filter for project name — now shows only projects active within the selected date-time range instead of showing all projects regardless of period.</li>
+          <li>Integrated LINE OA for proactive order status updates and post-purchase satisfaction surveys.</li>
         </ul>
       </div>
 
       <div class="exp-client-section" data-client="ishopping">
         <div class="exp-client-section-header">
-          <h3>iShopping</h3>
+          <h3>iShopping <span style="font-weight:400;color:#6e6e73">(ISP)</span></h3>
           <span class="exp-client-tag">E-Commerce Support CRM</span>
         </div>
         <ul>
-          <li>Built a customer support CRM for a TV shopping platform — handling inbound order inquiries, return requests, and product complaint logging.</li>
-          <li>Automated order status notifications and return status updates delivered to customers via LINE OA.</li>
-          <li>Agent productivity dashboard: tickets per agent, average resolution time, and SLA compliance rate across support queues.</li>
+          <li>Built customer support CRM for a TV shopping platform — handling inbound order inquiries, return requests, and product complaint logging.</li>
+          <li>Fixed export SO / import SO page table alignment; added Payment Date column to UI after Payment Status; sorted On-Air schedule page by date ascending (oldest to newest).</li>
+          <li>Agent productivity dashboard: tickets per agent, average resolution time, and SLA compliance rate.</li>
         </ul>
       </div>
 
@@ -1300,34 +1309,34 @@
           <span class="exp-client-tag">Hospitality CRM</span>
         </div>
         <ul>
-          <li>Built a reservation and guest inquiry management CRM for a Japanese hot spring resort brand operating in Thailand.</li>
-          <li>LINE OA integration for booking confirmation, pre-arrival instructions, and post-stay satisfaction surveys.</li>
-          <li>Centralized guest interaction history across channels (phone, LINE, web) enabling personalized service and targeted promotional outreach.</li>
+          <li>Built reservation and guest inquiry management CRM for a Japanese hot spring resort brand with LINE OA booking confirmations, pre-arrival instructions, and post-stay surveys.</li>
+          <li>Added Queue Name and Call Status search filters to the orange analytics report page for improved data drill-down.</li>
+          <li>Centralized guest interaction history across channels enabling personalized service and targeted promotional outreach.</li>
         </ul>
       </div>
 
       <div class="exp-client-section" data-client="kijsiri">
         <div class="exp-client-section-header">
           <img src="https://logo.clearbit.com/kijsiriasset.com" alt="" onerror="this.style.display='none'">
-          <h3>N&amp;S Number One Ltd. Partnership / Kijsiri Asset Co., Ltd.</h3>
+          <h3>N&amp;S Number One Ltd. Partnership / Kijsiri Asset Co., Ltd. <span style="font-weight:400;color:#6e6e73">(N&amp;S / Kijsiri)</span></h3>
           <span class="exp-client-tag">Real Estate CRM</span>
         </div>
         <ul>
-          <li>Developed a property sales CRM for a real estate developer — managing buyer leads, site visit scheduling, and purchase negotiation workflows.</li>
-          <li>Automated LINE OA follow-up sequences for prospective buyers at each pipeline stage: interest confirmation, site visit reminders, and post-visit proposals.</li>
+          <li>Developed property sales CRM for two linked entities — managing buyer leads, site visit scheduling, and purchase negotiation workflows with LINE OA automation.</li>
+          <li>Configured audio recording access permissions separately for N&amp;S and Kijsiri teams — ensuring each entity's agents can only listen to their own call recordings.</li>
           <li>Agent performance dashboard with lead source tracking, pipeline stage distribution, and conversion rate analytics per project.</li>
         </ul>
       </div>
 
       <div class="exp-client-section" data-client="dpah">
         <div class="exp-client-section-header">
-          <h3>dp a&amp;h (Accident &amp; Health)</h3>
+          <h3>dp a&amp;h</h3>
           <span class="exp-client-tag">Insurance CRM</span>
         </div>
         <ul>
-          <li>Built a CRM for accident &amp; health insurance sales — managing policy inquiries, quotation workflows, and agent-assigned follow-up tasks.</li>
-          <li>Automated policy renewal reminders and lapse-prevention follow-up campaigns delivered via LINE OA and scheduled outbound call queues.</li>
-          <li>Claim inquiry IVR: policyholders can check claim status and submission requirements via self-service DTMF before agent escalation.</li>
+          <li>Built CRM for accident &amp; health insurance sales — managing policy inquiries, quotation workflows, and agent-assigned follow-up tasks.</li>
+          <li>Developed agent break status system with 6 configurable statuses (Ready, Busy, Toilet, Meal, Consult, Mini Break) and generated associated status activity reports.</li>
+          <li>Automated policy renewal reminders and lapse-prevention campaigns via LINE OA; claim inquiry IVR for self-service status checks before agent escalation.</li>
         </ul>
       </div>
 
@@ -1346,13 +1355,48 @@
       <div class="exp-client-section" data-client="sbl">
         <div class="exp-client-section-header">
           <img src="https://logo.clearbit.com/sbl.co.th" alt="" onerror="this.style.display='none'">
-          <h3>S.B.L. Leasing Co., Ltd.</h3>
+          <h3>S.B.L. Leasing Co., Ltd. <span style="font-weight:400;color:#6e6e73">(SBL)</span></h3>
           <span class="exp-client-tag">Financial Services CRM</span>
         </div>
         <ul>
-          <li>Built a customer service CRM for financial services operations — managing inbound inquiries, case tracking, and resolution workflows with full audit trail.</li>
-          <li>Contact center analytics dashboard: call volume trends, agent handling time, and SLA compliance metrics for operations management.</li>
-          <li>Automated daily performance reports and CDR-based agent activity summaries delivered to supervisors on schedule.</li>
+          <li>Set up and configured full CRM system for S.B.L. Leasing — initial system setup, user provisioning, queue configuration, and go-live support.</li>
+          <li>Built customer service CRM for financial operations — managing inbound inquiries, case tracking, and resolution workflows with audit trail.</li>
+          <li>Contact center analytics dashboard with call volume trends, agent handling time, and SLA compliance metrics.</li>
+        </ul>
+      </div>
+
+      <div class="exp-client-section" data-client="genie">
+        <div class="exp-client-section-header">
+          <img src="https://logo.clearbit.com/genieproperties.co.th" alt="" onerror="this.style.display='none'">
+          <h3>Genie Properties Co., Ltd. <span style="font-weight:400;color:#6e6e73">(Genie)</span></h3>
+          <span class="exp-client-tag">Property Management CRM</span>
+        </div>
+        <ul>
+          <li>Developed backend APIs to facilitate secure data transmission between the CRM and property management systems.</li>
+          <li>Built "Call Data Search" functionality — enabling agents to query and retrieve call records linked to property inquiries directly within the CRM interface.</li>
+          <li>Integrated Asterisk CDR records with customer profiles for full call-to-case audit trails across property sales workflows.</li>
+        </ul>
+      </div>
+
+      <div class="exp-client-section" data-client="isuzu">
+        <div class="exp-client-section-header">
+          <img src="https://logo.clearbit.com/isuzu-tis.com" alt="" onerror="this.style.display='none'">
+          <h3>Isuzu Thailand <span style="font-weight:400;color:#6e6e73">(Isuzu)</span></h3>
+          <span class="exp-client-tag">Call Analytics</span>
+        </div>
+        <ul>
+          <li>Customized call center analytics reports — localized ANSWER/UNANSWER labels to Thai (รับสาย/ไม่รับสาย) for agent-facing reporting.</li>
+          <li>Updated queue display logic in all reports from queue number identifiers to human-readable queue names, improving report readability for operations supervisors.</li>
+        </ul>
+      </div>
+
+      <div class="exp-client-section" data-client="maneydaeng">
+        <div class="exp-client-section-header">
+          <h3>มณีแดง <span style="font-weight:400;color:#6e6e73">(Manee Daeng)</span></h3>
+          <span class="exp-client-tag">Sales Reporting</span>
+        </div>
+        <ul>
+          <li>Corrected purchase order detail report (#22) — fixed display logic for full price, discount amount, and net price fields to ensure accurate financial reporting for operations.</li>
         </ul>
       </div>
 
@@ -1384,13 +1428,15 @@
       </div>
       <div class="exp-modal-period">December 2023 – March 2024</div>
       <div class="exp-modal-tech">
-        <span>PHP</span><span>Laravel</span><span>MySQL</span><span>Bootstrap</span><span>JavaScript</span><span>Git</span>
+        <span>PHP</span><span>MSSQL</span><span>JavaScript</span><span>jQuery</span><span>HTML5/CSS3</span>
+        <span>RESTful API</span><span>OWASP Security</span><span>Git</span><span>Docker</span>
+        <span>AJAX</span><span>JSON</span><span>Bootstrap</span><span>DataTables</span><span>Glide Apps</span>
       </div>
     </div>
 
     <div class="exp-modal-section">
       <h3>Role Overview</h3>
-      <p class="exp-modal-overview">Delivered 4 internal full-stack web applications across different SCG business units during my second internship at one of Thailand's largest conglomerates — from requirements gathering through to implementation and handover within the internship period.</p>
+      <p class="exp-modal-overview">Collaborated with the 'Center of Excellence &amp; Data Driven' department to digitize manual workflows. Delivered 4 internal full-stack web applications spanning reservations, reference tracking, regional job management, and an event e-commerce platform.</p>
     </div>
 
     <div class="exp-modal-section">
@@ -1451,7 +1497,9 @@
       </div>
       <div class="exp-modal-period">April 2023 – July 2023</div>
       <div class="exp-modal-tech">
-        <span>PHP</span><span>Laravel</span><span>MySQL</span><span>Bootstrap</span><span>JavaScript</span><span>Git</span>
+        <span>PHP</span><span>MSSQL</span><span>JavaScript</span><span>jQuery</span><span>HTML5/CSS3</span>
+        <span>RESTful API</span><span>OWASP Security</span><span>Git</span><span>Docker</span>
+        <span>AJAX</span><span>JSON</span><span>Bootstrap</span><span>DataTables</span><span>Glide Apps</span>
       </div>
     </div>
 
@@ -1503,13 +1551,13 @@
       </div>
       <div class="exp-modal-period">September 2019 – December 2019</div>
       <div class="exp-modal-tech">
-        <span>Windows OS</span><span>Hardware Repair</span><span>PC Diagnostics</span><span>Data Recovery</span><span>Customer Support</span>
+        <span>Hardware Troubleshooting</span><span>Windows OS</span><span>System Maintenance</span>
       </div>
     </div>
 
     <div class="exp-modal-section">
       <h3>Role Overview</h3>
-      <p class="exp-modal-overview">Hands-on hardware repair and customer-facing technical support internship at Advice IT Infinite — one of Thailand's largest computer and IT retail chains. Operated in a high-volume service environment, managing a continuous queue of customer devices and support requests daily.</p>
+      <p class="exp-modal-overview">Diagnosed, repaired, and maintained hardware for 5+ devices daily while providing technical consultation to over 10 customers per day at one of Thailand's largest IT retail chains — ensuring high service satisfaction in a high-volume technical support environment.</p>
     </div>
 
     <div class="exp-modal-section">
