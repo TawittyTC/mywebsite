@@ -1383,12 +1383,14 @@
         <div class="exp-client-section-header">
           <img src="https://logo.clearbit.com/genieproperties.co.th" alt="" onerror="this.style.display='none'">
           <h3>Genie Properties Co., Ltd. <span style="font-weight:400;color:#6e6e73">(Genie)</span></h3>
-          <span class="exp-client-tag">Property Management CRM</span>
+          <span class="exp-client-tag">CTI Integration</span>
         </div>
         <ul>
-          <li>Developed backend APIs to facilitate secure data transmission between the CRM and property management systems.</li>
-          <li>Built "Call Data Search" functionality — enabling agents to query and retrieve call records linked to property inquiries directly within the CRM interface.</li>
-          <li>Integrated Asterisk CDR records with customer profiles for full call-to-case audit trails across property sales workflows.</li>
+          <li>Integrated <strong>Phonerlite softphone</strong> with the client's existing CRM — provisioned PBX extensions for agents (outbound via SIM) and supervisor (SpyCall-enabled) on Asterisk.</li>
+          <li>Built a <strong>Click-to-Call API endpoint</strong> — client's CRM triggers an outbound call on the agent's Phonerlite with a single button press, no manual dialing required.</li>
+          <li>Developed API to <strong>push inbound/outbound call detail reports</strong> in real time from Asterisk CDR into the client's own reporting system.</li>
+          <li>Built API to <strong>deliver call recording files</strong> (audio) directly to the client's report storage for playback within their platform.</li>
+          <li>Implemented <strong>agent status API</strong> — syncs real-time extension status (available, busy, break) from Asterisk AMI to the client's CRM dashboard.</li>
         </ul>
       </div>
 
