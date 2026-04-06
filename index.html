@@ -278,13 +278,35 @@
     .exp-card-btn svg{width:20px;height:20px;fill:#0071e3}
     @keyframes card-btn-hint{0%{transform:scale(1)}10%{transform:scale(1.4)}20%,100%{transform:scale(1)}}
     .exp-card-btn.hint-loop{animation:card-btn-hint 2s ease-in-out infinite}
+    .exp-card-highlights{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;margin-bottom:8px}
+    .exp-card-highlights .hl{font-size:12px;font-weight:600;color:#3a3a3c;background:#f5f5f7;border:1px solid rgba(0,0,0,.06);border-radius:20px;padding:5px 13px;letter-spacing:.1px}
+    .exp-card-highlights .hl-blue{color:#0071e3;background:rgba(0,113,227,.08);border-color:rgba(0,113,227,.12)}
+
+    /* Card shimmer on hover */
+    #experience .data-box[data-exp]{overflow:hidden}
+    #experience .data-box[data-exp]::after{content:'';position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.22) 50%,transparent 70%);transform:translateX(-160%);transition:transform .75s ease;pointer-events:none;border-radius:28px}
+    #experience .data-box[data-exp]:hover::after{transform:translateX(160%)}
+
+    /* Active/Current position pulse dot */
+    .exp-status-active{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#30d158;background:rgba(48,209,88,.1);border-radius:20px;padding:3px 10px;margin-left:6px;vertical-align:middle}
+    .exp-status-active::before{content:'';display:inline-block;width:6px;height:6px;background:#30d158;border-radius:50%;animation:pulse-active 2s ease-in-out infinite;flex-shrink:0}
+    @keyframes pulse-active{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(48,209,88,.5)}60%{opacity:.7;box-shadow:0 0 0 5px rgba(48,209,88,0)}}
+
+    /* Duration badge */
+    .exp-duration{display:inline-block;font-size:11px;color:#6e6e73;font-weight:400;background:#f5f5f7;border-radius:20px;padding:3px 10px;margin-top:4px}
+
+    /* Card stagger entry animation */
+    @keyframes card-enter{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+    #experience .data-box[data-exp]{opacity:0}
+    #experience .data-box[data-exp].card-visible{animation:card-enter .55s cubic-bezier(.16,1,.3,1) both}
 
     /* Experience details modal */
-    .exp-lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.25);backdrop-filter:blur(20px) saturate(1.8);-webkit-backdrop-filter:blur(20px) saturate(1.8);z-index:9999;align-items:center;justify-content:center;padding:20px;box-sizing:border-box}
-    .exp-lightbox.open{display:flex}
-    .exp-lightbox-inner{background:rgba(255,255,255,.97);border-radius:20px;max-width:740px;width:100%;max-height:88vh;overflow-y:auto;padding:36px 40px;position:relative;box-shadow:0 32px 80px rgba(0,0,0,.22)}
-    .exp-lightbox-close{position:sticky;top:0;float:right;background:rgba(232,232,237,.9);border:none;border-radius:50%;width:32px;height:32px;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;margin-bottom:8px;color:#1d1d1f}
-    .exp-lightbox-close:hover{background:#d8d8df}
+    .exp-lightbox{display:flex;position:fixed;inset:0;background:rgba(0,0,0,.25);backdrop-filter:blur(20px) saturate(1.8);-webkit-backdrop-filter:blur(20px) saturate(1.8);z-index:9999;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .22s ease,visibility .22s ease}
+    .exp-lightbox.open{opacity:1;visibility:visible;pointer-events:auto}
+    .exp-lightbox-inner{background:rgba(255,255,255,.97);border-radius:20px;max-width:740px;width:100%;max-height:88vh;overflow-y:auto;padding:36px 40px;position:relative;box-shadow:0 32px 80px rgba(0,0,0,.22);transform:translateY(24px) scale(.97);opacity:0;transition:transform .38s cubic-bezier(.34,1.56,.64,1),opacity .3s ease}
+    .exp-lightbox.open .exp-lightbox-inner{transform:translateY(0) scale(1);opacity:1}
+    .exp-lightbox-close{position:sticky;top:0;float:right;z-index:10;background:rgba(232,232,237,.9);border:none;border-radius:50%;width:32px;height:32px;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s,transform .15s;margin-bottom:8px;color:#1d1d1f}
+    .exp-lightbox-close:hover{background:#d8d8df;transform:scale(1.12)}
     /* ── Apple HIG: Modal Header ── */
     .exp-modal-header{margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid #e5e5e7}
     .exp-modal-role-header{display:flex;align-items:center;gap:16px;margin-bottom:14px}
@@ -606,7 +628,7 @@
                     <li>Chamnanhan,T., Phetkrachang, K., Sathiwantana, S.,Chalearnnetkul, P.,Choosong, C., (2023)
                       “Measuring of Words Similarity for Question Answering System for Diabetes”. Journal of Applied
                       Informatics and Technology, Vol. 5 No. 2 (2023): July-December (TCI1).</li>
-                  </ul>
+                  </ul>แ
                 </div>
               </div>
             </div>
@@ -635,12 +657,20 @@
                   <div>
                     <div class="mt-3 h2">Full Stack Developer</div>
                     <div class="fw-light">@ Protollcall Advance Service</div>
-                    <div class="fw-light">June 2024 - Present</div>
+                    <div class="fw-light">June 2024 - Present <span class="exp-status-active">Active</span></div>
+                    <div><span class="exp-duration">1 yr 10 mos</span></div>
                   </div>
                   <img src="assets/img/protollcall-logo.avif" alt="Protollcall Advance Service"
                     class="company-logo company-logo--lg" loading="lazy" decoding="async" width="320" height="211">
                 </div>
-                <p class="fw-light mt-3 mb-4">Built tailor-made CRM systems, Asterisk telephony integrations, multilingual IVR, and AI-powered pipelines for enterprise clients across Thailand and Southeast Asia.</p>
+                <p class="fw-light mt-3">Architected and shipped tailor-made enterprise CRM systems for 10+ clients across Thailand — integrating Asterisk PBX telephony (AGI, AMI, Dialplan), AI-powered IVR (TTS/ASR/LLM), Predictive Dialers, real-time analytics dashboards, and multi-channel API integrations. Delivered 60+ customization tickets spanning sales pipeline, debt collection, healthcare, insurance, and financial services — solo end-to-end from requirements through production deployment.</p>
+                <div class="exp-card-highlights">
+                  <span class="hl hl-blue">10+ Enterprise Clients</span>
+                  <span class="hl hl-blue">60+ Tickets Delivered</span>
+                  <span class="hl">Asterisk PBX / CTI</span>
+                  <span class="hl">AI IVR (TTS · ASR · LLM)</span>
+                  <span class="hl">Full Stack · End-to-End</span>
+                </div>
                 <div class="exp-card-cta" aria-hidden="true">
                   <span class="exp-card-cta-label">View details</span>
                   <div class="exp-card-btn">
@@ -658,11 +688,19 @@
                     <div class="mt-3 h2">Full Stack Developer Intern</div>
                     <div class="fw-light">@ The Siam Cement Group</div>
                     <div class="fw-light">December 2023 - March 2024</div>
+                    <div><span class="exp-duration">4 mos</span></div>
                   </div>
                   <img src="assets/img/scg-logo.avif" alt="SCG The Siam Cement Group" class="company-logo"
                     loading="lazy" decoding="async" width="320" height="113">
                 </div>
-                <p class="fw-light mt-3 mb-4">Delivered 4 internal full-stack web applications for SCG — spanning reservations, reference tracking, regional job management, and an event e-commerce platform.</p>
+                <p class="fw-light mt-3">Delivered 4 production-ready internal web applications for SCG's regional operations — a smart meeting room reservation system, document reference tracker, area-based job dispatch platform, and an event e-commerce store with inventory management. Worked within a professional engineering team through full SDLC: requirements, design, development, UAT, and deployment.</p>
+                <div class="exp-card-highlights">
+                  <span class="hl hl-blue">4 Apps Shipped</span>
+                  <span class="hl">Reservation System</span>
+                  <span class="hl">Job Dispatch Platform</span>
+                  <span class="hl">E-Commerce</span>
+                  <span class="hl">Full SDLC</span>
+                </div>
                 <div class="exp-card-cta" aria-hidden="true">
                   <span class="exp-card-cta-label">View details</span>
                   <div class="exp-card-btn">
@@ -681,11 +719,18 @@
                     <div class="mt-3 h2">Full Stack Developer Intern</div>
                     <div class="fw-light">@ The Siam Cement Group</div>
                     <div class="fw-light">April 2023 - July 2023</div>
+                    <div><span class="exp-duration">4 mos</span></div>
                   </div>
                   <img src="assets/img/scg-logo.avif" alt="SCG The Siam Cement Group" class="company-logo"
                     loading="lazy" decoding="async" width="320" height="113">
                 </div>
-                <p class="fw-light mt-3 mb-4">Developed 2 internal business platforms for SCG — a software license request management system and a company-wide asset tracking platform.</p>
+                <p class="fw-light mt-3">Built 2 enterprise internal platforms for SCG group-wide use — a software license procurement & multi-level approval workflow system, and a company-wide IT asset tracking platform with full lifecycle management (procurement, assignment, maintenance, disposal). First exposure to large-scale corporate software engineering inside one of Thailand's largest industrial conglomerates.</p>
+                <div class="exp-card-highlights">
+                  <span class="hl hl-blue">2 Platforms Shipped</span>
+                  <span class="hl">License Management</span>
+                  <span class="hl">Asset Lifecycle Tracking</span>
+                  <span class="hl">Approval Workflows</span>
+                </div>
                 <div class="exp-card-cta" aria-hidden="true">
                   <span class="exp-card-cta-label">View details</span>
                   <div class="exp-card-btn">
@@ -703,10 +748,17 @@
                     <div class="mt-3 h2">Computer Technician Intern</div>
                     <div class="fw-light">@ Advice IT Infinite Co., Ltd.</div>
                     <div class="fw-light">September 2019 - December 2019</div>
+                    <div><span class="exp-duration">4 mos</span></div>
                   </div>
                   <img src="assets/img/advice-logo.avif" alt="Advice IT Infinite" class="company-logo" loading="lazy" decoding="async" width="320" height="94">
                 </div>
-                <p class="fw-light mt-3 mb-4">Provided hands-on hardware repair and customer-facing technical support at one of Thailand's largest IT retail chains — servicing 5+ devices and 10+ customers daily.</p>
+                <p class="fw-light mt-3">Provided front-line hardware diagnostics, repair, and technical support at one of Thailand's largest IT retail chains — servicing 5+ devices and 10+ customers daily across laptops, desktops, and peripherals. Developed practical troubleshooting methodologies, parts sourcing, OS reinstallation, and direct customer communication skills in a fast-paced, high-volume retail environment.</p>
+                <div class="exp-card-highlights">
+                  <span class="hl hl-blue">5+ Devices / Day</span>
+                  <span class="hl">Hardware Diagnostics</span>
+                  <span class="hl">OS & System Repair</span>
+                  <span class="hl">Customer Support</span>
+                </div>
                 <div class="exp-card-cta" aria-hidden="true">
                   <span class="exp-card-cta-label">View details</span>
                   <div class="exp-card-btn">
@@ -1027,7 +1079,7 @@
       <h3>Clients &amp; Projects</h3>
       <div class="exp-client-filter">
         <button class="exp-filter-chip active" data-filter="all">All</button>
-        <button class="exp-filter-chip" data-filter="bkk-hosp">Bangkok Hospital CM</button>
+        <button class="exp-filter-chip" data-filter="bkk-hosp">BCM</button>
         <button class="exp-filter-chip" data-filter="kasikorn">Kasikorn Carabao</button>
         <button class="exp-filter-chip" data-filter="happy">Happy Products</button>
         <button class="exp-filter-chip" data-filter="vietjet">Thai VietJet Air</button>
@@ -1060,12 +1112,12 @@
       <div class="exp-client-section" data-client="bkk-hosp">
         <div class="exp-client-section-header">
           <img src="https://logo.clearbit.com/bangkokhospital.com" alt="" onerror="this.style.display='none'">
-          <h3>Bangkok Hospital Chiang Mai Co., Ltd. <span style="font-weight:400;color:#6e6e73">(BCM)</span></h3>
+          <h3>BCM <span style="font-weight:400;color:#6e6e73">(Bangkok Hospital Chiang Mai)</span></h3>
           <span class="exp-client-tag">Healthcare CRM</span>
         </div>
         <ul>
-          <li>Built a full-stack patient relationship CRM — patient database, appointment scheduling with conflict detection, and automated follow-up reminder sequences.</li>
-          <li>Developed "IV Team Request System" — real-time IV team dispatch requests with instant notifications delivered via LINE and Telegram API to on-duty nursing staff.</li>
+          <li>Built a full-stack patient relationship CRM — patient database, <strong>appointment scheduling</strong> with conflict detection (creation, editing, cancellation), and automated follow-up reminder sequences via LINE Notify.</li>
+          <li>Developed <strong>IV Team Request System</strong> — operational dispatch workflow for IV nursing teams: real-time team assignment, job status tracking (pending → dispatched → completed), with instant push notifications via LINE Notify and Telegram API to on-duty nursing staff.</li>
           <li>Integrated Asterisk CDR linking all patient call interactions to their CRM profile for complete care history visibility.</li>
         </ul>
       </div>
@@ -1077,11 +1129,12 @@
           <span class="exp-client-tag">Sales Campaign CRM</span>
         </div>
         <ul>
-          <li>Built high-performance dashboards for Call Productivity, Collection Performance, FCR by Area, and Agent Performance — processing daily massive CDR datasets with optimized SQL queries.</li>
-          <li>Developed LINE image sending in Collection module — UI button for image upload, AKSK key management, OBS Object Storage integration, and encrypted credential storage.</li>
-          <li>Integrated KBAOBOT: real-time chat history sync, ticket-status API, agent-transfer notifications, and UID-based customer lookup in Social menu.</li>
+          <li><strong>Core Modules built end-to-end:</strong> Social management, Predictive Dialer List (auto-dial), Manual Call List (agent-initiated), Outstanding tracking, Call-to-Visit workflow, FCR Management, Repayment management, Lock/Unlock case controls, Letter management, Analytics, Template management, Import pipeline, and Status management.</li>
+          <li><strong>Dashboards &amp; Reporting (heavy emphasis):</strong> Built Predictive Dashboard, FCR Dashboard, Call Productivity, Collection Performance, FCR by Area, and Agent Performance dashboards — processing large daily CDR datasets with optimized SQL queries; added CSV export to all key reports.</li>
+          <li><strong>OBS Config &amp; LINE Image Sending:</strong> Developed UI for Huawei OBS configuration (bucket, endpoint, AKSK key management) and integrated image sending from Collection module — agents send images directly to customers via LINE from within the CRM.</li>
+          <li>Integrated <strong>KBAOBOT</strong>: real-time chat history sync, ticket-status API, agent-transfer notifications, and UID-based customer lookup in Social menu.</li>
           <li>Implemented scheduled crontab for monthly data import with corrected date logic; fixed import conditions and deployed to production overnight to meet billing deadlines.</li>
-          <li>Added CSV export to reports and generated secure access link for Report Agent Login-Logout (billing use only).</li>
+          <li>Generated secure access link for Report Agent Login-Logout (billing use only).</li>
         </ul>
       </div>
 
@@ -1177,8 +1230,8 @@
         </div>
         <ul>
           <li>Developed service request and ticket management CRM — logging, categorizing, and tracking all customer support requests from intake to resolution with SLA-based escalation.</li>
-          <li>Built Abandon Call and Callback management menus — agents can log, stamp, and track callback attempts with timestamps and agent ID.</li>
-          <li>Added 5 analytics reports covering call volumes, agent performance, and queue metrics; enhanced report filtering and graph display per client specifications.</li>
+          <li>Built <strong>Abandoned Call</strong> page — dedicated queue for agents to identify and call back customers who abandoned before being answered; built <strong>Callback</strong> tracking page — supervisors can verify whether each callback was completed, with timestamps and agent ID.</li>
+          <li>Delivered <strong>6 analytics reports:</strong> Report Callback, Report Abandon Call, Report Summary Call, Report Summary Ticket, plus call volume and agent performance reports — with enhanced filtering and graph display per client specifications.</li>
           <li>Hardened security: implemented Password Policy (8+ chars, complexity rules, no username match), Account Lockout after 3 failed attempts, force-change on first login; patched HSTS, HTTP TRACE, PHP exposure, and jQuery XSS vulnerabilities.</li>
           <li>Built Emergency Announcement toggle — allows client to independently enable/disable emergency broadcast audio without developer intervention.</li>
         </ul>
@@ -1232,9 +1285,12 @@
         </div>
         <ul>
           <li>Delivered full insurance CRM customization — sales pipeline with multi-stage lead management, assignment rules, and follow-up task automation.</li>
+          <li>Built <strong>Policy Tracking System</strong> — full lifecycle management of insurance policies: status tracking, renewal monitoring, policy detail view, and history log per customer.</li>
+          <li>Built <strong>Policy Appointment System</strong> — agents schedule, manage, and follow up on policy appointments; automated reminders and calendar-based conflict detection.</li>
           <li>Developed duplicate lead detection system for agents; built policy expiry alert automation and outbound follow-up call scheduling for new customer acquisition.</li>
           <li>Implemented CTI popup integration with PhoneLite softphone — agents receive screen-pop with caller context on incoming/outgoing calls; extension status control via Webphone for break/ACW reporting.</li>
           <li>Built configurable lead distribution with count-based allocation rules; added bulk policy assignment checkboxes, Call Status column on policy page, and Created-by tracking for supervisor oversight.</li>
+          <li><strong>Improvement &amp; Maintenance:</strong> Ongoing bug fixes, UI/UX enhancements, performance tuning, and feature improvements across all ISV CRM modules throughout the engagement.</li>
         </ul>
       </div>
 
@@ -1388,9 +1444,11 @@
         <ul>
           <li>Integrated <strong>Phonerlite softphone</strong> with the client's existing CRM — provisioned PBX extensions for agents (outbound via SIM) and supervisor (SpyCall-enabled) on Asterisk.</li>
           <li>Built a <strong>Click-to-Call API endpoint</strong> — client's CRM triggers an outbound call on the agent's Phonerlite with a single button press, no manual dialing required.</li>
+          <li>Developed API to <strong>search and retrieve call history</strong> from <code>queuemetrics.queue_log</code> — enabling the client's platform to query inbound/outbound call records by agent, queue, and date range.</li>
           <li>Developed API to <strong>push inbound/outbound call detail reports</strong> in real time from Asterisk CDR into the client's own reporting system.</li>
           <li>Built API to <strong>deliver call recording files</strong> (audio) directly to the client's report storage for playback within their platform.</li>
           <li>Implemented <strong>agent status API</strong> — syncs real-time extension status (available, busy, break) from Asterisk AMI to the client's CRM dashboard.</li>
+          <li>Delivered full <strong>API documentation</strong> for every endpoint — request/response specs, authentication, and example payloads.</li>
         </ul>
       </div>
 

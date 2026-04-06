@@ -211,9 +211,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function closeExp() {
     lightbox.classList.remove('open');
-    document.body.style.overflow = '';
+    setTimeout(function() { document.body.style.overflow = ''; }, 220);
   }
-  closeBtn.addEventListener('click', closeExp);
+  closeBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    closeExp();
+  });
   lightbox.addEventListener('click', function (e) {
     if (e.target === lightbox) closeExp();
   });
@@ -267,19 +270,25 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
-  // Card hint: pulse the "+" button when card scrolls into view
+  // Card hint: pulse the "+" button + stagger entry animation when card scrolls into view
+  var expCards = Array.from(document.querySelectorAll('#experience .data-box[data-exp]'));
   if ('IntersectionObserver' in window) {
     var cardObs = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
         if (!entry.isIntersecting) return;
+        var idx = expCards.indexOf(entry.target);
+        entry.target.style.animationDelay = (idx * 80) + 'ms';
+        entry.target.classList.add('card-visible');
         var btn = entry.target.querySelector('.exp-card-btn');
-        if (btn) btn.classList.add('hint-loop');
+        if (btn) setTimeout(function() { btn.classList.add('hint-loop'); }, idx * 80 + 400);
         cardObs.unobserve(entry.target);
       });
-    }, { threshold: 0.5 });
-    document.querySelectorAll('#experience .data-box[data-exp]').forEach(function (card) {
+    }, { threshold: 0.2 });
+    expCards.forEach(function (card) {
       cardObs.observe(card);
     });
+  } else {
+    expCards.forEach(function (card) { card.classList.add('card-visible'); });
   }
 });
 

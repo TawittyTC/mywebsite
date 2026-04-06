@@ -71,6 +71,7 @@
     "Zabbix",
     "Phonerlite",
     "SpyCall",
-    "spycall"
+    "spycall",
+    "queuemetrics"
   ]
 }
