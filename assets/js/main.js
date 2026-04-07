@@ -469,7 +469,7 @@ document.addEventListener('DOMContentLoaded', function () {
       scrollEndTimer = setTimeout(function () {
         userScrolling = false;
         startHintLoop();
-      }, 7000);
+      }, 5000);
     }
 
     scroller.addEventListener('touchstart', onUserScroll, { passive: true });
@@ -612,7 +612,7 @@ document.addEventListener('DOMContentLoaded', function () {
       scrollEndTimer = setTimeout(function () {
         userScrolling = false;
         startHintLoop();
-      }, 7000);
+      }, 5000);
     }
     scroller.addEventListener('touchstart', onUserScroll, { passive: true });
     scroller.addEventListener('scroll', onUserScroll, { passive: true });
@@ -680,14 +680,13 @@ window.addEventListener('load', function() {
   }, { once: true });
 });
 
-// View Experience → instant scroll to Experience section
+
+// View Experience → link with default scroll
 var _expLink = document.querySelector('.profile-featured-body a[href="#experience"]');
 if (_expLink) _expLink.addEventListener('click', function(e) {
-  e.preventDefault();
-  e.stopPropagation();
   var el = document.getElementById('experience');
   if (!el) return;
-  window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 60);
+  el.scrollIntoView({ behavior: 'auto', block: 'start' });
 });
 
 // Experience expand/collapse
