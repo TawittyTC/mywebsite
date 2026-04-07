@@ -279,8 +279,8 @@
     @keyframes card-btn-hint{0%{transform:scale(1)}10%{transform:scale(1.4)}20%,100%{transform:scale(1)}}
     .exp-card-btn.hint-loop{animation:card-btn-hint 2s ease-in-out infinite}
     .exp-card-highlights{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;margin-bottom:8px}
-    .exp-card-highlights .hl{font-size:12px;font-weight:600;color:#3a3a3c;background:#f5f5f7;border:1px solid rgba(0,0,0,.06);border-radius:20px;padding:5px 13px;letter-spacing:.1px}
-    .exp-card-highlights .hl-blue{color:#0071e3;background:rgba(0,113,227,.08);border-color:rgba(0,113,227,.12)}
+    .exp-card-highlights .hl{font-size:12px;font-weight:600;color:#3a3a3c;background:#f5f5f7;border:none;border-radius:20px;padding:5px 13px;letter-spacing:.1px}
+    .exp-card-highlights .hl-blue{color:#0071e3;background:rgba(0,113,227,.08)}
 
     /* Card shimmer on hover */
     #experience .data-box[data-exp]{overflow:hidden}
@@ -698,35 +698,21 @@
                     <div class="exp-stat-label">Enterprise Clients</div>
                   </div>
                   <div class="exp-stat-item">
-                    <div class="exp-stat-num">60<span class="stat-sup">+</span></div>
-                    <div class="exp-stat-label">Tickets Delivered</div>
+                    <div class="exp-stat-num"><span class="js-count" data-count="60">60</span><span class="stat-sup">+</span></div>
+                    <div class="exp-stat-label">Projects Delivered</div>
+                  </div>
+                  <div class="exp-stat-item">
+                    <div class="exp-stat-num"><span class="js-count" data-count="10">10</span><span class="stat-sup">+</span></div>
+                    <div class="exp-stat-label">Integrations</div>
                   </div>
                 </div>
-                <div class="exp-card-work">
-                  <div class="exp-work-item">
-                    <span class="exp-work-dot"></span>
-                    <span>Engineered Predictive Dialer + real-time CTI dashboards with Asterisk AMI, queuelog analytics, live agent queue metrics, and supervision panels</span>
-                  </div>
-                  <div class="exp-work-item">
-                    <span class="exp-work-dot"></span>
-                    <span>Sole developer on 27-client CRM platform — multi-channel API integrations (LINE, Telegram, Webhook), OWASP security hardening, and full audit logging</span>
-                  </div>
-                </div>
+                
                 <div class="exp-card-highlights">
                   <span class="hl hl-blue exp-client-count-badge">27 Clients</span>
-                  <span class="hl hl-blue">60+ Tickets Delivered</span>
+                  <span class="hl hl-blue">60+ Projects Delivered</span>
                   <span class="hl">Asterisk PBX / CTI</span>
                   <span class="hl">AI IVR (TTS · ASR · LLM)</span>
                   <span class="hl">Full Stack · End-to-End</span>
-                </div>
-                <div class="exp-card-stack">
-                  <span>PHP</span><span>Python</span><span>MySQL</span><span>JavaScript</span><span>jQuery</span>
-                  <span>HTML5/CSS3</span><span>Bootstrap</span><span>AJAX</span><span>RESTful API</span>
-                  <span>Webhook</span><span>OAuth2</span><span>OWASP Security</span><span>Git</span><span>Docker</span>
-                  <span>DataTables</span><span>Select2</span><span>Chart.js</span><span>Moment.js</span>
-                  <span>PhpSpreadsheet</span><span>Asterisk PBX</span><span>AGI</span><span>AMI</span><span>Dialplan</span>
-                  <span>LINE Messaging API</span><span>Telegram Bot API</span><span>Huawei OBS</span>
-                  <span>Zabbix</span><span>Navicat</span><span>Linux</span><span>Shell Script</span><span>Crontab</span><span>npm</span>
                 </div>
                 <div class="exp-card-cta" aria-hidden="true">
                   <span class="exp-card-cta-label">View details</span>
@@ -754,7 +740,15 @@
                 <div class="exp-card-stats">
                   <div class="exp-stat-item">
                     <div class="exp-stat-num"><span class="js-count" data-count="4">4</span></div>
-                    <div class="exp-stat-label">Projects Completed</div>
+                    <div class="exp-stat-label">Projects Delivered</div>
+                  </div>
+                  <div class="exp-stat-item">
+                    <div class="exp-stat-num"><span class="js-count" data-count="5">5</span></div>
+                    <div class="exp-stat-label">SDLC Phases</div>
+                  </div>
+                  <div class="exp-stat-item">
+                    <div class="exp-stat-num"><span class="js-count" data-count="2000">2000</span><span class="stat-sup">+</span></div>
+                    <div class="exp-stat-label">Users</div>
                   </div>
                 </div>
                 <div class="exp-card-highlights">
@@ -763,11 +757,6 @@
                   <span class="hl">Job Dispatch Platform</span>
                   <span class="hl">E-Commerce</span>
                   <span class="hl">Full SDLC</span>
-                </div>
-                <div class="exp-card-stack">
-                  <span>PHP</span><span>Laravel</span><span>MSSQL</span><span>JavaScript</span><span>jQuery</span>
-                  <span>HTML5/CSS3</span><span>Bootstrap</span><span>AJAX</span><span>RESTful API</span>
-                  <span>OWASP Security</span><span>Git</span><span>Docker</span><span>DataTables</span><span>Glide Apps</span>
                 </div>
                 <div class="exp-card-cta" aria-hidden="true">
                   <span class="exp-card-cta-label">View details</span>
@@ -796,33 +785,24 @@
                 <div class="exp-card-stats">
                   <div class="exp-stat-item">
                     <div class="exp-stat-num"><span class="js-count" data-count="2">2</span></div>
-                    <div class="exp-stat-label">Platforms Built</div>
+                    <div class="exp-stat-label">Projects Delivered</div>
                   </div>
                   <div class="exp-stat-item">
-                    <div class="exp-stat-num"><span class="js-count" data-count="4">4</span></div>
-                    <div class="exp-stat-label">Months · Group-wide</div>
+                    <div class="exp-stat-num"><span class="js-count" data-count="5">5</span></div>
+                    <div class="exp-stat-label">SDLC Phases</div>
                   </div>
+                  <div class="exp-stat-item">
+                    <div class="exp-stat-num"><span class="js-count" data-count="2000">2000</span><span class="stat-sup">+</span></div>
+                    <div class="exp-stat-label">Users</div>
+                  </div>
+                  
                 </div>
-                <div class="exp-card-work">
-                  <div class="exp-work-item">
-                    <span class="exp-work-dot"></span>
-                    <span>Software license procurement system — multi-level approval workflows, license pool tracking, and procurement history across all SCG business units</span>
-                  </div>
-                  <div class="exp-work-item">
-                    <span class="exp-work-dot"></span>
-                    <span>Company-wide IT asset lifecycle platform — procurement, assignment, maintenance scheduling, warranty tracking, and disposal management across all SCG entities</span>
-                  </div>
-                </div>
+                
                 <div class="exp-card-highlights">
                   <span class="hl hl-blue">2 Platforms Shipped</span>
                   <span class="hl">License Management</span>
                   <span class="hl">Asset Lifecycle Tracking</span>
                   <span class="hl">Approval Workflows</span>
-                </div>
-                <div class="exp-card-stack">
-                  <span>PHP</span><span>Laravel</span><span>MSSQL</span><span>JavaScript</span><span>jQuery</span>
-                  <span>HTML5/CSS3</span><span>Bootstrap</span><span>AJAX</span><span>RESTful API</span>
-                  <span>OWASP Security</span><span>Git</span><span>Docker</span><span>DataTables</span><span>Glide Apps</span>
                 </div>
                 <div class="exp-card-cta" aria-hidden="true">
                   <span class="exp-card-cta-label">View details</span>
@@ -848,24 +828,19 @@
                 <p class="fw-light mt-3">Provided front-line hardware diagnostics, repair, and technical support at one of Thailand's largest IT retail chains — servicing 5+ devices and 10+ customers daily across laptops, desktops, and peripherals. Developed practical troubleshooting methodologies, parts sourcing, OS reinstallation, and direct customer communication skills in a fast-paced, high-volume retail environment.</p>
                 <div class="exp-card-stats">
                   <div class="exp-stat-item">
-                    <div class="exp-stat-num">5<span class="stat-sup">+</span></div>
+                    <div class="exp-stat-num"><span class="js-count" data-count="5">5</span><span class="stat-sup">+</span></div>
                     <div class="exp-stat-label">Devices / Day</div>
                   </div>
                   <div class="exp-stat-item">
-                    <div class="exp-stat-num">10<span class="stat-sup">+</span></div>
+                    <div class="exp-stat-num"><span class="js-count" data-count="10">10</span><span class="stat-sup">+</span></div>
                     <div class="exp-stat-label">Customers / Day</div>
                   </div>
-                </div>
-                <div class="exp-card-work">
-                  <div class="exp-work-item">
-                    <span class="exp-work-dot"></span>
-                    <span>Front-line hardware diagnostics and repair — laptops, desktops, and peripherals — motherboard-level troubleshooting with 5+ devices serviced daily</span>
-                  </div>
-                  <div class="exp-work-item">
-                    <span class="exp-work-dot"></span>
-                    <span>OS reinstallation, driver configuration, data migration, and parts sourcing — high-volume technical support in Thailand's largest IT retail chain</span>
+                  <div class="exp-stat-item">
+                    <div class="exp-stat-num"><span class="js-count" data-count="10">10</span><span class="stat-sup">+</span></div>
+                    <div class="exp-stat-label">Brands Serviced</div>
                   </div>
                 </div>
+          
                 <div class="exp-card-highlights">
                   <span class="hl hl-blue">5+ Devices / Day</span>
                   <span class="hl">Hardware Diagnostics</span>
