@@ -680,25 +680,14 @@ window.addEventListener('load', function() {
   }, { once: true });
 });
 
-// View Experience → slow scroll to Experience section
+// View Experience → instant scroll to Experience section
 var _expLink = document.querySelector('.profile-featured-body a[href="#experience"]');
 if (_expLink) _expLink.addEventListener('click', function(e) {
   e.preventDefault();
   e.stopPropagation();
   var el = document.getElementById('experience');
   if (!el) return;
-  var start = window.scrollY;
-  var target = el.getBoundingClientRect().top + window.scrollY - 60;
-  var startTime = null;
-  var duration = 300;
-  var ease = function(t) { return t < 0.5 ? 2*t*t : -1+(4-2*t)*t; };
-  var step = function(timestamp) {
-    if (!startTime) startTime = timestamp;
-    var progress = Math.min((timestamp - startTime) / duration, 1);
-    window.scrollTo(0, start + (target - start) * ease(progress));
-    if (progress < 1) requestAnimationFrame(step);
-  };
-  requestAnimationFrame(step);
+  window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 60);
 });
 
 // Experience expand/collapse
