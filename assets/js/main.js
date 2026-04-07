@@ -488,16 +488,6 @@ document.addEventListener('DOMContentLoaded', function () {
     hintObs.observe(scroller);
   }
 
-  // Desktop (>768px): redirect wheel events to page scroll.
-  // overflow-x:hidden still creates a scroll container that captures wheel events in Chrome/Safari.
-  // Intercepting here ensures the page scrolls normally when hovering over the card scroller.
-  if (window.innerWidth > 768 && scroller) {
-    scroller.addEventListener('wheel', function(e) {
-      e.preventDefault();
-      var delta = e.deltaMode === 1 ? e.deltaY * 20 : e.deltaMode === 2 ? e.deltaY * window.innerHeight : e.deltaY;
-      window.scrollBy(0, delta);
-    }, { passive: false });
-  }
 });
 
 
@@ -630,14 +620,6 @@ document.addEventListener('DOMContentLoaded', function () {
     hintObs.observe(scroller);
   }
 
-  // Desktop (>768px): redirect wheel events to page scroll.
-  if (window.innerWidth > 768 && scroller) {
-    scroller.addEventListener('wheel', function(e) {
-      e.preventDefault();
-      var delta = e.deltaMode === 1 ? e.deltaY * 20 : e.deltaMode === 2 ? e.deltaY * window.innerHeight : e.deltaY;
-      window.scrollBy(0, delta);
-    }, { passive: false });
-  }
 });
 
 // Contact Form
