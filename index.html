@@ -300,6 +300,19 @@
     #experience .data-box[data-exp]{opacity:0}
     #experience .data-box[data-exp].card-visible{animation:card-enter .55s cubic-bezier(.16,1,.3,1) both}
 
+    /* Extra padding-bottom so CTA button never crowds content */
+    #experience .data-box[data-exp]{padding-bottom:80px}
+
+    /* Key work bullet list */
+    .exp-card-work{margin:14px 0 2px;display:flex;flex-direction:column;gap:9px}
+    .exp-work-item{display:flex;align-items:flex-start;gap:10px;font-size:13.5px;color:#3a3a3c;line-height:1.6}
+    .exp-work-dot{flex-shrink:0;width:6px;height:6px;background:#0071e3;border-radius:50%;margin-top:7px}
+
+    /* Tech stack monospace pills */
+    .exp-card-stack{display:flex;flex-wrap:wrap;gap:5px;margin-top:14px;padding-top:14px;border-top:1px solid rgba(0,0,0,.06)}
+    .exp-card-stack span{font-size:11px;font-weight:500;color:#6e6e73;background:#f5f5f7;border:1px solid rgba(0,0,0,.08);border-radius:6px;padding:3px 9px;font-family:ui-monospace,'SF Mono',Monaco,Menlo,monospace;letter-spacing:.2px;transition:background .15s,color .15s}
+    #experience .data-box[data-exp]:hover .exp-card-stack span{background:#ebebf0;color:#3a3a3c}
+
     /* Stats bar inside experience cards */
     .exp-card-stats{display:flex;margin:18px 0 4px;padding:18px 0 14px;border-top:1px solid rgba(0,0,0,.06);border-bottom:1px solid rgba(0,0,0,.06)}
     .exp-stat-item{flex:1;text-align:center;padding:0 8px;border-right:1px solid rgba(0,0,0,.08);min-width:0}
@@ -687,12 +700,31 @@
                     <div class="exp-stat-label">Industries Served</div>
                   </div>
                 </div>
+                <div class="exp-card-work">
+                  <div class="exp-work-item">
+                    <span class="exp-work-dot"></span>
+                    <span>Built AI-powered IVR pipeline — ASR → LLM (Claude / GPT) → TTS — automated call routing, intent detection, and voice bots deployed to production</span>
+                  </div>
+                  <div class="exp-work-item">
+                    <span class="exp-work-dot"></span>
+                    <span>Engineered Predictive Dialer + real-time CTI dashboards with Asterisk AMI, queuelog analytics, live agent queue metrics, and supervision panels</span>
+                  </div>
+                  <div class="exp-work-item">
+                    <span class="exp-work-dot"></span>
+                    <span>Sole developer on 27-client CRM platform — multi-channel API integrations (LINE, Telegram, Webhook), OWASP security hardening, and full audit logging</span>
+                  </div>
+                </div>
                 <div class="exp-card-highlights">
                   <span class="hl hl-blue exp-client-count-badge">27 Clients</span>
                   <span class="hl hl-blue">60+ Tickets Delivered</span>
                   <span class="hl">Asterisk PBX / CTI</span>
                   <span class="hl">AI IVR (TTS · ASR · LLM)</span>
                   <span class="hl">Full Stack · End-to-End</span>
+                </div>
+                <div class="exp-card-stack">
+                  <span>PHP</span><span>Python</span><span>MySQL</span><span>Asterisk PBX</span>
+                  <span>JavaScript</span><span>RESTful API</span><span>Docker</span>
+                  <span>LINE Messaging API</span><span>Shell Script</span>
                 </div>
                 <div class="exp-card-cta" aria-hidden="true">
                   <span class="exp-card-cta-label">View details</span>
@@ -727,12 +759,30 @@
                     <div class="exp-stat-label">Months · Full SDLC</div>
                   </div>
                 </div>
+                <div class="exp-card-work">
+                  <div class="exp-work-item">
+                    <span class="exp-work-dot"></span>
+                    <span>Smart meeting room reservation — multi-branch availability, booking approval workflow, and conflict resolution for SCG regional offices</span>
+                  </div>
+                  <div class="exp-work-item">
+                    <span class="exp-work-dot"></span>
+                    <span>Area-based job dispatch platform — geolocation task assignment, regional manager dashboard, and real-time job progress tracking</span>
+                  </div>
+                  <div class="exp-work-item">
+                    <span class="exp-work-dot"></span>
+                    <span>Event e-commerce store — product catalog, inventory management, order processing, and admin fulfillment panel</span>
+                  </div>
+                </div>
                 <div class="exp-card-highlights">
                   <span class="hl hl-blue">4 Apps Shipped</span>
                   <span class="hl">Reservation System</span>
                   <span class="hl">Job Dispatch Platform</span>
                   <span class="hl">E-Commerce</span>
                   <span class="hl">Full SDLC</span>
+                </div>
+                <div class="exp-card-stack">
+                  <span>PHP</span><span>MySQL</span><span>JavaScript</span>
+                  <span>Bootstrap</span><span>jQuery</span><span>AJAX</span><span>Git</span>
                 </div>
                 <div class="exp-card-cta" aria-hidden="true">
                   <span class="exp-card-cta-label">View details</span>
@@ -768,11 +818,25 @@
                     <div class="exp-stat-label">Months · Group-wide</div>
                   </div>
                 </div>
+                <div class="exp-card-work">
+                  <div class="exp-work-item">
+                    <span class="exp-work-dot"></span>
+                    <span>Software license procurement system — multi-level approval workflows, license pool tracking, and procurement history across all SCG business units</span>
+                  </div>
+                  <div class="exp-work-item">
+                    <span class="exp-work-dot"></span>
+                    <span>Company-wide IT asset lifecycle platform — procurement, assignment, maintenance scheduling, warranty tracking, and disposal management across all SCG entities</span>
+                  </div>
+                </div>
                 <div class="exp-card-highlights">
                   <span class="hl hl-blue">2 Platforms Shipped</span>
                   <span class="hl">License Management</span>
                   <span class="hl">Asset Lifecycle Tracking</span>
                   <span class="hl">Approval Workflows</span>
+                </div>
+                <div class="exp-card-stack">
+                  <span>PHP</span><span>MySQL</span><span>JavaScript</span>
+                  <span>Bootstrap</span><span>jQuery</span><span>AJAX</span><span>Git</span>
                 </div>
                 <div class="exp-card-cta" aria-hidden="true">
                   <span class="exp-card-cta-label">View details</span>
@@ -804,6 +868,16 @@
                   <div class="exp-stat-item">
                     <div class="exp-stat-num">10<span class="stat-sup">+</span></div>
                     <div class="exp-stat-label">Customers / Day</div>
+                  </div>
+                </div>
+                <div class="exp-card-work">
+                  <div class="exp-work-item">
+                    <span class="exp-work-dot"></span>
+                    <span>Front-line hardware diagnostics and repair — laptops, desktops, and peripherals — motherboard-level troubleshooting with 5+ devices serviced daily</span>
+                  </div>
+                  <div class="exp-work-item">
+                    <span class="exp-work-dot"></span>
+                    <span>OS reinstallation, driver configuration, data migration, and parts sourcing — high-volume technical support in Thailand's largest IT retail chain</span>
                   </div>
                 </div>
                 <div class="exp-card-highlights">
