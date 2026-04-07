@@ -743,48 +743,4 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 });
 
-// Slow-scroll effect near #experience section
-(function () {
-  var section = document.getElementById('experience');
-  if (!section) return;
-
-  var THRESHOLD = 700;    // px before/after section edges to start easing
-  var MIN_FACTOR = 0.34;  // slowest multiplier (34% of normal speed)
-  var target = window.scrollY;
-  var raf = null;
-
-  function getSpeedFactor() {
-    var r = section.getBoundingClientRect();
-    var top = r.top, bottom = r.bottom, vh = window.innerHeight;
-    if (top > 0 && top < THRESHOLD)
-      return MIN_FACTOR + (1 - MIN_FACTOR) * (top / THRESHOLD);
-    if (top <= 0 && bottom >= vh)
-      return MIN_FACTOR;
-    if (bottom > 0 && bottom < THRESHOLD && top <= 0)
-      return MIN_FACTOR + (1 - MIN_FACTOR) * (bottom / THRESHOLD);
-    return 1;
-  }
-
-  function tick() {
-    var diff = target - window.scrollY;
-    if (Math.abs(diff) < 0.5) { raf = null; return; }
-    window.scrollTo(0, window.scrollY + diff * 0.13);
-    raf = requestAnimationFrame(tick);
-  }
-
-  window.addEventListener('wheel', function (e) {
-    var f = getSpeedFactor();
-    if (f >= 0.99) return;
-    e.preventDefault();
-    var d = e.deltaMode === 1 ? e.deltaY * 20 : e.deltaMode === 2 ? e.deltaY * window.innerHeight : e.deltaY;
-    var maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-    if (!raf) target = window.scrollY;
-    target = Math.max(0, Math.min(maxScroll, target + d * f));
-    if (!raf) raf = requestAnimationFrame(tick);
-  }, { passive: false });
-
-  window.addEventListener('scroll', function () {
-    if (!raf) target = window.scrollY;
-  }, { passive: true });
-})();
 
