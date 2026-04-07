@@ -690,7 +690,7 @@ if (_expLink) _expLink.addEventListener('click', function(e) {
   var start = window.scrollY;
   var target = el.getBoundingClientRect().top + window.scrollY - 60;
   var startTime = null;
-  var duration = 1500;
+  var duration = 800;
   var ease = function(t) { return t < 0.5 ? 2*t*t : -1+(4-2*t)*t; };
   var step = function(timestamp) {
     if (!startTime) startTime = timestamp;
