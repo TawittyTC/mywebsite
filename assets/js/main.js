@@ -681,14 +681,6 @@ window.addEventListener('load', function() {
 });
 
 
-// View Experience → link with default scroll
-var _expLink = document.querySelector('.profile-featured-body a[href="#experience"]');
-if (_expLink) _expLink.addEventListener('click', function(e) {
-  var el = document.getElementById('experience');
-  if (!el) return;
-  el.scrollIntoView({ behavior: 'auto', block: 'start' });
-});
-
 // Experience expand/collapse
 document.addEventListener('DOMContentLoaded', function () {
   document.querySelectorAll('.exp-body').forEach(function (body) {
