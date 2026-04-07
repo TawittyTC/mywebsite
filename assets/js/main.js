@@ -263,6 +263,24 @@ document.addEventListener("DOMContentLoaded", function () {
 })();
 
 document.addEventListener('DOMContentLoaded', function () {
+  // ── Auto-sync Protollcall client count from template ──
+  var protollcallTmpl = document.getElementById('exp-protollcall');
+  if (protollcallTmpl) {
+    var chips = protollcallTmpl.content.querySelectorAll(
+      '.exp-filter-chip[data-filter]:not([data-filter="all"]):not([data-filter="general"])'
+    );
+    var clientCount = chips.length;
+    // Update stat number + data-count for count-up
+    var statSpan = document.querySelector('[data-exp="protollcall"] .exp-stat-clients');
+    if (statSpan) { statSpan.dataset.count = clientCount; statSpan.textContent = clientCount; }
+    // Update highlight badge
+    var badge = document.querySelector('[data-exp="protollcall"] .exp-client-count-badge');
+    if (badge) badge.textContent = clientCount + ' Clients';
+    // Update paragraph text
+    var para = document.querySelector('[data-exp="protollcall"] .js-client-count-text');
+    if (para) para.textContent = clientCount;
+  }
+
   document.querySelectorAll('#experience .data-box[data-exp]').forEach(function (card) {
     card.addEventListener('click', function () {
       var tmpl = document.getElementById('exp-' + card.dataset.exp);
@@ -270,7 +288,20 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
-  // Card hint: pulse the "+" button + stagger entry animation when card scrolls into view
+  // ── Count-up animation for stat numbers ──
+  function countUp(el) {
+    var target = parseInt(el.dataset.count, 10);
+    if (isNaN(target) || target <= 0) return;
+    var dur = 700, t0 = performance.now();
+    el.textContent = '0';
+    (function step(now) {
+      var p = Math.min((now - t0) / dur, 1);
+      el.textContent = Math.round((1 - Math.pow(1 - p, 3)) * target);
+      if (p < 1) requestAnimationFrame(step);
+    }(performance.now()));
+  }
+
+  // ── Card stagger + count-up when card enters viewport ──
   var expCards = Array.from(document.querySelectorAll('#experience .data-box[data-exp]'));
   if ('IntersectionObserver' in window) {
     var cardObs = new IntersectionObserver(function (entries) {
@@ -280,15 +311,18 @@ document.addEventListener('DOMContentLoaded', function () {
         entry.target.style.animationDelay = (idx * 80) + 'ms';
         entry.target.classList.add('card-visible');
         var btn = entry.target.querySelector('.exp-card-btn');
-        if (btn) setTimeout(function() { btn.classList.add('hint-loop'); }, idx * 80 + 400);
+        if (btn) setTimeout(function () { btn.classList.add('hint-loop'); }, idx * 80 + 400);
+        var countEls = entry.target.querySelectorAll('.js-count[data-count]');
+        if (countEls.length) setTimeout(function () { countEls.forEach(countUp); }, idx * 80 + 300);
         cardObs.unobserve(entry.target);
       });
     }, { threshold: 0.2 });
-    expCards.forEach(function (card) {
-      cardObs.observe(card);
-    });
+    expCards.forEach(function (card) { cardObs.observe(card); });
   } else {
-    expCards.forEach(function (card) { card.classList.add('card-visible'); });
+    expCards.forEach(function (card) {
+      card.classList.add('card-visible');
+      card.querySelectorAll('.js-count[data-count]').forEach(countUp);
+    });
   }
 });
 

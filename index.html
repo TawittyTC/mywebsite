@@ -300,6 +300,15 @@
     #experience .data-box[data-exp]{opacity:0}
     #experience .data-box[data-exp].card-visible{animation:card-enter .55s cubic-bezier(.16,1,.3,1) both}
 
+    /* Stats bar inside experience cards */
+    .exp-card-stats{display:flex;margin:18px 0 4px;padding:18px 0 14px;border-top:1px solid rgba(0,0,0,.06);border-bottom:1px solid rgba(0,0,0,.06)}
+    .exp-stat-item{flex:1;text-align:center;padding:0 8px;border-right:1px solid rgba(0,0,0,.08);min-width:0}
+    .exp-stat-item:last-child{border-right:none}
+    .exp-stat-num{font-size:30px;font-weight:700;color:#1d1d1f;letter-spacing:-1px;line-height:1;display:flex;align-items:baseline;justify-content:center;gap:1px;font-variant-numeric:tabular-nums}
+    .stat-sup{font-size:13px;font-weight:700;color:#0071e3;line-height:1;letter-spacing:0}
+    .exp-stat-label{font-size:11px;color:#6e6e73;font-weight:400;margin-top:6px;line-height:1.3}
+    @media(max-width:480px){.exp-stat-num{font-size:22px}.exp-card-stats{padding:12px 0 10px}}
+
     /* Experience details modal */
     .exp-lightbox{display:flex;position:fixed;inset:0;background:rgba(0,0,0,.25);backdrop-filter:blur(20px) saturate(1.8);-webkit-backdrop-filter:blur(20px) saturate(1.8);z-index:9999;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .22s ease,visibility .22s ease}
     .exp-lightbox.open{opacity:1;visibility:visible;pointer-events:auto}
@@ -663,9 +672,23 @@
                   <img src="assets/img/protollcall-logo.avif" alt="Protollcall Advance Service"
                     class="company-logo company-logo--lg" loading="lazy" decoding="async" width="320" height="211">
                 </div>
-                <p class="fw-light mt-3">Architected and shipped tailor-made enterprise CRM systems for 10+ clients across Thailand — integrating Asterisk PBX telephony (AGI, AMI, Dialplan), AI-powered IVR (TTS/ASR/LLM), Predictive Dialers, real-time analytics dashboards, and multi-channel API integrations. Delivered 60+ customization tickets spanning sales pipeline, debt collection, healthcare, insurance, and financial services — solo end-to-end from requirements through production deployment.</p>
+                <p class="fw-light mt-3">Architected and shipped tailor-made enterprise CRM systems for <span class="js-client-count-text">27</span> clients across Thailand — integrating Asterisk PBX telephony (AGI, AMI, Dialplan), AI-powered IVR (TTS/ASR/LLM), Predictive Dialers, real-time analytics dashboards, and multi-channel API integrations. Delivered 60+ customization tickets spanning sales pipeline, debt collection, healthcare, insurance, and financial services — solo end-to-end from requirements through production deployment.</p>
+                <div class="exp-card-stats">
+                  <div class="exp-stat-item">
+                    <div class="exp-stat-num"><span class="js-count exp-stat-clients" data-count="27">27</span></div>
+                    <div class="exp-stat-label">Enterprise Clients</div>
+                  </div>
+                  <div class="exp-stat-item">
+                    <div class="exp-stat-num">60<span class="stat-sup">+</span></div>
+                    <div class="exp-stat-label">Tickets Delivered</div>
+                  </div>
+                  <div class="exp-stat-item">
+                    <div class="exp-stat-num"><span class="js-count" data-count="4">4</span></div>
+                    <div class="exp-stat-label">Industries Served</div>
+                  </div>
+                </div>
                 <div class="exp-card-highlights">
-                  <span class="hl hl-blue">10+ Enterprise Clients</span>
+                  <span class="hl hl-blue exp-client-count-badge">27 Clients</span>
                   <span class="hl hl-blue">60+ Tickets Delivered</span>
                   <span class="hl">Asterisk PBX / CTI</span>
                   <span class="hl">AI IVR (TTS · ASR · LLM)</span>
@@ -694,6 +717,16 @@
                     loading="lazy" decoding="async" width="320" height="113">
                 </div>
                 <p class="fw-light mt-3">Delivered 4 production-ready internal web applications for SCG's regional operations — a smart meeting room reservation system, document reference tracker, area-based job dispatch platform, and an event e-commerce store with inventory management. Worked within a professional engineering team through full SDLC: requirements, design, development, UAT, and deployment.</p>
+                <div class="exp-card-stats">
+                  <div class="exp-stat-item">
+                    <div class="exp-stat-num"><span class="js-count" data-count="4">4</span></div>
+                    <div class="exp-stat-label">Apps Shipped</div>
+                  </div>
+                  <div class="exp-stat-item">
+                    <div class="exp-stat-num"><span class="js-count" data-count="4">4</span></div>
+                    <div class="exp-stat-label">Months · Full SDLC</div>
+                  </div>
+                </div>
                 <div class="exp-card-highlights">
                   <span class="hl hl-blue">4 Apps Shipped</span>
                   <span class="hl">Reservation System</span>
@@ -725,6 +758,16 @@
                     loading="lazy" decoding="async" width="320" height="113">
                 </div>
                 <p class="fw-light mt-3">Built 2 enterprise internal platforms for SCG group-wide use — a software license procurement & multi-level approval workflow system, and a company-wide IT asset tracking platform with full lifecycle management (procurement, assignment, maintenance, disposal). First exposure to large-scale corporate software engineering inside one of Thailand's largest industrial conglomerates.</p>
+                <div class="exp-card-stats">
+                  <div class="exp-stat-item">
+                    <div class="exp-stat-num"><span class="js-count" data-count="2">2</span></div>
+                    <div class="exp-stat-label">Platforms Built</div>
+                  </div>
+                  <div class="exp-stat-item">
+                    <div class="exp-stat-num"><span class="js-count" data-count="4">4</span></div>
+                    <div class="exp-stat-label">Months · Group-wide</div>
+                  </div>
+                </div>
                 <div class="exp-card-highlights">
                   <span class="hl hl-blue">2 Platforms Shipped</span>
                   <span class="hl">License Management</span>
@@ -753,6 +796,16 @@
                   <img src="assets/img/advice-logo.avif" alt="Advice IT Infinite" class="company-logo" loading="lazy" decoding="async" width="320" height="94">
                 </div>
                 <p class="fw-light mt-3">Provided front-line hardware diagnostics, repair, and technical support at one of Thailand's largest IT retail chains — servicing 5+ devices and 10+ customers daily across laptops, desktops, and peripherals. Developed practical troubleshooting methodologies, parts sourcing, OS reinstallation, and direct customer communication skills in a fast-paced, high-volume retail environment.</p>
+                <div class="exp-card-stats">
+                  <div class="exp-stat-item">
+                    <div class="exp-stat-num">5<span class="stat-sup">+</span></div>
+                    <div class="exp-stat-label">Devices / Day</div>
+                  </div>
+                  <div class="exp-stat-item">
+                    <div class="exp-stat-num">10<span class="stat-sup">+</span></div>
+                    <div class="exp-stat-label">Customers / Day</div>
+                  </div>
+                </div>
                 <div class="exp-card-highlights">
                   <span class="hl hl-blue">5+ Devices / Day</span>
                   <span class="hl">Hardware Diagnostics</span>
