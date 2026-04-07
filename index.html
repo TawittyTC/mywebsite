@@ -313,6 +313,12 @@
     .exp-card-stack span{font-size:11px;font-weight:500;color:#6e6e73;background:#f5f5f7;border:1px solid rgba(0,0,0,.08);border-radius:6px;padding:3px 9px;font-family:ui-monospace,'SF Mono',Monaco,Menlo,monospace;letter-spacing:.2px;transition:background .15s,color .15s}
     #experience .data-box[data-exp]:hover .exp-card-stack span{background:#ebebf0;color:#3a3a3c}
 
+    /* Clients / Projects badge section */
+    .exp-card-badge-section{margin-top:12px;padding-top:12px;border-top:1px solid rgba(0,0,0,.06)}
+    .exp-badge-label{display:block;font-size:10px;font-weight:600;color:#aeaeb2;letter-spacing:.8px;text-transform:uppercase;margin-bottom:7px}
+    .exp-badge-chip{display:inline-block;font-size:11px;font-weight:500;color:#3a3a3c;background:#f5f5f7;border:1px solid rgba(0,0,0,.07);border-radius:20px;padding:3px 10px;margin:0 4px 5px 0;transition:background .15s,border-color .15s}
+    #experience .data-box[data-exp]:hover .exp-badge-chip{background:#ebebf0;border-color:rgba(0,0,0,.1)}
+
     /* Stats bar inside experience cards */
     .exp-card-stats{display:flex;margin:18px 0 4px;padding:18px 0 14px;border-top:1px solid rgba(0,0,0,.06);border-bottom:1px solid rgba(0,0,0,.06)}
     .exp-stat-item{flex:1;text-align:center;padding:0 8px;border-right:1px solid rgba(0,0,0,.08);min-width:0}
@@ -703,10 +709,6 @@
                 <div class="exp-card-work">
                   <div class="exp-work-item">
                     <span class="exp-work-dot"></span>
-                    <span>Built AI-powered IVR pipeline — ASR → LLM (Claude / GPT) → TTS — automated call routing, intent detection, and voice bots deployed to production</span>
-                  </div>
-                  <div class="exp-work-item">
-                    <span class="exp-work-dot"></span>
                     <span>Engineered Predictive Dialer + real-time CTI dashboards with Asterisk AMI, queuelog analytics, live agent queue metrics, and supervision panels</span>
                   </div>
                   <div class="exp-work-item">
@@ -722,9 +724,43 @@
                   <span class="hl">Full Stack · End-to-End</span>
                 </div>
                 <div class="exp-card-stack">
-                  <span>PHP</span><span>Python</span><span>MySQL</span><span>Asterisk PBX</span>
-                  <span>JavaScript</span><span>RESTful API</span><span>Docker</span>
-                  <span>LINE Messaging API</span><span>Shell Script</span>
+                  <span>PHP</span><span>Python</span><span>MySQL</span><span>JavaScript</span><span>jQuery</span>
+                  <span>HTML5/CSS3</span><span>Bootstrap</span><span>AJAX</span><span>RESTful API</span>
+                  <span>Webhook</span><span>OAuth2</span><span>OWASP Security</span><span>Git</span><span>Docker</span>
+                  <span>DataTables</span><span>Select2</span><span>Chart.js</span><span>Moment.js</span>
+                  <span>PhpSpreadsheet</span><span>Asterisk PBX</span><span>AGI</span><span>AMI</span><span>Dialplan</span>
+                  <span>LINE Messaging API</span><span>Telegram Bot API</span><span>Huawei OBS</span>
+                  <span>Zabbix</span><span>Navicat</span><span>Linux</span><span>Shell Script</span><span>Crontab</span><span>npm</span>
+                </div>
+                <div class="exp-card-badge-section">
+                  <span class="exp-badge-label">Clients</span>
+                  <span class="exp-badge-chip">BCM</span>
+                  <span class="exp-badge-chip">Kasikorn Carabao</span>
+                  <span class="exp-badge-chip">Happy Products</span>
+                  <span class="exp-badge-chip">Thai VietJet Air</span>
+                  <span class="exp-badge-chip">Artelia Cornerstone</span>
+                  <span class="exp-badge-chip">LivPlus</span>
+                  <span class="exp-badge-chip">Digiserve</span>
+                  <span class="exp-badge-chip">Thaivan</span>
+                  <span class="exp-badge-chip">Netbay</span>
+                  <span class="exp-badge-chip">Inchcape Thailand</span>
+                  <span class="exp-badge-chip">OTO Vision</span>
+                  <span class="exp-badge-chip">Nova Organic</span>
+                  <span class="exp-badge-chip">Insurverse</span>
+                  <span class="exp-badge-chip">Qprime</span>
+                  <span class="exp-badge-chip">Rabbit Card (BSS)</span>
+                  <span class="exp-badge-chip">MV Shopping Mall</span>
+                  <span class="exp-badge-chip">iShopping</span>
+                  <span class="exp-badge-chip">Treebisfix</span>
+                  <span class="exp-badge-chip">Mediviss</span>
+                  <span class="exp-badge-chip">Yunomori</span>
+                  <span class="exp-badge-chip">N&amp;S / Kijsiri</span>
+                  <span class="exp-badge-chip">dp a&amp;h</span>
+                  <span class="exp-badge-chip">Or The Medical</span>
+                  <span class="exp-badge-chip">SBL Leasing</span>
+                  <span class="exp-badge-chip">Genie Properties</span>
+                  <span class="exp-badge-chip">Isuzu Thailand</span>
+                  <span class="exp-badge-chip">มณีแดง</span>
                 </div>
                 <div class="exp-card-cta" aria-hidden="true">
                   <span class="exp-card-cta-label">View details</span>
@@ -781,8 +817,16 @@
                   <span class="hl">Full SDLC</span>
                 </div>
                 <div class="exp-card-stack">
-                  <span>PHP</span><span>MySQL</span><span>JavaScript</span>
-                  <span>Bootstrap</span><span>jQuery</span><span>AJAX</span><span>Git</span>
+                  <span>PHP</span><span>Laravel</span><span>MSSQL</span><span>JavaScript</span><span>jQuery</span>
+                  <span>HTML5/CSS3</span><span>Bootstrap</span><span>AJAX</span><span>RESTful API</span>
+                  <span>OWASP Security</span><span>Git</span><span>Docker</span><span>DataTables</span><span>Glide Apps</span>
+                </div>
+                <div class="exp-card-badge-section">
+                  <span class="exp-badge-label">Projects</span>
+                  <span class="exp-badge-chip">Project Booking</span>
+                  <span class="exp-badge-chip">Project Ref Number</span>
+                  <span class="exp-badge-chip">Project Job South</span>
+                  <span class="exp-badge-chip">Project Family Day Shop</span>
                 </div>
                 <div class="exp-card-cta" aria-hidden="true">
                   <span class="exp-card-cta-label">View details</span>
@@ -835,8 +879,14 @@
                   <span class="hl">Approval Workflows</span>
                 </div>
                 <div class="exp-card-stack">
-                  <span>PHP</span><span>MySQL</span><span>JavaScript</span>
-                  <span>Bootstrap</span><span>jQuery</span><span>AJAX</span><span>Git</span>
+                  <span>PHP</span><span>Laravel</span><span>MSSQL</span><span>JavaScript</span><span>jQuery</span>
+                  <span>HTML5/CSS3</span><span>Bootstrap</span><span>AJAX</span><span>RESTful API</span>
+                  <span>OWASP Security</span><span>Git</span><span>Docker</span><span>DataTables</span><span>Glide Apps</span>
+                </div>
+                <div class="exp-card-badge-section">
+                  <span class="exp-badge-label">Projects</span>
+                  <span class="exp-badge-chip">Project License</span>
+                  <span class="exp-badge-chip">Project Asset</span>
                 </div>
                 <div class="exp-card-cta" aria-hidden="true">
                   <span class="exp-card-cta-label">View details</span>
