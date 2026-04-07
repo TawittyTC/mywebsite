@@ -396,12 +396,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // เมื่อกดปุ่ม "Previous" เลื่อนกลับไป 1 ช่อง
   prevBtn.addEventListener('click', function () {
-    scroller.scrollBy({ left: -300, behavior: 'smooth' });
+    scroller.scrollBy({ left: -400, behavior: 'smooth' });
   });
 
   // เมื่อกดปุ่ม "Next" เลื่อนไปข้างหน้า 1 ช่อง
   nextBtn.addEventListener('click', function () {
-    scroller.scrollBy({ left: 300, behavior: 'smooth' });
+    scroller.scrollBy({ left: 400, behavior: 'smooth' });
   });
 
   // อัปเดตปุ่มเมื่อ scroll
@@ -417,7 +417,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // Hint animation บน mobile: เลื่อนการ์ดซ้ายแล้วกลับ วน loop ทุก 3 วิ
   if (window.innerWidth <= 1024 && scroller) {
     const hintDistance = 80;
-    const duration = 400;
+    const duration = 250;
     let userScrolling = false;
     let isAnimating = false;
     let scrollEndTimer = null;
@@ -544,10 +544,10 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   prevBtn.addEventListener('click', function () {
-    scroller.scrollBy({ left: -300, behavior: 'smooth' });
+    scroller.scrollBy({ left: -400, behavior: 'smooth' });
   });
   nextBtn.addEventListener('click', function () {
-    scroller.scrollBy({ left: 300, behavior: 'smooth' });
+    scroller.scrollBy({ left: 400, behavior: 'smooth' });
   });
   scroller.addEventListener('scroll', updateButtons, { passive: true });
   window.addEventListener('load', updateButtons);
@@ -555,7 +555,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   if (window.innerWidth <= 1024) {
     const hintDistance = 80;
-    const duration = 400;
+    const duration = 250;
     let userScrolling = false;
     let isAnimating = false;
     let scrollEndTimer = null;
