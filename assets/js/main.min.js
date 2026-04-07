@@ -469,7 +469,7 @@ document.addEventListener('DOMContentLoaded', function () {
       scrollEndTimer = setTimeout(function () {
         userScrolling = false;
         startHintLoop();
-      }, 5000);
+      }, 10000);
     }
 
     scroller.addEventListener('touchstart', onUserScroll, { passive: true });
@@ -612,7 +612,7 @@ document.addEventListener('DOMContentLoaded', function () {
       scrollEndTimer = setTimeout(function () {
         userScrolling = false;
         startHintLoop();
-      }, 5000);
+      }, 10000);
     }
     scroller.addEventListener('touchstart', onUserScroll, { passive: true });
     scroller.addEventListener('scroll', onUserScroll, { passive: true });
