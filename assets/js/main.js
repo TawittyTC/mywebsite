@@ -120,46 +120,10 @@
     typeTick();
   }
 
-  /**
-   * Scroll fade-up — native IntersectionObserver (replaces AOS, saves 14KB)
-   */
-  document.addEventListener("DOMContentLoaded", () => {
-    const aosEls = document.querySelectorAll('[data-aos]');
-    if (!aosEls.length) return;
-    const obs = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        if (e.isIntersecting) { e.target.classList.add('aos-animate'); obs.unobserve(e.target); }
-      });
-    }, { threshold: 0.08 });
-    aosEls.forEach(el => obs.observe(el));
-  });
 
 })();
 
 
-document.addEventListener("DOMContentLoaded", function () {
-  const elements = document.querySelectorAll(".fade");
-  const offset = 100; // Adjust this value based on when you want the animation to start
-  let _fadeRafPending = false;
-
-  function onScroll() {
-    if (_fadeRafPending) return;
-    _fadeRafPending = true;
-    requestAnimationFrame(() => {
-      _fadeRafPending = false;
-      elements.forEach((el, index) => {
-        if (el.getBoundingClientRect().top < window.innerHeight - offset) {
-          setTimeout(() => {
-            el.classList.add("show");
-          }, index * 50); // Adjust the delay as needed
-        }
-      });
-    });
-  }
-
-  window.addEventListener("scroll", onScroll, { passive: true });
-  onScroll(); // Run the function on page load
-});
 
 // Cert lightbox
 (function () {

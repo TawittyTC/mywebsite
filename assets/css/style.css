@@ -33,16 +33,8 @@ a:hover {
 # Scroll fade-up (replaces AOS library — native IntersectionObserver)
 --------------------------------------------------------------*/
 [data-aos="fade-up"] {
-  opacity: 0;
-  transform: translateY(24px);
-  transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
-}
-[data-aos="fade-up"].aos-animate {
   opacity: 1;
-  transform: translateY(0);
-}
-@media (prefers-reduced-motion: reduce) {
-  [data-aos="fade-up"] { opacity: 1; transform: none; transition: none; }
+  transform: none;
 }
 
 
@@ -201,8 +193,7 @@ section {
 }
 
 .fade {
-  opacity: 0;
-  transition: opacity 1.0s ease-in-out;
+  opacity: 1;
 }
 
 .fade.show {
