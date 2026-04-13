@@ -401,7 +401,7 @@ button {
   padding: 10px 0;
   overflow-x: auto;
   overflow-y: hidden;
-  overscroll-behavior: none;
+  overscroll-behavior-x: none;
   scrollbar-width: none;
   -ms-overflow-style: none;
   touch-action: manipulation;

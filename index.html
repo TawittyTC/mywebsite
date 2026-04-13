@@ -268,8 +268,12 @@
     .exp-toggle.hint svg{animation:exp-hint .45s ease-in-out 2}
 
     /* Experience Apple-style cards */
-    #experience .data-box[data-exp]{cursor:pointer;position:relative;transition:transform .3s cubic-bezier(.25,.46,.45,.94),box-shadow .3s ease;box-shadow:0 2px 12px rgba(0,0,0,.07)}
-    #experience .data-box[data-exp]:hover{transform:translateY(-3px);box-shadow:0 16px 48px rgba(0,0,0,.13)}
+    #experience .data-box[data-exp]{cursor:pointer;position:relative;will-change:transform;transition:transform .3s cubic-bezier(.25,.46,.45,.94);box-shadow:0 2px 12px rgba(0,0,0,.07)}
+    #experience .data-box[data-exp]::before{content:'';position:absolute;inset:0;border-radius:28px;box-shadow:0 16px 48px rgba(0,0,0,.13);opacity:0;transition:opacity .3s ease;pointer-events:none;z-index:0}
+    #experience .data-box[data-exp]:hover{transform:translateY(-3px)}
+    #experience .data-box[data-exp]:hover::before{opacity:1}
+    /* Logo stays right: prevent text div from overflowing flex container */
+    #experience .data-box .d-flex>div:first-child{min-width:0}
     .exp-card-cta{position:absolute;bottom:20px;right:20px;display:flex;align-items:center;gap:8px;pointer-events:none}
     .exp-card-cta-label{font-size:13px;font-weight:500;color:#0071e3;transition:opacity .2s}
     #experience .data-box[data-exp]:hover .exp-card-cta-label{opacity:.8}
