@@ -669,4 +669,18 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 });
 
+// Dynamic duration for Protollcall (current employer)
+(function () {
+  var el = document.getElementById('protollcall-duration');
+  if (!el) return;
+  var start = new Date(2024, 5, 1); // June 2024 (month is 0-indexed)
+  var now = new Date();
+  var years = now.getFullYear() - start.getFullYear();
+  var months = now.getMonth() - start.getMonth();
+  if (months < 0) { years--; months += 12; }
+  var parts = [];
+  if (years > 0) parts.push(years + (years === 1 ? ' yr' : ' yrs'));
+  if (months > 0) parts.push(months + (months === 1 ? ' month' : ' months'));
+  el.textContent = parts.join(' ') || '1 month';
+})();
 
