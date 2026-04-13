@@ -200,6 +200,11 @@ section {
   opacity: 1;
 }
 
+/* Override Bootstrap's .fade:not(.show) which hides non-modal elements using fade class */
+.fade:not(.show) {
+  opacity: 1;
+}
+
 /* Margin utility classes */
 .mt-0  { margin-top: 0; }
 .mt-1  { margin-top: 0.25rem; }
