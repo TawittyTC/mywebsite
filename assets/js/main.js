@@ -298,7 +298,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function buildCerts() {
     if (imagesList.dataset.loaded) return;
     imagesList.dataset.loaded = "1";
-    for (let i = 1; i <= 31; i++) {
+    for (let i = 1; i <= 32; i++) {
       const colDiv = document.createElement("div");
       colDiv.classList.add("col-6", "col-md-4", "mb-5");
       const card = document.createElement("div");
