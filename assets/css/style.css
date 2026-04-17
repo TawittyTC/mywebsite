@@ -232,9 +232,9 @@ section {
 .data-box {
   border-radius: 28px;
   box-shadow: none;
-  padding: 32px;
+  padding: 48px;
   background-color: #fff;
-  margin: 24px auto;
+  margin: 40px auto;
 }
 
 .company-logo {
@@ -266,6 +266,9 @@ section {
 .fw-light {
   font-size: 15px;
 }
+
+ul.fw-light li { margin-bottom: 10px; line-height: 1.7; }
+ul.fw-light li:last-child { margin-bottom: 0; }
 
 * {
   margin: 0;
@@ -419,7 +422,7 @@ button {
 .rf-cards-scroller-item {
   flex: 0 0 auto;
   width: 300px;
-  margin-right: 40px;
+  margin-right: 56px;
   border-radius: 28px;
   box-shadow: none;
   background-color: #fff;
@@ -443,7 +446,7 @@ button {
 
   .rf-cards-scroller-item {
     width: 240px;
-    margin-right: 23px;
+    margin-right: 32px;
     transform: none !important;
   }
 
@@ -488,7 +491,7 @@ button {
 
   .rf-cards-scroller-item {
     width: 350px;
-    margin-right: 40px;
+    margin-right: 56px;
   }
 
   .paddlenav {
@@ -504,7 +507,7 @@ button {
 
   .rf-cards-scroller-item {
     width: 400px;
-    margin-right: 40px;
+    margin-right: 56px;
   }
 
   .paddlenav {
@@ -843,7 +846,7 @@ button {
 # Apple Colors + Typography
 --------------------------------------------------------------*/
 .section-title {
-  padding-bottom: 40px;
+  padding-bottom: 64px;
 }
 .section-title h2 {
   font-size: clamp(32px, 4vw, 48px);
@@ -892,7 +895,7 @@ a:hover { color: #0077ed; }
 .boxWhyScg {
   background: #ffffff;
   border-radius: 28px;
-  padding: 36px;
+  padding: 48px;
   height: 100%;
   border: none;
   box-shadow: none;
@@ -910,14 +913,14 @@ a:hover { color: #0077ed; }
   box-shadow: none;
   transform: translateY(-4px);
 }
-.rf-cards-scroller-item h4 { font-weight: 600; color: #1d1d1f; letter-spacing: -0.2px; padding: 16px 20px 4px; }
-.rf-cards-scroller-item p.fw-light { color: #6e6e73; font-size: 14px; padding: 0 20px 20px; }
+.rf-cards-scroller-item h4 { font-weight: 600; color: #1d1d1f; letter-spacing: -0.2px; padding: 24px 28px 8px; }
+.rf-cards-scroller-item p.fw-light { color: #6e6e73; font-size: 14px; padding: 0 28px 28px; }
 
 /* Skill cards override */
 #skill .rf-cards-scroller-item {
   width: 340px;
   min-height: 450px;
-  padding: 32px;
+  padding: 48px;
   background-color: #f5f5f7;
   display: flex;
   flex-direction: column;
@@ -950,8 +953,8 @@ a:hover { color: #0077ed; }
 .data-box.profile-featured {
   display: flex;
   align-items: center;
-  gap: 30px;
-  padding: 40px;
+  gap: 40px;
+  padding: 56px;
 }
 .profile-featured-img { flex-shrink: 0; }
 .profile-featured-img img {
@@ -962,6 +965,7 @@ a:hover { color: #0077ed; }
 }
 .profile-featured-body { flex: 1; }
 .profile-bio { font-size: 16px; color: #6e6e73; margin: 0; line-height: 1.6; }
+.profile-bio-small { font-size: 13px; color: #6e6e73; margin: 0; line-height: 1.6; }
 
 @media (max-width: 576px) {
   .data-box.profile-featured {
