@@ -367,6 +367,12 @@
     .exp-filter-chip.active{background:#0071e3;color:#fff;box-shadow:0 2px 8px rgba(0,113,227,.25)}
     @keyframes chip-hint{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
     .exp-filter-chip.hint{animation:chip-hint .38s ease-in-out}
+    /* Mobile: chips scroll horizontally in one row (same pattern as project filters) */
+    @media(max-width:768px){
+      .exp-client-filter{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin-left:-18px;margin-right:-18px;padding-left:18px;padding-right:18px}
+      .exp-client-filter::-webkit-scrollbar{display:none}
+      .exp-filter-chip{flex-shrink:0}
+    }
     /* ── Apple HIG: Client sections — horizontal dividers, no colored left border ── */
     .exp-client-section{margin-top:0;margin-bottom:0;padding:36px 0;border-top:1px solid #f2f2f7;border-left:none;transition:background .2s}
     .exp-client-section:first-of-type{border-top:1px solid #e5e5e7;margin-top:16px}
