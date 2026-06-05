@@ -604,7 +604,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const status = document.getElementById('form-status');
     if (status) {
       status.style.display = 'block';
-      status.innerHTML = '<span style="color:#0563bb">Opening your email client... Thank you for reaching out!</span>';
+      status.innerHTML = '<span style="color:#0071e3">Opening your email client... Thank you for reaching out!</span>';
     }
   });
 });
