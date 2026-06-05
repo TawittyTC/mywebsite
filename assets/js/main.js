@@ -586,30 +586,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 });
 
-// Contact Form
-document.addEventListener('DOMContentLoaded', function () {
-  const form = document.getElementById('contact-form');
-  if (!form) return;
-
-  form.addEventListener('submit', function (e) {
-    e.preventDefault();
-    const name = document.getElementById('contact-name').value;
-    const email = document.getElementById('contact-email').value;
-    const subject = document.getElementById('contact-subject').value;
-    const message = document.getElementById('contact-message').value;
-
-    const body = `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`;
-    window.location.href = `mailto:tawitty.tc@gmail.com?subject=${encodeURIComponent(subject + ' - from ' + name)}&body=${encodeURIComponent(body)}`;
-
-    const status = document.getElementById('form-status');
-    if (status) {
-      status.style.display = 'block';
-      status.innerHTML = '<span style="color:#0071e3">Opening your email client... Thank you for reaching out!</span>';
-    }
-  });
-});
-
-
 // Hero animation now handled by CSS (@keyframes heroFadeIn) — no GSAP needed
 
 var currentYear = new Date().getFullYear();
