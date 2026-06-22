@@ -26,7 +26,8 @@
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="profile">
   <meta property="og:url" content="https://tawittytc.github.io/mywebsite/">
-  <meta property="og:title" content="ธนพล ชำนาญหาญ | รับทำเว็บไซต์ รับพัฒนา AI Agent กรุงเทพ | Full-Stack & AI Developer">
+  <meta property="og:title"
+    content="ธนพล ชำนาญหาญ | รับทำเว็บไซต์ รับพัฒนา AI Agent กรุงเทพ | Full-Stack & AI Developer">
   <meta property="og:description"
     content="Tanapol Chamnanhan — Software Engineer, Full-Stack &amp; AI Developer จากกรุงเทพ รับทำเว็บไซต์ รับพัฒนาระบบ CRM, AI Agent, Voice AI (ASR/TTS/STS). Python, PHP, JavaScript, React, AWS. 27 clients delivered.">
   <meta property="og:image" content="https://tawittytc.github.io/mywebsite/assets/img/img01.avif">
@@ -38,7 +39,8 @@
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:url" content="https://tawittytc.github.io/mywebsite/">
-  <meta name="twitter:title" content="ธนพล ชำนาญหาญ | รับทำเว็บไซต์ รับพัฒนา AI Agent กรุงเทพ | Full-Stack & AI Developer">
+  <meta name="twitter:title"
+    content="ธนพล ชำนาญหาญ | รับทำเว็บไซต์ รับพัฒนา AI Agent กรุงเทพ | Full-Stack & AI Developer">
   <meta name="twitter:description"
     content="Tanapol Chamnanhan — Software Engineer, Full-Stack &amp; AI Developer จากกรุงเทพ รับทำเว็บไซต์ รับพัฒนาระบบ CRM, AI Agent, Voice AI. Python, PHP, JavaScript, React, AWS. Bangkok, Thailand.">
   <meta name="twitter:image" content="https://tawittytc.github.io/mywebsite/assets/img/img01.avif">
@@ -64,9 +66,33 @@
   <!-- Critical CSS inlined: hero renders instantly, zero blocking requests -->
   <style>
     /* ── Self-hosted fonts (inlined — eliminates blocking fonts.css request) ── */
-    @font-face{font-family:'Inter';font-style:normal;font-weight:400 600;font-display:swap;src:url('assets/fonts/inter-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
-    @font-face{font-family:'Noto Sans Thai';font-style:normal;font-weight:400 600;font-display:swap;src:url('assets/fonts/notosansthai-thai.woff2') format('woff2');unicode-range:U+02D7,U+0303,U+0331,U+0E01-0E5B,U+200C-200D,U+25CC}
-    @font-face{font-family:'Noto Sans Thai';font-style:normal;font-weight:400 600;font-display:swap;src:url('assets/fonts/notosansthai-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+    @font-face {
+      font-family: 'Inter';
+      font-style: normal;
+      font-weight: 400 600;
+      font-display: swap;
+      src: url('assets/fonts/inter-latin.woff2') format('woff2');
+      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD
+    }
+
+    @font-face {
+      font-family: 'Noto Sans Thai';
+      font-style: normal;
+      font-weight: 400 600;
+      font-display: swap;
+      src: url('assets/fonts/notosansthai-thai.woff2') format('woff2');
+      unicode-range: U+02D7, U+0303, U+0331, U+0E01-0E5B, U+200C-200D, U+25CC
+    }
+
+    @font-face {
+      font-family: 'Noto Sans Thai';
+      font-style: normal;
+      font-weight: 400 600;
+      font-display: swap;
+      src: url('assets/fonts/notosansthai-latin.woff2') format('woff2');
+      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD
+    }
+
     /* ── Bootstrap critical subset ── */
     *,
     ::after,
@@ -244,6 +270,7 @@
       align-items: center;
       justify-content: center;
     }
+
     .loader::before {
       content: '';
       width: 28px;
@@ -254,150 +281,831 @@
       animation: loader-spin 0.75s linear infinite;
       will-change: transform;
     }
+
     @keyframes loader-spin {
-      to { transform: rotate(360deg); }
+      to {
+        transform: rotate(360deg);
+      }
     }
 
     /* Hero text entrance animation (CSS replaces GSAP — no CDN request) */
     @keyframes heroFadeIn {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
-    #hero h1 { animation: heroFadeIn 1s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both; }
-    #hero p  { animation: heroFadeIn 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both; }
+
+    #hero h1 {
+      animation: heroFadeIn 1s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+    }
+
+    #hero p {
+      animation: heroFadeIn 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
+    }
 
     /* Experience expand/collapse */
-    .exp-body{overflow:hidden;max-height:100px;transition:max-height .4s cubic-bezier(.4,0,.2,1);-webkit-mask-image:linear-gradient(to bottom,#000 40%,transparent 100%);mask-image:linear-gradient(to bottom,#000 40%,transparent 100%)}
-    .exp-body.open{max-height:1000px;-webkit-mask-image:none;mask-image:none}
-    .exp-toggle{display:inline-flex;align-items:center;gap:5px;background:none;border:none;cursor:pointer;color:#0071e3;font-size:13px;font-weight:500;padding:4px 0 2px;transition:opacity .2s}
-    .exp-toggle:hover{opacity:.75}
-    .exp-toggle svg{transition:transform .35s cubic-bezier(.4,0,.2,1);flex-shrink:0}
-    .exp-toggle.open svg{transform:rotate(180deg)}
-    @keyframes exp-hint{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
-    .exp-toggle.hint svg{animation:exp-hint .45s ease-in-out 2}
+    .exp-body {
+      overflow: hidden;
+      max-height: 100px;
+      transition: max-height .4s cubic-bezier(.4, 0, .2, 1);
+      -webkit-mask-image: linear-gradient(to bottom, #000 40%, transparent 100%);
+      mask-image: linear-gradient(to bottom, #000 40%, transparent 100%)
+    }
+
+    .exp-body.open {
+      max-height: 1000px;
+      -webkit-mask-image: none;
+      mask-image: none
+    }
+
+    .exp-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #0071e3;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 4px 0 2px;
+      transition: opacity .2s
+    }
+
+    .exp-toggle:hover {
+      opacity: .75
+    }
+
+    .exp-toggle svg {
+      transition: transform .35s cubic-bezier(.4, 0, .2, 1);
+      flex-shrink: 0
+    }
+
+    .exp-toggle.open svg {
+      transform: rotate(180deg)
+    }
+
+    @keyframes exp-hint {
+
+      0%,
+      100% {
+        transform: translateY(0)
+      }
+
+      50% {
+        transform: translateY(4px)
+      }
+    }
+
+    .exp-toggle.hint svg {
+      animation: exp-hint .45s ease-in-out 2
+    }
 
     /* Experience Apple-style cards */
-    #experience .data-box[data-exp]{cursor:pointer;position:relative;will-change:transform;transition:transform .3s cubic-bezier(.25,.46,.45,.94);box-shadow:0 2px 12px rgba(0,0,0,.07)}
-    #experience .data-box[data-exp]::before{content:'';position:absolute;inset:0;border-radius:28px;box-shadow:0 16px 48px rgba(0,0,0,.13);opacity:0;transition:opacity .3s ease;pointer-events:none;z-index:0}
-    #experience .data-box[data-exp]:hover{transform:translateY(-3px)}
-    #experience .data-box[data-exp]:hover::before{opacity:1}
+    #experience .data-box[data-exp] {
+      cursor: pointer;
+      position: relative;
+      will-change: transform;
+      transition: transform .3s cubic-bezier(.25, .46, .45, .94);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, .07)
+    }
+
+    #experience .data-box[data-exp]::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 28px;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, .13);
+      opacity: 0;
+      transition: opacity .3s ease;
+      pointer-events: none;
+      z-index: 0
+    }
+
+    #experience .data-box[data-exp]:hover {
+      transform: translateY(-3px)
+    }
+
+    #experience .data-box[data-exp]:hover::before {
+      opacity: 1
+    }
+
     /* Logo stays right: prevent text div from overflowing flex container */
-    #experience .data-box .d-flex>div:first-child{min-width:0}
-    .exp-card-cta{position:absolute;bottom:20px;right:20px;display:flex;align-items:center;gap:8px;pointer-events:none}
-    .exp-card-cta-label{font-size:13px;font-weight:500;color:#0071e3;transition:opacity .2s}
-    #experience .data-box[data-exp]:hover .exp-card-cta-label{opacity:.8}
-    .exp-card-btn{width:40px;height:40px;border-radius:50%;background:rgba(0,113,227,.1);display:flex;align-items:center;justify-content:center;transition:background .2s,transform .2s;flex-shrink:0}
-    #experience .data-box[data-exp]:hover .exp-card-btn{background:rgba(0,113,227,.18);transform:scale(1.1)}
-    .exp-card-btn svg{width:20px;height:20px;fill:#0071e3}
-    @keyframes card-btn-hint{0%{transform:scale(1)}10%{transform:scale(1.4)}20%,100%{transform:scale(1)}}
-    .exp-card-btn.hint-loop{animation:card-btn-hint 2s ease-in-out infinite}
-    .exp-card-highlights{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;margin-bottom:8px}
-    .exp-card-highlights .hl{font-size:12px;font-weight:600;color:#3a3a3c;background:#f5f5f7;border:none;border-radius:20px;padding:5px 13px;letter-spacing:.1px}
-    .exp-card-highlights .hl-blue{color:#0071e3;background:rgba(0,113,227,.08)}
+    #experience .data-box .d-flex>div:first-child {
+      min-width: 0
+    }
+
+    .exp-card-cta {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      pointer-events: none
+    }
+
+    .exp-card-cta-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: #0071e3;
+      transition: opacity .2s
+    }
+
+    #experience .data-box[data-exp]:hover .exp-card-cta-label {
+      opacity: .8
+    }
+
+    .exp-card-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(0, 113, 227, .1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .2s, transform .2s;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(255, 255, 255, 0.18);
+    }
+
+    #experience .data-box[data-exp]:hover .exp-card-btn {
+      background: rgba(0, 113, 227, .18);
+      transform: scale(1.1)
+    }
+
+    .exp-card-btn svg {
+      width: 20px;
+      height: 20px;
+      fill: #0071e3
+    }
+
+    @keyframes card-btn-hint {
+      0% {
+        transform: scale(1)
+      }
+
+      10% {
+        transform: scale(1.4)
+      }
+
+      20%,
+      100% {
+        transform: scale(1)
+      }
+    }
+
+    .exp-card-btn.hint-loop {
+      animation: card-btn-hint 2s ease-in-out infinite
+    }
+
+    .exp-card-highlights {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 20px;
+      margin-bottom: 8px
+    }
+
+    .exp-card-highlights .hl {
+      font-size: 10px;
+      font-weight: 400;
+      color: #3a3a3c;
+      background: #f5f5f7;
+      border: none;
+      border-radius: 20px;
+      padding: 5px 13px;
+      letter-spacing: .1px
+    }
+
+    .exp-card-highlights .hl-blue {
+      color: #0071e3;
+      background: rgba(0, 113, 227, .08)
+    }
 
     /* Card shimmer on hover */
-    #experience .data-box[data-exp]{overflow:hidden}
-    #experience .data-box[data-exp]::after{content:'';position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.22) 50%,transparent 70%);transform:translateX(-160%);transition:transform .75s ease;pointer-events:none;border-radius:28px}
-    #experience .data-box[data-exp]:hover::after{transform:translateX(160%)}
+    #experience .data-box[data-exp] {
+      overflow: hidden
+    }
+
+    #experience .data-box[data-exp]::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, .22) 50%, transparent 70%);
+      transform: translateX(-160%);
+      transition: transform .75s ease;
+      pointer-events: none;
+      border-radius: 28px
+    }
+
+    #experience .data-box[data-exp]:hover::after {
+      transform: translateX(160%)
+    }
 
     /* Active/Current position pulse dot */
-    .exp-status-active{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#30d158;background:rgba(48,209,88,.1);border-radius:20px;padding:3px 10px;margin-left:6px;vertical-align:middle}
-    .exp-status-active::before{content:'';display:inline-block;width:6px;height:6px;background:#30d158;border-radius:50%;animation:pulse-active 2s ease-in-out infinite;flex-shrink:0}
-    @keyframes pulse-active{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(48,209,88,.5)}60%{opacity:.7;box-shadow:0 0 0 5px rgba(48,209,88,0)}}
+    .exp-status-active {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #30d158;
+      background: rgba(48, 209, 88, .1);
+      border-radius: 20px;
+      padding: 3px 10px;
+      margin-left: 6px;
+      vertical-align: middle
+    }
+
+    .exp-status-active::before {
+      content: '';
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      background: #30d158;
+      border-radius: 50%;
+      animation: pulse-active 2s ease-in-out infinite;
+      flex-shrink: 0
+    }
+
+    @keyframes pulse-active {
+
+      0%,
+      100% {
+        opacity: 1;
+        box-shadow: 0 0 0 0 rgba(48, 209, 88, .5)
+      }
+
+      60% {
+        opacity: .7;
+        box-shadow: 0 0 0 5px rgba(48, 209, 88, 0)
+      }
+    }
 
     /* Duration badge */
-    .exp-duration{display:inline-block;font-size:11px;color:#6e6e73;font-weight:400;background:#f5f5f7;border-radius:20px;padding:3px 10px;margin-top:4px}
+    .exp-duration {
+      display: inline-block;
+      font-size: 11px;
+      color: #6e6e73;
+      font-weight: 400;
+      background: #f5f5f7;
+      border-radius: 20px;
+      padding: 3px 10px;
+      margin-top: 4px
+    }
 
     /* Card stagger entry animation */
-    @keyframes card-enter{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
-    #experience .data-box[data-exp]{opacity:0}
-    #experience .data-box[data-exp].card-visible{animation:card-enter .55s cubic-bezier(.16,1,.3,1) both}
+    @keyframes card-enter {
+      from {
+        opacity: 0;
+        transform: translateY(22px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    #experience .data-box[data-exp] {
+      opacity: 0
+    }
+
+    #experience .data-box[data-exp].card-visible {
+      animation: card-enter .55s cubic-bezier(.16, 1, .3, 1) both
+    }
 
     /* Extra padding-bottom so CTA button never crowds content */
-    #experience .data-box[data-exp]{padding-bottom:80px}
+    #experience .data-box[data-exp] {
+      padding-bottom: 80px
+    }
 
     /* Key work bullet list */
-    .exp-card-work{margin:14px 0 2px;display:flex;flex-direction:column;gap:9px}
-    .exp-work-item{display:flex;align-items:flex-start;gap:10px;font-size:13.5px;color:#3a3a3c;line-height:1.6}
-    .exp-work-dot{flex-shrink:0;width:6px;height:6px;background:#0071e3;border-radius:50%;margin-top:7px}
+    .exp-card-work {
+      margin: 14px 0 2px;
+      display: flex;
+      flex-direction: column;
+      gap: 9px
+    }
+
+    .exp-work-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 13.5px;
+      color: #3a3a3c;
+      line-height: 1.6
+    }
+
+    .exp-work-dot {
+      flex-shrink: 0;
+      width: 6px;
+      height: 6px;
+      background: #0071e3;
+      border-radius: 50%;
+      margin-top: 7px
+    }
 
     /* Tech stack monospace pills */
-    .exp-card-stack{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;padding-top:16px;border-top:1px solid rgba(0,0,0,.06)}
-    .exp-card-stack span{font-size:11px;font-weight:500;color:#6e6e73;background:#f5f5f7;border:none;border-radius:20px;padding:5px 12px;line-height:1;font-family:ui-monospace,'SF Mono',Monaco,Menlo,monospace;letter-spacing:.2px;transition:background .15s,color .15s}
-    #experience .data-box[data-exp]:hover .exp-card-stack span{background:#ebebf0;color:#3a3a3c}
+    .exp-card-stack {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(0, 0, 0, .06)
+    }
+
+    .exp-card-stack span {
+      font-size: 11px;
+      font-weight: 500;
+      color: #6e6e73;
+      background: #f5f5f7;
+      border: none;
+      border-radius: 20px;
+      padding: 5px 12px;
+      line-height: 1;
+      font-family: ui-monospace, 'SF Mono', Monaco, Menlo, monospace;
+      letter-spacing: .2px;
+      transition: background .15s, color .15s
+    }
+
+    #experience .data-box[data-exp]:hover .exp-card-stack span {
+      background: #ebebf0;
+      color: #3a3a3c
+    }
 
     /* Clients / Projects badge section */
-    .exp-card-badge-section{margin-top:12px;padding-top:12px;border-top:1px solid rgba(0,0,0,.06)}
-    .exp-badge-label{display:block;font-size:10px;font-weight:600;color:#aeaeb2;letter-spacing:.8px;text-transform:uppercase;margin-bottom:7px}
-    .exp-badge-chip{display:inline-block;font-size:11px;font-weight:500;color:#3a3a3c;background:#f5f5f7;border:1px solid rgba(0,0,0,.07);border-radius:20px;padding:3px 10px;margin:0 4px 5px 0;transition:background .15s,border-color .15s}
-    #experience .data-box[data-exp]:hover .exp-badge-chip{background:#ebebf0;border-color:rgba(0,0,0,.1)}
+    .exp-card-badge-section {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(0, 0, 0, .06)
+    }
+
+    .exp-badge-label {
+      display: block;
+      font-size: 10px;
+      font-weight: 600;
+      color: #aeaeb2;
+      letter-spacing: .8px;
+      text-transform: uppercase;
+      margin-bottom: 7px
+    }
+
+    .exp-badge-chip {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 500;
+      color: #3a3a3c;
+      background: #f5f5f7;
+      border: 1px solid rgba(0, 0, 0, .07);
+      border-radius: 20px;
+      padding: 3px 10px;
+      margin: 0 4px 5px 0;
+      transition: background .15s, border-color .15s
+    }
+
+    #experience .data-box[data-exp]:hover .exp-badge-chip {
+      background: #ebebf0;
+      border-color: rgba(0, 0, 0, .1)
+    }
 
     /* Stats bar inside experience cards */
-    .exp-card-stats{display:flex;margin:18px 0 4px;padding:18px 0 14px;border-top:1px solid rgba(0,0,0,.06);border-bottom:1px solid rgba(0,0,0,.06)}
-    .exp-stat-item{flex:1;text-align:center;padding:0 8px;border-right:1px solid rgba(0,0,0,.08);min-width:0}
-    .exp-stat-item:last-child{border-right:none}
-    .exp-stat-num{font-size:30px;font-weight:700;color:#1d1d1f;letter-spacing:-1px;line-height:1;display:flex;align-items:baseline;justify-content:center;gap:1px;font-variant-numeric:tabular-nums}
-    .stat-sup{font-size:13px;font-weight:700;color:#0071e3;line-height:1;letter-spacing:0}
-    .exp-stat-label{font-size:11px;color:#6e6e73;font-weight:400;margin-top:6px;line-height:1.3}
-    @media(max-width:480px){.exp-stat-num{font-size:22px}.exp-card-stats{padding:12px 0 10px}}
+    .exp-card-stats {
+      display: flex;
+      margin: 18px 0 4px;
+      padding: 18px 0 14px;
+      border-top: 1px solid rgba(0, 0, 0, .06);
+      border-bottom: 1px solid rgba(0, 0, 0, .06)
+    }
+
+    .exp-stat-item {
+      flex: 1;
+      text-align: center;
+      padding: 0 8px;
+      border-right: 1px solid rgba(0, 0, 0, .08);
+      min-width: 0
+    }
+
+    .exp-stat-item:last-child {
+      border-right: none
+    }
+
+    .exp-stat-num {
+      font-size: 30px;
+      font-weight: 700;
+      color: #1d1d1f;
+      letter-spacing: -1px;
+      line-height: 1;
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 1px;
+      font-variant-numeric: tabular-nums
+    }
+
+    .stat-sup {
+      font-size: 13px;
+      font-weight: 700;
+      color: #0071e3;
+      line-height: 1;
+      letter-spacing: 0
+    }
+
+    .exp-stat-label {
+      font-size: 11px;
+      color: #6e6e73;
+      font-weight: 400;
+      margin-top: 6px;
+      line-height: 1.3
+    }
+
+    @media(max-width:480px) {
+      .exp-stat-num {
+        font-size: 22px
+      }
+
+      .exp-card-stats {
+        padding: 12px 0 10px
+      }
+    }
 
     /* Experience details modal */
-    .exp-lightbox{display:flex;position:fixed;inset:0;background:rgba(0,0,0,.25);backdrop-filter:blur(20px) saturate(1.8);-webkit-backdrop-filter:blur(20px) saturate(1.8);z-index:9999;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .22s ease,visibility .22s ease}
-    .exp-lightbox.open{opacity:1;visibility:visible;pointer-events:auto}
-    .exp-lightbox-inner{background:rgba(255,255,255,.97);border-radius:20px;max-width:740px;width:100%;max-height:88vh;overflow-y:auto;padding:36px 40px;position:relative;box-shadow:0 32px 80px rgba(0,0,0,.22);transform:translateY(24px) scale(.97);opacity:0;transition:transform .38s cubic-bezier(.34,1.56,.64,1),opacity .3s ease}
-    .exp-lightbox.open .exp-lightbox-inner{transform:translateY(0) scale(1);opacity:1}
-    .exp-lightbox-close{position:sticky;top:0;float:right;z-index:10;background:rgba(232,232,237,.9);border:none;border-radius:50%;width:32px;height:32px;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s,transform .15s;margin-bottom:8px;color:#1d1d1f}
-    .exp-lightbox-close:hover{background:#d8d8df;transform:scale(1.12)}
-    /* ── Apple HIG: Modal Header ── */
-    .exp-modal-header{margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid #e5e5e7}
-    .exp-modal-role-header{display:flex;align-items:center;gap:16px;margin-bottom:14px}
-    .exp-modal-company-logo{width:52px;height:52px;object-fit:contain;border-radius:12px;border:1px solid rgba(0,0,0,.06);flex-shrink:0;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.08),0 4px 12px rgba(0,0,0,.06)}
-    .exp-modal-title{font-size:24px;font-weight:700;color:#1d1d1f;margin:0 0 4px;letter-spacing:-.5px;line-height:1.2}
-    .exp-modal-company{font-size:15px;color:#6e6e73;font-weight:400;line-height:1.4}
-    /* Period as a subtle inline badge */
-    .exp-modal-period{display:inline-block;font-size:12px;color:#0071e3;font-weight:600;background:rgba(0,113,227,.08);border-radius:20px;padding:4px 12px;margin-bottom:18px;letter-spacing:.1px}
-    /* Tech tags: Apple pill style */
-    .exp-modal-tech{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:0}
-    .exp-modal-tech span{font-size:11px;font-weight:500;color:#3a3a3c;background:#f5f5f7;border-radius:20px;padding:4px 12px;border:1px solid rgba(0,0,0,.04)}
-    .exp-modal-overview{font-size:15px;color:#3a3a3c;line-height:1.75;margin:0}
-    /* ── Apple HIG: Filter chips ── */
-    .exp-client-filter{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0 8px}
-    .exp-filter-chip{background:#f5f5f7;border:none;border-radius:20px;padding:6px 16px;font-size:13px;font-weight:500;color:#1d1d1f;cursor:pointer;transition:background .2s,color .2s,box-shadow .2s}
-    .exp-filter-chip:hover{background:#e8e8ed;box-shadow:0 1px 4px rgba(0,0,0,.08)}
-    .exp-filter-chip.active{background:#0071e3;color:#fff;box-shadow:0 2px 8px rgba(0,113,227,.25)}
-    @keyframes chip-hint{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
-    .exp-filter-chip.hint{animation:chip-hint .38s ease-in-out}
-    /* Mobile: chips scroll horizontally in one row (same pattern as project filters) */
-    @media(max-width:768px){
-      .exp-client-filter{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin-left:-18px;margin-right:-18px;padding-left:18px;padding-right:18px}
-      .exp-client-filter::-webkit-scrollbar{display:none}
-      .exp-filter-chip{flex-shrink:0}
+    .exp-lightbox {
+      display: flex;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .25);
+      backdrop-filter: blur(20px) saturate(1.8);
+      -webkit-backdrop-filter: blur(20px) saturate(1.8);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      box-sizing: border-box;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity .22s ease, visibility .22s ease
     }
+
+    .exp-lightbox.open {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto
+    }
+
+    .exp-lightbox-inner {
+      background: rgba(255, 255, 255, .97);
+      border-radius: 20px;
+      max-width: 740px;
+      width: 100%;
+      max-height: 88vh;
+      overflow-y: auto;
+      padding: 36px 40px;
+      position: relative;
+      box-shadow: 0 32px 80px rgba(0, 0, 0, .22);
+      transform: translateY(24px) scale(.97);
+      opacity: 0;
+      transition: transform .38s cubic-bezier(.34, 1.56, .64, 1), opacity .3s ease
+    }
+
+    .exp-lightbox.open .exp-lightbox-inner {
+      transform: translateY(0) scale(1);
+      opacity: 1
+    }
+
+    .exp-lightbox-close {
+      position: sticky;
+      top: 0;
+      float: right;
+      z-index: 10;
+      background: rgba(232, 232, 237, .9);
+      border: none;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      font-size: 17px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .2s, transform .15s;
+      margin-bottom: 8px;
+      color: #1d1d1f
+    }
+
+    .exp-lightbox-close:hover {
+      background: #d8d8df;
+      transform: scale(1.12)
+    }
+
+    /* ── Apple HIG: Modal Header ── */
+    .exp-modal-header {
+      margin-bottom: 28px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid #e5e5e7
+    }
+
+    .exp-modal-role-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 14px
+    }
+
+    .exp-modal-company-logo {
+      width: 52px;
+      height: 52px;
+      object-fit: contain;
+      border-radius: 12px;
+      border: 1px solid rgba(0, 0, 0, .06);
+      flex-shrink: 0;
+      background: #fff;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, .08), 0 4px 12px rgba(0, 0, 0, .06)
+    }
+
+    .exp-modal-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1d1d1f;
+      margin: 0 0 4px;
+      letter-spacing: -.5px;
+      line-height: 1.2
+    }
+
+    .exp-modal-company {
+      font-size: 15px;
+      color: #6e6e73;
+      font-weight: 400;
+      line-height: 1.4
+    }
+
+    /* Period as a subtle inline badge */
+    .exp-modal-period {
+      display: inline-block;
+      font-size: 12px;
+      color: #0071e3;
+      font-weight: 600;
+      background: rgba(0, 113, 227, .08);
+      border-radius: 20px;
+      padding: 4px 12px;
+      margin-bottom: 18px;
+      letter-spacing: .1px
+    }
+
+    /* Tech tags: Apple pill style */
+    .exp-modal-tech {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 0
+    }
+
+    .exp-modal-tech span {
+      font-size: 11px;
+      font-weight: 500;
+      color: #3a3a3c;
+      background: #f5f5f7;
+      border-radius: 20px;
+      padding: 4px 12px;
+      border: 1px solid rgba(0, 0, 0, .04)
+    }
+
+    .exp-modal-overview {
+      font-size: 15px;
+      color: #3a3a3c;
+      line-height: 1.75;
+      margin: 0
+    }
+
+    /* ── Apple HIG: Filter chips ── */
+    .exp-client-filter {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 20px 0 8px
+    }
+
+    .exp-filter-chip {
+      background: #f5f5f7;
+      border: none;
+      border-radius: 20px;
+      padding: 6px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #1d1d1f;
+      cursor: pointer;
+      transition: background .2s, color .2s, box-shadow .2s
+    }
+
+    .exp-filter-chip:hover {
+      background: #e8e8ed;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, .08)
+    }
+
+    .exp-filter-chip.active {
+      background: #0071e3;
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(0, 113, 227, .25)
+    }
+
+    @keyframes chip-hint {
+
+      0%,
+      100% {
+        transform: translateY(0)
+      }
+
+      50% {
+        transform: translateY(-4px)
+      }
+    }
+
+    .exp-filter-chip.hint {
+      animation: chip-hint .38s ease-in-out
+    }
+
+    /* Mobile: chips scroll horizontally in one row (same pattern as project filters) */
+    @media(max-width:768px) {
+      .exp-client-filter {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        margin-left: -18px;
+        margin-right: -18px;
+        padding-left: 18px;
+        padding-right: 18px
+      }
+
+      .exp-client-filter::-webkit-scrollbar {
+        display: none
+      }
+
+      .exp-filter-chip {
+        flex-shrink: 0
+      }
+    }
+
     /* ── Apple HIG: Client sections — horizontal dividers, no colored left border ── */
-    .exp-client-section{margin-top:0;margin-bottom:0;padding:36px 0;border-top:1px solid #f2f2f7;border-left:none;transition:background .2s}
-    .exp-client-section:first-of-type{border-top:1px solid #e5e5e7;margin-top:16px}
-    .exp-client-section:hover{background:rgba(0,113,227,.015);border-radius:12px;padding-left:12px;padding-right:12px}
+    .exp-client-section {
+      margin-top: 0;
+      margin-bottom: 0;
+      padding: 36px 0;
+      border-top: 1px solid #f2f2f7;
+      border-left: none;
+      transition: background .2s
+    }
+
+    .exp-client-section:first-of-type {
+      border-top: 1px solid #e5e5e7;
+      margin-top: 16px
+    }
+
+    .exp-client-section:hover {
+      background: rgba(0, 113, 227, .015);
+      border-radius: 12px;
+      padding-left: 12px;
+      padding-right: 12px
+    }
+
     /* Header: logo + name + tag */
-    .exp-client-section-header{display:flex;align-items:center;gap:10px;margin-bottom:16px}
-    .exp-client-section-header img{width:24px;height:24px;object-fit:contain;border-radius:6px;flex-shrink:0;box-shadow:0 1px 3px rgba(0,0,0,.1)}
-    .exp-client-section-header h3{font-size:15px;font-weight:600;color:#1d1d1f;margin:0;line-height:1.3}
+    .exp-client-section-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px
+    }
+
+    .exp-client-section-header img {
+      width: 24px;
+      height: 24px;
+      object-fit: contain;
+      border-radius: 6px;
+      flex-shrink: 0;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, .1)
+    }
+
+    .exp-client-section-header h3 {
+      font-size: 15px;
+      font-weight: 600;
+      color: #1d1d1f;
+      margin: 0;
+      line-height: 1.3
+    }
+
     /* Category tag: Apple blue-tinted pill */
-    .exp-client-section-header .exp-client-tag{font-size:11px;font-weight:600;color:#0071e3;background:rgba(0,113,227,.08);border-radius:20px;padding:3px 10px;margin-left:auto;flex-shrink:0;letter-spacing:.1px}
+    .exp-client-section-header .exp-client-tag {
+      font-size: 11px;
+      font-weight: 600;
+      color: #0071e3;
+      background: rgba(0, 113, 227, .08);
+      border-radius: 20px;
+      padding: 3px 10px;
+      margin-left: auto;
+      flex-shrink: 0;
+      letter-spacing: .1px
+    }
+
     /* List: Apple-style with refined bullets */
-    .exp-client-section ul{margin:0;padding-left:0;font-size:14px;line-height:1.8;color:#3a3a3c;list-style:none}
-    .exp-client-section li{margin-bottom:10px;padding-left:18px;position:relative}
-    .exp-client-section li::before{content:'';position:absolute;left:2px;top:10px;width:5px;height:5px;background:#c7c7cc;border-radius:50%;flex-shrink:0}
-    .exp-client-section li strong{color:#1d1d1f;font-weight:600}
+    .exp-client-section ul {
+      margin: 0;
+      padding-left: 0;
+      font-size: 14px;
+      line-height: 1.8;
+      color: #3a3a3c;
+      list-style: none
+    }
+
+    .exp-client-section li {
+      margin-bottom: 10px;
+      padding-left: 18px;
+      position: relative
+    }
+
+    .exp-client-section li::before {
+      content: '';
+      position: absolute;
+      left: 2px;
+      top: 10px;
+      width: 5px;
+      height: 5px;
+      background: #c7c7cc;
+      border-radius: 50%;
+      flex-shrink: 0
+    }
+
+    .exp-client-section li strong {
+      color: #1d1d1f;
+      font-weight: 600
+    }
+
     /* ── Apple HIG: Generic sections (Role Overview, Responsibilities) ── */
-    .exp-modal-section{margin-bottom:32px}
-    .exp-modal-section h3{font-size:17px;font-weight:700;color:#1d1d1f;margin:0 0 14px;letter-spacing:-.2px}
-    .exp-modal-section ul{margin:0;padding-left:0;font-size:15px;line-height:1.8;color:#3a3a3c;list-style:none}
-    .exp-modal-section li{margin-bottom:12px;padding-left:18px;position:relative}
-    .exp-modal-section li::before{content:'';position:absolute;left:2px;top:10px;width:5px;height:5px;background:#c7c7cc;border-radius:50%}
-    .exp-modal-section li strong{color:#1d1d1f;font-weight:600}
+    .exp-modal-section {
+      margin-bottom: 32px
+    }
+
+    .exp-modal-section h3 {
+      font-size: 17px;
+      font-weight: 700;
+      color: #1d1d1f;
+      margin: 0 0 14px;
+      letter-spacing: -.2px
+    }
+
+    .exp-modal-section ul {
+      margin: 0;
+      padding-left: 0;
+      font-size: 15px;
+      line-height: 1.8;
+      color: #3a3a3c;
+      list-style: none
+    }
+
+    .exp-modal-section li {
+      margin-bottom: 12px;
+      padding-left: 18px;
+      position: relative
+    }
+
+    .exp-modal-section li::before {
+      content: '';
+      position: absolute;
+      left: 2px;
+      top: 10px;
+      width: 5px;
+      height: 5px;
+      background: #c7c7cc;
+      border-radius: 50%
+    }
+
+    .exp-modal-section li strong {
+      color: #1d1d1f;
+      font-weight: 600
+    }
+
     /* Cert card clickable */
-    .cert-card{cursor:pointer}
-    @media(max-width:600px){.exp-lightbox-inner{padding:24px 18px}.exp-modal-title{font-size:20px}}
+    .cert-card {
+      cursor: pointer
+    }
+
+    @media(max-width:600px) {
+      .exp-lightbox-inner {
+        padding: 24px 18px
+      }
+
+      .exp-modal-title {
+        font-size: 20px
+      }
+    }
 
     /* Apple HIG: Reduce Motion */
     @media(prefers-reduced-motion:reduce) {
@@ -691,637 +1399,714 @@
   <div class="loader" aria-hidden="true"></div>
 
 
-<main id="main-content">
+  <main id="main-content">
 
-  <!-- ======= Hero Section ======= -->
-  <section id="hero" class="d-flex flex-column justify-content-center">
-    <div class="container">
-      <h1 class="text-dark">Tanapol Chamnanhan</h1>
-      <p>&nbsp;-- I am <span class="typed"
-          data-typed-items="Programmer, Web Developer, AI Engineer, Front-End Developer, Back-End Developer, AI Agent Developer, UX/UI Designer, Full-Stack Developer, Software Engineer, Software Developer"></span>
-      </p>
-    </div>
-    <div class="fallback-background">
-      <!-- คุณสามารถใส่ภาพพื้นหลังหรือเนื้อหาอื่น ๆ ที่นี่ -->
-    </div>
-  <div class="hero-scroll-hint" aria-hidden="true">
-    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <polyline points="6 9 12 15 18 9"></polyline>
-    </svg>
-  </div>
-  </section>
-
-  <!-- ======= Resume Section ======= -->
-  <section id="resume" class="resume">
-    <div class="container" data-aos="fade-up">
-
-      <div class="section-title">
-        <h2>Resume</h2>
-        <p>Background and education.</p>
+    <!-- ======= Hero Section ======= -->
+    <section id="hero" class="d-flex flex-column justify-content-center">
+      <div class="container">
+        <h1 class="text-dark">Tanapol Chamnanhan</h1>
+        <p>&nbsp;-- I am <span class="typed"
+            data-typed-items="Programmer, Web Developer, AI Engineer, Front-End Developer, Back-End Developer, AI Agent Developer, UX/UI Designer, Full-Stack Developer, Software Engineer, Software Developer"></span>
+        </p>
       </div>
+      <div class="fallback-background">
+        <!-- คุณสามารถใส่ภาพพื้นหลังหรือเนื้อหาอื่น ๆ ที่นี่ -->
+      </div>
+      <div class="hero-scroll-hint" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </div>
+    </section>
 
-      <div class="row">
-        <div class="col-lg-12">
+    <!-- ======= Resume Section ======= -->
+    <section id="resume" class="resume">
+      <div class="container" data-aos="fade-up">
 
-          <div class="resume-title mt-5 h1">Profile</div>
+        <div class="section-title">
+          <h2>Resume</h2>
+          <p>Background and education.</p>
+        </div>
 
-          <!-- Featured Profile Card -->
-          <div class="row">
-            <div class="col-lg-12 mx-auto">
-              <div class="data-box profile-featured">
-                <div class="profile-featured-img">
-                  <img src="assets/img/img01.avif" alt="Tanapol Chamnanhan" fetchpriority="high" decoding="sync" width="520" height="520">
-                </div>
-                <div class="profile-featured-body">
-                  <div class="h2" style="margin: 0 0 16px 0; color: #000000;">Tanapol Chamnanhan</div>
-                  <p class="fw-light profile-bio">I'm Tanapol
-                    Chamnanhan, a full-stack developer and computer engineer. Proficient in coding, web development, and
-                    building scalable applications with modern technologies — with hands-on experience in AI engineering:
-                    LLM integration, voice AI (ASR, TTS, speech-to-speech), and agentic AI systems for business automation.</p>
-                  <div>
-                    <div class="social-links" style="display: flex; flex-direction: row; gap: 12px; margin-top: 16px;">
-                      <a href="https://github.com/TawittyTC" class="github" aria-label="Visit my GitHub profile"><svg
-                          class="social-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                          <path
-                            d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z" />
-                        </svg></a>
-                      <a href="https://www.linkedin.com/in/tanapol-chamnanhan/" class="linkedin"
-                        aria-label="Visit my LinkedIn profile"><svg class="social-icon" viewBox="0 0 24 24"
-                          fill="currentColor" aria-hidden="true">
-                          <path
-                            d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-                        </svg></a>
-                      <a href="https://www.facebook.com/turnery.scarbert/" class="facebook"
-                        aria-label="Visit my Facebook profile"><svg class="social-icon" viewBox="0 0 24 24"
-                          fill="currentColor" aria-hidden="true">
-                          <path
-                            d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-                        </svg></a>
-                      <a href="https://www.instagram.com/transistor.tc/" class="instagram"
-                        aria-label="Follow me on Instagram"><svg class="social-icon" viewBox="0 0 24 24"
-                          fill="currentColor" aria-hidden="true">
-                          <path
-                            d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z" />
-                        </svg></a>
+        <div class="row">
+          <div class="col-lg-12">
+
+            <div class="resume-title mt-5 h1">Profile</div>
+
+            <!-- Featured Profile Card -->
+            <div class="row">
+              <div class="col-lg-12 mx-auto">
+                <div class="data-box profile-featured">
+                  <div class="profile-featured-img">
+                    <img src="assets/img/img01.avif" alt="Tanapol Chamnanhan" fetchpriority="high" decoding="sync"
+                      width="520" height="520">
+                  </div>
+                  <div class="profile-featured-body">
+                    <div class="h2" style="margin: 0 0 16px 0; color: #000000;">Tanapol Chamnanhan</div>
+                    <p class="fw-light profile-bio">I'm Tanapol
+                      Chamnanhan, a full-stack developer and computer engineer. Proficient in coding, web development,
+                      and
+                      building scalable applications with modern technologies — with hands-on experience in AI
+                      engineering:
+                      LLM integration, voice AI (ASR, TTS, speech-to-speech), and agentic AI systems for business
+                      automation.</p>
+                    <div>
+                      <div class="social-links"
+                        style="display: flex; flex-direction: row; gap: 12px; margin-top: 16px;">
+                        <a href="https://github.com/TawittyTC" class="github" aria-label="Visit my GitHub profile"><svg
+                            class="social-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                            <path
+                              d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z" />
+                          </svg></a>
+                        <a href="https://www.linkedin.com/in/tanapol-chamnanhan/" class="linkedin"
+                          aria-label="Visit my LinkedIn profile"><svg class="social-icon" viewBox="0 0 24 24"
+                            fill="currentColor" aria-hidden="true">
+                            <path
+                              d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+                          </svg></a>
+                        <a href="https://www.facebook.com/turnery.scarbert/" class="facebook"
+                          aria-label="Visit my Facebook profile"><svg class="social-icon" viewBox="0 0 24 24"
+                            fill="currentColor" aria-hidden="true">
+                            <path
+                              d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                          </svg></a>
+                        <a href="https://www.instagram.com/transistor.tc/" class="instagram"
+                          aria-label="Follow me on Instagram"><svg class="social-icon" viewBox="0 0 24 24"
+                            fill="currentColor" aria-hidden="true">
+                            <path
+                              d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z" />
+                          </svg></a>
+                      </div>
+                    </div>
+                    <div style="display: flex; gap: 20px; margin-top: 24px;">
+                      <a href="#experience" style="color: #0071e3; text-decoration: none; font-weight: 500;">View
+                        Experience →</a>
                     </div>
                   </div>
-                  <div style="display: flex; gap: 20px; margin-top: 24px;">
-                    <a href="#experience"
-                      style="color: #0071e3; text-decoration: none; font-weight: 500;">View Experience →</a>
-                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <!-- Contact Info Grid -->
-          <div class="row">
-            <div class="col-md-6">
-              <div class="data-box">
-                <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
-                  aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
-                  <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0z" />
-                </svg>
-                <div class="mt-3 h2">Address</div>
-                <ul class="fw-light profile-bio mt-3">
-                  <li>45/411 Soi Muban Si Nakhon Phattana 1 Khlong Kum, Bueng Kum District Bangkok 10230 Thailand</li>
-                </ul>
+            <!-- Contact Info Grid -->
+            <div class="row">
+              <div class="col-md-6">
+                <div class="data-box">
+                  <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                    aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0z" />
+                  </svg>
+                  <div class="mt-3 h2">Address</div>
+                  <ul class="fw-light profile-bio mt-3">
+                    <li>45/411 Soi Muban Si Nakhon Phattana 1 Khlong Kum, Bueng Kum District Bangkok 10230 Thailand</li>
+                  </ul>
+                </div>
               </div>
-            </div>
-            <div class="col-md-6">
-              <div class="data-box">
-                <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
-                  aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
-                </svg>
-                <div class="mt-3 h2">Contact</div>
-                <ul class="fw-light profile-bio  mt-3">
-                  <li><a href="tel:+66962437210" class="text-decoration-none">+66 962-437210</a></li>
-                  <li><a href="mailto:tanapol.ch@rmutsvmail.com"
-                      class="text-decoration-none">tanapol.ch@rmutsvmail.com</a></li>
-                </ul>
-              </div>
-            </div>
-          </div>
-
-          <h3 class="resume-title mt-5">Education</h3>
-
-          <div class="row">
-            <div class="col-md-6">
-              <div class="data-box">
-                <div class="fw-light">
+              <div class="col-md-6">
+                <div class="data-box">
                   <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
                     aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round"
-                      d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0z" />
+                      d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
                   </svg>
-                  <div class="mt-3 h2">Computer Engineering</div>
-
-                  <h4 class="fw-light mt-3 profile-bio ">Bachelor's degree in Computer Engineering at Rajamangala University of
-                    Technology
-                    Srivijaya</h4>
-                  <ul class="profile-bio ">
-                    <li>June 2020 - April 2024</li>
-                    <li>GPAX 3.64</li>
+                  <div class="mt-3 h2">Contact</div>
+                  <ul class="fw-light profile-bio  mt-3">
+                    <li><a href="tel:+66962437210" class="text-decoration-none">+66 962-437210</a></li>
+                    <li><a href="mailto:tanapol.ch@rmutsvmail.com"
+                        class="text-decoration-none">tanapol.ch@rmutsvmail.com</a></li>
                   </ul>
                 </div>
               </div>
             </div>
-            <div class="col-md-6">
-              <div class="data-box">
-                <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
-                  aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44z" />
+
+            <h3 class="resume-title mt-5">Education</h3>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="data-box">
+                  <div class="fw-light">
+                    <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                      aria-hidden="true">
+                      <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0z" />
+                    </svg>
+                    <div class="mt-3 h2">Computer Engineering</div>
+
+                    <h4 class="fw-light mt-3 profile-bio ">Bachelor's degree in Computer Engineering at Rajamangala
+                      University of
+                      Technology
+                      Srivijaya</h4>
+                    <ul class="profile-bio ">
+                      <li>June 2020 - April 2024</li>
+                      <li>GPAX 3.64</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="data-box">
+                  <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                    aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44z" />
+                  </svg>
+                  <div class="mt-3 h2">Information Technology</div>
+                  <div class="fw-light profile-bio mt-3">
+                    <h4 class="fw-light profile-bio ">Vocational Certificate at Songkhla Technical College Major in
+                      Information
+                      Technology, Songkhla, Thailand </h4>
+
+                    <ul>
+                      <li>May 2017 - March 2019</li>
+                      <li>GPAX 3.84</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <h3 class="resume-title mt-5">Achievement</h3>
+            <div class="row">
+              <div class="col-md-12">
+                <div class="data-box">
+                  <div class="fw-light profile-bio mt-3">
+                    <ul>
+                      <li>Accredited professional qualifications Digital Industry Profession Software and Applications
+                        system tester level 4</li>
+                      <br>
+                      <li>Chamnanhan,T., Phetkrachang, K., Sathiwantana, S.,Chalearnnetkul, P.,Choosong, C., (2023)
+                        “Measuring of Words Similarity for Question Answering System for Diabetes”. Journal of Applied
+                        Informatics and Technology, Vol. 5 No. 2 (2023): July-December (TCI1).</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section><!-- End Resume Section -->
+
+    <!-- ======= Experience Section ======= -->
+    <section id="experience" class="resume">
+      <div class="container" data-aos="fade-up">
+
+        <div class="section-title">
+          <h2>Experience</h2>
+          <p>Where I've built and grown.</p>
+        </div>
+
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="row">
+              <div class="col-md-12">
+                <div class="data-box" data-exp="protollcall">
+                  <div class="d-flex justify-content-between align-items-start gap-3">
+                    <div>
+                      <div class="mt-3 h2">Full Stack Developer</div>
+                      <div class="fw-light mb-1">at Protollcall Advance Service</div>
+                      <div class="fw-light profile-bio-small ">June 2024 - Present <span
+                          class="exp-status-active">Active</span></div>
+                      <div><span class="exp-duration" id="protollcall-duration">2 yr 10 months</span></div>
+                    </div>
+                    <img src="assets/img/protollcall-logo.avif" alt="Protollcall Advance Service"
+                      class="company-logo company-logo--lg" loading="lazy" decoding="async" width="320" height="211">
+                  </div>
+                  <div class="fw-light profile-bio-small mt-3">Architected and shipped tailor-made
+                    enterprise CRM systems for <span class="js-client-count-text">27</span> clients across Thailand —
+                    integrating Asterisk PBX telephony (AGI, AMI, Dialplan), AI-powered IVR (TTS/ASR/LLM), Predictive
+                    Dialers, real-time analytics dashboards, and multi-channel API integrations. Researched and
+                    prototyped agentic AI systems — multi-agent orchestration (orchestrator + sub-agents), LLM-powered
+                    voice pipelines, and real-time speech-to-speech (STS) — for business automation. Delivered 60+
+                    customization tickets spanning sales pipeline, debt collection, healthcare, insurance, and financial
+                    services — solo end-to-end from requirements through production deployment.</div>
+                    <div class="exp-card-stats">
+                      <div class="exp-stat-item">
+                        <div class="exp-stat-num"><span class="js-count exp-stat-clients" data-count="27">27</span>
+                        </div>
+                        <div class="exp-stat-label">Enterprise Clients</div>
+                      </div>
+                      <div class="exp-stat-item">
+                        <div class="exp-stat-num"><span class="js-count" data-count="60">60</span><span
+                            class="stat-sup">+</span></div>
+                        <div class="exp-stat-label">Projects Delivered</div>
+                      </div>
+                      <div class="exp-stat-item">
+                        <div class="exp-stat-num"><span class="js-count" data-count="10">10</span><span
+                            class="stat-sup">+</span></div>
+                        <div class="exp-stat-label">Integrations</div>
+                      </div>
+                    </div>
+
+                    <div class="exp-card-highlights profile-bio-small mt-4">
+                      <span class="hl hl-blue exp-client-count-badge">27 Clients</span>
+                      <span class="hl hl-blue">60+ Projects Delivered</span>
+                      <span class="hl">Asterisk PBX / CTI</span>
+                      <span class="hl">AI Voice Agent · IVR</span>
+                      <span class="hl">Agentic AI · Multi-Agent</span>
+                      <span class="hl">Voice AI · STS</span>
+                      <span class="hl">Full Stack · End-to-End</span>
+                    </div>
+                    <div class="exp-card-cta" aria-hidden="true">
+                      <span class="exp-card-cta-label">View details</span>
+                      <div class="exp-card-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36">
+                          <path
+                            d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" />
+                        </svg>
+                      </div>
+                    </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <div class="data-box" data-exp="scg-2">
+                  <div class="d-flex justify-content-between align-items-start gap-3">
+                    <div>
+                      <div class="mt-3 h2">Full Stack Developer Intern</div>
+                      <div class="fw-light mb-1">at The Siam Cement Group</div>
+                      <div class="fw-light profile-bio-small">December 2023 - March 2024</div>
+                      <div><span class="exp-duration">4 months</span></div>
+                    </div>
+                    <img src="assets/img/scg-logo.avif" alt="SCG The Siam Cement Group" class="company-logo"
+                      loading="lazy" decoding="async" width="320" height="113">
+                  </div>
+                  <p class="fw-light profile-bio-small  mt-3">Delivered 4 production-ready internal web applications for SCG's
+                    regional operations — a smart meeting room reservation system, document reference tracker,
+                    area-based job dispatch platform, and an event e-commerce store with inventory management. Worked
+                    within a professional engineering team through full SDLC: requirements, design, development, UAT,
+                    and deployment.</p>
+                  <div class="exp-card-stats">
+                    <div class="exp-stat-item">
+                      <div class="exp-stat-num"><span class="js-count" data-count="4">4</span></div>
+                      <div class="exp-stat-label">Projects Delivered</div>
+                    </div>
+                    <div class="exp-stat-item">
+                      <div class="exp-stat-num"><span class="js-count" data-count="5">5</span></div>
+                      <div class="exp-stat-label">SDLC Phases</div>
+                    </div>
+                    <div class="exp-stat-item">
+                      <div class="exp-stat-num"><span class="js-count" data-count="2000">2000</span><span
+                          class="stat-sup">+</span></div>
+                      <div class="exp-stat-label">Users</div>
+                    </div>
+                  </div>
+                  <div class="exp-card-highlights profile-bio-small mt-4">
+                    <span class="hl hl-blue">4 Apps Shipped</span>
+                    <span class="hl">Reservation System</span>
+                    <span class="hl">Job Dispatch Platform</span>
+                    <span class="hl">E-Commerce</span>
+                    <span class="hl">Full SDLC</span>
+                  </div>
+                  <div class="exp-card-cta" aria-hidden="true">
+                    <span class="exp-card-cta-label">View details</span>
+                    <div class="exp-card-btn">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36">
+                        <path
+                          d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12">
+                <div class="data-box" data-exp="scg-1">
+                  <div class="d-flex justify-content-between align-items-start gap-3">
+                    <div>
+                      <div class="mt-3 h2">Full Stack Developer Intern</div>
+                      <div class="fw-light mb-1">at The Siam Cement Group</div>
+                      <div class="fw-light profile-bio-small">April 2023 - July 2023</div>
+                      <div><span class="exp-duration">4 months</span></div>
+                    </div>
+                    <img src="assets/img/scg-logo.avif" alt="SCG The Siam Cement Group" class="company-logo"
+                      loading="lazy" decoding="async" width="320" height="113">
+                  </div>
+                  <p class="fw-light profile-bio-small  mt-3">Built 2 enterprise internal platforms for SCG group-wide use — a
+                    software license procurement & multi-level approval workflow system, and a company-wide IT asset
+                    tracking platform with full lifecycle management (procurement, assignment, maintenance, disposal).
+                    First exposure to large-scale corporate software engineering inside one of Thailand's largest
+                    industrial conglomerates.</p>
+                  <div class="exp-card-stats">
+                    <div class="exp-stat-item">
+                      <div class="exp-stat-num"><span class="js-count" data-count="2">2</span></div>
+                      <div class="exp-stat-label">Projects Delivered</div>
+                    </div>
+                    <div class="exp-stat-item">
+                      <div class="exp-stat-num"><span class="js-count" data-count="5">5</span></div>
+                      <div class="exp-stat-label">SDLC Phases</div>
+                    </div>
+                    <div class="exp-stat-item">
+                      <div class="exp-stat-num"><span class="js-count" data-count="2000">2000</span><span
+                          class="stat-sup">+</span></div>
+                      <div class="exp-stat-label">Users</div>
+                    </div>
+
+                  </div>
+
+                  <div class="exp-card-highlights profile-bio-small mt-4">
+                    <span class="hl hl-blue">2 Platforms Shipped</span>
+                    <span class="hl">License Management</span>
+                    <span class="hl">Asset Lifecycle Tracking</span>
+                    <span class="hl">Approval Workflows</span>
+                  </div>
+                  <div class="exp-card-cta" aria-hidden="true">
+                    <span class="exp-card-cta-label">View details</span>
+                    <div class="exp-card-btn">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36">
+                        <path
+                          d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <div class="data-box" data-exp="advice">
+                  <div class="d-flex justify-content-between align-items-start gap-3">
+                    <div>
+                      <div class="mt-3 h2">Computer Technician Intern</div>
+                      <div class="fw-light mb-1">at Advice IT Infinite Co., Ltd.</div>
+                      <div class="fw-light profile-bio-small">September 2019 - December 2019</div>
+                      <div><span class="exp-duration">4 months</span></div>
+                    </div>
+                    <img src="assets/img/advice-logo.avif" alt="Advice IT Infinite" class="company-logo" loading="lazy"
+                      decoding="async" width="320" height="94">
+                  </div>
+                  <p class="fw-light profile-bio-small  mt-3">Provided front-line hardware diagnostics, repair, and technical
+                    support at one of Thailand's largest IT retail chains — servicing 5+ devices and 10+ customers daily
+                    across laptops, desktops, and peripherals. Developed practical troubleshooting methodologies, parts
+                    sourcing, OS reinstallation, and direct customer communication skills in a fast-paced, high-volume
+                    retail environment.</p>
+                  <div class="exp-card-stats">
+                    <div class="exp-stat-item">
+                      <div class="exp-stat-num"><span class="js-count" data-count="5">5</span><span
+                          class="stat-sup">+</span></div>
+                      <div class="exp-stat-label">Devices / Day</div>
+                    </div>
+                    <div class="exp-stat-item">
+                      <div class="exp-stat-num"><span class="js-count" data-count="10">10</span><span
+                          class="stat-sup">+</span></div>
+                      <div class="exp-stat-label">Customers / Day</div>
+                    </div>
+                    <div class="exp-stat-item">
+                      <div class="exp-stat-num"><span class="js-count" data-count="10">10</span><span
+                          class="stat-sup">+</span></div>
+                      <div class="exp-stat-label">Brands Serviced</div>
+                    </div>
+                  </div>
+
+                  <div class="exp-card-highlights profile-bio-small mt-4">
+                    <span class="hl hl-blue">5+ Devices / Day</span>
+                    <span class="hl">Hardware Diagnostics</span>
+                    <span class="hl">OS & System Repair</span>
+                    <span class="hl">Customer Support</span>
+                  </div>
+                  <div class="exp-card-cta" aria-hidden="true">
+                    <span class="exp-card-cta-label">View details</span>
+                    <div class="exp-card-btn">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36">
+                        <path
+                          d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section><!-- End Experience Section -->
+
+    <!-- ======= Skills Section ======= -->
+    <section id="skill">
+      <div class="container p-4">
+        <div class="section-title">
+          <h2>Skills</h2>
+          <p>The technologies and tools I bring to every project.</p>
+        </div>
+
+        <div class="rf-cards-scroller">
+          <div class="rf-cards-scroller-overflow" id="skill-scroller">
+
+            <div class="rf-cards-scroller-item">
+              <img src="assets/icon/img16.avif" class="skill-icon" alt="Web Design skill icon" loading="lazy"
+                decoding="async" width="170" height="170">
+              <div class="title h3">Web Design</div>
+              <p class="skill-desc fw-light">UX/UI, Graphic &amp; Responsive Design</p>
+            </div>
+
+            <div class="rf-cards-scroller-item">
+              <img src="assets/icon/img1.avif" class="skill-icon" alt="Web Development skill icon" loading="lazy"
+                decoding="async" width="170" height="170">
+              <div class="title h3">Web Development</div>
+              <p class="skill-desc fw-light">Full-stack from front-end to back-end APIs and databases</p>
+            </div>
+
+            <div class="rf-cards-scroller-item">
+              <svg class="skill-icon" viewBox="0 0 170 170" fill="none" aria-hidden="true" role="img">
+                <circle cx="85" cy="50" r="22" stroke="#3b4cca" stroke-width="5" />
+                <circle cx="85" cy="50" r="8" fill="#0071e3" />
+                <circle cx="38" cy="120" r="16" stroke="#3b4cca" stroke-width="5" />
+                <circle cx="85" cy="128" r="16" stroke="#3b4cca" stroke-width="5" />
+                <circle cx="132" cy="120" r="16" stroke="#3b4cca" stroke-width="5" />
+                <path d="M73 68 45 106M85 72v40M97 68l28 38" stroke="#0071e3" stroke-width="5" stroke-linecap="round" />
+                <path d="M107 28l4-9 4 9 9 4-9 4-4 9-4-9-9-4 9-4z" fill="#0071e3" />
+              </svg>
+              <div class="title h3">Agentic AI</div>
+              <p class="skill-desc fw-light">AI agents, sub-agents &amp; multi-agent orchestration with LLMs for
+                business automation</p>
+            </div>
+
+            <div class="rf-cards-scroller-item">
+              <svg class="skill-icon" viewBox="0 0 170 170" fill="none" aria-hidden="true" role="img">
+                <rect x="28" y="38" width="114" height="76" rx="20" stroke="#3b4cca" stroke-width="5" />
+                <path d="M62 132l-8 18 30-18" fill="none" stroke="#3b4cca" stroke-width="5" stroke-linejoin="round" />
+                <path d="M52 88V64M68 96V56M85 100V52M102 96V56M118 88V64" stroke="#0071e3" stroke-width="6"
+                  stroke-linecap="round" />
+              </svg>
+              <div class="title h3">Voice &amp; Conversational AI</div>
+              <p class="skill-desc fw-light">ASR, TTS &amp; real-time speech-to-speech (STS) voice pipelines —
+                LLM-powered IVR &amp; chatbots</p>
+            </div>
+
+            <div class="rf-cards-scroller-item">
+              <img src="assets/icon/img2.avif" class="skill-icon" alt="Web Security skill icon" loading="lazy"
+                decoding="async" width="170" height="170">
+              <div class="title h3">Web Security</div>
+              <p class="skill-desc fw-light">XSS, SQL Injection, CSRF prevention &amp; SSL/TLS configuration</p>
+            </div>
+
+            <div class="rf-cards-scroller-item">
+              <img src="assets/icon/img7.avif" class="skill-icon" alt="Version Control skill icon" loading="lazy"
+                decoding="async" width="170" height="170">
+              <div class="title h3">Version Control</div>
+              <p class="skill-desc fw-light">Git, Subversion &amp; Mercurial for source code management</p>
+            </div>
+
+            <div class="rf-cards-scroller-item">
+              <img src="assets/icon/img4.avif" class="skill-icon" alt="Problem Solving skill icon" loading="lazy"
+                decoding="async" width="170" height="170">
+              <div class="title h3">Problem Solving</div>
+              <p class="skill-desc fw-light">Fast learning, debugging &amp; utilizing modern developer tools</p>
+            </div>
+
+            <div class="rf-cards-scroller-item">
+              <img src="assets/icon/img3.avif" class="skill-icon" alt="Project Management skill icon" loading="lazy"
+                decoding="async" width="170" height="170">
+              <div class="title h3">Project Management</div>
+              <p class="skill-desc fw-light">End-to-end delivery from initiation through closure</p>
+            </div>
+
+          </div>
+
+          <div class="paddlenav paddlenav-alpha paddlenav-framed paddlenav-elevated">
+            <button type="button" class="paddlenav-arrow skill-paddlenav-arrow-previous" aria-label="Previous Skill">
+              <span>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36">
+                  <path
+                    d="M21.559,12.062 L15.618,17.984 L21.5221,23.944 C22.105,24.533 22.1021,25.482 21.5131,26.065 C21.2211,26.355 20.8391,26.4999987 20.4571,26.4999987 C20.0711,26.4999987 19.6851,26.352 19.3921,26.056 L12.4351,19.034 C11.8531,18.446 11.8551,17.4999987 12.4411,16.916 L19.4411,9.938 C20.0261,9.353 20.9781,9.354 21.5621,9.941 C22.1471,10.528 22.1451,11.478 21.5591,12.062 L21.559,12.062 Z">
+                  </path>
                 </svg>
-                <div class="mt-3 h2">Information Technology</div>
-                <div class="fw-light profile-bio mt-3">
-                  <h4 class="fw-light profile-bio ">Vocational Certificate at Songkhla Technical College Major in Information
-                    Technology, Songkhla, Thailand </h4>
-
-                  <ul>
-                    <li>May 2017 - March 2019</li>
-                    <li>GPAX 3.84</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <h3 class="resume-title mt-5">Achievement</h3>
-          <div class="row">
-            <div class="col-md-12">
-              <div class="data-box">
-                <div class="fw-light profile-bio mt-3">
-                  <ul>
-                    <li>Accredited professional qualifications Digital Industry Profession Software and Applications
-                      system tester level 4</li>
-                    <br>
-                    <li>Chamnanhan,T., Phetkrachang, K., Sathiwantana, S.,Chalearnnetkul, P.,Choosong, C., (2023)
-                      “Measuring of Words Similarity for Question Answering System for Diabetes”. Journal of Applied
-                      Informatics and Technology, Vol. 5 No. 2 (2023): July-December (TCI1).</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
+              </span>
+              <span class="visuallyhidden"></span>
+            </button>
+            <button type="button" class="paddlenav-arrow skill-paddlenav-arrow-next" aria-label="Next Skill">
+              <span>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36">
+                  <path
+                    d="M23.5587,16.916 C24.1447,17.4999987 24.1467,18.446 23.5647,19.034 L16.6077,26.056 C16.3147,26.352 15.9287,26.4999987 15.5427,26.4999987 C15.1607,26.4999987 14.7787,26.355 14.4867,26.065 C13.8977,25.482 13.8947,24.533 14.4777,23.944 L20.3818,17.984 L14.4408,12.062 C13.8548,11.478 13.8528,10.5279 14.4378,9.941 C15.0218,9.354 15.9738,9.353 16.5588,9.938 L23.5588,16.916 L23.5587,16.916 Z">
+                  </path>
+                </svg>
+              </span>
+              <span class="visuallyhidden"></span>
+            </button>
           </div>
         </div>
       </div>
+    </section>
 
-    </div>
-  </section><!-- End Resume Section -->
 
-  <!-- ======= Experience Section ======= -->
-  <section id="experience" class="resume">
-    <div class="container" data-aos="fade-up">
+    <section id="portfolio" class="portfolio section-bg mb-5" aria-labelledby="portfolio-title">
+      <div class="container mb-5" data-aos="fade-up">
+        <div class="section-title" id="portfolio-title">
+          <h2>My Projects</h2>
+          <p>Selected work I'm proud of.</p>
+        </div>
 
-      <div class="section-title">
-        <h2>Experience</h2>
-        <p>Where I've built and grown.</p>
-      </div>
+        <!-- Project Filters -->
+        <div class="project-filters-wrap">
+          <div class="project-filters" data-aos="fade-up">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="iot">IoT / AWS</button>
+            <button class="filter-btn" data-filter="php">PHP</button>
+            <button class="filter-btn" data-filter="python">Python</button>
+            <button class="filter-btn" data-filter="java">Java</button>
+          </div>
+        </div>
 
-      <div class="row">
-        <div class="col-lg-12">
-          <div class="row">
-            <div class="col-md-12">
-              <div class="data-box" data-exp="protollcall">
-                <div class="d-flex justify-content-between align-items-start gap-3">
-                  <div>
-                    <div class="mt-3 h2">Full Stack Developer</div>
-                    <div class="fw-light mb-1">at Protollcall Advance Service</div>
-                    <div class="fw-light profile-bio-small ">June 2024 - Present <span class="exp-status-active">Active</span></div>
-                    <div><span class="exp-duration" id="protollcall-duration">2 yr 10 months</span></div>
-                  </div>
-                  <img src="assets/img/protollcall-logo.avif" alt="Protollcall Advance Service"
-                    class="company-logo company-logo--lg" loading="lazy" decoding="async" width="320" height="211">
-                </div>
-                <p class="fw-light profile-bio  mt-3">Architected and shipped tailor-made enterprise CRM systems for <span class="js-client-count-text">27</span> clients across Thailand — integrating Asterisk PBX telephony (AGI, AMI, Dialplan), AI-powered IVR (TTS/ASR/LLM), Predictive Dialers, real-time analytics dashboards, and multi-channel API integrations. Researched and prototyped agentic AI systems — multi-agent orchestration (orchestrator + sub-agents), LLM-powered voice pipelines, and real-time speech-to-speech (STS) — for business automation. Delivered 60+ customization tickets spanning sales pipeline, debt collection, healthcare, insurance, and financial services — solo end-to-end from requirements through production deployment.</p>
-                <div class="exp-card-stats">
-                  <div class="exp-stat-item">
-                    <div class="exp-stat-num"><span class="js-count exp-stat-clients" data-count="27">27</span></div>
-                    <div class="exp-stat-label">Enterprise Clients</div>
-                  </div>
-                  <div class="exp-stat-item">
-                    <div class="exp-stat-num"><span class="js-count" data-count="60">60</span><span class="stat-sup">+</span></div>
-                    <div class="exp-stat-label">Projects Delivered</div>
-                  </div>
-                  <div class="exp-stat-item">
-                    <div class="exp-stat-num"><span class="js-count" data-count="10">10</span><span class="stat-sup">+</span></div>
-                    <div class="exp-stat-label">Integrations</div>
-                  </div>
-                </div>
-                
-                <div class="exp-card-highlights">
-                  <span class="hl hl-blue exp-client-count-badge">27 Clients</span>
-                  <span class="hl hl-blue">60+ Projects Delivered</span>
-                  <span class="hl">Asterisk PBX / CTI</span>
-                  <span class="hl">AI Voice Agent · IVR</span>
-                  <span class="hl">Agentic AI · Multi-Agent</span>
-                  <span class="hl">Voice AI · STS</span>
-                  <span class="hl">Full Stack · End-to-End</span>
-                </div>
-                <div class="exp-card-cta" aria-hidden="true">
-                  <span class="exp-card-cta-label">View details</span>
-                  <div class="exp-card-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z"/></svg>
-                  </div>
-                </div>
+        <!-- Project Scroller Wrapper -->
+        <div class="rf-cards-scroller">
+          <div class="rf-cards-scroller-overflow" id="scroller">
+            <!-- Project 1 -->
+            <div class="rf-cards-scroller-item" role="region" aria-labelledby="project1-title" data-tech="iot">
+              <div class="project-img">
+                <img src="assets/img/projects/RealTimePulseTemperature Monitoring System/portfolio-details-3.avif"
+                  alt="Real Time Pulse & Temperature Monitoring System with AWS and ThingsBoard" class="img-fluid"
+                  loading="lazy" decoding="async" width="1916" height="809" />
               </div>
+              <span class="project-tag">IoT / AWS</span>
+              <h4 id="project1-title">Real Time Pulse & Temperature Monitoring</h4>
+              <p class="fw-light">ThingsBoard, AWS, Sensors</p>
             </div>
-          </div>
-          <div class="row">
-            <div class="col-md-12">
-              <div class="data-box" data-exp="scg-2">
-                <div class="d-flex justify-content-between align-items-start gap-3">
-                  <div>
-                    <div class="mt-3 h2">Full Stack Developer Intern</div>
-                    <div class="fw-light mb-1">at The Siam Cement Group</div>
-                    <div class="fw-light profile-bio-small">December 2023 - March 2024</div>
-                    <div><span class="exp-duration">4 months</span></div>
-                  </div>
-                  <img src="assets/img/scg-logo.avif" alt="SCG The Siam Cement Group" class="company-logo"
-                    loading="lazy" decoding="async" width="320" height="113">
-                </div>
-                <p class="fw-light profile-bio  mt-3">Delivered 4 production-ready internal web applications for SCG's regional operations — a smart meeting room reservation system, document reference tracker, area-based job dispatch platform, and an event e-commerce store with inventory management. Worked within a professional engineering team through full SDLC: requirements, design, development, UAT, and deployment.</p>
-                <div class="exp-card-stats">
-                  <div class="exp-stat-item">
-                    <div class="exp-stat-num"><span class="js-count" data-count="4">4</span></div>
-                    <div class="exp-stat-label">Projects Delivered</div>
-                  </div>
-                  <div class="exp-stat-item">
-                    <div class="exp-stat-num"><span class="js-count" data-count="5">5</span></div>
-                    <div class="exp-stat-label">SDLC Phases</div>
-                  </div>
-                  <div class="exp-stat-item">
-                    <div class="exp-stat-num"><span class="js-count" data-count="2000">2000</span><span class="stat-sup">+</span></div>
-                    <div class="exp-stat-label">Users</div>
-                  </div>
-                </div>
-                <div class="exp-card-highlights">
-                  <span class="hl hl-blue">4 Apps Shipped</span>
-                  <span class="hl">Reservation System</span>
-                  <span class="hl">Job Dispatch Platform</span>
-                  <span class="hl">E-Commerce</span>
-                  <span class="hl">Full SDLC</span>
-                </div>
-                <div class="exp-card-cta" aria-hidden="true">
-                  <span class="exp-card-cta-label">View details</span>
-                  <div class="exp-card-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z"/></svg>
-                  </div>
-                </div>
+
+            <!-- Project 2 -->
+            <div class="rf-cards-scroller-item" role="region" aria-labelledby="project2-title" data-tech="php">
+              <div class="project-img">
+                <img src="assets/img/projects/StudentProjectManagementSystem/portfolio-details-7.avif"
+                  alt="Student Project Management System with PHP, MySQL, and HTML" class="img-fluid" loading="lazy"
+                  decoding="async" width="1888" height="721" />
               </div>
+              <span class="project-tag">PHP / MySQL</span>
+              <h4 id="project2-title">Student's Project Management System</h4>
+              <p class="fw-light">PHP, HTML, CSS, MySQL</p>
             </div>
-          </div>
 
-          <div class="row">
-            <div class="col-md-12">
-              <div class="data-box" data-exp="scg-1">
-                <div class="d-flex justify-content-between align-items-start gap-3">
-                  <div>
-                    <div class="mt-3 h2">Full Stack Developer Intern</div>
-                    <div class="fw-light mb-1">at The Siam Cement Group</div>
-                    <div class="fw-light profile-bio-small">April 2023 - July 2023</div>
-                    <div><span class="exp-duration">4 months</span></div>
-                  </div>
-                  <img src="assets/img/scg-logo.avif" alt="SCG The Siam Cement Group" class="company-logo"
-                    loading="lazy" decoding="async" width="320" height="113">
-                </div>
-                <p class="fw-light profile-bio  mt-3">Built 2 enterprise internal platforms for SCG group-wide use — a software license procurement & multi-level approval workflow system, and a company-wide IT asset tracking platform with full lifecycle management (procurement, assignment, maintenance, disposal). First exposure to large-scale corporate software engineering inside one of Thailand's largest industrial conglomerates.</p>
-                <div class="exp-card-stats">
-                  <div class="exp-stat-item">
-                    <div class="exp-stat-num"><span class="js-count" data-count="2">2</span></div>
-                    <div class="exp-stat-label">Projects Delivered</div>
-                  </div>
-                  <div class="exp-stat-item">
-                    <div class="exp-stat-num"><span class="js-count" data-count="5">5</span></div>
-                    <div class="exp-stat-label">SDLC Phases</div>
-                  </div>
-                  <div class="exp-stat-item">
-                    <div class="exp-stat-num"><span class="js-count" data-count="2000">2000</span><span class="stat-sup">+</span></div>
-                    <div class="exp-stat-label">Users</div>
-                  </div>
-                  
-                </div>
-                
-                <div class="exp-card-highlights">
-                  <span class="hl hl-blue">2 Platforms Shipped</span>
-                  <span class="hl">License Management</span>
-                  <span class="hl">Asset Lifecycle Tracking</span>
-                  <span class="hl">Approval Workflows</span>
-                </div>
-                <div class="exp-card-cta" aria-hidden="true">
-                  <span class="exp-card-cta-label">View details</span>
-                  <div class="exp-card-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z"/></svg>
-                  </div>
-                </div>
+            <!-- Project 3 -->
+            <div class="rf-cards-scroller-item" role="region" aria-labelledby="project3-title" data-tech="python">
+              <div class="project-img">
+                <img src="assets/img/projects/Covid-19SpreadAnalysisWebsite/portfolio-details-2.avif"
+                  alt="Covid-19 Spread Analysis Website with Flask and Python" class="img-fluid" loading="lazy"
+                  decoding="async" width="1354" height="678" />
               </div>
+              <span class="project-tag">Python / Flask</span>
+              <h4 id="project3-title">Covid-19 Spread Analysis Website</h4>
+              <p class="fw-light">Flask, HTML, CSS, Python libraries</p>
             </div>
-          </div>
-          <div class="row">
-            <div class="col-md-12">
-              <div class="data-box" data-exp="advice">
-                <div class="d-flex justify-content-between align-items-start gap-3">
-                  <div>
-                    <div class="mt-3 h2">Computer Technician Intern</div>
-                    <div class="fw-light mb-1">at Advice IT Infinite Co., Ltd.</div>
-                    <div class="fw-light profile-bio-small">September 2019 - December 2019</div>
-                    <div><span class="exp-duration">4 months</span></div>
-                  </div>
-                  <img src="assets/img/advice-logo.avif" alt="Advice IT Infinite" class="company-logo" loading="lazy" decoding="async" width="320" height="94">
-                </div>
-                <p class="fw-light profile-bio  mt-3">Provided front-line hardware diagnostics, repair, and technical support at one of Thailand's largest IT retail chains — servicing 5+ devices and 10+ customers daily across laptops, desktops, and peripherals. Developed practical troubleshooting methodologies, parts sourcing, OS reinstallation, and direct customer communication skills in a fast-paced, high-volume retail environment.</p>
-                <div class="exp-card-stats">
-                  <div class="exp-stat-item">
-                    <div class="exp-stat-num"><span class="js-count" data-count="5">5</span><span class="stat-sup">+</span></div>
-                    <div class="exp-stat-label">Devices / Day</div>
-                  </div>
-                  <div class="exp-stat-item">
-                    <div class="exp-stat-num"><span class="js-count" data-count="10">10</span><span class="stat-sup">+</span></div>
-                    <div class="exp-stat-label">Customers / Day</div>
-                  </div>
-                  <div class="exp-stat-item">
-                    <div class="exp-stat-num"><span class="js-count" data-count="10">10</span><span class="stat-sup">+</span></div>
-                    <div class="exp-stat-label">Brands Serviced</div>
-                  </div>
-                </div>
-          
-                <div class="exp-card-highlights">
-                  <span class="hl hl-blue">5+ Devices / Day</span>
-                  <span class="hl">Hardware Diagnostics</span>
-                  <span class="hl">OS & System Repair</span>
-                  <span class="hl">Customer Support</span>
-                </div>
-                <div class="exp-card-cta" aria-hidden="true">
-                  <span class="exp-card-cta-label">View details</span>
-                  <div class="exp-card-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z"/></svg>
-                  </div>
-                </div>
+
+            <!-- Project 4 -->
+            <div class="rf-cards-scroller-item" role="region" aria-labelledby="project4-title" data-tech="java">
+              <div class="project-img">
+                <img src="assets/img/projects/ClassroomBookingRecordSystem/portfolio-details-1.avif"
+                  alt="Classroom Booking Record System using Java and NetBeans" class="img-fluid" loading="lazy"
+                  decoding="async" width="980" height="476" />
               </div>
+              <span class="project-tag">Java</span>
+              <h4 id="project4-title">Classroom Booking Record System</h4>
+              <p class="fw-light">Java, NetBeans</p>
             </div>
+          </div>
+
+          <!-- Navigation Arrows for Scroller -->
+          <div class="paddlenav paddlenav-alpha paddlenav-framed paddlenav-elevated">
+            <!-- Previous Arrow -->
+            <button type="button" class="paddlenav-arrow paddlenav-arrow-previous" aria-label="Previous Project">
+              <span>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36">
+                  <path
+                    d="M21.559,12.062 L15.618,17.984 L21.5221,23.944 C22.105,24.533 22.1021,25.482 21.5131,26.065 C21.2211,26.355 20.8391,26.4999987 20.4571,26.4999987 C20.0711,26.4999987 19.6851,26.352 19.3921,26.056 L12.4351,19.034 C11.8531,18.446 11.8551,17.4999987 12.4411,16.916 L19.4411,9.938 C20.0261,9.353 20.9781,9.354 21.5621,9.941 C22.1471,10.528 22.1451,11.478 21.5591,12.062 L21.559,12.062 Z">
+                  </path>
+                </svg>
+              </span>
+              <span class="visuallyhidden"></span>
+            </button>
+
+            <!-- Next Arrow -->
+            <button type="button" class="paddlenav-arrow paddlenav-arrow-next" aria-label="Next Project">
+              <span>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36">
+                  <path
+                    d="M23.5587,16.916 C24.1447,17.4999987 24.1467,18.446 23.5647,19.034 L16.6077,26.056 C16.3147,26.352 15.9287,26.4999987 15.5427,26.4999987 C15.1607,26.4999987 14.7787,26.355 14.4867,26.065 C13.8977,25.482 13.8947,24.533 14.4777,23.944 L20.3818,17.984 L14.4408,12.062 C13.8548,11.478 13.8528,10.5279 14.4378,9.941 C15.0218,9.354 15.9738,9.353 16.5588,9.938 L23.5588,16.916 L23.5587,16.916 Z">
+                  </path>
+                </svg>
+              </span>
+              <span class="visuallyhidden"></span>
+            </button>
           </div>
         </div>
       </div>
+    </section>
 
-    </div>
-  </section><!-- End Experience Section -->
 
-  <!-- ======= Skills Section ======= -->
-  <section id="skill">
-    <div class="container p-4">
-      <div class="section-title">
-        <h2>Skills</h2>
-        <p>The technologies and tools I bring to every project.</p>
-      </div>
 
-      <div class="rf-cards-scroller">
-        <div class="rf-cards-scroller-overflow" id="skill-scroller">
-
-          <div class="rf-cards-scroller-item">
-            <img src="assets/icon/img16.avif" class="skill-icon" alt="Web Design skill icon" loading="lazy" decoding="async" width="170" height="170">
-            <div class="title h3">Web Design</div>
-            <p class="skill-desc fw-light">UX/UI, Graphic &amp; Responsive Design</p>
-          </div>
-
-          <div class="rf-cards-scroller-item">
-            <img src="assets/icon/img1.avif" class="skill-icon" alt="Web Development skill icon" loading="lazy" decoding="async" width="170" height="170">
-            <div class="title h3">Web Development</div>
-            <p class="skill-desc fw-light">Full-stack from front-end to back-end APIs and databases</p>
-          </div>
-
-          <div class="rf-cards-scroller-item">
-            <svg class="skill-icon" viewBox="0 0 170 170" fill="none" aria-hidden="true" role="img">
-              <circle cx="85" cy="50" r="22" stroke="#3b4cca" stroke-width="5"/>
-              <circle cx="85" cy="50" r="8" fill="#0071e3"/>
-              <circle cx="38" cy="120" r="16" stroke="#3b4cca" stroke-width="5"/>
-              <circle cx="85" cy="128" r="16" stroke="#3b4cca" stroke-width="5"/>
-              <circle cx="132" cy="120" r="16" stroke="#3b4cca" stroke-width="5"/>
-              <path d="M73 68 45 106M85 72v40M97 68l28 38" stroke="#0071e3" stroke-width="5" stroke-linecap="round"/>
-              <path d="M107 28l4-9 4 9 9 4-9 4-4 9-4-9-9-4 9-4z" fill="#0071e3"/>
-            </svg>
-            <div class="title h3">Agentic AI</div>
-            <p class="skill-desc fw-light">AI agents, sub-agents &amp; multi-agent orchestration with LLMs for business automation</p>
-          </div>
-
-          <div class="rf-cards-scroller-item">
-            <svg class="skill-icon" viewBox="0 0 170 170" fill="none" aria-hidden="true" role="img">
-              <rect x="28" y="38" width="114" height="76" rx="20" stroke="#3b4cca" stroke-width="5"/>
-              <path d="M62 132l-8 18 30-18" fill="none" stroke="#3b4cca" stroke-width="5" stroke-linejoin="round"/>
-              <path d="M52 88V64M68 96V56M85 100V52M102 96V56M118 88V64" stroke="#0071e3" stroke-width="6" stroke-linecap="round"/>
-            </svg>
-            <div class="title h3">Voice &amp; Conversational AI</div>
-            <p class="skill-desc fw-light">ASR, TTS &amp; real-time speech-to-speech (STS) voice pipelines — LLM-powered IVR &amp; chatbots</p>
-          </div>
-
-          <div class="rf-cards-scroller-item">
-            <img src="assets/icon/img2.avif" class="skill-icon" alt="Web Security skill icon" loading="lazy" decoding="async" width="170" height="170">
-            <div class="title h3">Web Security</div>
-            <p class="skill-desc fw-light">XSS, SQL Injection, CSRF prevention &amp; SSL/TLS configuration</p>
-          </div>
-
-          <div class="rf-cards-scroller-item">
-            <img src="assets/icon/img7.avif" class="skill-icon" alt="Version Control skill icon" loading="lazy" decoding="async" width="170" height="170">
-            <div class="title h3">Version Control</div>
-            <p class="skill-desc fw-light">Git, Subversion &amp; Mercurial for source code management</p>
-          </div>
-
-          <div class="rf-cards-scroller-item">
-            <img src="assets/icon/img4.avif" class="skill-icon" alt="Problem Solving skill icon" loading="lazy" decoding="async" width="170" height="170">
-            <div class="title h3">Problem Solving</div>
-            <p class="skill-desc fw-light">Fast learning, debugging &amp; utilizing modern developer tools</p>
-          </div>
-
-          <div class="rf-cards-scroller-item">
-            <img src="assets/icon/img3.avif" class="skill-icon" alt="Project Management skill icon" loading="lazy" decoding="async" width="170" height="170">
-            <div class="title h3">Project Management</div>
-            <p class="skill-desc fw-light">End-to-end delivery from initiation through closure</p>
-          </div>
-
+    <!-- ======= Services Section ======= -->
+    <section id="certificates" class="certificates bg-light">
+      <div class="container">
+        <div class="section-title">
+          <h2>Certificates</h2>
+          <p>Credentials that speak for themselves.</p>
         </div>
 
-        <div class="paddlenav paddlenav-alpha paddlenav-framed paddlenav-elevated">
-          <button type="button" class="paddlenav-arrow skill-paddlenav-arrow-previous" aria-label="Previous Skill">
-            <span>
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36">
-                <path d="M21.559,12.062 L15.618,17.984 L21.5221,23.944 C22.105,24.533 22.1021,25.482 21.5131,26.065 C21.2211,26.355 20.8391,26.4999987 20.4571,26.4999987 C20.0711,26.4999987 19.6851,26.352 19.3921,26.056 L12.4351,19.034 C11.8531,18.446 11.8551,17.4999987 12.4411,16.916 L19.4411,9.938 C20.0261,9.353 20.9781,9.354 21.5621,9.941 C22.1471,10.528 22.1451,11.478 21.5591,12.062 L21.559,12.062 Z"></path>
-              </svg>
-            </span>
-            <span class="visuallyhidden"></span>
-          </button>
-          <button type="button" class="paddlenav-arrow skill-paddlenav-arrow-next" aria-label="Next Skill">
-            <span>
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36">
-                <path d="M23.5587,16.916 C24.1447,17.4999987 24.1467,18.446 23.5647,19.034 L16.6077,26.056 C16.3147,26.352 15.9287,26.4999987 15.5427,26.4999987 C15.1607,26.4999987 14.7787,26.355 14.4867,26.065 C13.8977,25.482 13.8947,24.533 14.4777,23.944 L20.3818,17.984 L14.4408,12.062 C13.8548,11.478 13.8528,10.5279 14.4378,9.941 C15.0218,9.354 15.9738,9.353 16.5588,9.938 L23.5588,16.916 L23.5587,16.916 Z"></path>
-              </svg>
-            </span>
-            <span class="visuallyhidden"></span>
-          </button>
-        </div>
-      </div>
-    </div>
-  </section>
-
-
-  <section id="portfolio" class="portfolio section-bg mb-5" aria-labelledby="portfolio-title">
-    <div class="container mb-5" data-aos="fade-up">
-      <div class="section-title" id="portfolio-title">
-        <h2>My Projects</h2>
-        <p>Selected work I'm proud of.</p>
-      </div>
-
-      <!-- Project Filters -->
-      <div class="project-filters-wrap">
-      <div class="project-filters" data-aos="fade-up">
-        <button class="filter-btn active" data-filter="all">All</button>
-        <button class="filter-btn" data-filter="iot">IoT / AWS</button>
-        <button class="filter-btn" data-filter="php">PHP</button>
-        <button class="filter-btn" data-filter="python">Python</button>
-        <button class="filter-btn" data-filter="java">Java</button>
-      </div>
-      </div>
-
-      <!-- Project Scroller Wrapper -->
-      <div class="rf-cards-scroller">
-        <div class="rf-cards-scroller-overflow" id="scroller">
-          <!-- Project 1 -->
-          <div class="rf-cards-scroller-item" role="region" aria-labelledby="project1-title" data-tech="iot">
-            <div class="project-img">
-              <img src="assets/img/projects/RealTimePulseTemperature Monitoring System/portfolio-details-3.avif"
-                alt="Real Time Pulse & Temperature Monitoring System with AWS and ThingsBoard" class="img-fluid"
-                loading="lazy" decoding="async" width="1916" height="809" />
-            </div>
-            <span class="project-tag">IoT / AWS</span>
-            <h4 id="project1-title">Real Time Pulse & Temperature Monitoring</h4>
-            <p class="fw-light">ThingsBoard, AWS, Sensors</p>
-          </div>
-
-          <!-- Project 2 -->
-          <div class="rf-cards-scroller-item" role="region" aria-labelledby="project2-title" data-tech="php">
-            <div class="project-img">
-              <img src="assets/img/projects/StudentProjectManagementSystem/portfolio-details-7.avif"
-                alt="Student Project Management System with PHP, MySQL, and HTML" class="img-fluid"
-                loading="lazy" decoding="async" width="1888" height="721" />
-            </div>
-            <span class="project-tag">PHP / MySQL</span>
-            <h4 id="project2-title">Student's Project Management System</h4>
-            <p class="fw-light">PHP, HTML, CSS, MySQL</p>
-          </div>
-
-          <!-- Project 3 -->
-          <div class="rf-cards-scroller-item" role="region" aria-labelledby="project3-title" data-tech="python">
-            <div class="project-img">
-              <img src="assets/img/projects/Covid-19SpreadAnalysisWebsite/portfolio-details-2.avif"
-                alt="Covid-19 Spread Analysis Website with Flask and Python" class="img-fluid" loading="lazy" decoding="async" width="1354" height="678" />
-            </div>
-            <span class="project-tag">Python / Flask</span>
-            <h4 id="project3-title">Covid-19 Spread Analysis Website</h4>
-            <p class="fw-light">Flask, HTML, CSS, Python libraries</p>
-          </div>
-
-          <!-- Project 4 -->
-          <div class="rf-cards-scroller-item" role="region" aria-labelledby="project4-title" data-tech="java">
-            <div class="project-img">
-              <img src="assets/img/projects/ClassroomBookingRecordSystem/portfolio-details-1.avif"
-                alt="Classroom Booking Record System using Java and NetBeans" class="img-fluid"
-                loading="lazy" decoding="async" width="980" height="476" />
-            </div>
-            <span class="project-tag">Java</span>
-            <h4 id="project4-title">Classroom Booking Record System</h4>
-            <p class="fw-light">Java, NetBeans</p>
-          </div>
+        <!-- Content for larger screens -->
+        <div class="row images-list" id="images-list">
+          <!-- Images will be added here by JavaScript -->
         </div>
 
-        <!-- Navigation Arrows for Scroller -->
-        <div class="paddlenav paddlenav-alpha paddlenav-framed paddlenav-elevated">
-          <!-- Previous Arrow -->
-          <button type="button" class="paddlenav-arrow paddlenav-arrow-previous" aria-label="Previous Project">
-            <span>
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36">
-                <path
-                  d="M21.559,12.062 L15.618,17.984 L21.5221,23.944 C22.105,24.533 22.1021,25.482 21.5131,26.065 C21.2211,26.355 20.8391,26.4999987 20.4571,26.4999987 C20.0711,26.4999987 19.6851,26.352 19.3921,26.056 L12.4351,19.034 C11.8531,18.446 11.8551,17.4999987 12.4411,16.916 L19.4411,9.938 C20.0261,9.353 20.9781,9.354 21.5621,9.941 C22.1471,10.528 22.1451,11.478 21.5591,12.062 L21.559,12.062 Z">
-                </path>
-              </svg>
-            </span>
-            <span class="visuallyhidden"></span>
-          </button>
-
-          <!-- Next Arrow -->
-          <button type="button" class="paddlenav-arrow paddlenav-arrow-next" aria-label="Next Project">
-            <span>
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36">
-                <path
-                  d="M23.5587,16.916 C24.1447,17.4999987 24.1467,18.446 23.5647,19.034 L16.6077,26.056 C16.3147,26.352 15.9287,26.4999987 15.5427,26.4999987 C15.1607,26.4999987 14.7787,26.355 14.4867,26.065 C13.8977,25.482 13.8947,24.533 14.4777,23.944 L20.3818,17.984 L14.4408,12.062 C13.8548,11.478 13.8528,10.5279 14.4378,9.941 C15.0218,9.354 15.9738,9.353 16.5588,9.938 L23.5588,16.916 L23.5587,16.916 Z">
-                </path>
-              </svg>
-            </span>
-            <span class="visuallyhidden"></span>
-          </button>
-        </div>
       </div>
-    </div>
-  </section>
+    </section>
 
 
+    <!-- ======= SEO content (hidden from UI, indexed by Google) ======= -->
+    <section id="hire" aria-label="บริการและประวัติ" style="display:none;" lang="th">
+      <h2>ธนพล ชำนาญหาญ — รับทำเว็บไซต์กรุงเทพ รับพัฒนาระบบ CRM POS</h2>
+      <p>ธนพล ชำนาญหาญ (Tanapol Chamnanhan) คือ Full-Stack Developer, Software Engineer และโปรแกรมเมอร์จากกรุงเทพมหานคร
+        มีประสบการณ์กว่า 2 ปีในการพัฒนาระบบ CRM, POS, เว็บไซต์ และซอฟต์แวร์องค์กร พร้อมรับงาน Freelance และสมัครงาน
+        Full-time</p>
 
-  <!-- ======= Services Section ======= -->
-  <section id="certificates" class="certificates bg-light">
-    <div class="container">
-      <div class="section-title">
-        <h2>Certificates</h2>
-        <p>Credentials that speak for themselves.</p>
-      </div>
+      <h3>รับทำเว็บไซต์กรุงเทพ</h3>
+      <p>โปรแกรมเมอร์ ธนพล ชำนาญหาญ รับทำเว็บไซต์ทุกประเภท ทั้ง Corporate Website, Landing Page, E-Commerce, Web
+        Application Responsive ทุกอุปกรณ์ ราคาเหมาะสม ส่งงานตรงเวลา</p>
 
-      <!-- Content for larger screens -->
-      <div class="row images-list" id="images-list">
-        <!-- Images will be added here by JavaScript -->
-      </div>
+      <h3>รับทำระบบ CRM กรุงเทพ</h3>
+      <p>รับพัฒนาระบบ CRM (Customer Relationship Management) แบบ Custom สำหรับองค์กร ครอบคลุม Sales Pipeline, Lead
+        Management, Call Center CRM, Reporting Dashboard มีประสบการณ์จริงจาก 27 องค์กรชั้นนำในไทย อาทิ Bangkok Hospital,
+        Kasikorn, Thai VietJet Air, SCG</p>
 
-    </div>
-  </section>
+      <h3>รับทำระบบ POS กรุงเทพ</h3>
+      <p>รับพัฒนาระบบ POS (Point of Sale) แบบ Custom ครบวงจร จุดขาย, ระบบสต็อกสินค้า, รายงานยอดขาย, เชื่อมต่อ Payment
+        Gateway และระบบอื่นๆ ตามความต้องการ</p>
 
+      <h3>รับพัฒนา AI Agent และระบบ AI สำหรับธุรกิจ</h3>
+      <p>รับออกแบบและพัฒนา AI Agent สำหรับธุรกิจ — Agentic AI แบบ Multi-Agent Orchestration (Orchestrator + Sub-Agents),
+        LLM Integration (GPT, Gemini, Claude), Voice AI ครบวงจร ทั้ง ASR (Speech-to-Text), TTS (Text-to-Speech) และ
+        Speech-to-Speech (STS) แบบ Realtime สไตล์ Gemini Live, AI Chatbot, AI IVR อัจฉริยะสำหรับ Contact Center, Prompt
+        Engineering และ AI Workflow Automation มีประสบการณ์วิจัยและพัฒนา AI Pipeline จริงที่ Protollcall Advance Service
+      </p>
 
-  <!-- ======= SEO content (hidden from UI, indexed by Google) ======= -->
-  <section id="hire" aria-label="บริการและประวัติ" style="display:none;" lang="th">
-    <h2>ธนพล ชำนาญหาญ — รับทำเว็บไซต์กรุงเทพ รับพัฒนาระบบ CRM POS</h2>
-    <p>ธนพล ชำนาญหาญ (Tanapol Chamnanhan) คือ Full-Stack Developer, Software Engineer และโปรแกรมเมอร์จากกรุงเทพมหานคร มีประสบการณ์กว่า 2 ปีในการพัฒนาระบบ CRM, POS, เว็บไซต์ และซอฟต์แวร์องค์กร พร้อมรับงาน Freelance และสมัครงาน Full-time</p>
+      <h3>บริการอื่นๆ</h3>
+      <ul>
+        <li>รับพัฒนาระบบ ERP, Back-Office, Dashboard, Booking System</li>
+        <li>ระบบ AI และ Automation — IVR อัจฉริยะ, Chatbot, LLM/TTS/ASR Integration, LINE Bot</li>
+        <li>API Integration — LINE Messaging API, Telegram Bot, Payment Gateway</li>
+        <li>Asterisk PBX, Call Center System, CDR Analytics</li>
+        <li>Cloud และ DevOps — AWS, Docker, Linux Server</li>
+      </ul>
 
-    <h3>รับทำเว็บไซต์กรุงเทพ</h3>
-    <p>โปรแกรมเมอร์ ธนพล ชำนาญหาญ รับทำเว็บไซต์ทุกประเภท ทั้ง Corporate Website, Landing Page, E-Commerce, Web Application Responsive ทุกอุปกรณ์ ราคาเหมาะสม ส่งงานตรงเวลา</p>
+      <h3>ธนพล ชำนาญหาญ — หางาน Software Engineer กรุงเทพ</h3>
+      <p>ธนพล ชำนาญหาญ เปิดรับโอกาสงานใหม่ในตำแหน่ง Software Engineer, Full-Stack Developer, Web Developer, Programmer
+        กรุงเทพ หรือรูปแบบ Remote Full-time, Contract และ Freelance ติดต่อ HR ได้ที่ tawitty.tc@gmail.com หรือโทร +66
+        962-437210</p>
 
-    <h3>รับทำระบบ CRM กรุงเทพ</h3>
-    <p>รับพัฒนาระบบ CRM (Customer Relationship Management) แบบ Custom สำหรับองค์กร ครอบคลุม Sales Pipeline, Lead Management, Call Center CRM, Reporting Dashboard มีประสบการณ์จริงจาก 27 องค์กรชั้นนำในไทย อาทิ Bangkok Hospital, Kasikorn, Thai VietJet Air, SCG</p>
+      <h3>เทคโนโลยีที่เชี่ยวชาญ</h3>
+      <p>PHP, Python, JavaScript, React, MySQL, AWS, Docker, Git, CRM Systems, POS Systems, Asterisk PBX, AI LLM
+        Integration (GPT, Gemini, Claude), AI Agent / Agentic AI, Multi-Agent Orchestration, Voice AI (ASR, TTS, STS),
+        Gemini Live API, Prompt Engineering, LINE API, Telegram Bot API, HTML5, CSS3, REST API, OWASP Security</p>
 
-    <h3>รับทำระบบ POS กรุงเทพ</h3>
-    <p>รับพัฒนาระบบ POS (Point of Sale) แบบ Custom ครบวงจร จุดขาย, ระบบสต็อกสินค้า, รายงานยอดขาย, เชื่อมต่อ Payment Gateway และระบบอื่นๆ ตามความต้องการ</p>
-
-    <h3>รับพัฒนา AI Agent และระบบ AI สำหรับธุรกิจ</h3>
-    <p>รับออกแบบและพัฒนา AI Agent สำหรับธุรกิจ — Agentic AI แบบ Multi-Agent Orchestration (Orchestrator + Sub-Agents), LLM Integration (GPT, Gemini, Claude), Voice AI ครบวงจร ทั้ง ASR (Speech-to-Text), TTS (Text-to-Speech) และ Speech-to-Speech (STS) แบบ Realtime สไตล์ Gemini Live, AI Chatbot, AI IVR อัจฉริยะสำหรับ Contact Center, Prompt Engineering และ AI Workflow Automation มีประสบการณ์วิจัยและพัฒนา AI Pipeline จริงที่ Protollcall Advance Service</p>
-
-    <h3>บริการอื่นๆ</h3>
-    <ul>
-      <li>รับพัฒนาระบบ ERP, Back-Office, Dashboard, Booking System</li>
-      <li>ระบบ AI และ Automation — IVR อัจฉริยะ, Chatbot, LLM/TTS/ASR Integration, LINE Bot</li>
-      <li>API Integration — LINE Messaging API, Telegram Bot, Payment Gateway</li>
-      <li>Asterisk PBX, Call Center System, CDR Analytics</li>
-      <li>Cloud และ DevOps — AWS, Docker, Linux Server</li>
-    </ul>
-
-    <h3>ธนพล ชำนาญหาญ — หางาน Software Engineer กรุงเทพ</h3>
-    <p>ธนพล ชำนาญหาญ เปิดรับโอกาสงานใหม่ในตำแหน่ง Software Engineer, Full-Stack Developer, Web Developer, Programmer กรุงเทพ หรือรูปแบบ Remote Full-time, Contract และ Freelance ติดต่อ HR ได้ที่ tawitty.tc@gmail.com หรือโทร +66 962-437210</p>
-
-    <h3>เทคโนโลยีที่เชี่ยวชาญ</h3>
-    <p>PHP, Python, JavaScript, React, MySQL, AWS, Docker, Git, CRM Systems, POS Systems, Asterisk PBX, AI LLM Integration (GPT, Gemini, Claude), AI Agent / Agentic AI, Multi-Agent Orchestration, Voice AI (ASR, TTS, STS), Gemini Live API, Prompt Engineering, LINE API, Telegram Bot API, HTML5, CSS3, REST API, OWASP Security</p>
-
-    <p>ติดต่อ: tawitty.tc@gmail.com | +66 962-437210 | linkedin.com/in/tanapol-chamnanhan/</p>
-  </section><!-- End SEO hidden section -->
+      <p>ติดต่อ: tawitty.tc@gmail.com | +66 962-437210 | linkedin.com/in/tanapol-chamnanhan/</p>
+    </section><!-- End SEO hidden section -->
 
 
-</main>
+  </main>
 
   <!-- ======= Footer ======= -->
   <footer id="footer">
@@ -1330,18 +2115,24 @@
 
         <div class="row ">
           <div class="col-12 col-md-4 mt-3">
-            <div style="font-size:17px;font-weight:600;color:#1d1d1f;margin-bottom:8px;letter-spacing:-0.2px;">Tanapol Chamnanhan</div>
-            <div class="fw-light" style="font-size:14px;color:#6e6e73;line-height:1.6;">Full-Stack Developer &amp; Software Engineer based in Bangkok, Thailand.</div>
+            <div style="font-size:17px;font-weight:600;color:#1d1d1f;margin-bottom:8px;letter-spacing:-0.2px;">Tanapol
+              Chamnanhan</div>
+            <div class="fw-light" style="font-size:14px;color:#6e6e73;line-height:1.6;">Full-Stack Developer &amp;
+              Software Engineer based in Bangkok, Thailand.</div>
           </div>
 
           <div class="col-0 col-md-4">
           </div>
 
           <div class="col-12 col-md-4 mt-3">
-            <div style="font-size:17px;font-weight:600;color:#1d1d1f;margin-bottom:8px;letter-spacing:-0.2px;">Contact</div>
-            <div class="fw-light" style="font-size:14px;color:#6e6e73;"><a href="mailto:tanapol.ch@rmutsvmail.com" class="text-decoration-none" style="color:#0071e3;">tanapol.ch@rmutsvmail.com</a></div>
-            <div class="fw-light" style="font-size:14px;color:#6e6e73;"><a href="mailto:tawitty.tc@gmail.com" class="text-decoration-none" style="color:#0071e3;">tawitty.tc@gmail.com</a></div>
-            <div class="fw-light" style="font-size:14px;color:#6e6e73;"><a href="tel:+66962437210" class="text-decoration-none" style="color:#0071e3;">+66 962 437 210</a></div>
+            <div style="font-size:17px;font-weight:600;color:#1d1d1f;margin-bottom:8px;letter-spacing:-0.2px;">Contact
+            </div>
+            <div class="fw-light" style="font-size:14px;color:#6e6e73;"><a href="mailto:tanapol.ch@rmutsvmail.com"
+                class="text-decoration-none" style="color:#0071e3;">tanapol.ch@rmutsvmail.com</a></div>
+            <div class="fw-light" style="font-size:14px;color:#6e6e73;"><a href="mailto:tawitty.tc@gmail.com"
+                class="text-decoration-none" style="color:#0071e3;">tawitty.tc@gmail.com</a></div>
+            <div class="fw-light" style="font-size:14px;color:#6e6e73;"><a href="tel:+66962437210"
+                class="text-decoration-none" style="color:#0071e3;">+66 962 437 210</a></div>
 
             <div class="social-links-footer" style="display: flex; flex-direction: row; gap: 12px; margin-top: 16px;">
               <a href="https://github.com/TawittyTC" class="github" aria-label="Visit my GitHub profile"><svg
@@ -1388,14 +2179,15 @@
   <!-- Main JS -->
   <script defer src="assets/js/main.min.js?v=1.57.0"></script>
   <!-- Service Worker: cache assets for repeat visits -->
-  <script>if('serviceWorker'in navigator){var _sw=function(){navigator.serviceWorker.register('sw.js')};'requestIdleCallback'in window?requestIdleCallback(_sw):window.addEventListener('load',_sw)}</script>
+  <script>if ('serviceWorker' in navigator) { var _sw = function () { navigator.serviceWorker.register('sw.js') }; 'requestIdleCallback' in window ? requestIdleCallback(_sw) : window.addEventListener('load', _sw) }</script>
 
   <!-- ═══ Experience modal templates ═══ -->
 
   <template id="exp-protollcall">
     <div class="exp-modal-header">
       <div class="exp-modal-role-header">
-        <img src="assets/img/protollcall-logo.avif" alt="Protollcall" class="exp-modal-company-logo" onerror="this.style.display='none'">
+        <img src="assets/img/protollcall-logo.avif" alt="Protollcall" class="exp-modal-company-logo"
+          onerror="this.style.display='none'">
         <div>
           <div class="exp-modal-title">Full Stack Developer</div>
           <div class="exp-modal-company">at Protollcall Advance Service Co., Ltd.</div>
@@ -1418,19 +2210,35 @@
 
     <div class="exp-modal-section">
       <h3>Role Overview</h3>
-      <p class="exp-modal-overview">Architected and deployed customized CRM solutions for 10+ enterprise clients across Healthcare, Finance, Insurance, and E-Commerce industries. Served as sole full-stack developer managing the complete SDLC — from requirements through deployment and ongoing maintenance — across multiple concurrent client engagements.</p>
+      <p class="exp-modal-overview">Architected and deployed customized CRM solutions for 10+ enterprise clients across
+        Healthcare, Finance, Insurance, and E-Commerce industries. Served as sole full-stack developer managing the
+        complete SDLC — from requirements through deployment and ongoing maintenance — across multiple concurrent client
+        engagements.</p>
     </div>
 
     <div class="exp-modal-section">
       <h3>Responsibilities</h3>
       <ul>
-        <li><strong>End-to-End Development:</strong> Architected and deployed customized CRM solutions for 10+ enterprise clients (Healthcare, Finance, Insurance), handling the full lifecycle from requirements gathering to production deployment.</li>
-        <li><strong>High-Volume Delivery:</strong> Successfully delivered and maintained 60+ customization tickets, ranging from UI/UX enhancements to complex backend logic and database optimization.</li>
-        <li><strong>Security &amp; OWASP:</strong> Hardened system security per OWASP guidelines — patched XSS vulnerabilities, enforced HSTS, disabled HTTP TRACE, secured session management, and implemented strong password policies with account lockout for public company clients.</li>
-        <li><strong>API Integration:</strong> Engineered RESTful APIs and Webhooks for real-time data synchronization between CRM systems, warehouse platforms, and 3rd-party services (LINE Notify, Telegram, KBAOBOT).</li>
-        <li><strong>Monitoring &amp; Observability:</strong> Monitored server health, resource usage, and network traffic using <strong>Zabbix</strong>; tracked query performance and database activity via <strong>Navicat Server Monitor</strong>; performed cross-browser compatibility testing and UI verification on web browsers.</li>
-        <li><strong>Audit Log:</strong> Designed and implemented audit log systems across CRM platforms — capturing create, edit, delete, and update events across all admin menus for compliance, traceability, and security review.</li>
-        <li><strong>AI &amp; Agentic Systems R&amp;D:</strong> Researched and prototyped LLM-powered voice automation (ASR → LLM → TTS) and real-time speech-to-speech (STS) pipelines; designed agentic AI architectures with an orchestrator coordinating specialized sub-agents for contact-center and business-automation use cases.</li>
+        <li><strong>End-to-End Development:</strong> Architected and deployed customized CRM solutions for 10+
+          enterprise clients (Healthcare, Finance, Insurance), handling the full lifecycle from requirements gathering
+          to production deployment.</li>
+        <li><strong>High-Volume Delivery:</strong> Successfully delivered and maintained 60+ customization tickets,
+          ranging from UI/UX enhancements to complex backend logic and database optimization.</li>
+        <li><strong>Security &amp; OWASP:</strong> Hardened system security per OWASP guidelines — patched XSS
+          vulnerabilities, enforced HSTS, disabled HTTP TRACE, secured session management, and implemented strong
+          password policies with account lockout for public company clients.</li>
+        <li><strong>API Integration:</strong> Engineered RESTful APIs and Webhooks for real-time data synchronization
+          between CRM systems, warehouse platforms, and 3rd-party services (LINE Notify, Telegram, KBAOBOT).</li>
+        <li><strong>Monitoring &amp; Observability:</strong> Monitored server health, resource usage, and network
+          traffic using <strong>Zabbix</strong>; tracked query performance and database activity via <strong>Navicat
+            Server Monitor</strong>; performed cross-browser compatibility testing and UI verification on web browsers.
+        </li>
+        <li><strong>Audit Log:</strong> Designed and implemented audit log systems across CRM platforms — capturing
+          create, edit, delete, and update events across all admin menus for compliance, traceability, and security
+          review.</li>
+        <li><strong>AI &amp; Agentic Systems R&amp;D:</strong> Researched and prototyped LLM-powered voice automation
+          (ASR → LLM → TTS) and real-time speech-to-speech (STS) pipelines; designed agentic AI architectures with an
+          orchestrator coordinating specialized sub-agents for contact-center and business-automation use cases.</li>
       </ul>
     </div>
 
@@ -1475,9 +2283,14 @@
           <span class="exp-client-tag">Healthcare CRM</span>
         </div>
         <ul>
-          <li>Built a full-stack patient relationship CRM — patient database, <strong>appointment scheduling</strong> with conflict detection (creation, editing, cancellation), and automated follow-up reminder sequences via LINE Notify.</li>
-          <li>Developed <strong>IV Team Request System</strong> — operational dispatch workflow for IV nursing teams: real-time team assignment, job status tracking (pending → dispatched → completed), with instant push notifications via LINE Notify and Telegram API to on-duty nursing staff.</li>
-          <li>Integrated Asterisk CDR linking all patient call interactions to their CRM profile for complete care history visibility.</li>
+          <li>Built a full-stack patient relationship CRM — patient database, <strong>appointment scheduling</strong>
+            with conflict detection (creation, editing, cancellation), and automated follow-up reminder sequences via
+            LINE Notify.</li>
+          <li>Developed <strong>IV Team Request System</strong> — operational dispatch workflow for IV nursing teams:
+            real-time team assignment, job status tracking (pending → dispatched → completed), with instant push
+            notifications via LINE Notify and Telegram API to on-duty nursing staff.</li>
+          <li>Integrated Asterisk CDR linking all patient call interactions to their CRM profile for complete care
+            history visibility.</li>
         </ul>
       </div>
 
@@ -1488,11 +2301,20 @@
           <span class="exp-client-tag">Sales Campaign CRM</span>
         </div>
         <ul>
-          <li><strong>Core Modules built end-to-end:</strong> Social management, Predictive Dialer List (auto-dial), Manual Call List (agent-initiated), Outstanding tracking, Call-to-Visit workflow, FCR Management, Repayment management, Lock/Unlock case controls, Letter management, Analytics, Template management, Import pipeline, and Status management.</li>
-          <li><strong>Dashboards &amp; Reporting (heavy emphasis):</strong> Built Predictive Dashboard, FCR Dashboard, Call Productivity, Collection Performance, FCR by Area, and Agent Performance dashboards — processing large daily CDR datasets with optimized SQL queries; added CSV export to all key reports.</li>
-          <li><strong>OBS Config &amp; LINE Image Sending:</strong> Developed UI for Huawei OBS configuration (bucket, endpoint, AKSK key management) and integrated image sending from Collection module — agents send images directly to customers via LINE from within the CRM.</li>
-          <li>Integrated <strong>KBAOBOT</strong>: real-time chat history sync, ticket-status API, agent-transfer notifications, and UID-based customer lookup in Social menu.</li>
-          <li>Implemented scheduled crontab for monthly data import with corrected date logic; fixed import conditions and deployed to production overnight to meet billing deadlines.</li>
+          <li><strong>Core Modules built end-to-end:</strong> Social management, Predictive Dialer List (auto-dial),
+            Manual Call List (agent-initiated), Outstanding tracking, Call-to-Visit workflow, FCR Management, Repayment
+            management, Lock/Unlock case controls, Letter management, Analytics, Template management, Import pipeline,
+            and Status management.</li>
+          <li><strong>Dashboards &amp; Reporting (heavy emphasis):</strong> Built Predictive Dashboard, FCR Dashboard,
+            Call Productivity, Collection Performance, FCR by Area, and Agent Performance dashboards — processing large
+            daily CDR datasets with optimized SQL queries; added CSV export to all key reports.</li>
+          <li><strong>OBS Config &amp; LINE Image Sending:</strong> Developed UI for Huawei OBS configuration (bucket,
+            endpoint, AKSK key management) and integrated image sending from Collection module — agents send images
+            directly to customers via LINE from within the CRM.</li>
+          <li>Integrated <strong>KBAOBOT</strong>: real-time chat history sync, ticket-status API, agent-transfer
+            notifications, and UID-based customer lookup in Social menu.</li>
+          <li>Implemented scheduled crontab for monthly data import with corrected date logic; fixed import conditions
+            and deployed to production overnight to meet billing deadlines.</li>
           <li>Generated secure access link for Report Agent Login-Logout (billing use only).</li>
         </ul>
       </div>
@@ -1500,16 +2322,23 @@
       <div class="exp-client-section" data-client="happy">
         <div class="exp-client-section-header">
           <img src="https://logo.clearbit.com/happyproducts.co.th" alt="" onerror="this.style.display='none'">
-          <h3>Happy Products &amp; Services Co., Ltd. <span style="font-weight:400;color:#6e6e73">(Tnews, Happy Shopping)</span></h3>
+          <h3>Happy Products &amp; Services Co., Ltd. <span style="font-weight:400;color:#6e6e73">(Tnews, Happy
+              Shopping)</span></h3>
           <span class="exp-client-tag">End-to-End CRM</span>
         </div>
         <ul>
-          <li>Built full end-to-end CRM for TV shopping operations — managing airtime scheduling, purchase orders, product catalog, and telesales agent workflows.</li>
-          <li>Developed "Warehouse API Integration" — real-time stock quantity sync with warehouse system; Out-of-Stock popup alerts during order placement with configurable override option.</li>
-          <li>Built "Product Lock" system — prevents incompatible products from being sold together; configurable lock/unlock rules with item code mapping and bulk management UI.</li>
-          <li>Implemented Abandon Call management, Lead Filter workflows, and Auto Report Email delivery for daily/weekly operations summaries.</li>
-          <li>Built agent group management: Supervisor assigns agents by group (Telesales1/Telesales2) with auto-prefix routing and multi-group campaign support.</li>
-          <li>Developed audit log system for all admin menu actions (create/edit/delete/update) for compliance tracking.</li>
+          <li>Built full end-to-end CRM for TV shopping operations — managing airtime scheduling, purchase orders,
+            product catalog, and telesales agent workflows.</li>
+          <li>Developed "Warehouse API Integration" — real-time stock quantity sync with warehouse system; Out-of-Stock
+            popup alerts during order placement with configurable override option.</li>
+          <li>Built "Product Lock" system — prevents incompatible products from being sold together; configurable
+            lock/unlock rules with item code mapping and bulk management UI.</li>
+          <li>Implemented Abandon Call management, Lead Filter workflows, and Auto Report Email delivery for
+            daily/weekly operations summaries.</li>
+          <li>Built agent group management: Supervisor assigns agents by group (Telesales1/Telesales2) with auto-prefix
+            routing and multi-group campaign support.</li>
+          <li>Developed audit log system for all admin menu actions (create/edit/delete/update) for compliance tracking.
+          </li>
         </ul>
       </div>
 
@@ -1520,10 +2349,15 @@
           <span class="exp-client-tag">Multilingual IVR System</span>
         </div>
         <ul>
-          <li>Designed and built a production <strong>multilingual IVR</strong> (Thai and English) — callers select their preferred language at entry, and all subsequent prompts adapt accordingly.</li>
-          <li>Live API-integrated call flows: callers input booking references or flight numbers via DTMF to receive real-time flight status, baggage allowance, and refund policy — spoken via dynamic <strong>TTS synthesis</strong>.</li>
-          <li>Intent-based agent escalation: transfers include full context (language preference, menu path, inputs) pre-populated for the receiving agent.</li>
-          <li>Optimized Asterisk AGI/ARI dialplan for concurrent multi-call handling; graceful fallback for API timeouts and no-input scenarios.</li>
+          <li>Designed and built a production <strong>multilingual IVR</strong> (Thai and English) — callers select
+            their preferred language at entry, and all subsequent prompts adapt accordingly.</li>
+          <li>Live API-integrated call flows: callers input booking references or flight numbers via DTMF to receive
+            real-time flight status, baggage allowance, and refund policy — spoken via dynamic <strong>TTS
+              synthesis</strong>.</li>
+          <li>Intent-based agent escalation: transfers include full context (language preference, menu path, inputs)
+            pre-populated for the receiving agent.</li>
+          <li>Optimized Asterisk AGI/ARI dialplan for concurrent multi-call handling; graceful fallback for API timeouts
+            and no-input scenarios.</li>
         </ul>
       </div>
 
@@ -1534,10 +2368,14 @@
           <span class="exp-client-tag">Operations Dashboard</span>
         </div>
         <ul>
-          <li>Built real-time contact center dashboard with live queue depth, agent status, and SLA adherence counters; configurable alerts via LINE and email for queue spikes and SLA breaches.</li>
-          <li>Developed 4 Historical Reports: Call Center Performance (In-Out hrs, YTD), Performance per Agent, and Agent Performance — with queue/agent filters and time-range selection.</li>
-          <li>Built KPI target comparison dashboard: configurable targets for Answer &lt;30s %, Abandoned Calls %, and Call Answered %; displayed as visual comparison against actuals.</li>
-          <li>Monthly/YTD overview tables (Call Offered, Answered, Abandoned, Avg Wait/Talk times), queue statistics, agent statistics, and YTD bar chart with export capability.</li>
+          <li>Built real-time contact center dashboard with live queue depth, agent status, and SLA adherence counters;
+            configurable alerts via LINE and email for queue spikes and SLA breaches.</li>
+          <li>Developed 4 Historical Reports: Call Center Performance (In-Out hrs, YTD), Performance per Agent, and
+            Agent Performance — with queue/agent filters and time-range selection.</li>
+          <li>Built KPI target comparison dashboard: configurable targets for Answer &lt;30s %, Abandoned Calls %, and
+            Call Answered %; displayed as visual comparison against actuals.</li>
+          <li>Monthly/YTD overview tables (Call Offered, Answered, Abandoned, Avg Wait/Talk times), queue statistics,
+            agent statistics, and YTD bar chart with export capability.</li>
         </ul>
       </div>
 
@@ -1549,9 +2387,12 @@
         </div>
         <ul>
           <li>Operations dashboard with call center KPI tracking across multiple queues and agent groups.</li>
-          <li>Automated scheduled report generation — daily and weekly summaries (volume, AHT, abandon rate, SLA %) exported to PDF and Excel.</li>
-          <li>Email distribution list management — reports auto-delivered to configured recipients (operations managers, QA, executives) on schedule.</li>
-          <li>Powered by <strong>queuelog</strong> and <strong>asteriskcdrdb</strong> queries with SQL optimization to handle millions of CDR records at sub-second response time.</li>
+          <li>Automated scheduled report generation — daily and weekly summaries (volume, AHT, abandon rate, SLA %)
+            exported to PDF and Excel.</li>
+          <li>Email distribution list management — reports auto-delivered to configured recipients (operations managers,
+            QA, executives) on schedule.</li>
+          <li>Powered by <strong>queuelog</strong> and <strong>asteriskcdrdb</strong> queries with SQL optimization to
+            handle millions of CDR records at sub-second response time.</li>
         </ul>
       </div>
 
@@ -1562,10 +2403,13 @@
           <span class="exp-client-tag">Customer Analytics</span>
         </div>
         <ul>
-          <li>Customer analytics dashboard aggregating multi-channel data (calls, LINE messages, email) into a unified view.</li>
-          <li>Interactive date-range filtering, dimension drill-down by channel/agent/time-of-day, and period-over-period comparison.</li>
+          <li>Customer analytics dashboard aggregating multi-channel data (calls, LINE messages, email) into a unified
+            view.</li>
+          <li>Interactive date-range filtering, dimension drill-down by channel/agent/time-of-day, and
+            period-over-period comparison.</li>
           <li>Full export capability: CSV, Excel, and PDF report downloads for all dashboard views.</li>
-          <li>Data pipeline: raw CDR + CRM event ingestion → aggregation layer → dashboard, with scheduled pre-aggregation for fast load times.</li>
+          <li>Data pipeline: raw CDR + CRM event ingestion → aggregation layer → dashboard, with scheduled
+            pre-aggregation for fast load times.</li>
         </ul>
       </div>
 
@@ -1575,9 +2419,12 @@
           <span class="exp-client-tag">Contact Center Analytics</span>
         </div>
         <ul>
-          <li>Built contact center performance analytics platform integrating Asterisk CDR and queuelog data sources with real-time agent monitoring and SLA tracking.</li>
-          <li>Added configurable Dropdown Lists (Problem Summary Category, Solution Summary Category) to ticket case recording form.</li>
-          <li>Added ticket type/category field; relabeled customer profile fields to merchant-specific terminology (Merchant Name, TID, EDC S/N, Merchant Province) for payment terminal support use case.</li>
+          <li>Built contact center performance analytics platform integrating Asterisk CDR and queuelog data sources
+            with real-time agent monitoring and SLA tracking.</li>
+          <li>Added configurable Dropdown Lists (Problem Summary Category, Solution Summary Category) to ticket case
+            recording form.</li>
+          <li>Added ticket type/category field; relabeled customer profile fields to merchant-specific terminology
+            (Merchant Name, TID, EDC S/N, Merchant Province) for payment terminal support use case.</li>
         </ul>
       </div>
 
@@ -1588,11 +2435,19 @@
           <span class="exp-client-tag">IT Services CRM</span>
         </div>
         <ul>
-          <li>Developed service request and ticket management CRM — logging, categorizing, and tracking all customer support requests from intake to resolution with SLA-based escalation.</li>
-          <li>Built <strong>Abandoned Call</strong> page — dedicated queue for agents to identify and call back customers who abandoned before being answered; built <strong>Callback</strong> tracking page — supervisors can verify whether each callback was completed, with timestamps and agent ID.</li>
-          <li>Delivered <strong>6 analytics reports:</strong> Report Callback, Report Abandon Call, Report Summary Call, Report Summary Ticket, plus call volume and agent performance reports — with enhanced filtering and graph display per client specifications.</li>
-          <li>Hardened security: implemented Password Policy (8+ chars, complexity rules, no username match), Account Lockout after 3 failed attempts, force-change on first login; patched HSTS, HTTP TRACE, PHP exposure, and jQuery XSS vulnerabilities.</li>
-          <li>Built Emergency Announcement toggle — allows client to independently enable/disable emergency broadcast audio without developer intervention.</li>
+          <li>Developed service request and ticket management CRM — logging, categorizing, and tracking all customer
+            support requests from intake to resolution with SLA-based escalation.</li>
+          <li>Built <strong>Abandoned Call</strong> page — dedicated queue for agents to identify and call back
+            customers who abandoned before being answered; built <strong>Callback</strong> tracking page — supervisors
+            can verify whether each callback was completed, with timestamps and agent ID.</li>
+          <li>Delivered <strong>6 analytics reports:</strong> Report Callback, Report Abandon Call, Report Summary Call,
+            Report Summary Ticket, plus call volume and agent performance reports — with enhanced filtering and graph
+            display per client specifications.</li>
+          <li>Hardened security: implemented Password Policy (8+ chars, complexity rules, no username match), Account
+            Lockout after 3 failed attempts, force-change on first login; patched HSTS, HTTP TRACE, PHP exposure, and
+            jQuery XSS vulnerabilities.</li>
+          <li>Built Emergency Announcement toggle — allows client to independently enable/disable emergency broadcast
+            audio without developer intervention.</li>
         </ul>
       </div>
 
@@ -1603,9 +2458,12 @@
           <span class="exp-client-tag">Automotive Sales CRM</span>
         </div>
         <ul>
-          <li>Built vehicle sales CRM covering the full buyer journey: lead capture → test drive scheduling → negotiation → purchase → after-sales follow-up with LINE OA automation.</li>
-          <li>Added calllist_status field to tbl_project_result; extended Status and Calling Status details on CRM for richer call disposition tracking.</li>
-          <li>Added filter for status types (Close, In Progress, etc.) in Case Detail report for improved operations review.</li>
+          <li>Built vehicle sales CRM covering the full buyer journey: lead capture → test drive scheduling →
+            negotiation → purchase → after-sales follow-up with LINE OA automation.</li>
+          <li>Added calllist_status field to tbl_project_result; extended Status and Calling Status details on CRM for
+            richer call disposition tracking.</li>
+          <li>Added filter for status types (Close, In Progress, etc.) in Case Detail report for improved operations
+            review.</li>
         </ul>
       </div>
 
@@ -1616,10 +2474,14 @@
           <span class="exp-client-tag">Vehicle Finance CRM</span>
         </div>
         <ul>
-          <li>Developed vehicle financing CRM — managing loan applications, document collection, credit review stages, and approval workflows with full audit trail.</li>
-          <li>Built lead redistribution logic: new agents can be added to active projects and assigned uncalled numbers, while already-recorded entries remain fixed to original agents.</li>
-          <li>Added bulk view-list selection (multi-agent), owner change functionality, and export button for outbound call management.</li>
-          <li>Automated follow-up sequences for incomplete applications and payment due dates via LINE OA and outbound call queues.</li>
+          <li>Developed vehicle financing CRM — managing loan applications, document collection, credit review stages,
+            and approval workflows with full audit trail.</li>
+          <li>Built lead redistribution logic: new agents can be added to active projects and assigned uncalled numbers,
+            while already-recorded entries remain fixed to original agents.</li>
+          <li>Added bulk view-list selection (multi-agent), owner change functionality, and export button for outbound
+            call management.</li>
+          <li>Automated follow-up sequences for incomplete applications and payment due dates via LINE OA and outbound
+            call queues.</li>
         </ul>
       </div>
 
@@ -1630,9 +2492,12 @@
           <span class="exp-client-tag">Operations &amp; Reporting</span>
         </div>
         <ul>
-          <li>Contact center operations dashboard with real-time queue monitoring, agent availability tracking, and SLA compliance metrics.</li>
-          <li>Added employee code and position columns to Sales Performance by Employee report; restricted SuperAgent role from editing their own permissions.</li>
-          <li>Developed file import system for bulk data ingestion; added customer code column to Service Search page with export support.</li>
+          <li>Contact center operations dashboard with real-time queue monitoring, agent availability tracking, and SLA
+            compliance metrics.</li>
+          <li>Added employee code and position columns to Sales Performance by Employee report; restricted SuperAgent
+            role from editing their own permissions.</li>
+          <li>Developed file import system for bulk data ingestion; added customer code column to Service Search page
+            with export support.</li>
         </ul>
       </div>
 
@@ -1643,13 +2508,20 @@
           <span class="exp-client-tag">Sales Pipeline CRM</span>
         </div>
         <ul>
-          <li>Delivered full insurance CRM customization — sales pipeline with multi-stage lead management, assignment rules, and follow-up task automation.</li>
-          <li>Built <strong>Policy Tracking System</strong> — full lifecycle management of insurance policies: status tracking, renewal monitoring, policy detail view, and history log per customer.</li>
-          <li>Built <strong>Policy Appointment System</strong> — agents schedule, manage, and follow up on policy appointments; automated reminders and calendar-based conflict detection.</li>
-          <li>Developed duplicate lead detection system for agents; built policy expiry alert automation and outbound follow-up call scheduling for new customer acquisition.</li>
-          <li>Implemented CTI popup integration with PhoneLite softphone — agents receive screen-pop with caller context on incoming/outgoing calls; extension status control via Webphone for break/ACW reporting.</li>
-          <li>Built configurable lead distribution with count-based allocation rules; added bulk policy assignment checkboxes, Call Status column on policy page, and Created-by tracking for supervisor oversight.</li>
-          <li><strong>Improvement &amp; Maintenance:</strong> Ongoing bug fixes, UI/UX enhancements, performance tuning, and feature improvements across all ISV CRM modules throughout the engagement.</li>
+          <li>Delivered full insurance CRM customization — sales pipeline with multi-stage lead management, assignment
+            rules, and follow-up task automation.</li>
+          <li>Built <strong>Policy Tracking System</strong> — full lifecycle management of insurance policies: status
+            tracking, renewal monitoring, policy detail view, and history log per customer.</li>
+          <li>Built <strong>Policy Appointment System</strong> — agents schedule, manage, and follow up on policy
+            appointments; automated reminders and calendar-based conflict detection.</li>
+          <li>Developed duplicate lead detection system for agents; built policy expiry alert automation and outbound
+            follow-up call scheduling for new customer acquisition.</li>
+          <li>Implemented CTI popup integration with PhoneLite softphone — agents receive screen-pop with caller context
+            on incoming/outgoing calls; extension status control via Webphone for break/ACW reporting.</li>
+          <li>Built configurable lead distribution with count-based allocation rules; added bulk policy assignment
+            checkboxes, Call Status column on policy page, and Created-by tracking for supervisor oversight.</li>
+          <li><strong>Improvement &amp; Maintenance:</strong> Ongoing bug fixes, UI/UX enhancements, performance tuning,
+            and feature improvements across all ISV CRM modules throughout the engagement.</li>
         </ul>
       </div>
 
@@ -1660,10 +2532,14 @@
           <span class="exp-client-tag">Real Estate CRM</span>
         </div>
         <ul>
-          <li>Built real estate sales CRM covering lead capture through site visit scheduling, negotiation, and closing — with LINE OA automated follow-up at each pipeline stage.</li>
-          <li>Customized case management view: removed unused columns (popup phone, contact channel, created date), added surgery date, SO status, consultation date, and customer name columns with sort controls.</li>
-          <li>Implemented case notification page with assignment-date-based sort, newest-first default ordering, and column parity with the main case list.</li>
-          <li>Updated field type for surgery date from Datetime to Date-only; restricted phone number visibility in all reports for DATA permission level (id 7).</li>
+          <li>Built real estate sales CRM covering lead capture through site visit scheduling, negotiation, and closing
+            — with LINE OA automated follow-up at each pipeline stage.</li>
+          <li>Customized case management view: removed unused columns (popup phone, contact channel, created date),
+            added surgery date, SO status, consultation date, and customer name columns with sort controls.</li>
+          <li>Implemented case notification page with assignment-date-based sort, newest-first default ordering, and
+            column parity with the main case list.</li>
+          <li>Updated field type for surgery date from Datetime to Date-only; restricted phone number visibility in all
+            reports for DATA permission level (id 7).</li>
         </ul>
       </div>
 
@@ -1674,9 +2550,12 @@
           <span class="exp-client-tag">Fintech Customer Service</span>
         </div>
         <ul>
-          <li>Built IVR for self-service card operations: balance inquiry, transaction history, and card activation via DTMF with live backend API integration.</li>
-          <li>Customized Report Blacklist/Unblacklist (Report #8) to include customer ID Card data alongside phone number for compliance tracking.</li>
-          <li>Contact center analytics dashboard tracking call volumes, IVR self-service completion rates, and agent escalation breakdowns with SLA tracking.</li>
+          <li>Built IVR for self-service card operations: balance inquiry, transaction history, and card activation via
+            DTMF with live backend API integration.</li>
+          <li>Customized Report Blacklist/Unblacklist (Report #8) to include customer ID Card data alongside phone
+            number for compliance tracking.</li>
+          <li>Contact center analytics dashboard tracking call volumes, IVR self-service completion rates, and agent
+            escalation breakdowns with SLA tracking.</li>
         </ul>
       </div>
 
@@ -1687,8 +2566,10 @@
           <span class="exp-client-tag">E-Commerce CRM</span>
         </div>
         <ul>
-          <li>Developed customer service CRM for e-commerce operations — managing order inquiries, complaints, returns, and delivery dispute resolution with SLA tracking.</li>
-          <li>Fixed Outbound Project Detail report filter for project name — now shows only projects active within the selected date-time range instead of showing all projects regardless of period.</li>
+          <li>Developed customer service CRM for e-commerce operations — managing order inquiries, complaints, returns,
+            and delivery dispute resolution with SLA tracking.</li>
+          <li>Fixed Outbound Project Detail report filter for project name — now shows only projects active within the
+            selected date-time range instead of showing all projects regardless of period.</li>
           <li>Integrated LINE OA for proactive order status updates and post-purchase satisfaction surveys.</li>
         </ul>
       </div>
@@ -1699,8 +2580,10 @@
           <span class="exp-client-tag">E-Commerce Support CRM</span>
         </div>
         <ul>
-          <li>Built customer support CRM for a TV shopping platform — handling inbound order inquiries, return requests, and product complaint logging.</li>
-          <li>Fixed export SO / import SO page table alignment; added Payment Date column to UI after Payment Status; sorted On-Air schedule page by date ascending (oldest to newest).</li>
+          <li>Built customer support CRM for a TV shopping platform — handling inbound order inquiries, return requests,
+            and product complaint logging.</li>
+          <li>Fixed export SO / import SO page table alignment; added Payment Date column to UI after Payment Status;
+            sorted On-Air schedule page by date ascending (oldest to newest).</li>
           <li>Agent productivity dashboard: tickets per agent, average resolution time, and SLA compliance rate.</li>
         </ul>
       </div>
@@ -1712,9 +2595,12 @@
           <span class="exp-client-tag">Field Service CRM</span>
         </div>
         <ul>
-          <li>Developed a field service management CRM for property repair and maintenance operations — job intake, technician dispatch, progress tracking, and completion sign-off.</li>
-          <li>Customer notification workflow via LINE OA: job confirmation, technician dispatch alerts, and post-service satisfaction follow-up.</li>
-          <li>Operations dashboard with job queue status, technician utilization rates, and SLA compliance for service completion windows.</li>
+          <li>Developed a field service management CRM for property repair and maintenance operations — job intake,
+            technician dispatch, progress tracking, and completion sign-off.</li>
+          <li>Customer notification workflow via LINE OA: job confirmation, technician dispatch alerts, and post-service
+            satisfaction follow-up.</li>
+          <li>Operations dashboard with job queue status, technician utilization rates, and SLA compliance for service
+            completion windows.</li>
         </ul>
       </div>
 
@@ -1725,9 +2611,12 @@
           <span class="exp-client-tag">Healthcare CRM</span>
         </div>
         <ul>
-          <li>Developed a patient CRM for medical services — managing appointment bookings, doctor-patient assignments, and follow-up care scheduling.</li>
-          <li>Automated appointment reminders and health check-up recall notifications via LINE OA, reducing missed appointments.</li>
-          <li>Integrated Asterisk CDR linking all patient call interactions to their CRM profile for complete care history visibility.</li>
+          <li>Developed a patient CRM for medical services — managing appointment bookings, doctor-patient assignments,
+            and follow-up care scheduling.</li>
+          <li>Automated appointment reminders and health check-up recall notifications via LINE OA, reducing missed
+            appointments.</li>
+          <li>Integrated Asterisk CDR linking all patient call interactions to their CRM profile for complete care
+            history visibility.</li>
         </ul>
       </div>
 
@@ -1738,22 +2627,29 @@
           <span class="exp-client-tag">Hospitality CRM</span>
         </div>
         <ul>
-          <li>Built reservation and guest inquiry management CRM for a Japanese hot spring resort brand with LINE OA booking confirmations, pre-arrival instructions, and post-stay surveys.</li>
-          <li>Added Queue Name and Call Status search filters to the orange analytics report page for improved data drill-down.</li>
-          <li>Centralized guest interaction history across channels enabling personalized service and targeted promotional outreach.</li>
+          <li>Built reservation and guest inquiry management CRM for a Japanese hot spring resort brand with LINE OA
+            booking confirmations, pre-arrival instructions, and post-stay surveys.</li>
+          <li>Added Queue Name and Call Status search filters to the orange analytics report page for improved data
+            drill-down.</li>
+          <li>Centralized guest interaction history across channels enabling personalized service and targeted
+            promotional outreach.</li>
         </ul>
       </div>
 
       <div class="exp-client-section" data-client="kijsiri">
         <div class="exp-client-section-header">
           <img src="https://logo.clearbit.com/kijsiriasset.com" alt="" onerror="this.style.display='none'">
-          <h3>N&amp;S Number One Ltd. Partnership / Kijsiri Asset Co., Ltd. <span style="font-weight:400;color:#6e6e73">(N&amp;S / Kijsiri)</span></h3>
+          <h3>N&amp;S Number One Ltd. Partnership / Kijsiri Asset Co., Ltd. <span
+              style="font-weight:400;color:#6e6e73">(N&amp;S / Kijsiri)</span></h3>
           <span class="exp-client-tag">Real Estate CRM</span>
         </div>
         <ul>
-          <li>Developed property sales CRM for two linked entities — managing buyer leads, site visit scheduling, and purchase negotiation workflows with LINE OA automation.</li>
-          <li>Configured audio recording access permissions separately for N&amp;S and Kijsiri teams — ensuring each entity's agents can only listen to their own call recordings.</li>
-          <li>Agent performance dashboard with lead source tracking, pipeline stage distribution, and conversion rate analytics per project.</li>
+          <li>Developed property sales CRM for two linked entities — managing buyer leads, site visit scheduling, and
+            purchase negotiation workflows with LINE OA automation.</li>
+          <li>Configured audio recording access permissions separately for N&amp;S and Kijsiri teams — ensuring each
+            entity's agents can only listen to their own call recordings.</li>
+          <li>Agent performance dashboard with lead source tracking, pipeline stage distribution, and conversion rate
+            analytics per project.</li>
         </ul>
       </div>
 
@@ -1763,9 +2659,12 @@
           <span class="exp-client-tag">Insurance CRM</span>
         </div>
         <ul>
-          <li>Built CRM for accident &amp; health insurance sales — managing policy inquiries, quotation workflows, and agent-assigned follow-up tasks.</li>
-          <li>Developed agent break status system with 6 configurable statuses (Ready, Busy, Toilet, Meal, Consult, Mini Break) and generated associated status activity reports.</li>
-          <li>Automated policy renewal reminders and lapse-prevention campaigns via LINE OA; claim inquiry IVR for self-service status checks before agent escalation.</li>
+          <li>Built CRM for accident &amp; health insurance sales — managing policy inquiries, quotation workflows, and
+            agent-assigned follow-up tasks.</li>
+          <li>Developed agent break status system with 6 configurable statuses (Ready, Busy, Toilet, Meal, Consult, Mini
+            Break) and generated associated status activity reports.</li>
+          <li>Automated policy renewal reminders and lapse-prevention campaigns via LINE OA; claim inquiry IVR for
+            self-service status checks before agent escalation.</li>
         </ul>
       </div>
 
@@ -1775,9 +2674,12 @@
           <span class="exp-client-tag">Medical Appointment CRM</span>
         </div>
         <ul>
-          <li>Developed a patient appointment management CRM for a medical clinic — scheduling, doctor assignment, and follow-up care coordination.</li>
-          <li>Automated appointment reminders and post-consultation follow-up via LINE OA, reducing no-show rates and improving patient experience.</li>
-          <li>Asterisk CDR integration linking patient call history to profiles, giving clinic staff full context before each interaction.</li>
+          <li>Developed a patient appointment management CRM for a medical clinic — scheduling, doctor assignment, and
+            follow-up care coordination.</li>
+          <li>Automated appointment reminders and post-consultation follow-up via LINE OA, reducing no-show rates and
+            improving patient experience.</li>
+          <li>Asterisk CDR integration linking patient call history to profiles, giving clinic staff full context before
+            each interaction.</li>
         </ul>
       </div>
 
@@ -1788,9 +2690,12 @@
           <span class="exp-client-tag">Financial Services CRM</span>
         </div>
         <ul>
-          <li>Set up and configured full CRM system for S.B.L. Leasing — initial system setup, user provisioning, queue configuration, and go-live support.</li>
-          <li>Built customer service CRM for financial operations — managing inbound inquiries, case tracking, and resolution workflows with audit trail.</li>
-          <li>Contact center analytics dashboard with call volume trends, agent handling time, and SLA compliance metrics.</li>
+          <li>Set up and configured full CRM system for S.B.L. Leasing — initial system setup, user provisioning, queue
+            configuration, and go-live support.</li>
+          <li>Built customer service CRM for financial operations — managing inbound inquiries, case tracking, and
+            resolution workflows with audit trail.</li>
+          <li>Contact center analytics dashboard with call volume trends, agent handling time, and SLA compliance
+            metrics.</li>
         </ul>
       </div>
 
@@ -1801,13 +2706,21 @@
           <span class="exp-client-tag">CTI Integration</span>
         </div>
         <ul>
-          <li>Integrated <strong>Phonerlite softphone</strong> with the client's existing CRM — provisioned PBX extensions for agents (outbound via SIM) and supervisor (SpyCall-enabled) on Asterisk.</li>
-          <li>Built a <strong>Click-to-Call API endpoint</strong> — client's CRM triggers an outbound call on the agent's Phonerlite with a single button press, no manual dialing required.</li>
-          <li>Developed API to <strong>search and retrieve call history</strong> from <code>queuemetrics.queue_log</code> — enabling the client's platform to query inbound/outbound call records by agent, queue, and date range.</li>
-          <li>Developed API to <strong>push inbound/outbound call detail reports</strong> in real time from Asterisk CDR into the client's own reporting system.</li>
-          <li>Built API to <strong>deliver call recording files</strong> (audio) directly to the client's report storage for playback within their platform.</li>
-          <li>Implemented <strong>agent status API</strong> — syncs real-time extension status (available, busy, break) from Asterisk AMI to the client's CRM dashboard.</li>
-          <li>Delivered full <strong>API documentation</strong> for every endpoint — request/response specs, authentication, and example payloads.</li>
+          <li>Integrated <strong>Phonerlite softphone</strong> with the client's existing CRM — provisioned PBX
+            extensions for agents (outbound via SIM) and supervisor (SpyCall-enabled) on Asterisk.</li>
+          <li>Built a <strong>Click-to-Call API endpoint</strong> — client's CRM triggers an outbound call on the
+            agent's Phonerlite with a single button press, no manual dialing required.</li>
+          <li>Developed API to <strong>search and retrieve call history</strong> from
+            <code>queuemetrics.queue_log</code> — enabling the client's platform to query inbound/outbound call records
+            by agent, queue, and date range.</li>
+          <li>Developed API to <strong>push inbound/outbound call detail reports</strong> in real time from Asterisk CDR
+            into the client's own reporting system.</li>
+          <li>Built API to <strong>deliver call recording files</strong> (audio) directly to the client's report storage
+            for playback within their platform.</li>
+          <li>Implemented <strong>agent status API</strong> — syncs real-time extension status (available, busy, break)
+            from Asterisk AMI to the client's CRM dashboard.</li>
+          <li>Delivered full <strong>API documentation</strong> for every endpoint — request/response specs,
+            authentication, and example payloads.</li>
         </ul>
       </div>
 
@@ -1818,8 +2731,10 @@
           <span class="exp-client-tag">Call Analytics</span>
         </div>
         <ul>
-          <li>Customized call center analytics reports — localized ANSWER/UNANSWER labels to Thai (รับสาย/ไม่รับสาย) for agent-facing reporting.</li>
-          <li>Updated queue display logic in all reports from queue number identifiers to human-readable queue names, improving report readability for operations supervisors.</li>
+          <li>Customized call center analytics reports — localized ANSWER/UNANSWER labels to Thai (รับสาย/ไม่รับสาย) for
+            agent-facing reporting.</li>
+          <li>Updated queue display logic in all reports from queue number identifiers to human-readable queue names,
+            improving report readability for operations supervisors.</li>
         </ul>
       </div>
 
@@ -1829,7 +2744,8 @@
           <span class="exp-client-tag">Sales Reporting</span>
         </div>
         <ul>
-          <li>Corrected purchase order detail report (#22) — fixed display logic for full price, discount amount, and net price fields to ensure accurate financial reporting for operations.</li>
+          <li>Corrected purchase order detail report (#22) — fixed display logic for full price, discount amount, and
+            net price fields to ensure accurate financial reporting for operations.</li>
         </ul>
       </div>
 
@@ -1839,14 +2755,24 @@
           <span class="exp-client-tag">R&amp;D</span>
         </div>
         <ul>
-          <li>Researched and prototyped an end-to-end intelligent voice automation pipeline: <strong>ASR → LLM → TTS</strong> targeting automated call handling for Thai and English contact center use cases.</li>
-          <li>Evaluated and benchmarked multiple ASR engines for real-time Thai/English transcription — assessing accuracy, streaming latency, and noise tolerance under realistic call conditions.</li>
-          <li>Used <strong>GPT (OpenAI)</strong> and <strong>Gemini (Google)</strong> as the core LLM reasoning layer for intent classification, dialogue management, and response generation.</li>
-          <li>Explored real-time <strong>speech-to-speech (STS)</strong> conversational AI (Gemini Live-style realtime APIs) — studying end-to-end latency, barge-in handling, and naturalness against the classic ASR → LLM → TTS chain for live phone conversations.</li>
-          <li>Designed and prototyped <strong>agentic AI architectures</strong>: an orchestrator agent coordinating specialized sub-agents (intent routing, data lookup, action execution) with tool calling — applying the pattern to business workflows like lead qualification and after-call work automation.</li>
-          <li>Leveraged <strong>Claude</strong> throughout R&amp;D: synthesizing technical papers, evaluating tradeoffs, designing prompt strategies, and accelerating product decisions.</li>
-          <li>Post-call AI features: smart summarization, sentiment tagging, and automated follow-up action suggestions surfaced to agents after each call.</li>
-          <li>All production systems on <strong>AWS</strong> (EC2, S3, RDS) with auto-scaling, deployment automation, OWASP security practices, and SQL optimization across all client platforms.</li>
+          <li>Researched and prototyped an end-to-end intelligent voice automation pipeline: <strong>ASR → LLM →
+              TTS</strong> targeting automated call handling for Thai and English contact center use cases.</li>
+          <li>Evaluated and benchmarked multiple ASR engines for real-time Thai/English transcription — assessing
+            accuracy, streaming latency, and noise tolerance under realistic call conditions.</li>
+          <li>Used <strong>GPT (OpenAI)</strong> and <strong>Gemini (Google)</strong> as the core LLM reasoning layer
+            for intent classification, dialogue management, and response generation.</li>
+          <li>Explored real-time <strong>speech-to-speech (STS)</strong> conversational AI (Gemini Live-style realtime
+            APIs) — studying end-to-end latency, barge-in handling, and naturalness against the classic ASR → LLM → TTS
+            chain for live phone conversations.</li>
+          <li>Designed and prototyped <strong>agentic AI architectures</strong>: an orchestrator agent coordinating
+            specialized sub-agents (intent routing, data lookup, action execution) with tool calling — applying the
+            pattern to business workflows like lead qualification and after-call work automation.</li>
+          <li>Leveraged <strong>Claude</strong> throughout R&amp;D: synthesizing technical papers, evaluating tradeoffs,
+            designing prompt strategies, and accelerating product decisions.</li>
+          <li>Post-call AI features: smart summarization, sentiment tagging, and automated follow-up action suggestions
+            surfaced to agents after each call.</li>
+          <li>All production systems on <strong>AWS</strong> (EC2, S3, RDS) with auto-scaling, deployment automation,
+            OWASP security practices, and SQL optimization across all client platforms.</li>
         </ul>
       </div>
     </div>
@@ -1855,7 +2781,8 @@
   <template id="exp-scg-2">
     <div class="exp-modal-header">
       <div class="exp-modal-role-header">
-        <img src="assets/img/scg-logo.avif" alt="SCG" class="exp-modal-company-logo" onerror="this.style.display='none'">
+        <img src="assets/img/scg-logo.avif" alt="SCG" class="exp-modal-company-logo"
+          onerror="this.style.display='none'">
         <div>
           <div class="exp-modal-title">Full Stack Developer Intern</div>
           <div class="exp-modal-company">at The Siam Cement Group (SCG)</div>
@@ -1871,14 +2798,18 @@
 
     <div class="exp-modal-section">
       <h3>Role Overview</h3>
-      <p class="exp-modal-overview">Collaborated with the 'Center of Excellence &amp; Data Driven' department to digitize manual workflows. Delivered 4 internal full-stack web applications spanning reservations, reference tracking, regional job management, and an event e-commerce platform.</p>
+      <p class="exp-modal-overview">Collaborated with the 'Center of Excellence &amp; Data Driven' department to
+        digitize manual workflows. Delivered 4 internal full-stack web applications spanning reservations, reference
+        tracking, regional job management, and an event e-commerce platform.</p>
     </div>
 
     <div class="exp-modal-section">
       <h3>Responsibilities</h3>
       <ul>
-        <li>Gathered requirements from internal business stakeholders and translated them into technical specifications.</li>
-        <li>Designed database schemas, built REST APIs (Laravel), and developed frontend UI (Bootstrap + JavaScript).</li>
+        <li>Gathered requirements from internal business stakeholders and translated them into technical specifications.
+        </li>
+        <li>Designed database schemas, built REST APIs (Laravel), and developed frontend UI (Bootstrap + JavaScript).
+        </li>
         <li>Applied MVC architecture, form validation, CSRF protection, and user authentication across all systems.</li>
         <li>Practiced Git-based version control, code review participation, and Agile sprint methodology.</li>
       </ul>
@@ -1887,33 +2818,48 @@
     <div class="exp-modal-section">
       <h3>Projects</h3>
       <div class="exp-client-section" style="border:none;padding:14px 0;display:block">
-        <div class="exp-client-section-header"><h3>Project Booking — Internal Reservation System</h3></div>
+        <div class="exp-client-section-header">
+          <h3>Project Booking — Internal Reservation System</h3>
+        </div>
         <ul>
-          <li>Internal booking and reservation management for meeting rooms, company vehicles, equipment, and shared facilities.</li>
-          <li>Calendar views, time-slot conflict detection, approval workflows, and automated confirmation notifications via email.</li>
-          <li>Admin panel for managing resource inventory, configuring booking rules (max duration, advance windows), and reviewing approval queues.</li>
+          <li>Internal booking and reservation management for meeting rooms, company vehicles, equipment, and shared
+            facilities.</li>
+          <li>Calendar views, time-slot conflict detection, approval workflows, and automated confirmation notifications
+            via email.</li>
+          <li>Admin panel for managing resource inventory, configuring booking rules (max duration, advance windows),
+            and reviewing approval queues.</li>
         </ul>
       </div>
       <div class="exp-client-section" style="border:none;padding:14px 0;display:block">
-        <div class="exp-client-section-header"><h3>Project Ref Number — Reference Code Generator</h3></div>
+        <div class="exp-client-section-header">
+          <h3>Project Ref Number — Reference Code Generator</h3>
+        </div>
         <ul>
-          <li>Reference code generation and tracking system for managing document reference numbers across SCG business units.</li>
-          <li>Configurable prefix/suffix rules, sequential numbering with padding, and category-based series for multiple document types.</li>
+          <li>Reference code generation and tracking system for managing document reference numbers across SCG business
+            units.</li>
+          <li>Configurable prefix/suffix rules, sequential numbering with padding, and category-based series for
+            multiple document types.</li>
           <li>Search and audit history — trace the lifecycle and usage of any reference code.</li>
         </ul>
       </div>
       <div class="exp-client-section" style="border:none;padding:14px 0;display:block">
-        <div class="exp-client-section-header"><h3>Project Job South — Regional Job Management</h3></div>
+        <div class="exp-client-section-header">
+          <h3>Project Job South — Regional Job Management</h3>
+        </div>
         <ul>
-          <li>Job tracking and management for SCG's southern region operations — create, assign, monitor, and close field jobs.</li>
+          <li>Job tracking and management for SCG's southern region operations — create, assign, monitor, and close
+            field jobs.</li>
           <li>Job status workflows (open → assigned → in-progress → completed/cancelled) with history logging.</li>
           <li>Regional summaries reporting job completion rates and workload distribution across teams.</li>
         </ul>
       </div>
       <div class="exp-client-section" style="border:none;padding:14px 0;display:block">
-        <div class="exp-client-section-header"><h3>Project Family Day Shop — Event E-Commerce</h3></div>
+        <div class="exp-client-section-header">
+          <h3>Project Family Day Shop — Event E-Commerce</h3>
+        </div>
         <ul>
-          <li>Internal online shop for SCG's annual Family Day event — employees browse, select, and purchase participation packages, merchandise, and activity slots.</li>
+          <li>Internal online shop for SCG's annual Family Day event — employees browse, select, and purchase
+            participation packages, merchandise, and activity slots.</li>
           <li>Product catalog with stock management, shopping cart, order placement, and payment confirmation flow.</li>
           <li>Admin dashboard for managing listings, tracking orders, and monitoring inventory in real time.</li>
         </ul>
@@ -1924,7 +2870,8 @@
   <template id="exp-scg-1">
     <div class="exp-modal-header">
       <div class="exp-modal-role-header">
-        <img src="assets/img/scg-logo.avif" alt="SCG" class="exp-modal-company-logo" onerror="this.style.display='none'">
+        <img src="assets/img/scg-logo.avif" alt="SCG" class="exp-modal-company-logo"
+          onerror="this.style.display='none'">
         <div>
           <div class="exp-modal-title">Full Stack Developer Intern</div>
           <div class="exp-modal-company">at The Siam Cement Group (SCG)</div>
@@ -1940,13 +2887,16 @@
 
     <div class="exp-modal-section">
       <h3>Role Overview</h3>
-      <p class="exp-modal-overview">First internship at SCG — delivered 2 internal enterprise software platforms covering software license lifecycle management and company-wide asset tracking, gaining foundational experience in enterprise requirements and corporate software delivery.</p>
+      <p class="exp-modal-overview">First internship at SCG — delivered 2 internal enterprise software platforms
+        covering software license lifecycle management and company-wide asset tracking, gaining foundational experience
+        in enterprise requirements and corporate software delivery.</p>
     </div>
 
     <div class="exp-modal-section">
       <h3>Responsibilities</h3>
       <ul>
-        <li>Collaborated with IT and operations stakeholders to define requirements and translate them into working systems.</li>
+        <li>Collaborated with IT and operations stakeholders to define requirements and translate them into working
+          systems.</li>
         <li>Designed database relationships, built RESTful APIs with Eloquent ORM, and developed admin-facing UIs.</li>
         <li>Implemented approval workflow logic, automated email notifications, and audit trail logging.</li>
         <li>Delivered both projects within the internship period with full handover documentation.</li>
@@ -1956,20 +2906,31 @@
     <div class="exp-modal-section">
       <h3>Projects</h3>
       <div class="exp-client-section" style="border:none;padding:14px 0;display:block">
-        <div class="exp-client-section-header"><h3>Project License — Software License Management System</h3></div>
+        <div class="exp-client-section-header">
+          <h3>Project License — Software License Management System</h3>
+        </div>
         <ul>
-          <li>Multi-step license request and approval workflow: employee submission → IT manager review → procurement purchasing → license assignment back to requester.</li>
-          <li>Software catalog management: available licenses, vendor details, renewal dates, seat counts, and active utilization tracking.</li>
-          <li>Automated email notifications at each workflow stage; reporting views for usage rates, upcoming renewals, and department-level cost allocation.</li>
+          <li>Multi-step license request and approval workflow: employee submission → IT manager review → procurement
+            purchasing → license assignment back to requester.</li>
+          <li>Software catalog management: available licenses, vendor details, renewal dates, seat counts, and active
+            utilization tracking.</li>
+          <li>Automated email notifications at each workflow stage; reporting views for usage rates, upcoming renewals,
+            and department-level cost allocation.</li>
         </ul>
       </div>
       <div class="exp-client-section" style="border:none;padding:14px 0;display:block">
-        <div class="exp-client-section-header"><h3>Project Assets — Enterprise Asset Management Platform</h3></div>
+        <div class="exp-client-section-header">
+          <h3>Project Assets — Enterprise Asset Management Platform</h3>
+        </div>
         <ul>
-          <li>Company-wide IT and physical asset tracking: register, assign, transfer, and retire assets with full audit trail (procurement → assignment → transfer → maintenance → disposal).</li>
-          <li>Barcode/QR-code asset lookup — scan any asset to retrieve full ownership and maintenance history instantly.</li>
-          <li>Inventory reports: asset counts by department, condition status, age distribution, and depreciation tracking.</li>
-          <li>Check-out/check-in workflows for shared assets (projectors, cameras) with availability calendars and reservation queues.</li>
+          <li>Company-wide IT and physical asset tracking: register, assign, transfer, and retire assets with full audit
+            trail (procurement → assignment → transfer → maintenance → disposal).</li>
+          <li>Barcode/QR-code asset lookup — scan any asset to retrieve full ownership and maintenance history
+            instantly.</li>
+          <li>Inventory reports: asset counts by department, condition status, age distribution, and depreciation
+            tracking.</li>
+          <li>Check-out/check-in workflows for shared assets (projectors, cameras) with availability calendars and
+            reservation queues.</li>
         </ul>
       </div>
     </div>
@@ -1978,7 +2939,8 @@
   <template id="exp-advice">
     <div class="exp-modal-header">
       <div class="exp-modal-role-header">
-        <img src="assets/img/advice-logo.avif" alt="Advice IT Infinite" class="exp-modal-company-logo" onerror="this.style.display='none'">
+        <img src="assets/img/advice-logo.avif" alt="Advice IT Infinite" class="exp-modal-company-logo"
+          onerror="this.style.display='none'">
         <div>
           <div class="exp-modal-title">Computer Technician Intern</div>
           <div class="exp-modal-company">at Advice IT Infinite Co., Ltd.</div>
@@ -1992,17 +2954,24 @@
 
     <div class="exp-modal-section">
       <h3>Role Overview</h3>
-      <p class="exp-modal-overview">Diagnosed, repaired, and maintained hardware for 5+ devices daily while providing technical consultation to over 10 customers per day at one of Thailand's largest IT retail chains — ensuring high service satisfaction in a high-volume technical support environment.</p>
+      <p class="exp-modal-overview">Diagnosed, repaired, and maintained hardware for 5+ devices daily while providing
+        technical consultation to over 10 customers per day at one of Thailand's largest IT retail chains — ensuring
+        high service satisfaction in a high-volume technical support environment.</p>
     </div>
 
     <div class="exp-modal-section">
       <h3>Responsibilities</h3>
       <ul>
-        <li>Diagnosed and repaired 5+ laptops and 2+ desktop computers daily — HDD/SSD replacements, RAM failures, overheating, display panel faults, and keyboard/trackpad replacements.</li>
-        <li>Performed OS installations, driver updates, BIOS configuration, malware removal, and post-repair hardware testing before device return.</li>
-        <li>Data backup and recovery from failing storage devices; repair job ticketing from intake through to completion.</li>
-        <li>Provided direct technical consultation to 10+ customers daily — diagnosing symptoms, explaining repair options and costs, and recommending upgrade or replacement solutions.</li>
-        <li>Advised on product selection (laptops, desktops, peripherals) matched to customer use-case and budget; handled warranty claims and data recovery risk communication.</li>
+        <li>Diagnosed and repaired 5+ laptops and 2+ desktop computers daily — HDD/SSD replacements, RAM failures,
+          overheating, display panel faults, and keyboard/trackpad replacements.</li>
+        <li>Performed OS installations, driver updates, BIOS configuration, malware removal, and post-repair hardware
+          testing before device return.</li>
+        <li>Data backup and recovery from failing storage devices; repair job ticketing from intake through to
+          completion.</li>
+        <li>Provided direct technical consultation to 10+ customers daily — diagnosing symptoms, explaining repair
+          options and costs, and recommending upgrade or replacement solutions.</li>
+        <li>Advised on product selection (laptops, desktops, peripherals) matched to customer use-case and budget;
+          handled warranty claims and data recovery risk communication.</li>
       </ul>
     </div>
   </template>
