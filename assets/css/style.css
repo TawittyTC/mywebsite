@@ -972,3 +972,84 @@ select:focus-visible {
     transition: none !important;
   }
 }
+
+/*--------------------------------------------------------------
+# Parallax ambient light — hero aurora & scroll reveals
+--------------------------------------------------------------*/
+.hero-fx {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Large ultra-soft light fields that echo the sunset photo.
+   JS adds slow parallax; CSS adds a gentle breathing drift. */
+.hero-aurora {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  will-change: transform;
+  animation: aurora-breathe 14s ease-in-out infinite;
+}
+.hero-aurora--warm {
+  width: 58vw;
+  height: 58vw;
+  top: -8%;
+  left: -6%;
+  opacity: 0.5;
+  background: radial-gradient(circle at 42% 42%, rgba(255, 196, 158, 0.85), rgba(255, 224, 176, 0.22) 55%, transparent 72%);
+}
+.hero-aurora--gold {
+  width: 44vw;
+  height: 44vw;
+  top: 34%;
+  left: 30%;
+  opacity: 0.34;
+  background: radial-gradient(circle at 50% 50%, rgba(255, 214, 150, 0.75), rgba(255, 235, 200, 0.18) 55%, transparent 72%);
+  animation-duration: 18s;
+  animation-delay: -6s;
+}
+.hero-aurora--cool {
+  width: 52vw;
+  height: 52vw;
+  right: -8%;
+  bottom: -10%;
+  left: auto;
+  opacity: 0.42;
+  background: radial-gradient(circle at 55% 45%, rgba(146, 190, 236, 0.6), rgba(170, 182, 230, 0.16) 55%, transparent 72%);
+  animation-duration: 16s;
+  animation-delay: -9s;
+}
+
+@keyframes aurora-breathe {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50%      { transform: translate3d(2vw, -2vh, 0) scale(1.06); }
+}
+
+/* Hero copy sits above the light field and gets a subtle scroll transform from JS */
+#hero .hero-copy { position: relative; z-index: 2; will-change: transform, opacity; }
+
+/* Scroll reveal — only armed by JS (adds .js-reveal), so no-JS content stays visible */
+.js-reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--reveal-delay, 0s);
+}
+.js-reveal.is-visible { opacity: 1; transform: none; }
+
+/* Lighter blur on small screens (GPU cost), same calm look */
+@media (max-width: 992px) {
+  .hero-aurora { filter: blur(60px); }
+  .hero-aurora--warm { width: 90vw; height: 90vw; }
+  .hero-aurora--gold { width: 70vw; height: 70vw; }
+  .hero-aurora--cool { width: 80vw; height: 80vw; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-aurora { animation: none !important; }
+  .js-reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+}

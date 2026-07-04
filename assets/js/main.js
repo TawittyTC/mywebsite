@@ -660,3 +660,99 @@ document.addEventListener('DOMContentLoaded', function () {
   el.textContent = parts.join(' ') || '1 month';
 })();
 
+
+/**
+ * Parallax ambient light — hero aurora parallax + scroll reveals
+ * All transform/opacity, rAF-throttled, gated on motion preference & pointer type.
+ */
+(function () {
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var finePointer = window.matchMedia && window.matchMedia('(pointer: fine)').matches;
+  var canTranslate = typeof document.documentElement.style.translate !== 'undefined';
+
+  // ---- Hero parallax (scroll + optional mouse) ----
+  var hero = document.getElementById('hero');
+  if (hero && !reduce) {
+    var copy = hero.querySelector('.hero-copy');
+    var photo = hero.querySelector('.fallback-background');
+    var auroras = Array.prototype.slice.call(hero.querySelectorAll('.hero-aurora'));
+    var mx = 0, my = 0, ticking = false;
+
+    function apply() {
+      ticking = false;
+      var sy = window.scrollY || window.pageYOffset || 0;
+      var h = hero.offsetHeight || window.innerHeight;
+      var prog = Math.min(Math.max(sy / h, 0), 1);
+      if (copy) {
+        copy.style.transform = 'translate3d(0,' + (sy * 0.32) + 'px,0)';
+        copy.style.opacity = String(Math.max(1 - prog * 1.15, 0));
+      }
+      if (photo) {
+        photo.style.transform = 'translate3d(0,' + (sy * 0.16) + 'px,0) scale(' + (1 + prog * 0.12) + ')';
+      }
+      // Auroras animate `transform` in CSS (breathe), so parallax uses the
+      // separate `translate` property, which composes with the animation.
+      if (canTranslate) {
+        auroras.forEach(function (a) {
+          var d = parseFloat(a.getAttribute('data-depth')) || 0.3;
+          var tx = mx * d * 70;
+          var ty = sy * d * 0.5 + my * d * 70;
+          a.style.translate = tx.toFixed(1) + 'px ' + ty.toFixed(1) + 'px';
+        });
+      }
+    }
+    function requestTick() { if (!ticking) { ticking = true; requestAnimationFrame(apply); } }
+
+    window.addEventListener('scroll', requestTick, { passive: true });
+    window.addEventListener('resize', requestTick, { passive: true });
+    if (finePointer) {
+      hero.addEventListener('mousemove', function (e) {
+        var r = hero.getBoundingClientRect();
+        mx = (e.clientX - r.left) / r.width - 0.5;
+        my = (e.clientY - r.top) / r.height - 0.5;
+        requestTick();
+      });
+      hero.addEventListener('mouseleave', function () { mx = 0; my = 0; requestTick(); });
+    }
+    apply();
+  }
+
+  // ---- Scroll reveals ----
+  // Position-checked on each (rAF-throttled) scroll instead of
+  // IntersectionObserver: IO can skip an element entirely when a fast
+  // scroll jumps past it in one frame (worse with content-visibility),
+  // leaving it stuck hidden. A position check can't miss.
+  if (!reduce) {
+    var targets = [];
+    document.querySelectorAll('.section-title').forEach(function (el) { targets.push(el); });
+    ['#resume .data-box', '#experience .data-box', '#skill .boxWhyScg',
+     '#portfolio .rf-cards-scroller-item'].forEach(function (sel) {
+      var group = document.querySelectorAll(sel);
+      group.forEach(function (el, i) { el.style.setProperty('--reveal-delay', Math.min(i, 5) * 0.06 + 's'); targets.push(el); });
+    });
+    var armed = [];
+    targets.forEach(function (el) {
+      if (el.getBoundingClientRect().top < window.innerHeight * 0.92) { return; } // already in view — leave visible
+      el.classList.add('js-reveal');
+      armed.push(el);
+    });
+    var revealTicking = false;
+    function checkReveal() {
+      revealTicking = false;
+      if (!armed.length) return;
+      var fold = window.innerHeight * 0.92;
+      armed = armed.filter(function (el) {
+        if (el.getBoundingClientRect().top < fold) { el.classList.add('is-visible'); return false; }
+        return true;
+      });
+      if (!armed.length) {
+        window.removeEventListener('scroll', onRevealScroll);
+        window.removeEventListener('resize', onRevealScroll);
+      }
+    }
+    function onRevealScroll() { if (!revealTicking) { revealTicking = true; requestAnimationFrame(checkReveal); } }
+    window.addEventListener('scroll', onRevealScroll, { passive: true });
+    window.addEventListener('resize', onRevealScroll, { passive: true });
+    checkReveal();
+  }
+})();

@@ -1121,10 +1121,10 @@
   </style>
 
   <!-- Full CSS loaded async: no render blocking (bootstrap merged in) -->
-  <link rel="preload" href="assets/css/style.min.css?v=1.64.0" as="style"
+  <link rel="preload" href="assets/css/style.min.css?v=1.67.0" as="style"
     onload="this.onload=null;this.rel='stylesheet'">
   <noscript>
-    <link href="assets/css/style.min.css?v=1.64.0" rel="stylesheet">
+    <link href="assets/css/style.min.css?v=1.67.0" rel="stylesheet">
   </noscript>
 
 
@@ -1378,7 +1378,7 @@
   </script>
 
   <!-- Preload deferred JS to start downloading before parser reaches script tags -->
-  <link rel="preload" href="assets/js/main.min.js?v=1.58.0" as="script">
+  <link rel="preload" href="assets/js/main.min.js?v=1.61.0" as="script">
 
   <script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="233b92be-5a2d-492b-b093-9c3ed14c9063"
     type="text/javascript" async></script>
@@ -1403,7 +1403,7 @@
 
     <!-- ======= Hero Section ======= -->
     <section id="hero" class="d-flex flex-column justify-content-center">
-      <div class="container">
+      <div class="container hero-copy">
         <h1 class="text-dark">Tanapol Chamnanhan</h1>
         <p>&nbsp;-- I am <span class="typed"
             data-typed-items="Programmer, Web Developer, AI Engineer, Front-End Developer, Back-End Developer, AI Agent Developer, UX/UI Designer, Full-Stack Developer, Software Engineer, Software Developer"></span>
@@ -1412,6 +1412,14 @@
       <div class="fallback-background">
         <!-- คุณสามารถใส่ภาพพื้นหลังหรือเนื้อหาอื่น ๆ ที่นี่ -->
       </div>
+
+      <!-- ======= Parallax ambient light (soft gradient glow) ======= -->
+      <div class="hero-fx" aria-hidden="true">
+        <span class="hero-aurora hero-aurora--warm" data-depth="0.18"></span>
+        <span class="hero-aurora hero-aurora--gold" data-depth="0.3"></span>
+        <span class="hero-aurora hero-aurora--cool" data-depth="0.42"></span>
+      </div>
+
       <div class="hero-scroll-hint" aria-hidden="true">
         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"
           stroke-linecap="round" stroke-linejoin="round">
@@ -2176,7 +2184,7 @@
   </footer><!-- End Footer -->
 
   <!-- Main JS -->
-  <script defer src="assets/js/main.min.js?v=1.58.0"></script>
+  <script defer src="assets/js/main.min.js?v=1.61.0"></script>
   <!-- Service Worker: cache assets for repeat visits -->
   <script>if ('serviceWorker' in navigator) { var _sw = function () { navigator.serviceWorker.register('sw.js') }; 'requestIdleCallback' in window ? requestIdleCallback(_sw) : window.addEventListener('load', _sw) }</script>
 
