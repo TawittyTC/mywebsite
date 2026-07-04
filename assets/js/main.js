@@ -662,19 +662,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 /**
- * Parallax depth field — hero glyph/aurora parallax + scroll reveals
+ * Parallax ambient light — hero aurora parallax + scroll reveals
  * All transform/opacity, rAF-throttled, gated on motion preference & pointer type.
  */
 (function () {
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var finePointer = window.matchMedia && window.matchMedia('(pointer: fine)').matches;
+  var canTranslate = typeof document.documentElement.style.translate !== 'undefined';
 
   // ---- Hero parallax (scroll + optional mouse) ----
   var hero = document.getElementById('hero');
   if (hero && !reduce) {
     var copy = hero.querySelector('.hero-copy');
     var photo = hero.querySelector('.fallback-background');
-    var planes = Array.prototype.slice.call(hero.querySelectorAll('.hero-plane'));
     var auroras = Array.prototype.slice.call(hero.querySelectorAll('.hero-aurora'));
     var mx = 0, my = 0, ticking = false;
 
@@ -690,16 +690,16 @@ document.addEventListener('DOMContentLoaded', function () {
       if (photo) {
         photo.style.transform = 'translate3d(0,' + (sy * 0.16) + 'px,0) scale(' + (1 + prog * 0.12) + ')';
       }
-      planes.forEach(function (p) {
-        var d = parseFloat(p.getAttribute('data-depth')) || 0.3;
-        var tx = mx * d * 46;
-        var ty = sy * d * 0.55 + my * d * 46;
-        p.style.transform = 'translate3d(' + tx + 'px,' + ty + 'px,0)';
-      });
-      auroras.forEach(function (a, i) {
-        var d = i === 0 ? 0.22 : 0.32;
-        a.style.transform = 'translate3d(' + (mx * d * 60) + 'px,' + (sy * d * 0.4 + my * d * 60) + 'px,0)';
-      });
+      // Auroras animate `transform` in CSS (breathe), so parallax uses the
+      // separate `translate` property, which composes with the animation.
+      if (canTranslate) {
+        auroras.forEach(function (a) {
+          var d = parseFloat(a.getAttribute('data-depth')) || 0.3;
+          var tx = mx * d * 70;
+          var ty = sy * d * 0.5 + my * d * 70;
+          a.style.translate = tx.toFixed(1) + 'px ' + ty.toFixed(1) + 'px';
+        });
+      }
     }
     function requestTick() { if (!ticking) { ticking = true; requestAnimationFrame(apply); } }
 

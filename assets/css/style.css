@@ -974,7 +974,7 @@ select:focus-visible {
 }
 
 /*--------------------------------------------------------------
-# Parallax depth field — hero glyphs, aurora & scroll reveals
+# Parallax ambient light — hero aurora & scroll reveals
 --------------------------------------------------------------*/
 .hero-fx {
   position: absolute;
@@ -984,55 +984,51 @@ select:focus-visible {
   pointer-events: none;
 }
 
-/* Soft aurora glows tuned to the sunset photo behind the name */
+/* Large ultra-soft light fields that echo the sunset photo.
+   JS adds slow parallax; CSS adds a gentle breathing drift. */
 .hero-aurora {
   position: absolute;
   border-radius: 50%;
-  filter: blur(70px);
-  opacity: 0.55;
+  filter: blur(90px);
   will-change: transform;
+  animation: aurora-breathe 14s ease-in-out infinite;
 }
 .hero-aurora--warm {
-  width: 46vw;
-  height: 46vw;
-  top: 6%;
-  left: 4%;
-  background: radial-gradient(circle at 40% 40%, rgba(255, 201, 163, 0.9), rgba(255, 224, 176, 0.25) 55%, transparent 70%);
+  width: 58vw;
+  height: 58vw;
+  top: -8%;
+  left: -6%;
+  opacity: 0.5;
+  background: radial-gradient(circle at 42% 42%, rgba(255, 196, 158, 0.85), rgba(255, 224, 176, 0.22) 55%, transparent 72%);
+}
+.hero-aurora--gold {
+  width: 44vw;
+  height: 44vw;
+  top: 34%;
+  left: 30%;
+  opacity: 0.34;
+  background: radial-gradient(circle at 50% 50%, rgba(255, 214, 150, 0.75), rgba(255, 235, 200, 0.18) 55%, transparent 72%);
+  animation-duration: 18s;
+  animation-delay: -6s;
 }
 .hero-aurora--cool {
-  width: 40vw;
-  height: 40vw;
-  right: 2%;
-  bottom: 2%;
+  width: 52vw;
+  height: 52vw;
+  right: -8%;
+  bottom: -10%;
   left: auto;
-  background: radial-gradient(circle at 55% 45%, rgba(143, 190, 240, 0.7), rgba(168, 180, 232, 0.2) 55%, transparent 70%);
+  opacity: 0.42;
+  background: radial-gradient(circle at 55% 45%, rgba(146, 190, 236, 0.6), rgba(170, 182, 230, 0.16) 55%, transparent 72%);
+  animation-duration: 16s;
+  animation-delay: -9s;
 }
 
-/* Depth planes get their parallax transform from JS; glyphs drift on their own */
-.hero-plane {
-  position: absolute;
-  inset: 0;
-  will-change: transform;
-}
-.hero-plane .glyph {
-  position: absolute;
-  color: var(--color-text);
-  opacity: 0.14;
-  animation: glyph-float 9s ease-in-out infinite;
-}
-.hero-plane--far .glyph  { width: 46px; height: 46px; opacity: 0.09; }
-.hero-plane--mid .glyph  { width: 62px; height: 62px; opacity: 0.13; }
-.hero-plane--near .glyph { width: 80px; height: 80px; opacity: 0.17; }
-.hero-plane .glyph svg { width: 100%; height: 100%; display: block; }
-.hero-plane .glyph:nth-child(2) { animation-duration: 11s; animation-delay: -3s; }
-.hero-plane .glyph:nth-child(3) { animation-duration: 13s; animation-delay: -6s; }
-
-@keyframes glyph-float {
-  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
-  50%      { transform: translate3d(0, -14px, 0) rotate(4deg); }
+@keyframes aurora-breathe {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50%      { transform: translate3d(2vw, -2vh, 0) scale(1.06); }
 }
 
-/* Hero copy sits above the field and gets a subtle scroll transform from JS */
+/* Hero copy sits above the light field and gets a subtle scroll transform from JS */
 #hero .hero-copy { position: relative; z-index: 2; will-change: transform, opacity; }
 
 /* Scroll reveal — only armed by JS (adds .js-reveal), so no-JS content stays visible */
@@ -1045,15 +1041,15 @@ select:focus-visible {
 }
 .js-reveal.is-visible { opacity: 1; transform: none; }
 
-/* Trim aurora / glyph weight on small screens; motion handled by JS gating too */
+/* Lighter blur on small screens (GPU cost), same calm look */
 @media (max-width: 992px) {
-  .hero-aurora { filter: blur(50px); opacity: 0.4; }
-  .hero-plane--far .glyph  { width: 34px; height: 34px; }
-  .hero-plane--mid .glyph  { width: 44px; height: 44px; }
-  .hero-plane--near .glyph { width: 56px; height: 56px; }
+  .hero-aurora { filter: blur(60px); }
+  .hero-aurora--warm { width: 90vw; height: 90vw; }
+  .hero-aurora--gold { width: 70vw; height: 70vw; }
+  .hero-aurora--cool { width: 80vw; height: 80vw; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero-plane .glyph { animation: none !important; }
+  .hero-aurora { animation: none !important; }
   .js-reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
 }
