@@ -96,11 +96,13 @@ test('page loads with no console errors and no failed asset requests', async () 
   await page.close();
 });
 
-test('hero renders name, typed role and ambient-light layers', async () => {
+test('hero renders name, typed role and the AI voice orb', async () => {
   const { page } = await openPage();
   assert.match(await page.textContent('#hero h1'), /Tanapol Chamnanhan/);
   await page.waitForFunction(() => document.querySelector('#hero .typed')?.textContent.length > 0);
-  assert.equal(await page.locator('#hero .hero-aurora').count(), 3);
+  assert.equal(await page.locator('#hero .hero-orb').count(), 1, 'orb missing');
+  assert.equal(await page.locator('#hero .hero-orb-eq i').count(), 7, 'equalizer bars missing');
+  assert.match(await page.textContent('#hero .hero-orb-live'), /AI VOICE AGENT/);
   await page.close();
 });
 

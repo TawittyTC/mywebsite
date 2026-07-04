@@ -662,21 +662,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 /**
- * Parallax ambient light — hero aurora parallax + scroll reveals
+ * Hero motion — copy scroll drift/fade, orb mouse-follow + scroll reveals
  * All transform/opacity, rAF-throttled, gated on motion preference & pointer type.
  */
 (function () {
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var finePointer = window.matchMedia && window.matchMedia('(pointer: fine)').matches;
-  var canTranslate = typeof document.documentElement.style.translate !== 'undefined';
 
-  // ---- Hero parallax (scroll + optional mouse) ----
+  // ---- Hero parallax (scroll) ----
   var hero = document.getElementById('hero');
   if (hero && !reduce) {
     var copy = hero.querySelector('.hero-copy');
-    var photo = hero.querySelector('.fallback-background');
-    var auroras = Array.prototype.slice.call(hero.querySelectorAll('.hero-aurora'));
-    var mx = 0, my = 0, ticking = false;
+    var orbStage = hero.querySelector('.hero-orb-stage');
+    var ticking = false;
 
     function apply() {
       ticking = false;
@@ -687,34 +685,47 @@ document.addEventListener('DOMContentLoaded', function () {
         copy.style.transform = 'translate3d(0,' + (sy * 0.32) + 'px,0)';
         copy.style.opacity = String(Math.max(1 - prog * 1.15, 0));
       }
-      if (photo) {
-        photo.style.transform = 'translate3d(0,' + (sy * 0.16) + 'px,0) scale(' + (1 + prog * 0.12) + ')';
-      }
-      // Auroras animate `transform` in CSS (breathe), so parallax uses the
-      // separate `translate` property, which composes with the animation.
-      if (canTranslate) {
-        auroras.forEach(function (a) {
-          var d = parseFloat(a.getAttribute('data-depth')) || 0.3;
-          var tx = mx * d * 70;
-          var ty = sy * d * 0.5 + my * d * 70;
-          a.style.translate = tx.toFixed(1) + 'px ' + ty.toFixed(1) + 'px';
-        });
+      if (orbStage) {
+        orbStage.style.transform = 'translate3d(0,' + (sy * 0.18) + 'px,0)';
+        orbStage.style.opacity = String(Math.max(1 - prog * 1.05, 0));
       }
     }
     function requestTick() { if (!ticking) { ticking = true; requestAnimationFrame(apply); } }
 
     window.addEventListener('scroll', requestTick, { passive: true });
     window.addEventListener('resize', requestTick, { passive: true });
-    if (finePointer) {
-      hero.addEventListener('mousemove', function (e) {
-        var r = hero.getBoundingClientRect();
-        mx = (e.clientX - r.left) / r.width - 0.5;
-        my = (e.clientY - r.top) / r.height - 0.5;
-        requestTick();
-      });
-      hero.addEventListener('mouseleave', function () { mx = 0; my = 0; requestTick(); });
-    }
     apply();
+
+    // ---- Orb mouse-follow (eased; runs only while hero is on screen) ----
+    var follow = document.getElementById('hero-orb-follow');
+    if (follow && finePointer) {
+      var tx = 0, ty = 0, cx = 0, cy = 0, following = false;
+
+      hero.addEventListener('mousemove', function (e) {
+        tx = ((e.clientX / window.innerWidth) - 0.5) * 40;  // ±20px
+        ty = ((e.clientY / window.innerHeight) - 0.5) * 40;
+      });
+      hero.addEventListener('mouseleave', function () { tx = 0; ty = 0; });
+
+      function followLoop() {
+        if (!following) return;
+        cx += (tx - cx) * 0.055;
+        cy += (ty - cy) * 0.055;
+        follow.style.transform = 'translate3d(' + cx.toFixed(2) + 'px,' + cy.toFixed(2) + 'px,0)';
+        requestAnimationFrame(followLoop);
+      }
+      if ('IntersectionObserver' in window) {
+        var orbIo = new IntersectionObserver(function (entries) {
+          var vis = entries[0].isIntersecting;
+          if (vis && !following) { following = true; requestAnimationFrame(followLoop); }
+          else if (!vis) { following = false; }
+        }, { threshold: 0 });
+        orbIo.observe(hero);
+      } else {
+        following = true;
+        requestAnimationFrame(followLoop);
+      }
+    }
   }
 
   // ---- Scroll reveals ----
@@ -801,110 +812,4 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 })();
 
-/**
- * Hero voice wave — signature graphic for the AI voice-agent work.
- * A calm composite sine ribbon in sunset ink; amplitude swells near
- * the cursor. Pauses off-screen; renders one static frame under
- * prefers-reduced-motion.
- */
-(function () {
-  var canvas = document.getElementById('hero-wave');
-  if (!canvas || !canvas.getContext) return;
-  var ctx = canvas.getContext('2d');
-  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var hero = document.getElementById('hero');
-  var dpr = Math.min(window.devicePixelRatio || 1, 2);
-  var w = 0, h = 0;
-  var mouseU = 0.5;          // cursor x as 0..1 across the canvas
-  var swell = 0;             // eased cursor influence
-  var running = false;
 
-  function resize() {
-    var rect = canvas.getBoundingClientRect();
-    w = Math.max(rect.width, 1);
-    h = Math.max(rect.height, 1);
-    canvas.width = Math.round(w * dpr);
-    canvas.height = Math.round(h * dpr);
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  }
-
-  function ink() {
-    var g = ctx.createLinearGradient(0, 0, w, 0);
-    g.addColorStop(0, 'rgba(180, 96, 42, 0)');
-    g.addColorStop(0.12, 'rgba(180, 96, 42, 0.85)');
-    g.addColorStop(0.5, 'rgba(217, 144, 67, 0.9)');
-    g.addColorStop(0.88, 'rgba(63, 110, 166, 0.85)');
-    g.addColorStop(1, 'rgba(63, 110, 166, 0)');
-    return g;
-  }
-
-  function drawFrame(t) {
-    ctx.clearRect(0, 0, w, h);
-    var mid = h / 2;
-    var base = h * 0.30;
-    var layers = [
-      { amp: 1.0, alpha: 0.9, width: 2,   phase: 0 },
-      { amp: 0.62, alpha: 0.35, width: 1.5, phase: 1.7 },
-      { amp: 0.38, alpha: 0.18, width: 1,  phase: 3.1 }
-    ];
-    ctx.strokeStyle = ink();
-    ctx.lineCap = 'round';
-    layers.forEach(function (L) {
-      ctx.globalAlpha = L.alpha;
-      ctx.lineWidth = L.width;
-      ctx.beginPath();
-      for (var x = 0; x <= w; x += 2) {
-        var u = x / w;
-        var d = u - mouseU;
-        var bump = 1 + swell * 1.6 * Math.exp(-(d * d) / 0.02);
-        var envelope = Math.sin(Math.PI * u); // taper to zero at both ends
-        var y = mid + base * L.amp * envelope * bump * (
-          Math.sin(u * 9.5 + t * 0.9 + L.phase) * 0.55 +
-          Math.sin(u * 17 - t * 0.6 + L.phase * 2) * 0.3 +
-          Math.sin(u * 4.2 + t * 0.35 + L.phase) * 0.35
-        );
-        if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-      }
-      ctx.stroke();
-    });
-    ctx.globalAlpha = 1;
-  }
-
-  var start = null;
-  function loop(ts) {
-    if (!running) return;
-    if (start === null) start = ts;
-    swell += ((hovering ? 1 : 0) - swell) * 0.06;
-    drawFrame((ts - start) / 1000);
-    requestAnimationFrame(loop);
-  }
-
-  var hovering = false;
-  if (hero && window.matchMedia && window.matchMedia('(pointer: fine)').matches) {
-    hero.addEventListener('mousemove', function (e) {
-      var r = canvas.getBoundingClientRect();
-      mouseU = Math.min(Math.max((e.clientX - r.left) / Math.max(r.width, 1), 0), 1);
-      hovering = true;
-    });
-    hero.addEventListener('mouseleave', function () { hovering = false; });
-  }
-
-  resize();
-  window.addEventListener('resize', function () { resize(); if (reduce) drawFrame(1.2); }, { passive: true });
-
-  if (reduce) {
-    drawFrame(1.2); // single still frame
-    return;
-  }
-  if ('IntersectionObserver' in window && hero) {
-    var io = new IntersectionObserver(function (entries) {
-      var vis = entries[0].isIntersecting;
-      if (vis && !running) { running = true; start = null; requestAnimationFrame(loop); }
-      else if (!vis) { running = false; }
-    }, { threshold: 0 });
-    io.observe(hero);
-  } else {
-    running = true;
-    requestAnimationFrame(loop);
-  }
-})();
