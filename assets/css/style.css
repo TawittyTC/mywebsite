@@ -972,3 +972,88 @@ select:focus-visible {
     transition: none !important;
   }
 }
+
+/*--------------------------------------------------------------
+# Parallax depth field — hero glyphs, aurora & scroll reveals
+--------------------------------------------------------------*/
+.hero-fx {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Soft aurora glows tuned to the sunset photo behind the name */
+.hero-aurora {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(70px);
+  opacity: 0.55;
+  will-change: transform;
+}
+.hero-aurora--warm {
+  width: 46vw;
+  height: 46vw;
+  top: 6%;
+  left: 4%;
+  background: radial-gradient(circle at 40% 40%, rgba(255, 201, 163, 0.9), rgba(255, 224, 176, 0.25) 55%, transparent 70%);
+}
+.hero-aurora--cool {
+  width: 40vw;
+  height: 40vw;
+  right: 2%;
+  bottom: 2%;
+  left: auto;
+  background: radial-gradient(circle at 55% 45%, rgba(143, 190, 240, 0.7), rgba(168, 180, 232, 0.2) 55%, transparent 70%);
+}
+
+/* Depth planes get their parallax transform from JS; glyphs drift on their own */
+.hero-plane {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+.hero-plane .glyph {
+  position: absolute;
+  color: var(--color-text);
+  opacity: 0.14;
+  animation: glyph-float 9s ease-in-out infinite;
+}
+.hero-plane--far .glyph  { width: 46px; height: 46px; opacity: 0.09; }
+.hero-plane--mid .glyph  { width: 62px; height: 62px; opacity: 0.13; }
+.hero-plane--near .glyph { width: 80px; height: 80px; opacity: 0.17; }
+.hero-plane .glyph svg { width: 100%; height: 100%; display: block; }
+.hero-plane .glyph:nth-child(2) { animation-duration: 11s; animation-delay: -3s; }
+.hero-plane .glyph:nth-child(3) { animation-duration: 13s; animation-delay: -6s; }
+
+@keyframes glyph-float {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50%      { transform: translate3d(0, -14px, 0) rotate(4deg); }
+}
+
+/* Hero copy sits above the field and gets a subtle scroll transform from JS */
+#hero .hero-copy { position: relative; z-index: 2; will-change: transform, opacity; }
+
+/* Scroll reveal — only armed by JS (adds .js-reveal), so no-JS content stays visible */
+.js-reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--reveal-delay, 0s);
+}
+.js-reveal.is-visible { opacity: 1; transform: none; }
+
+/* Trim aurora / glyph weight on small screens; motion handled by JS gating too */
+@media (max-width: 992px) {
+  .hero-aurora { filter: blur(50px); opacity: 0.4; }
+  .hero-plane--far .glyph  { width: 34px; height: 34px; }
+  .hero-plane--mid .glyph  { width: 44px; height: 44px; }
+  .hero-plane--near .glyph { width: 56px; height: 56px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-plane .glyph { animation: none !important; }
+  .js-reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+}

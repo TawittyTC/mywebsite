@@ -1121,10 +1121,10 @@
   </style>
 
   <!-- Full CSS loaded async: no render blocking (bootstrap merged in) -->
-  <link rel="preload" href="assets/css/style.min.css?v=1.64.0" as="style"
+  <link rel="preload" href="assets/css/style.min.css?v=1.65.0" as="style"
     onload="this.onload=null;this.rel='stylesheet'">
   <noscript>
-    <link href="assets/css/style.min.css?v=1.64.0" rel="stylesheet">
+    <link href="assets/css/style.min.css?v=1.65.0" rel="stylesheet">
   </noscript>
 
 
@@ -1378,7 +1378,7 @@
   </script>
 
   <!-- Preload deferred JS to start downloading before parser reaches script tags -->
-  <link rel="preload" href="assets/js/main.min.js?v=1.58.0" as="script">
+  <link rel="preload" href="assets/js/main.min.js?v=1.59.0" as="script">
 
   <script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="233b92be-5a2d-492b-b093-9c3ed14c9063"
     type="text/javascript" async></script>
@@ -1403,7 +1403,7 @@
 
     <!-- ======= Hero Section ======= -->
     <section id="hero" class="d-flex flex-column justify-content-center">
-      <div class="container">
+      <div class="container hero-copy">
         <h1 class="text-dark">Tanapol Chamnanhan</h1>
         <p>&nbsp;-- I am <span class="typed"
             data-typed-items="Programmer, Web Developer, AI Engineer, Front-End Developer, Back-End Developer, AI Agent Developer, UX/UI Designer, Full-Stack Developer, Software Engineer, Software Developer"></span>
@@ -1412,6 +1412,46 @@
       <div class="fallback-background">
         <!-- คุณสามารถใส่ภาพพื้นหลังหรือเนื้อหาอื่น ๆ ที่นี่ -->
       </div>
+
+      <!-- ======= Parallax depth field (developer glyphs + aurora) ======= -->
+      <div class="hero-fx" aria-hidden="true">
+        <span class="hero-aurora hero-aurora--warm"></span>
+        <span class="hero-aurora hero-aurora--cool"></span>
+        <div class="hero-plane hero-plane--far" data-depth="0.18">
+          <span class="glyph" style="top:16%;left:9%">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 8l-4 4 4 4"/><path d="M16 8l4 4-4 4"/><path d="M13.5 6l-3 12"/></svg>
+          </span>
+          <span class="glyph" style="top:70%;left:14%">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v12c0 1.66 3.13 3 7 3s7-1.34 7-3V6"/><path d="M5 12c0 1.66 3.13 3 7 3s7-1.34 7-3"/></svg>
+          </span>
+          <span class="glyph" style="top:30%;left:82%">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.4"/><circle cx="6" cy="18" r="2.4"/><circle cx="18" cy="8" r="2.4"/><path d="M6 8.4v7.2"/><path d="M6 12h6a4 4 0 0 0 4-4"/></svg>
+          </span>
+        </div>
+        <div class="hero-plane hero-plane--mid" data-depth="0.36">
+          <span class="glyph" style="top:22%;left:24%">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4c-2.5 0-3 1.5-3 4s.5 4-2 4c2.5 0 2 1.5 2 4s.5 4 3 4"/><path d="M16 4c2.5 0 3 1.5 3 4s-.5 4 2 4c-2.5 0-2 1.5-2 4s-.5 4-3 4"/></svg>
+          </span>
+          <span class="glyph" style="top:74%;left:78%">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M7 10l2.5 2L7 14"/><path d="M12.5 15h4"/></svg>
+          </span>
+          <span class="glyph" style="top:12%;left:60%">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.2"/><ellipse cx="12" cy="12" rx="10" ry="4.3"/><ellipse cx="12" cy="12" rx="10" ry="4.3" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4.3" transform="rotate(120 12 12)"/></svg>
+          </span>
+        </div>
+        <div class="hero-plane hero-plane--near" data-depth="0.6">
+          <span class="glyph" style="top:58%;left:40%">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.6L19.5 9l-4.4 3.4L16.6 18 12 14.7 7.4 18l1.5-5.6L4.5 9l5.6-.4z"/></svg>
+          </span>
+          <span class="glyph" style="top:40%;left:70%">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/></svg>
+          </span>
+          <span class="glyph" style="top:82%;left:52%">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H6a2 2 0 0 0-2 2v3M15 5h3a2 2 0 0 1 2 2v3M9 19H6a2 2 0 0 1-2-2v-3M15 19h3a2 2 0 0 0 2-2v-3"/></svg>
+          </span>
+        </div>
+      </div>
+
       <div class="hero-scroll-hint" aria-hidden="true">
         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"
           stroke-linecap="round" stroke-linejoin="round">
@@ -2176,7 +2216,7 @@
   </footer><!-- End Footer -->
 
   <!-- Main JS -->
-  <script defer src="assets/js/main.min.js?v=1.58.0"></script>
+  <script defer src="assets/js/main.min.js?v=1.59.0"></script>
   <!-- Service Worker: cache assets for repeat visits -->
   <script>if ('serviceWorker' in navigator) { var _sw = function () { navigator.serviceWorker.register('sw.js') }; 'requestIdleCallback' in window ? requestIdleCallback(_sw) : window.addEventListener('load', _sw) }</script>
 
