@@ -662,18 +662,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 /**
- * Hero motion — copy scroll drift/fade, orb mouse-follow + scroll reveals
- * All transform/opacity, rAF-throttled, gated on motion preference & pointer type.
+ * Hero motion — copy scroll drift/fade + scroll reveals
+ * All transform/opacity, rAF-throttled, gated on motion preference.
  */
 (function () {
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var finePointer = window.matchMedia && window.matchMedia('(pointer: fine)').matches;
 
   // ---- Hero parallax (scroll) ----
   var hero = document.getElementById('hero');
   if (hero && !reduce) {
     var copy = hero.querySelector('.hero-copy');
-    var orbStage = hero.querySelector('.hero-orb-stage');
     var ticking = false;
 
     function apply() {
@@ -685,47 +683,12 @@ document.addEventListener('DOMContentLoaded', function () {
         copy.style.transform = 'translate3d(0,' + (sy * 0.32) + 'px,0)';
         copy.style.opacity = String(Math.max(1 - prog * 1.15, 0));
       }
-      if (orbStage) {
-        orbStage.style.transform = 'translate3d(0,' + (sy * 0.18) + 'px,0)';
-        orbStage.style.opacity = String(Math.max(1 - prog * 1.05, 0));
-      }
     }
     function requestTick() { if (!ticking) { ticking = true; requestAnimationFrame(apply); } }
 
     window.addEventListener('scroll', requestTick, { passive: true });
     window.addEventListener('resize', requestTick, { passive: true });
     apply();
-
-    // ---- Orb mouse-follow (eased; runs only while hero is on screen) ----
-    var follow = document.getElementById('hero-orb-follow');
-    if (follow && finePointer) {
-      var tx = 0, ty = 0, cx = 0, cy = 0, following = false;
-
-      hero.addEventListener('mousemove', function (e) {
-        tx = ((e.clientX / window.innerWidth) - 0.5) * 40;  // ±20px
-        ty = ((e.clientY / window.innerHeight) - 0.5) * 40;
-      });
-      hero.addEventListener('mouseleave', function () { tx = 0; ty = 0; });
-
-      function followLoop() {
-        if (!following) return;
-        cx += (tx - cx) * 0.055;
-        cy += (ty - cy) * 0.055;
-        follow.style.transform = 'translate3d(' + cx.toFixed(2) + 'px,' + cy.toFixed(2) + 'px,0)';
-        requestAnimationFrame(followLoop);
-      }
-      if ('IntersectionObserver' in window) {
-        var orbIo = new IntersectionObserver(function (entries) {
-          var vis = entries[0].isIntersecting;
-          if (vis && !following) { following = true; requestAnimationFrame(followLoop); }
-          else if (!vis) { following = false; }
-        }, { threshold: 0 });
-        orbIo.observe(hero);
-      } else {
-        following = true;
-        requestAnimationFrame(followLoop);
-      }
-    }
   }
 
   // ---- Scroll reveals ----
@@ -813,3 +776,242 @@ document.addEventListener('DOMContentLoaded', function () {
 })();
 
 
+
+/**
+ * Hero constellation — his multi-agent systems as a living graph.
+ * Nodes drift and connect; six labeled nodes (CRM/POS/ASR/TTS/LLM/IVR);
+ * cursor gently repels nearby nodes and links to them like a peer.
+ * Desktop: cluster on the right of the copy. Mobile: below the copy.
+ * Pauses off-screen; renders a single static frame under reduced motion.
+ */
+(function () {
+  var canvas = document.getElementById('hero-net');
+  if (!canvas || !canvas.getContext) return;
+  var ctx = canvas.getContext('2d');
+  var labelsHost = document.getElementById('hero-net-labels');
+  var hero = document.getElementById('hero');
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var finePointer = window.matchMedia && window.matchMedia('(pointer: fine)').matches;
+
+  var W = 0, H = 0, DPR = 1;
+  var CONNECT = 130, MOUSE_DIST = 120;
+  var mouse = { x: -9999, y: -9999, active: false };
+
+  function hexToRgb(h) {
+    return { r: parseInt(h.slice(1, 3), 16), g: parseInt(h.slice(3, 5), 16), b: parseInt(h.slice(5, 7), 16) };
+  }
+  var WARM1 = hexToRgb('#B4602A'), WARM2 = hexToRgb('#D99043'), COOL = hexToRgb('#3F6EA6');
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function mix(c1, c2, t) {
+    return { r: Math.round(lerp(c1.r, c2.r, t)), g: Math.round(lerp(c1.g, c2.g, t)), b: Math.round(lerp(c1.b, c2.b, t)) };
+  }
+  function rgba(c, a) { return 'rgba(' + c.r + ',' + c.g + ',' + c.b + ',' + a + ')'; }
+  function isMobile() { return W < 992; }
+  // warm on one side of the cluster blending to cool on the other
+  function colorForX(x) {
+    var b = bounds();
+    var t = Math.max(0, Math.min(1, (x - b.x0) / Math.max(b.x1 - b.x0, 1)));
+    return t < 0.5 ? mix(WARM1, WARM2, t / 0.5) : mix(WARM2, COOL, (t - 0.5) / 0.5);
+  }
+
+  var LABELS = ['CRM', 'POS', 'ASR', 'TTS', 'LLM', 'IVR'];
+  var nodes = [], labelEls = [];
+
+  function bounds() {
+    return isMobile()
+      ? { x0: W * 0.05, x1: W * 0.95, y0: H * 0.58, y1: H * 0.96 }
+      : { x0: W * 0.44, x1: W * 0.97, y0: H * 0.08, y1: H * 0.92 };
+  }
+  function anchorPoint() {
+    return isMobile() ? { x: W * 0.5, y: H * 0.52 } : { x: W * 0.36, y: H * 0.46 };
+  }
+
+  function makeNodes() {
+    nodes = [];
+    var b = bounds();
+    var total = isMobile() ? 36 : 55;
+    for (var i = 0; i < total; i++) {
+      var special = i < LABELS.length;
+      var x, y;
+      if (special) { // seed specials on a loose ring so labels spread out
+        var ang = (i / LABELS.length) * Math.PI * 2 + 0.5;
+        var cx = (b.x0 + b.x1) / 2, cy = (b.y0 + b.y1) / 2;
+        x = cx + Math.cos(ang) * (b.x1 - b.x0) * 0.3 + (Math.random() - 0.5) * 40;
+        y = cy + Math.sin(ang) * (b.y1 - b.y0) * 0.32 + (Math.random() - 0.5) * 40;
+      } else {
+        x = b.x0 + ((Math.random() + Math.random()) / 2) * (b.x1 - b.x0);
+        y = b.y0 + Math.random() * (b.y1 - b.y0);
+      }
+      var dir = Math.random() * Math.PI * 2;
+      var speed = 0.15 * (0.6 + Math.random() * 0.8);
+      nodes.push({
+        x: x, y: y,
+        vx: Math.cos(dir) * speed, vy: Math.sin(dir) * speed,
+        r: special ? 7 : (2.5 + Math.random() * 2),
+        px: 0, py: 0,
+        special: special, label: special ? LABELS[i] : null
+      });
+    }
+  }
+
+  function makeLabels() {
+    if (!labelsHost) return;
+    labelsHost.innerHTML = '';
+    labelEls = [];
+    LABELS.forEach(function (text) {
+      var el = document.createElement('div');
+      el.className = 'hero-net-label';
+      el.textContent = text;
+      labelsHost.appendChild(el);
+      labelEls.push(el);
+    });
+  }
+
+  function resize() {
+    var rect = hero.getBoundingClientRect();
+    W = rect.width;
+    H = rect.height;
+    DPR = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(W * DPR);
+    canvas.height = Math.round(H * DPR);
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    makeNodes();
+  }
+
+  if (finePointer) {
+    hero.addEventListener('mousemove', function (e) {
+      var r = canvas.getBoundingClientRect();
+      mouse.x = e.clientX - r.left;
+      mouse.y = e.clientY - r.top;
+      mouse.active = true;
+    }, { passive: true });
+    hero.addEventListener('mouseleave', function () {
+      mouse.active = false; mouse.x = -9999; mouse.y = -9999;
+    });
+  }
+  window.addEventListener('resize', function () { resize(); if (reduce) drawFrame(1.2); }, { passive: true });
+
+  function drawFrame(time) {
+    ctx.clearRect(0, 0, W, H);
+    var b = bounds();
+
+    for (var i = 0; i < nodes.length; i++) {
+      var n = nodes[i];
+      n.x += n.vx; n.y += n.vy;
+      if (n.x < b.x0) n.vx += 0.004;
+      if (n.x > b.x1) n.vx -= 0.004;
+      if (n.y < b.y0) n.vy += 0.004;
+      if (n.y > b.y1) n.vy -= 0.004;
+      var vmax = 0.22;
+      n.vx = Math.max(-vmax, Math.min(vmax, n.vx));
+      n.vy = Math.max(-vmax, Math.min(vmax, n.vy));
+
+      var tx = 0, ty = 0;
+      if (mouse.active) {
+        var dxm = n.x - mouse.x, dym = n.y - mouse.y;
+        var dm = Math.sqrt(dxm * dxm + dym * dym);
+        if (dm < MOUSE_DIST && dm > 0.001) {
+          var f = 1 - dm / MOUSE_DIST;
+          f *= f;
+          tx = (dxm / dm) * f * 34;
+          ty = (dym / dm) * f * 34;
+        }
+      }
+      n.px += (tx - n.px) * 0.08;
+      n.py += (ty - n.py) * 0.08;
+    }
+
+    // connections (clearer than the classic treatment: alpha up to 0.3)
+    ctx.lineWidth = 1;
+    for (var a = 0; a < nodes.length; a++) {
+      var na = nodes[a];
+      var ax = na.x + na.px, ay = na.y + na.py;
+      for (var c = a + 1; c < nodes.length; c++) {
+        var nc = nodes[c];
+        var bx = nc.x + nc.px, by = nc.y + nc.py;
+        var dx = ax - bx, dy = ay - by;
+        var d2 = dx * dx + dy * dy;
+        if (d2 < CONNECT * CONNECT) {
+          var d = Math.sqrt(d2);
+          ctx.strokeStyle = rgba(colorForX((ax + bx) / 2), (1 - d / CONNECT) * 0.3);
+          ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by); ctx.stroke();
+        }
+      }
+      if (mouse.active) { // the cursor joins the graph as a peer
+        var dxc = ax - mouse.x, dyc = ay - mouse.y;
+        var dc2 = dxc * dxc + dyc * dyc;
+        if (dc2 < CONNECT * CONNECT) {
+          ctx.strokeStyle = rgba(colorForX(ax), (1 - Math.sqrt(dc2) / CONNECT) * 0.16);
+          ctx.beginPath(); ctx.moveTo(mouse.x, mouse.y); ctx.lineTo(ax, ay); ctx.stroke();
+        }
+      }
+    }
+
+    // hairline from the copy block to the nearest node, breathing
+    var anchor = anchorPoint();
+    var nearest = null, best = Infinity;
+    for (var k = 0; k < nodes.length; k++) {
+      var nk = nodes[k];
+      var ddx = nk.x + nk.px - anchor.x, ddy = nk.y + nk.py - anchor.y;
+      var dd = ddx * ddx + ddy * ddy;
+      if (dd < best) { best = dd; nearest = nk; }
+    }
+    if (nearest) {
+      var breathe = 0.08 + 0.08 * (0.5 + 0.5 * Math.sin(time * 0.9));
+      var g = ctx.createLinearGradient(anchor.x, anchor.y, nearest.x + nearest.px, nearest.y + nearest.py);
+      g.addColorStop(0, rgba(WARM2, breathe));
+      g.addColorStop(1, rgba(COOL, breathe));
+      ctx.strokeStyle = g;
+      ctx.beginPath(); ctx.moveTo(anchor.x, anchor.y); ctx.lineTo(nearest.x + nearest.px, nearest.y + nearest.py); ctx.stroke();
+    }
+
+    // nodes (clearer: brighter cores, wider halos on specials)
+    var li = 0;
+    for (var m = 0; m < nodes.length; m++) {
+      var nm = nodes[m];
+      var nx = nm.x + nm.px, ny = nm.y + nm.py;
+      var col = colorForX(nx);
+      if (nm.special) {
+        ctx.fillStyle = rgba(col, 0.16);
+        ctx.beginPath(); ctx.arc(nx, ny, nm.r + 9, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = rgba(col, 0.95);
+        ctx.beginPath(); ctx.arc(nx, ny, nm.r, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = 'rgba(251,251,253,0.95)';
+        ctx.beginPath(); ctx.arc(nx, ny, 2.4, 0, Math.PI * 2); ctx.fill();
+        var el = labelEls[li++];
+        if (el) { el.style.left = nx + 'px'; el.style.top = ny + 'px'; }
+      } else {
+        ctx.fillStyle = rgba(col, 0.8);
+        ctx.beginPath(); ctx.arc(nx, ny, nm.r, 0, Math.PI * 2); ctx.fill();
+      }
+    }
+  }
+
+  var running = false, t0 = null;
+  function loop(ts) {
+    if (!running) return;
+    if (t0 === null) t0 = ts;
+    drawFrame((ts - t0) / 1000);
+    requestAnimationFrame(loop);
+  }
+
+  makeLabels();
+  resize();
+
+  if (reduce) {
+    // settle the layout a little, then draw one still frame
+    for (var s = 0; s < 30; s++) drawFrame(s * 0.05);
+    return;
+  }
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      var vis = entries[0].isIntersecting;
+      if (vis && !running) { running = true; t0 = null; requestAnimationFrame(loop); }
+      else if (!vis) { running = false; }
+    }, { threshold: 0 });
+    io.observe(hero);
+  } else {
+    running = true;
+    requestAnimationFrame(loop);
+  }
+})();

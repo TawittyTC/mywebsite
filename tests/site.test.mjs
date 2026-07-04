@@ -96,13 +96,21 @@ test('page loads with no console errors and no failed asset requests', async () 
   await page.close();
 });
 
-test('hero renders name, typed role and the AI voice orb', async () => {
+test('hero renders name, typed role and the multi-agent constellation', async () => {
   const { page } = await openPage();
   assert.match(await page.textContent('#hero h1'), /Tanapol Chamnanhan/);
   await page.waitForFunction(() => document.querySelector('#hero .typed')?.textContent.length > 0);
-  assert.equal(await page.locator('#hero .hero-orb').count(), 1, 'orb missing');
-  assert.equal(await page.locator('#hero .hero-orb-eq i').count(), 7, 'equalizer bars missing');
-  assert.match(await page.textContent('#hero .hero-orb-live'), /AI VOICE AGENT/);
+  assert.equal(await page.locator('#hero-net').count(), 1, 'constellation canvas missing');
+  const labels = await page.$$eval('#hero-net-labels .hero-net-label', (els) => els.map((e) => e.textContent));
+  assert.deepEqual(labels.sort(), ['ASR', 'CRM', 'IVR', 'LLM', 'POS', 'TTS'], 'labeled nodes missing');
+  // canvas actually drew something
+  const painted = await page.evaluate(() => {
+    const c = document.getElementById('hero-net');
+    const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data;
+    for (let i = 3; i < d.length; i += 4) if (d[i] > 0) return true;
+    return false;
+  });
+  assert.ok(painted, 'constellation canvas is blank');
   await page.close();
 });
 
