@@ -870,40 +870,6 @@ button {
   50%      { transform: scaleY(1); }
 }
 
-/* Thin ring with a gradient arc riding it */
-.hero-orb-ring {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 116%;
-  height: 116%;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-  animation: orb-spin-cw 36s linear infinite;
-}
-.hero-orb-ring::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  border: 1px solid rgba(29, 29, 31, 0.08);
-}
-.hero-orb-ring::after {
-  content: "";
-  position: absolute;
-  inset: -1px;
-  border-radius: 50%;
-  background: conic-gradient(from 0deg,
-    rgba(217, 144, 67, 0) 0deg,
-    rgba(217, 144, 67, 0.9) 24deg,
-    rgba(232, 168, 124, 0.9) 44deg,
-    rgba(143, 190, 240, 0.7) 62deg,
-    rgba(143, 190, 240, 0) 84deg,
-    transparent 360deg);
-  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 1.5px));
-          mask: radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 1.5px));
-}
-
 #hero p.hero-orb-live {
   margin: 0;
   font-size: 11px;
@@ -945,7 +911,7 @@ button {
 }
 @media (prefers-reduced-motion: reduce) {
   #hero .typed::after { animation: none; }
-  .hero-orb, .hero-orb-layer, .hero-orb-ring, .hero-orb-halo,
+  .hero-orb, .hero-orb-layer, .hero-orb-halo,
   .hero-orb-eq i, .hero-live-dot { animation: none !important; }
 }
 
@@ -1241,7 +1207,7 @@ select:focus-visible {
 }
 
 /*--------------------------------------------------------------
-# Hero copy — role line, subline & calls to action
+# Hero copy — role line & subline
 --------------------------------------------------------------*/
 #hero .hero-sub {
   margin-top: 12px;
@@ -1249,34 +1215,8 @@ select:focus-visible {
   color: var(--color-text-secondary);
   max-width: 560px;
 }
-#hero .hero-cta {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-top: 32px;
-  flex-wrap: wrap;
-}
-.hero-btn {
-  display: inline-block;
-  font-size: 16px;
-  font-weight: 500;
-  padding: 11px 24px;
-  border-radius: 980px;
-  transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
-}
-.hero-btn--primary {
-  background: var(--color-link);
-  color: #fff;
-}
-.hero-btn--primary:hover { background: var(--color-link-hover); color: #fff; transform: scale(1.03); }
-.hero-btn--quiet {
-  color: var(--color-link);
-  border: 1px solid rgba(0, 113, 227, 0.5);
-}
-.hero-btn--quiet:hover { background: rgba(0, 113, 227, 0.08); transform: scale(1.03); }
 @media (max-width: 992px) {
   #hero .hero-sub { margin-left: auto; margin-right: auto; }
-  #hero .hero-cta { justify-content: center; }
 }
 
 /*--------------------------------------------------------------

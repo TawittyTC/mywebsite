@@ -212,9 +212,12 @@ test('sticky nav: 6 section links, glass state after scroll, active link tracks 
   await page.close();
 });
 
-test('hero CTA scrolls to projects section', async () => {
+test('hero stays clean: no CTA buttons, no orb ring', async () => {
   const { page } = await openPage();
-  await page.click('.hero-btn--primary');
+  assert.equal(await page.locator('#hero .hero-btn').count(), 0, 'CTA buttons should be removed');
+  assert.equal(await page.locator('#hero .hero-orb-ring').count(), 0, 'orb ring should be removed');
+  // Projects stay reachable through the nav instead
+  await page.click('#site-nav a[href="#portfolio"]');
   await page.waitForFunction(() => {
     const r = document.getElementById('portfolio').getBoundingClientRect();
     return r.top > -50 && r.top < 200;
