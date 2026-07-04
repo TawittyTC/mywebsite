@@ -1121,10 +1121,10 @@
   </style>
 
   <!-- Full CSS loaded async: no render blocking (bootstrap merged in) -->
-  <link rel="preload" href="assets/css/style.min.css?v=1.68.0" as="style"
+  <link rel="preload" href="assets/css/style.min.css?v=1.69.0" as="style"
     onload="this.onload=null;this.rel='stylesheet'">
   <noscript>
-    <link href="assets/css/style.min.css?v=1.68.0" rel="stylesheet">
+    <link href="assets/css/style.min.css?v=1.69.0" rel="stylesheet">
   </noscript>
 
 
@@ -1378,7 +1378,7 @@
   </script>
 
   <!-- Preload deferred JS to start downloading before parser reaches script tags -->
-  <link rel="preload" href="assets/js/main.min.js?v=1.62.0" as="script">
+  <link rel="preload" href="assets/js/main.min.js?v=1.63.0" as="script">
 
   <script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="233b92be-5a2d-492b-b093-9c3ed14c9063"
     type="text/javascript" async></script>
@@ -1419,12 +1419,13 @@
     <!-- ======= Hero Section ======= -->
     <section id="hero" class="d-flex flex-column justify-content-center">
       <div class="container hero-copy">
-        <h1 class="text-dark">Tanapol Chamnanhan</h1>
+        <h1 class="hero-name"><span class="hero-name-line">Tanapol</span> <span
+            class="hero-name-line">Chamnanhan</span></h1>
+        <canvas id="hero-wave" width="900" height="96" aria-hidden="true"></canvas>
         <p class="hero-role">I'm a <span class="typed"
             data-typed-items="Programmer, Web Developer, AI Engineer, Front-End Developer, Back-End Developer, AI Agent Developer, UX/UI Designer, Full-Stack Developer, Software Engineer, Software Developer"></span>
         </p>
-        <p class="hero-sub">Full-Stack Developer &amp; AI Engineer in Bangkok. <br class="hero-sub-br">I build
-          CRM, POS and AI agent systems used by 27+ organizations.</p>
+        <p class="hero-sub">Building CRM, POS &amp; AI voice-agent systems used by 27+ organizations in Thailand.</p>
         <div class="hero-cta">
           <a href="#portfolio" class="scrollto hero-btn hero-btn--primary">View my projects</a>
           <a href="#footer" class="scrollto hero-btn hero-btn--quiet">Contact me</a>
@@ -2213,7 +2214,7 @@
   </button>
 
   <!-- Main JS -->
-  <script defer src="assets/js/main.min.js?v=1.62.0"></script>
+  <script defer src="assets/js/main.min.js?v=1.63.0"></script>
   <!-- Service Worker: cache assets for repeat visits -->
   <script>if ('serviceWorker' in navigator) { var _sw = function () { navigator.serviceWorker.register('sw.js') }; 'requestIdleCallback' in window ? requestIdleCallback(_sw) : window.addEventListener('load', _sw) }</script>
 

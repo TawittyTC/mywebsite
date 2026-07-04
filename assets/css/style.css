@@ -64,7 +64,10 @@ a:hover {
 
 #hero:before {
   content: "";
-  background: rgba(255, 255, 255, 0.8);
+  background: linear-gradient(100deg,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(255, 255, 255, 0.78) 45%,
+    rgba(255, 255, 255, 0.62) 100%);
   position: absolute;
   bottom: 0;
   top: 0;
@@ -729,19 +732,59 @@ button {
 #experience .data-box { background: #fff; }
 #skill .boxWhyScg { background: var(--color-fill); color: var(--color-text); }
 #certificates .data-box, #certificates .boxWhyScg { background: #fff; color: var(--color-text); }
-#hero h1 {
-  font-size: clamp(36px, 9vw, 128px);
+/* Poster name — sunset ink flows through the letters (Apple Intelligence-style) */
+#hero h1.hero-name {
+  margin: 0;
+  font-size: clamp(56px, 11.5vw, 168px);
   font-weight: 700;
-  letter-spacing: -4px;
-  line-height: 0.97;
+  letter-spacing: -0.045em;
+  line-height: 0.94;
   color: var(--color-text);
+  background-image: linear-gradient(105deg,
+    #1d1d1f 0%, #1d1d1f 26%,
+    #b4602a 38%, #d99043 46%, #c98a56 52%, #3f6ea6 62%,
+    #1d1d1f 76%, #1d1d1f 100%);
+  background-size: 260% 100%;
+  background-position: 0% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: hero-ink 11s ease-in-out infinite;
 }
-#hero p { color: var(--color-text-secondary); font-size: clamp(20px, 2.5vw, 28px); font-family: inherit; margin-top: 24px; }
-#hero p span { color: var(--color-link); letter-spacing: normal; }
-@media (max-width: 735px) {
-  #hero h1 {
-    letter-spacing: -2px;
-  }
+.hero-name-line { display: block; }
+@keyframes hero-ink {
+  0%, 100% { background-position: 0% 0; }
+  50%      { background-position: 100% 0; }
+}
+
+/* Voice wave — the signature; canvas sized by JS */
+#hero-wave {
+  display: block;
+  width: min(720px, 92%);
+  height: 96px;
+  margin: 8px 0 4px;
+}
+
+#hero p { color: var(--color-text-secondary); font-size: clamp(20px, 2.5vw, 28px); font-family: inherit; margin-top: 16px; }
+#hero p span.typed { color: var(--color-link); letter-spacing: normal; }
+#hero .typed::after {
+  content: "";
+  display: inline-block;
+  width: 3px;
+  height: 0.95em;
+  margin-left: 3px;
+  vertical-align: text-bottom;
+  background: var(--color-link);
+  animation: caret-blink 1.1s steps(1) infinite;
+}
+@keyframes caret-blink { 50% { opacity: 0; } }
+
+@media (max-width: 992px) {
+  #hero-wave { margin-left: auto; margin-right: auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #hero h1.hero-name { animation: none; background-position: 55% 0; }
+  #hero .typed::after { animation: none; }
 }
 
 /*--------------------------------------------------------------
@@ -1039,12 +1082,11 @@ select:focus-visible {
 # Hero copy — role line, subline & calls to action
 --------------------------------------------------------------*/
 #hero .hero-sub {
-  margin-top: 20px;
-  font-size: clamp(16px, 1.6vw, 19px);
+  margin-top: 12px;
+  font-size: clamp(15px, 1.4vw, 17px);
   color: var(--color-text-secondary);
   max-width: 560px;
 }
-@media (min-width: 736px) { .hero-sub-br { display: none; } }
 #hero .hero-cta {
   display: flex;
   align-items: center;
