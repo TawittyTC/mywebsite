@@ -197,3 +197,35 @@ test('mobile viewport renders hero and certificates', async () => {
   assert.deepEqual(errors, [], `mobile console errors:\n${errors.join('\n')}`);
   await page.close();
 });
+
+test('sticky nav: 6 section links, glass state after scroll, active link tracks section', async () => {
+  const { page } = await openPage();
+  assert.equal(await page.locator('#site-nav .site-nav-links a').count(), 6);
+  assert.ok(!(await page.$eval('#site-nav', (n) => n.classList.contains('scrolled'))), 'nav should start transparent');
+  await page.evaluate(() => document.getElementById('experience').scrollIntoView());
+  await page.waitForFunction(() => document.getElementById('site-nav').classList.contains('scrolled'));
+  await page.waitForFunction(() =>
+    document.querySelector('#site-nav a[href="#experience"]').classList.contains('active')
+  );
+  await page.close();
+});
+
+test('hero CTA scrolls to projects section', async () => {
+  const { page } = await openPage();
+  await page.click('.hero-btn--primary');
+  await page.waitForFunction(() => {
+    const r = document.getElementById('portfolio').getBoundingClientRect();
+    return r.top > -50 && r.top < 200;
+  }, null, { timeout: 5000 });
+  await page.close();
+});
+
+test('back-to-top appears after scrolling and returns to top', async () => {
+  const { page } = await openPage();
+  assert.ok(!(await page.$eval('#back-to-top', (b) => b.classList.contains('visible'))), 'hidden at top');
+  await page.evaluate(() => window.scrollTo(0, 2000));
+  await page.waitForFunction(() => document.getElementById('back-to-top').classList.contains('visible'));
+  await page.click('#back-to-top');
+  await page.waitForFunction(() => window.scrollY === 0, null, { timeout: 5000 });
+  await page.close();
+});
