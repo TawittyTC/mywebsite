@@ -1,0 +1,12 @@
+{
+  "name": "mywebsite",
+  "private": true,
+  "description": "Personal portfolio site — static HTML/CSS/JS",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "build": "./build.sh"
+  },
+  "devDependencies": {
+    "playwright": "^1.61.1"
+  }
+}

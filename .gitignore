@@ -2,3 +2,6 @@
 .DS_Store
 .vscode/
 babel.json
+
+node_modules/
+test-results/

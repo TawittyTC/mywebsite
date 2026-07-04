@@ -718,7 +718,11 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // ---- Scroll reveals ----
-  if (!reduce && 'IntersectionObserver' in window) {
+  // Position-checked on each (rAF-throttled) scroll instead of
+  // IntersectionObserver: IO can skip an element entirely when a fast
+  // scroll jumps past it in one frame (worse with content-visibility),
+  // leaving it stuck hidden. A position check can't miss.
+  if (!reduce) {
     var targets = [];
     document.querySelectorAll('.section-title').forEach(function (el) { targets.push(el); });
     ['#resume .data-box', '#experience .data-box', '#skill .boxWhyScg',
@@ -726,16 +730,29 @@ document.addEventListener('DOMContentLoaded', function () {
       var group = document.querySelectorAll(sel);
       group.forEach(function (el, i) { el.style.setProperty('--reveal-delay', Math.min(i, 5) * 0.06 + 's'); targets.push(el); });
     });
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (en) {
-        if (en.isIntersecting) { en.target.classList.add('is-visible'); io.unobserve(en.target); }
-      });
-    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+    var armed = [];
     targets.forEach(function (el) {
-      var r = el.getBoundingClientRect();
-      if (r.top < window.innerHeight * 0.92) { return; } // already in view — leave visible
+      if (el.getBoundingClientRect().top < window.innerHeight * 0.92) { return; } // already in view — leave visible
       el.classList.add('js-reveal');
-      io.observe(el);
+      armed.push(el);
     });
+    var revealTicking = false;
+    function checkReveal() {
+      revealTicking = false;
+      if (!armed.length) return;
+      var fold = window.innerHeight * 0.92;
+      armed = armed.filter(function (el) {
+        if (el.getBoundingClientRect().top < fold) { el.classList.add('is-visible'); return false; }
+        return true;
+      });
+      if (!armed.length) {
+        window.removeEventListener('scroll', onRevealScroll);
+        window.removeEventListener('resize', onRevealScroll);
+      }
+    }
+    function onRevealScroll() { if (!revealTicking) { revealTicking = true; requestAnimationFrame(checkReveal); } }
+    window.addEventListener('scroll', onRevealScroll, { passive: true });
+    window.addEventListener('resize', onRevealScroll, { passive: true });
+    checkReveal();
   }
 })();
