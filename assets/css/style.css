@@ -813,12 +813,19 @@ button {
 }
 
 @media (max-width: 992px) {
-  /* copy sits in the upper half; the constellation lives below it */
-  #hero .hero-grid { margin-bottom: 38vh; }
+  /* Balanced phone composition: copy anchored in the upper third,
+     the constellation owns the lower half.
+     !important needed to beat Bootstrap's .justify-content-center */
+  #hero { justify-content: flex-start !important; }
+  #hero .hero-grid { margin: 0; padding-top: calc(48px + 9vh); }
   #hero .hero-copy { text-align: center; margin: 0 auto; }
   #hero .hero-copy::before { left: 50%; transform: translate(-50%, -50%); width: 480px; height: 480px; }
+  #hero .hero-eyebrow { font-size: 10px; letter-spacing: 0.14em; margin-bottom: 12px; }
+  #hero h1.hero-name { font-size: clamp(38px, 10.5vw, 48px); line-height: 1.08; }
+  #hero .hero-sub { max-width: 320px; }
   #hero .hero-foot { display: none; }
   .hero-net-label { font-size: 9px; }
+  .hero-scroll-hint { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   #hero .typed::after { animation: none; }

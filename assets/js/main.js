@@ -819,11 +819,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function bounds() {
     return isMobile()
-      ? { x0: W * 0.05, x1: W * 0.95, y0: H * 0.58, y1: H * 0.96 }
+      ? { x0: W * 0.05, x1: W * 0.95, y0: H * 0.52, y1: H * 0.94 }
       : { x0: W * 0.44, x1: W * 0.97, y0: H * 0.08, y1: H * 0.92 };
   }
   function anchorPoint() {
-    return isMobile() ? { x: W * 0.5, y: H * 0.52 } : { x: W * 0.36, y: H * 0.46 };
+    return isMobile() ? { x: W * 0.5, y: H * 0.46 } : { x: W * 0.36, y: H * 0.46 };
   }
 
   function makeNodes() {
