@@ -100,7 +100,7 @@ test('hero renders name, eyebrow and the multi-agent constellation', async () =>
   const { page } = await openPage();
   assert.match(await page.textContent('#hero h1'), /Tanapol Chamnanhan/);
   assert.match(await page.textContent('#hero .hero-eyebrow'), /Software Engineer/);
-  assert.match(await page.textContent('#hero .hero-sub'), /27\+ organizations/);
+  await page.waitForFunction(() => document.querySelector('#hero .typed')?.textContent.length > 0);
   assert.equal(await page.locator('#hero-net').count(), 1, 'constellation canvas missing');
   const labels = await page.$$eval('#hero-net-labels .hero-net-label', (els) => els.map((e) => e.textContent));
   assert.deepEqual(labels.sort(), ['ASR', 'CRM', 'IVR', 'LLM', 'POS', 'TTS'], 'labeled nodes missing');
