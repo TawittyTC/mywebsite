@@ -795,6 +795,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   var LABELS = ['CRM', 'POS', 'ASR', 'TTS', 'LLM', 'IVR'];
   var nodes = [], labelEls = [];
+  var pulses = [], nextPulse = 0.9; // signals travelling along the links
 
   function bounds() {
     return isMobile()
@@ -830,25 +831,32 @@ document.addEventListener('DOMContentLoaded', function () {
         y = b.y0 + Math.random() * (b.y1 - b.y0);
       }
       // Organic drift: each node breathes around its home point on two
-      // layered sines with incommensurate frequencies — a slow Lissajous
+      // layered sines with incommensurate frequencies — a Lissajous
       // wander that never visibly repeats and is a pure function of time
-      // (frame-rate independent, perfectly smooth).
+      // (frame-rate independent, perfectly smooth). Frequencies are
+      // tuned to read as alive within the first second of looking.
+      var dir = Math.random() * Math.PI * 2;
       nodes.push({
         hx: x, hy: y,
         x: x, y: y,
-        a1: (special ? 8 : 14) + Math.random() * (special ? 8 : 14),
-        a2: 4 + Math.random() * 6,
-        f1: 0.05 + Math.random() * 0.07,
-        f2: 0.11 + Math.random() * 0.09,
+        a1: (special ? 10 : 16) + Math.random() * (special ? 8 : 16),
+        a2: 5 + Math.random() * 7,
+        f1: 0.34 + Math.random() * 0.22,
+        f2: 0.68 + Math.random() * 0.42,
         p1: Math.random() * Math.PI * 2,
         p2: Math.random() * Math.PI * 2,
         p3: Math.random() * Math.PI * 2,
         p4: Math.random() * Math.PI * 2,
+        // entrance: fly in from this direction, staggered by index
+        ix: Math.cos(dir), iy: Math.sin(dir),
+        st: i * 0.035 + Math.random() * 0.1,
+        iv: 0,
         r: special ? 7 : (2.5 + Math.random() * 2),
         px: 0, py: 0,
         special: special, label: special ? LABELS[i] : null
       });
     }
+    pulses = [];
   }
 
   function makeLabels() {
@@ -933,9 +941,22 @@ document.addEventListener('DOMContentLoaded', function () {
 
     for (var i = 0; i < nodes.length; i++) {
       var n = nodes[i];
-      // layered-sine wander around the home point (slow, subtle, smooth)
+      // layered-sine wander around the home point (lively but smooth)
       n.x = n.hx + n.a1 * Math.sin(time * n.f1 + n.p1) + n.a2 * Math.sin(time * n.f2 + n.p2);
       n.y = n.hy + n.a1 * Math.cos(time * n.f1 * 0.83 + n.p3) + n.a2 * Math.sin(time * n.f2 * 1.27 + n.p4);
+
+      // entrance: fly in + fade in, staggered — the network assembles
+      // itself in the first ~2s (skipped under reduced motion)
+      if (n.iv < 1) {
+        if (reduce) { n.iv = 1; }
+        else {
+          var ip = Math.min(Math.max((time - n.st) / 0.7, 0), 1);
+          n.iv = 1 - Math.pow(1 - ip, 3); // easeOutCubic
+          var away = (1 - n.iv) * 80;
+          n.x += n.ix * away;
+          n.y += n.iy * away;
+        }
+      }
 
       var tx = 0, ty = 0;
       if (mouse.active) {
@@ -951,7 +972,27 @@ document.addEventListener('DOMContentLoaded', function () {
       n.px += (tx - n.px) * 0.08;
       n.py += (ty - n.py) * 0.08;
       // how visible this node is near the copy block (0 gone → 1 full)
-      n.f = fadeAt(n.x + n.px, n.y + n.py);
+      n.f = fadeAt(n.x + n.px, n.y + n.py) * n.iv;
+    }
+
+    // signals: bright dots travelling along links — the system talking
+    if (!reduce && time > 1.4) {
+      if (time >= nextPulse && pulses.length < 4) {
+        var A = nodes[(Math.random() * nodes.length) | 0];
+        if (A && A.f > 0.35) {
+          var B = null, bd = Infinity;
+          for (var q = 0; q < nodes.length; q++) {
+            var nq = nodes[q];
+            if (nq === A || nq.f <= 0.35) continue;
+            var qdx = nq.x - A.x, qdy = nq.y - A.y;
+            var qd = qdx * qdx + qdy * qdy;
+            if (qd < CONNECT * CONNECT * 4 && qd > 400 && Math.random() < 0.4 && qd < bd) { bd = qd; B = nq; }
+          }
+          if (B) pulses.push({ a: A, b: B, t0: time, dur: 0.8 + Math.random() * 0.5 });
+        }
+        nextPulse = time + 0.35 + Math.random() * 0.55;
+      }
+      pulses = pulses.filter(function (p) { return time - p.t0 < p.dur; });
     }
 
     // connections (clearer than the classic treatment: alpha up to 0.3)
@@ -1031,6 +1072,25 @@ document.addEventListener('DOMContentLoaded', function () {
         ctx.beginPath(); ctx.arc(nx, ny, nm.r * (0.35 + 0.65 * f), 0, Math.PI * 2); ctx.fill();
       }
     }
+
+    // draw travelling signals on top
+    for (var s = 0; s < pulses.length; s++) {
+      var pu = pulses[s];
+      var pr = (time - pu.t0) / pu.dur;
+      if (pr < 0 || pr > 1) continue;
+      var pe = pr < 0.5 ? 2 * pr * pr : 1 - Math.pow(-2 * pr + 2, 2) / 2; // easeInOut
+      var sx = pu.a.x + pu.a.px + (pu.b.x + pu.b.px - pu.a.x - pu.a.px) * pe;
+      var sy = pu.a.y + pu.a.py + (pu.b.y + pu.b.py - pu.a.y - pu.a.py) * pe;
+      var sa = Math.sin(Math.PI * pr) * Math.min(pu.a.f, pu.b.f) * fadeAt(sx, sy);
+      if (sa <= 0.02) continue;
+      var sc = colorForX(sx);
+      ctx.fillStyle = rgba(sc, 0.18 * sa);
+      ctx.beginPath(); ctx.arc(sx, sy, 7, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = rgba(sc, 0.9 * sa);
+      ctx.beginPath(); ctx.arc(sx, sy, 2.6, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,' + (0.8 * sa).toFixed(3) + ')';
+      ctx.beginPath(); ctx.arc(sx, sy, 1.1, 0, Math.PI * 2); ctx.fill();
+    }
   }
 
   var running = false, t0 = null;
@@ -1050,7 +1110,7 @@ document.addEventListener('DOMContentLoaded', function () {
   if ('IntersectionObserver' in window) {
     var io = new IntersectionObserver(function (entries) {
       var vis = entries[0].isIntersecting;
-      if (vis && !running) { running = true; t0 = null; requestAnimationFrame(loop); }
+      if (vis && !running) { running = true; requestAnimationFrame(loop); }
       else if (!vis) { running = false; }
     }, { threshold: 0 });
     io.observe(hero);
