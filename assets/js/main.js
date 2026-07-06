@@ -841,8 +841,10 @@ document.addEventListener('DOMContentLoaded', function () {
       // tuned to read as alive within the first second of looking.
       var dir = Math.random() * Math.PI * 2;
       nodes.push({
-        hx: x, hy: y,
-        thx: x, thy: y,
+        // home as FRACTIONS of the hero size — recomputed every frame,
+        // so the graph tracks container resizes continuously (iOS
+        // delivers resize events late during scroll; fractions don't care)
+        fx: x / W, fy: y / H,
         x: x, y: y,
         a1: (special ? 10 : 16) + Math.random() * (special ? 8 : 16),
         a2: 5 + Math.random() * 7,
@@ -920,7 +922,6 @@ document.addEventListener('DOMContentLoaded', function () {
       requestAnimationFrame(resize);
       return;
     }
-    var prevW = W, prevH = H;
     W = rect.width;
     H = rect.height;
     DPR = Math.min(window.devicePixelRatio || 1, 2);
@@ -931,20 +932,9 @@ document.addEventListener('DOMContentLoaded', function () {
     canvas.style.height = H + 'px';
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     updateCopyRect();
-    // The graph is seeded exactly once. In-app browsers (Facebook etc.)
-    // resize the webview whenever their toolbars collapse during scroll —
-    // reseeding there shuffles every node. Instead, rescale each node's
-    // home proportionally; drawFrame eases toward it, so even a real
-    // resize glides rather than jumps.
-    if (!nodes.length) {
-      makeNodes();
-    } else if (prevW > 0 && prevH > 0 && (Math.abs(W - prevW) > 1 || Math.abs(H - prevH) > 1)) {
-      var sx = W / prevW, sy = H / prevH;
-      for (var i = 0; i < nodes.length; i++) {
-        nodes[i].thx *= sx;
-        nodes[i].thy *= sy;
-      }
-    }
+    // The graph is seeded exactly once; homes are fractions of W/H,
+    // so a resize needs no node bookkeeping at all.
+    if (!nodes.length) makeNodes();
   }
 
   if (finePointer) {
@@ -959,6 +949,9 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
   window.addEventListener('resize', resize, { passive: true });
+  if ('ResizeObserver' in window) {
+    new ResizeObserver(function () { resize(); }).observe(hero);
+  }
   window.addEventListener('load', function () { updateCopyRect(); resize(); }, { passive: true });
   // iOS/WKWebView can purge a canvas backing store while the page is
   // hidden or restored from the back-forward cache — repaint on return
@@ -972,12 +965,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     for (var i = 0; i < nodes.length; i++) {
       var n = nodes[i];
-      // glide the home point toward its (possibly rescaled) target
-      n.hx += (n.thx - n.hx) * 0.06;
-      n.hy += (n.thy - n.hy) * 0.06;
-      // layered-sine wander around the home point (lively but smooth)
-      n.x = n.hx + n.a1 * Math.sin(time * n.f1 + n.p1) + n.a2 * Math.sin(time * n.f2 + n.p2);
-      n.y = n.hy + n.a1 * Math.cos(time * n.f1 * 0.83 + n.p3) + n.a2 * Math.sin(time * n.f2 * 1.27 + n.p4);
+      // layered-sine wander around the fractional home point
+      n.x = n.fx * W + n.a1 * Math.sin(time * n.f1 + n.p1) + n.a2 * Math.sin(time * n.f2 + n.p2);
+      n.y = n.fy * H + n.a1 * Math.cos(time * n.f1 * 0.83 + n.p3) + n.a2 * Math.sin(time * n.f2 * 1.27 + n.p4);
 
       // entrance: fly in + fade in, staggered — the network assembles
       // itself in the first ~2s (skipped under reduced motion)
@@ -1158,6 +1148,9 @@ document.addEventListener('DOMContentLoaded', function () {
   function loop(ts) {
     if (!running) return;
     if (t0 === null) t0 = ts;
+    // iOS batches resize events until scroll momentum ends; catch the
+    // container changing size the moment it happens instead
+    if (Math.abs(hero.clientWidth - W) > 1 || Math.abs(hero.clientHeight - H) > 1) resize();
     // Under reduced motion the scene is repainted with frozen time:
     // visually static, but the continuous paint keeps the canvas
     // backing store alive on iOS/WKWebView, which purges idle canvases.
