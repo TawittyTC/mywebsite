@@ -842,6 +842,7 @@ document.addEventListener('DOMContentLoaded', function () {
       var dir = Math.random() * Math.PI * 2;
       nodes.push({
         hx: x, hy: y,
+        thx: x, thy: y,
         x: x, y: y,
         a1: (special ? 10 : 16) + Math.random() * (special ? 8 : 16),
         a2: 5 + Math.random() * 7,
@@ -904,7 +905,7 @@ document.addEventListener('DOMContentLoaded', function () {
       requestAnimationFrame(resize);
       return;
     }
-    var changed = Math.abs(rect.width - W) > 1 || Math.abs(rect.height - H) > 1;
+    var prevW = W, prevH = H;
     W = rect.width;
     H = rect.height;
     DPR = Math.min(window.devicePixelRatio || 1, 2);
@@ -915,9 +916,20 @@ document.addEventListener('DOMContentLoaded', function () {
     canvas.style.height = H + 'px';
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     updateCopyRect();
-    // iOS fires resize continuously while the URL bar collapses during
-    // scroll — only reseed the graph when the size really changed
-    if (changed || !nodes.length) makeNodes();
+    // The graph is seeded exactly once. In-app browsers (Facebook etc.)
+    // resize the webview whenever their toolbars collapse during scroll —
+    // reseeding there shuffles every node. Instead, rescale each node's
+    // home proportionally; drawFrame eases toward it, so even a real
+    // resize glides rather than jumps.
+    if (!nodes.length) {
+      makeNodes();
+    } else if (prevW > 0 && prevH > 0 && (Math.abs(W - prevW) > 1 || Math.abs(H - prevH) > 1)) {
+      var sx = W / prevW, sy = H / prevH;
+      for (var i = 0; i < nodes.length; i++) {
+        nodes[i].thx *= sx;
+        nodes[i].thy *= sy;
+      }
+    }
   }
 
   if (finePointer) {
@@ -945,6 +957,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     for (var i = 0; i < nodes.length; i++) {
       var n = nodes[i];
+      // glide the home point toward its (possibly rescaled) target
+      n.hx += (n.thx - n.hx) * 0.06;
+      n.hy += (n.thy - n.hy) * 0.06;
       // layered-sine wander around the home point (lively but smooth)
       n.x = n.hx + n.a1 * Math.sin(time * n.f1 + n.p1) + n.a2 * Math.sin(time * n.f2 + n.p2);
       n.y = n.hy + n.a1 * Math.cos(time * n.f1 * 0.83 + n.p3) + n.a2 * Math.sin(time * n.f2 * 1.27 + n.p4);
