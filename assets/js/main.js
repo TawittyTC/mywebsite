@@ -732,47 +732,26 @@ document.addEventListener('DOMContentLoaded', function () {
 })();
 
 /**
- * Sticky nav state, active-section highlight & back-to-top
- * One rAF-throttled scroll handler for all three.
+ * Back-to-top — appears past the first viewport.
  */
 (function () {
-  var nav = document.getElementById('site-nav');
   var toTop = document.getElementById('back-to-top');
-  if (!nav && !toTop) return;
+  if (!toTop) return;
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var links = nav ? Array.prototype.slice.call(nav.querySelectorAll('.site-nav-links a[href^="#"]')) : [];
-  var sections = links
-    .map(function (a) { return document.getElementById(a.hash.slice(1)); })
-    .filter(Boolean);
 
   var ticking = false;
   function update() {
     ticking = false;
-    var sy = window.scrollY || 0;
-    if (nav) nav.classList.toggle('scrolled', sy > 40);
-    if (toTop) toTop.classList.toggle('visible', sy > window.innerHeight * 0.9);
-    if (sections.length) {
-      var current = null;
-      var probe = 92; // just below the nav bar
-      sections.forEach(function (sec) {
-        var r = sec.getBoundingClientRect();
-        if (r.top <= probe && r.bottom > probe) current = sec.id;
-      });
-      links.forEach(function (a) {
-        a.classList.toggle('active', a.hash === '#' + current);
-      });
-    }
+    toTop.classList.toggle('visible', (window.scrollY || 0) > window.innerHeight * 0.9);
   }
   function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', onScroll, { passive: true });
   update();
 
-  if (toTop) {
-    toTop.addEventListener('click', function () {
-      window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
-    });
-  }
+  toTop.addEventListener('click', function () {
+    window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+  });
 })();
 
 

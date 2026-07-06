@@ -209,28 +209,15 @@ test('mobile viewport renders hero and certificates', async () => {
   await page.close();
 });
 
-test('sticky nav: 6 section links, glass state after scroll, active link tracks section', async () => {
+test('hero stays clean: no navbar, no CTA buttons; name lines carry the ink treatment', async () => {
   const { page } = await openPage();
-  assert.equal(await page.locator('#site-nav .site-nav-links a').count(), 6);
-  assert.ok(!(await page.$eval('#site-nav', (n) => n.classList.contains('scrolled'))), 'nav should start transparent');
-  await page.evaluate(() => document.getElementById('experience').scrollIntoView());
-  await page.waitForFunction(() => document.getElementById('site-nav').classList.contains('scrolled'));
-  await page.waitForFunction(() =>
-    document.querySelector('#site-nav a[href="#experience"]').classList.contains('active')
-  );
-  await page.close();
-});
-
-test('hero stays clean: no CTA buttons, no orb ring', async () => {
-  const { page } = await openPage();
+  assert.equal(await page.locator('#site-nav').count(), 0, 'navbar should be removed');
   assert.equal(await page.locator('#hero .hero-btn').count(), 0, 'CTA buttons should be removed');
-  assert.equal(await page.locator('#hero .hero-orb-ring').count(), 0, 'orb ring should be removed');
-  // Projects stay reachable through the nav instead
-  await page.click('#site-nav a[href="#portfolio"]');
-  await page.waitForFunction(() => {
-    const r = document.getElementById('portfolio').getBoundingClientRect();
-    return r.top > -50 && r.top < 200;
-  }, null, { timeout: 5000 });
+  const clipped = await page.$$eval('#hero .hero-name-line', (els) =>
+    els.map((el) => getComputedStyle(el).webkitBackgroundClip || getComputedStyle(el).backgroundClip)
+  );
+  assert.equal(clipped.length, 2, 'expected two name lines');
+  clipped.forEach((v) => assert.equal(v, 'text', 'name gradient ink missing'));
   await page.close();
 });
 
