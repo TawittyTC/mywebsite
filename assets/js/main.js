@@ -867,6 +867,26 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
+  // Keep-out zone: nodes and lines shrink as they approach the copy
+  // block and vanish just before touching it.
+  var copyEl = hero.querySelector('.hero-copy');
+  var copyRect = null;
+  function updateCopyRect() {
+    if (!copyEl) { copyRect = null; return; }
+    var hr = hero.getBoundingClientRect();
+    var cr = copyEl.getBoundingClientRect();
+    copyRect = { x0: cr.left - hr.left, y0: cr.top - hr.top, x1: cr.right - hr.left, y1: cr.bottom - hr.top };
+  }
+  // 1 = fully visible, 0 = gone (within 24px of the text block);
+  // the ramp runs over the next 130px
+  function fadeAt(x, y) {
+    if (!copyRect) return 1;
+    var dx = Math.max(copyRect.x0 - x, 0, x - copyRect.x1);
+    var dy = Math.max(copyRect.y0 - y, 0, y - copyRect.y1);
+    var d = Math.sqrt(dx * dx + dy * dy);
+    return Math.max(0, Math.min(1, (d - 24) / 130));
+  }
+
   function resize() {
     var rect = hero.getBoundingClientRect();
     W = rect.width;
@@ -875,6 +895,7 @@ document.addEventListener('DOMContentLoaded', function () {
     canvas.width = Math.round(W * DPR);
     canvas.height = Math.round(H * DPR);
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    updateCopyRect();
     makeNodes();
   }
 
@@ -919,21 +940,26 @@ document.addEventListener('DOMContentLoaded', function () {
       }
       n.px += (tx - n.px) * 0.08;
       n.py += (ty - n.py) * 0.08;
+      // how visible this node is near the copy block (0 gone → 1 full)
+      n.f = fadeAt(n.x + n.px, n.y + n.py);
     }
 
     // connections (clearer than the classic treatment: alpha up to 0.3)
     ctx.lineWidth = 1;
     for (var a = 0; a < nodes.length; a++) {
       var na = nodes[a];
+      if (na.f <= 0.02) continue;
       var ax = na.x + na.px, ay = na.y + na.py;
       for (var c = a + 1; c < nodes.length; c++) {
         var nc = nodes[c];
+        var lf = Math.min(na.f, nc.f);
+        if (lf <= 0.02) continue;
         var bx = nc.x + nc.px, by = nc.y + nc.py;
         var dx = ax - bx, dy = ay - by;
         var d2 = dx * dx + dy * dy;
         if (d2 < CONNECT * CONNECT) {
           var d = Math.sqrt(d2);
-          ctx.strokeStyle = rgba(colorForX((ax + bx) / 2), (1 - d / CONNECT) * 0.3);
+          ctx.strokeStyle = rgba(colorForX((ax + bx) / 2), (1 - d / CONNECT) * 0.3 * lf);
           ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by); ctx.stroke();
         }
       }
@@ -941,7 +967,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var dxc = ax - mouse.x, dyc = ay - mouse.y;
         var dc2 = dxc * dxc + dyc * dyc;
         if (dc2 < CONNECT * CONNECT) {
-          ctx.strokeStyle = rgba(colorForX(ax), (1 - Math.sqrt(dc2) / CONNECT) * 0.16);
+          ctx.strokeStyle = rgba(colorForX(ax), (1 - Math.sqrt(dc2) / CONNECT) * 0.16 * na.f);
           ctx.beginPath(); ctx.moveTo(mouse.x, mouse.y); ctx.lineTo(ax, ay); ctx.stroke();
         }
       }
@@ -952,6 +978,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var nearest = null, best = Infinity;
     for (var k = 0; k < nodes.length; k++) {
       var nk = nodes[k];
+      if (nk.f < 0.5) continue; // only link to a clearly visible node
       var ddx = nk.x + nk.px - anchor.x, ddy = nk.y + nk.py - anchor.y;
       var dd = ddx * ddx + ddy * ddy;
       if (dd < best) { best = dd; nearest = nk; }
@@ -965,24 +992,33 @@ document.addEventListener('DOMContentLoaded', function () {
       ctx.beginPath(); ctx.moveTo(anchor.x, anchor.y); ctx.lineTo(nearest.x + nearest.px, nearest.y + nearest.py); ctx.stroke();
     }
 
-    // nodes (clearer: brighter cores, wider halos on specials)
+    // nodes (clearer: brighter cores, wider halos on specials);
+    // near the copy block they shrink with their fade and disappear
     var li = 0;
     for (var m = 0; m < nodes.length; m++) {
       var nm = nodes[m];
       var nx = nm.x + nm.px, ny = nm.y + nm.py;
-      var col = colorForX(nx);
+      var f = nm.f;
       if (nm.special) {
-        ctx.fillStyle = rgba(col, 0.16);
-        ctx.beginPath(); ctx.arc(nx, ny, nm.r + 9, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = rgba(col, 0.95);
-        ctx.beginPath(); ctx.arc(nx, ny, nm.r, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = 'rgba(251,251,253,0.95)';
-        ctx.beginPath(); ctx.arc(nx, ny, 2.4, 0, Math.PI * 2); ctx.fill();
         var el = labelEls[li++];
-        if (el) { el.style.left = nx + 'px'; el.style.top = ny + 'px'; }
+        if (el) {
+          el.style.left = nx + 'px';
+          el.style.top = ny + 'px';
+          el.style.opacity = String(f);
+        }
+        if (f <= 0.02) continue;
+        var col = colorForX(nx);
+        var r = nm.r * (0.35 + 0.65 * f);
+        ctx.fillStyle = rgba(col, 0.16 * f);
+        ctx.beginPath(); ctx.arc(nx, ny, r + 9 * f, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = rgba(col, 0.95 * f);
+        ctx.beginPath(); ctx.arc(nx, ny, r, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = 'rgba(251,251,253,' + (0.95 * f) + ')';
+        ctx.beginPath(); ctx.arc(nx, ny, 2.4 * f, 0, Math.PI * 2); ctx.fill();
       } else {
-        ctx.fillStyle = rgba(col, 0.8);
-        ctx.beginPath(); ctx.arc(nx, ny, nm.r, 0, Math.PI * 2); ctx.fill();
+        if (f <= 0.02) continue;
+        ctx.fillStyle = rgba(colorForX(nx), 0.8 * f);
+        ctx.beginPath(); ctx.arc(nx, ny, nm.r * (0.35 + 0.65 * f), 0, Math.PI * 2); ctx.fill();
       }
     }
   }
