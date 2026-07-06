@@ -829,11 +829,21 @@ document.addEventListener('DOMContentLoaded', function () {
         x = b.x0 + ((Math.random() + Math.random()) / 2) * (b.x1 - b.x0);
         y = b.y0 + Math.random() * (b.y1 - b.y0);
       }
-      var dir = Math.random() * Math.PI * 2;
-      var speed = 0.15 * (0.6 + Math.random() * 0.8);
+      // Organic drift: each node breathes around its home point on two
+      // layered sines with incommensurate frequencies — a slow Lissajous
+      // wander that never visibly repeats and is a pure function of time
+      // (frame-rate independent, perfectly smooth).
       nodes.push({
+        hx: x, hy: y,
         x: x, y: y,
-        vx: Math.cos(dir) * speed, vy: Math.sin(dir) * speed,
+        a1: (special ? 8 : 14) + Math.random() * (special ? 8 : 14),
+        a2: 4 + Math.random() * 6,
+        f1: 0.05 + Math.random() * 0.07,
+        f2: 0.11 + Math.random() * 0.09,
+        p1: Math.random() * Math.PI * 2,
+        p2: Math.random() * Math.PI * 2,
+        p3: Math.random() * Math.PI * 2,
+        p4: Math.random() * Math.PI * 2,
         r: special ? 7 : (2.5 + Math.random() * 2),
         px: 0, py: 0,
         special: special, label: special ? LABELS[i] : null
@@ -902,18 +912,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function drawFrame(time) {
     ctx.clearRect(0, 0, W, H);
-    var b = bounds();
 
     for (var i = 0; i < nodes.length; i++) {
       var n = nodes[i];
-      n.x += n.vx; n.y += n.vy;
-      if (n.x < b.x0) n.vx += 0.004;
-      if (n.x > b.x1) n.vx -= 0.004;
-      if (n.y < b.y0) n.vy += 0.004;
-      if (n.y > b.y1) n.vy -= 0.004;
-      var vmax = 0.22;
-      n.vx = Math.max(-vmax, Math.min(vmax, n.vx));
-      n.vy = Math.max(-vmax, Math.min(vmax, n.vy));
+      // layered-sine wander around the home point (slow, subtle, smooth)
+      n.x = n.hx + n.a1 * Math.sin(time * n.f1 + n.p1) + n.a2 * Math.sin(time * n.f2 + n.p2);
+      n.y = n.hy + n.a1 * Math.cos(time * n.f1 * 0.83 + n.p3) + n.a2 * Math.sin(time * n.f2 * 1.27 + n.p4);
 
       var tx = 0, ty = 0;
       if (mouse.active) {
@@ -1023,8 +1027,7 @@ document.addEventListener('DOMContentLoaded', function () {
   resize();
 
   if (reduce) {
-    // settle the layout a little, then draw one still frame
-    for (var s = 0; s < 30; s++) drawFrame(s * 0.05);
+    drawFrame(1.2); // positions are a pure function of time — one frame is enough
     return;
   }
   if ('IntersectionObserver' in window) {
