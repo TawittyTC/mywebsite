@@ -883,6 +883,21 @@ document.addEventListener('DOMContentLoaded', function () {
   var copyRect = null;
   function updateCopyRect() {
     if (!copyEl) { copyRect = null; return; }
+    // Use untransformed offset geometry. getBoundingClientRect bakes in
+    // the scroll-parallax translate — when an in-app browser fires
+    // resize mid-scroll (toolbar collapse), that poisoned the keep-out
+    // zone onto the cluster and hid nearly every node.
+    var top = 0, left = 0, el = copyEl;
+    while (el && el !== hero && el.offsetParent) {
+      top += el.offsetTop;
+      left += el.offsetLeft;
+      el = el.offsetParent;
+    }
+    if (el === hero) {
+      copyRect = { x0: left, y0: top, x1: left + copyEl.offsetWidth, y1: top + copyEl.offsetHeight };
+      return;
+    }
+    // fallback (unexpected DOM): old behaviour
     var hr = hero.getBoundingClientRect();
     var cr = copyEl.getBoundingClientRect();
     copyRect = { x0: cr.left - hr.left, y0: cr.top - hr.top, x1: cr.right - hr.left, y1: cr.bottom - hr.top };

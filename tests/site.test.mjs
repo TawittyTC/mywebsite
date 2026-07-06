@@ -252,3 +252,32 @@ test('mobile: constellation never draws inside the hero copy block', async () =>
   assert.equal(inked, 0, `${inked} canvas pixels drawn over the hero text`);
   await page.close();
 });
+
+test('mobile: resize while scrolled (in-app toolbar) does not blank the constellation', async () => {
+  const { page } = await openPage({
+    viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true,
+  });
+  await page.waitForTimeout(2500);
+  // scroll deep into the page, then resize (like an in-app browser
+  // collapsing its toolbars mid-scroll), then return to the top
+  await page.evaluate(() => window.scrollTo(0, 3000));
+  await page.setViewportSize({ width: 390, height: 944 });
+  await page.waitForTimeout(400);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.waitForTimeout(1500);
+  // most labeled nodes must still be visible
+  const visible = await page.$$eval('#hero-net-labels .hero-net-label',
+    (els) => els.filter((el) => parseFloat(el.style.opacity || '1') > 0.5).length);
+  assert.ok(visible >= 4, `only ${visible}/6 labeled nodes visible after mid-scroll resize`);
+  // and the cluster area must actually contain ink
+  const inked = await page.evaluate(() => {
+    const c = document.getElementById('hero-net');
+    const d = c.getContext('2d').getImageData(0, Math.round(c.height * 0.55), c.width, Math.round(c.height * 0.4)).data;
+    let n = 0;
+    for (let i = 3; i < d.length; i += 4) if (d[i] > 8) n++;
+    return n;
+  });
+  assert.ok(inked > 2000, `cluster area nearly empty (${inked} px) after mid-scroll resize`);
+  await page.close();
+});
