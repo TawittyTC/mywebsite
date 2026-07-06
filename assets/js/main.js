@@ -822,8 +822,16 @@ document.addEventListener('DOMContentLoaded', function () {
       ? { x0: W * 0.05, x1: W * 0.95, y0: H * 0.52, y1: H * 0.94 }
       : { x0: W * 0.44, x1: W * 0.97, y0: H * 0.08, y1: H * 0.92 };
   }
+  // Where the breathing hairline starts — always OUTSIDE the copy
+  // block (below it on phones, to its right on desktop) so the line
+  // can never cross the text.
   function anchorPoint() {
-    return isMobile() ? { x: W * 0.5, y: H * 0.46 } : { x: W * 0.36, y: H * 0.46 };
+    if (copyRect) {
+      return isMobile()
+        ? { x: (copyRect.x0 + copyRect.x1) / 2, y: copyRect.y1 + 30 }
+        : { x: copyRect.x1 + 26, y: (copyRect.y0 + copyRect.y1) / 2 };
+    }
+    return isMobile() ? { x: W * 0.5, y: H * 0.55 } : { x: W * 0.36, y: H * 0.46 };
   }
 
   function makeNodes() {
@@ -884,7 +892,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var dx = Math.max(copyRect.x0 - x, 0, x - copyRect.x1);
     var dy = Math.max(copyRect.y0 - y, 0, y - copyRect.y1);
     var d = Math.sqrt(dx * dx + dy * dy);
-    return Math.max(0, Math.min(1, (d - 24) / 130));
+    return Math.max(0, Math.min(1, (d - 30) / 130));
   }
 
   function resize() {
@@ -911,6 +919,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
   window.addEventListener('resize', function () { resize(); if (reduce) drawFrame(1.2); }, { passive: true });
+  window.addEventListener('load', updateCopyRect);
 
   function drawFrame(time) {
     ctx.clearRect(0, 0, W, H);

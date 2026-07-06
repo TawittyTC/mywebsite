@@ -242,3 +242,25 @@ test('back-to-top appears after scrolling and returns to top', async () => {
   await page.waitForFunction(() => window.scrollY === 0, null, { timeout: 5000 });
   await page.close();
 });
+
+test('mobile: constellation never draws inside the hero copy block', async () => {
+  const { page } = await openPage({
+    viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true,
+  });
+  await page.waitForTimeout(4000); // let nodes drift toward the text
+  const inked = await page.evaluate(() => {
+    const c = document.getElementById('hero-net');
+    const hr = document.getElementById('hero').getBoundingClientRect();
+    const cr = document.querySelector('#hero .hero-copy').getBoundingClientRect();
+    const dpr = c.width / hr.width;
+    const x = Math.max(0, Math.round((cr.left - hr.left) * dpr));
+    const y = Math.max(0, Math.round((cr.top - hr.top) * dpr));
+    const d = c.getContext('2d')
+      .getImageData(x, y, Math.round(cr.width * dpr), Math.round(cr.height * dpr)).data;
+    let n = 0;
+    for (let i = 3; i < d.length; i += 4) if (d[i] > 8) n++;
+    return n;
+  });
+  assert.equal(inked, 0, `${inked} canvas pixels drawn over the hero text`);
+  await page.close();
+});
