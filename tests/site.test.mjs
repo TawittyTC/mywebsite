@@ -96,11 +96,22 @@ test('page loads with no console errors and no failed asset requests', async () 
   await page.close();
 });
 
-test('hero renders name, typed role and ambient-light layers', async () => {
+test('hero renders name, eyebrow and the multi-agent constellation', async () => {
   const { page } = await openPage();
   assert.match(await page.textContent('#hero h1'), /Tanapol Chamnanhan/);
+  assert.match(await page.textContent('#hero .hero-eyebrow'), /Software Engineer/);
   await page.waitForFunction(() => document.querySelector('#hero .typed')?.textContent.length > 0);
-  assert.equal(await page.locator('#hero .hero-aurora').count(), 3);
+  assert.equal(await page.locator('#hero-net').count(), 1, 'constellation canvas missing');
+  const labels = await page.$$eval('#hero-net-labels .hero-net-label', (els) => els.map((e) => e.textContent));
+  assert.deepEqual(labels.sort(), ['ASR', 'CRM', 'IVR', 'LLM', 'POS', 'TTS'], 'labeled nodes missing');
+  // canvas actually drew something
+  const painted = await page.evaluate(() => {
+    const c = document.getElementById('hero-net');
+    const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data;
+    for (let i = 3; i < d.length; i += 4) if (d[i] > 0) return true;
+    return false;
+  });
+  assert.ok(painted, 'constellation canvas is blank');
   await page.close();
 });
 
@@ -195,5 +206,49 @@ test('mobile viewport renders hero and certificates', async () => {
   await page.evaluate(() => document.getElementById('certificates').scrollIntoView());
   await page.waitForSelector('#images-list img');
   assert.deepEqual(errors, [], `mobile console errors:\n${errors.join('\n')}`);
+  await page.close();
+});
+
+test('hero stays clean: no navbar, no CTA buttons; name lines carry the ink treatment', async () => {
+  const { page } = await openPage();
+  assert.equal(await page.locator('#site-nav').count(), 0, 'navbar should be removed');
+  assert.equal(await page.locator('#hero .hero-btn').count(), 0, 'CTA buttons should be removed');
+  const clipped = await page.$$eval('#hero .hero-name-line', (els) =>
+    els.map((el) => getComputedStyle(el).webkitBackgroundClip || getComputedStyle(el).backgroundClip)
+  );
+  assert.equal(clipped.length, 2, 'expected two name lines');
+  clipped.forEach((v) => assert.equal(v, 'text', 'name gradient ink missing'));
+  await page.close();
+});
+
+test('back-to-top appears after scrolling and returns to top', async () => {
+  const { page } = await openPage();
+  assert.ok(!(await page.$eval('#back-to-top', (b) => b.classList.contains('visible'))), 'hidden at top');
+  await page.evaluate(() => window.scrollTo(0, 2000));
+  await page.waitForFunction(() => document.getElementById('back-to-top').classList.contains('visible'));
+  await page.click('#back-to-top');
+  await page.waitForFunction(() => window.scrollY === 0, null, { timeout: 5000 });
+  await page.close();
+});
+
+test('mobile: constellation never draws inside the hero copy block', async () => {
+  const { page } = await openPage({
+    viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true,
+  });
+  await page.waitForTimeout(4000); // let nodes drift toward the text
+  const inked = await page.evaluate(() => {
+    const c = document.getElementById('hero-net');
+    const hr = document.getElementById('hero').getBoundingClientRect();
+    const cr = document.querySelector('#hero .hero-copy').getBoundingClientRect();
+    const dpr = c.width / hr.width;
+    const x = Math.max(0, Math.round((cr.left - hr.left) * dpr));
+    const y = Math.max(0, Math.round((cr.top - hr.top) * dpr));
+    const d = c.getContext('2d')
+      .getImageData(x, y, Math.round(cr.width * dpr), Math.round(cr.height * dpr)).data;
+    let n = 0;
+    for (let i = 3; i < d.length; i += 4) if (d[i] > 8) n++;
+    return n;
+  });
+  assert.equal(inked, 0, `${inked} canvas pixels drawn over the hero text`);
   await page.close();
 });
