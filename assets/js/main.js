@@ -796,6 +796,10 @@ document.addEventListener('DOMContentLoaded', function () {
   var LABELS = ['CRM', 'POS', 'ASR', 'TTS', 'LLM', 'IVR'];
   var nodes = [], labelEls = [];
   var pulses = [], nextPulse = 0.9; // signals travelling along the links
+  // eased state for the node-lit name ink
+  var nameEl = hero.querySelector('.hero-name');
+  var inkX = 62, inkR = 180, inkG = 96, inkB = 42;
+  var inkNode = null, nextInkSwitch = 1.6;
 
   function bounds() {
     return isMobile()
@@ -1041,6 +1045,33 @@ document.addEventListener('DOMContentLoaded', function () {
       g.addColorStop(1, rgba(COOL, breathe));
       ctx.strokeStyle = g;
       ctx.beginPath(); ctx.moveTo(anchor.x, anchor.y); ctx.lineTo(nearest.x + nearest.px, nearest.y + nearest.py); ctx.stroke();
+
+      // The name mirrors the constellation's ink: the glow in the
+      // letters tracks one agent node at a time — its horizontal spot
+      // in the name matches where that agent sits in the cluster, in
+      // that agent's own color. Focus glides to another agent every
+      // few seconds.
+      if (nameEl) {
+        if (time >= nextInkSwitch) {
+          nextInkSwitch = time + 3.5 + Math.random() * 2.5;
+          var cands = [];
+          for (var ci = 0; ci < nodes.length; ci++) {
+            if (nodes[ci].special && nodes[ci].f > 0.4) cands.push(nodes[ci]);
+          }
+          inkNode = cands.length ? cands[(Math.random() * cands.length) | 0] : nearest;
+        }
+        var src = (inkNode && inkNode.f > 0.3) ? inkNode : nearest;
+        var cb = bounds();
+        var targetC = colorForX(src.x + src.px);
+        var rel = ((src.x + src.px) - cb.x0) / Math.max(cb.x1 - cb.x0, 1);
+        var targetX = 12 + Math.max(0, Math.min(1, rel)) * 76;
+        inkX += (targetX - inkX) * 0.02;
+        inkR += (targetC.r - inkR) * 0.02;
+        inkG += (targetC.g - inkG) * 0.02;
+        inkB += (targetC.b - inkB) * 0.02;
+        nameEl.style.setProperty('--ink-x', inkX.toFixed(1) + '%');
+        nameEl.style.setProperty('--ink-c', 'rgb(' + Math.round(inkR) + ',' + Math.round(inkG) + ',' + Math.round(inkB) + ')');
+      }
     }
 
     // nodes (clearer: brighter cores, wider halos on specials);

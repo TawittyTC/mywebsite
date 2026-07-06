@@ -729,32 +729,32 @@ button {
   line-height: 1.03;
   color: var(--color-text);
 }
-/* The ink of the constellation flows through the letters */
+/* The name is lit by the constellation: a colored glow sits in the
+   letters on the side facing the nearest node, in that node's own
+   ink — JS eases --ink-x / --ink-c toward it every frame. */
+#hero .hero-name {
+  --ink-x: 62%;
+  --ink-c: #B4602A;
+}
 .hero-name-line {
   display: block;
-  background-image: linear-gradient(105deg,
-    #1d1d1f 0%, #1d1d1f 28%,
-    #B4602A 44%, #D99043 52%, #3F6EA6 64%,
-    #1d1d1f 80%, #1d1d1f 100%);
-  background-size: 240% 100%;
-  background-position: 0% 0;
+  background-image: linear-gradient(100deg,
+    #1d1d1f 0%,
+    #1d1d1f calc(var(--ink-x) - 30%),
+    var(--ink-c) var(--ink-x),
+    #1d1d1f calc(var(--ink-x) + 30%),
+    #1d1d1f 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation:
-    name-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) both,
-    hero-ink 12s ease-in-out 0.9s infinite;
+  animation: name-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 .hero-name-line:nth-child(2) {
-  animation-delay: 0.14s, 1.04s;
+  animation-delay: 0.14s;
 }
 @keyframes name-rise {
   from { opacity: 0; transform: translateY(24px); }
   to   { opacity: 1; transform: none; }
-}
-@keyframes hero-ink {
-  0%, 100% { background-position: 0% 0; }
-  50%      { background-position: 100% 0; }
 }
 
 #hero .hero-role {
@@ -1126,6 +1126,6 @@ select:focus-visible {
 
 @media (prefers-reduced-motion: reduce) {
   #hero .typed::after { animation: none; }
-  .hero-name-line { animation: none; opacity: 1; transform: none; background-position: 55% 0; }
+  .hero-name-line { animation: none; opacity: 1; transform: none; }
   .js-reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
 }
