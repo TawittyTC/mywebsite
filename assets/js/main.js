@@ -886,14 +886,26 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function resize() {
     var rect = hero.getBoundingClientRect();
+    // WKWebViews (e.g. Facebook's in-app browser) can report a transient
+    // 0-sized rect mid-layout — retry instead of building degenerate state
+    if (rect.width < 10 || rect.height < 10) {
+      requestAnimationFrame(resize);
+      return;
+    }
+    var changed = Math.abs(rect.width - W) > 1 || Math.abs(rect.height - H) > 1;
     W = rect.width;
     H = rect.height;
     DPR = Math.min(window.devicePixelRatio || 1, 2);
     canvas.width = Math.round(W * DPR);
     canvas.height = Math.round(H * DPR);
+    // explicit CSS size — never rely on stretch alone
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     updateCopyRect();
-    makeNodes();
+    // iOS fires resize continuously while the URL bar collapses during
+    // scroll — only reseed the graph when the size really changed
+    if (changed || !nodes.length) makeNodes();
   }
 
   if (finePointer) {
@@ -907,8 +919,14 @@ document.addEventListener('DOMContentLoaded', function () {
       mouse.active = false; mouse.x = -9999; mouse.y = -9999;
     });
   }
-  window.addEventListener('resize', function () { resize(); if (reduce) drawFrame(1.2); }, { passive: true });
-  window.addEventListener('load', updateCopyRect);
+  window.addEventListener('resize', resize, { passive: true });
+  window.addEventListener('load', function () { updateCopyRect(); resize(); }, { passive: true });
+  // iOS/WKWebView can purge a canvas backing store while the page is
+  // hidden or restored from the back-forward cache — repaint on return
+  window.addEventListener('pageshow', resize, { passive: true });
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden) resize();
+  });
 
   function drawFrame(time) {
     ctx.clearRect(0, 0, W, H);
@@ -1019,17 +1037,16 @@ document.addEventListener('DOMContentLoaded', function () {
   function loop(ts) {
     if (!running) return;
     if (t0 === null) t0 = ts;
-    drawFrame((ts - t0) / 1000);
+    // Under reduced motion the scene is repainted with frozen time:
+    // visually static, but the continuous paint keeps the canvas
+    // backing store alive on iOS/WKWebView, which purges idle canvases.
+    drawFrame(reduce ? 1.2 : (ts - t0) / 1000);
     requestAnimationFrame(loop);
   }
 
   makeLabels();
   resize();
 
-  if (reduce) {
-    drawFrame(1.2); // positions are a pure function of time — one frame is enough
-    return;
-  }
   if ('IntersectionObserver' in window) {
     var io = new IntersectionObserver(function (entries) {
       var vis = entries[0].isIntersecting;
