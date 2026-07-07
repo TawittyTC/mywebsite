@@ -187,3 +187,25 @@ test('name ink follows the nodes (CSS vars driven and changing)', async () => {
   assert.ok(a.x !== b.x || a.c !== b.c, 'name ink frozen — not following nodes');
   await page.close();
 });
+
+test('animation resumes after scrolling away and back (observer stop/start)', async () => {
+  const { page } = await ctx.openPage();
+  await page.waitForTimeout(2600);
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  await page.waitForTimeout(600);
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.waitForFunction(() => { window.scrollTo(0, 0); return window.scrollY === 0; });
+  await page.waitForTimeout(400);
+  const snap = () => page.evaluate(`(() => {
+    const c = document.getElementById('hero-net');
+    const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data;
+    let h = 0;
+    for (let i = 3; i < d.length; i += 4096) h = (h * 31 + d[i]) | 0;
+    return h;
+  })()`);
+  const a = await snap();
+  await page.waitForTimeout(700);
+  const b = await snap();
+  assert.notEqual(a, b, 'animation did not resume after returning to the hero');
+  await page.close();
+});

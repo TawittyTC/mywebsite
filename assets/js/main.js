@@ -335,7 +335,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   if ("IntersectionObserver" in window) {
     const obs = new IntersectionObserver(function(entries) {
-      if (entries[0].isIntersecting) { buildCerts(); obs.disconnect(); }
+      if (entries.some(function (e) { return e.isIntersecting; })) { buildCerts(); obs.disconnect(); }
     }, { rootMargin: "200px" });
     obs.observe(imagesList);
   } else {
@@ -442,7 +442,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Trigger hint immediately when section scrolls into view
     var hintStarted = false;
     var hintObs = new IntersectionObserver(function(entries) {
-      if (entries[0].isIntersecting && !hintStarted) {
+      if (entries.some(function (e) { return e.isIntersecting; }) && !hintStarted) {
         hintStarted = true;
         hintObs.disconnect();
         runHint();
@@ -574,7 +574,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Trigger hint immediately when section scrolls into view
     var hintStarted = false;
     var hintObs = new IntersectionObserver(function(entries) {
-      if (entries[0].isIntersecting && !hintStarted) {
+      if (entries.some(function (e) { return e.isIntersecting; }) && !hintStarted) {
         hintStarted = true;
         hintObs.disconnect();
         runHint();
@@ -1151,10 +1151,10 @@ document.addEventListener('DOMContentLoaded', function () {
     // iOS batches resize events until scroll momentum ends; catch the
     // container changing size the moment it happens instead
     if (Math.abs(hero.clientWidth - W) > 1 || Math.abs(hero.clientHeight - H) > 1) resize();
-    // Under reduced motion the scene is repainted with frozen time:
-    // visually static, but the continuous paint keeps the canvas
-    // backing store alive on iOS/WKWebView, which purges idle canvases.
-    drawFrame(reduce ? 1.2 : (ts - t0) / 1000);
+    // Under reduced motion the scene drifts at quarter speed (no
+    // pulses, no assembly) — never a hard freeze, and the continuous
+    // paint keeps the canvas backing store alive on iOS/WKWebView.
+    drawFrame((ts - t0) / (reduce ? 4500 : 1000));
     requestAnimationFrame(loop);
   }
 
@@ -1163,11 +1163,24 @@ document.addEventListener('DOMContentLoaded', function () {
 
   if ('IntersectionObserver' in window) {
     var io = new IntersectionObserver(function (entries) {
-      var vis = entries[0].isIntersecting;
+      // entries arrive oldest-first and browsers (Firefox especially)
+      // batch several per callback — always act on the newest state
+      var vis = entries[entries.length - 1].isIntersecting;
       if (vis && !running) { running = true; requestAnimationFrame(loop); }
       else if (!vis) { running = false; }
     }, { threshold: 0 });
     io.observe(hero);
+    // watchdog: if the observer ever leaves us stopped while the hero is
+    // actually on screen (batched/stale entries), restart on scroll
+    window.addEventListener('scroll', function () {
+      if (!running) {
+        var r = hero.getBoundingClientRect();
+        if (r.bottom > 0 && r.top < window.innerHeight) {
+          running = true;
+          requestAnimationFrame(loop);
+        }
+      }
+    }, { passive: true });
   } else {
     running = true;
     requestAnimationFrame(loop);
