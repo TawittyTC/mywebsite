@@ -848,8 +848,8 @@ document.addEventListener('DOMContentLoaded', function () {
         x: x, y: y,
         a1: (special ? 10 : 16) + Math.random() * (special ? 8 : 16),
         a2: 5 + Math.random() * 7,
-        f1: 0.34 + Math.random() * 0.22,
-        f2: 0.68 + Math.random() * 0.42,
+        f1: 0.5 + Math.random() * 0.3,
+        f2: 0.95 + Math.random() * 0.55,
         p1: Math.random() * Math.PI * 2,
         p2: Math.random() * Math.PI * 2,
         p3: Math.random() * Math.PI * 2,
@@ -962,12 +962,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function drawFrame(time) {
     ctx.clearRect(0, 0, W, H);
+    var ampScale = Math.max(1, Math.min(W / 1100, 2));
 
     for (var i = 0; i < nodes.length; i++) {
       var n = nodes[i];
-      // layered-sine wander around the fractional home point
-      n.x = n.fx * W + n.a1 * Math.sin(time * n.f1 + n.p1) + n.a2 * Math.sin(time * n.f2 + n.p2);
-      n.y = n.fy * H + n.a1 * Math.cos(time * n.f1 * 0.83 + n.p3) + n.a2 * Math.sin(time * n.f2 * 1.27 + n.p4);
+      // layered-sine wander around the fractional home point;
+      // amplitudes scale with the hero so 2K screens feel as alive
+      // as phones (fixed px reads tiny on a wide canvas)
+      var A = ampScale;
+      n.x = n.fx * W + A * (n.a1 * Math.sin(time * n.f1 + n.p1) + n.a2 * Math.sin(time * n.f2 + n.p2));
+      n.y = n.fy * H + A * (n.a1 * Math.cos(time * n.f1 * 0.83 + n.p3) + n.a2 * Math.sin(time * n.f2 * 1.27 + n.p4));
 
       // entrance: fly in + fade in, staggered — the network assembles
       // itself in the first ~2s (skipped under reduced motion)
@@ -1151,10 +1155,10 @@ document.addEventListener('DOMContentLoaded', function () {
     // iOS batches resize events until scroll momentum ends; catch the
     // container changing size the moment it happens instead
     if (Math.abs(hero.clientWidth - W) > 1 || Math.abs(hero.clientHeight - H) > 1) resize();
-    // Under reduced motion the scene drifts at quarter speed (no
-    // pulses, no assembly) — never a hard freeze, and the continuous
-    // paint keeps the canvas backing store alive on iOS/WKWebView.
-    drawFrame((ts - t0) / (reduce ? 4500 : 1000));
+    // Under reduced motion the scene drifts at half speed (no pulses,
+    // no assembly) — never a hard freeze, and the continuous paint
+    // keeps the canvas backing store alive on iOS/WKWebView.
+    drawFrame((ts - t0) / (reduce ? 2000 : 1000));
     requestAnimationFrame(loop);
   }
 
