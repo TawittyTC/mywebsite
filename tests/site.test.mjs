@@ -115,20 +115,23 @@ test('hero renders name, eyebrow and the multi-agent constellation', async () =>
   await page.close();
 });
 
-test('scroll parallax moves and fades the hero copy', async () => {
+test('hero is rigid during scroll: no parallax transform, nodes stay put', async () => {
   const { page } = await openPage();
-  const before = await page.$eval('#hero .hero-copy', (el) => ({
-    transform: el.style.transform, opacity: getComputedStyle(el).opacity,
-  }));
+  await page.waitForTimeout(2600);
+  const before = await page.$$eval('#hero-net-labels .hero-net-label',
+    (els) => els.map((el) => [parseFloat(el.style.left), parseFloat(el.style.top)]));
   await page.evaluate(() => window.scrollTo(0, 400));
-  await page.waitForFunction(
-    (prev) => document.querySelector('#hero .hero-copy').style.transform !== prev,
-    before.transform, { timeout: 5000 }
+  await page.waitForTimeout(500);
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.waitForTimeout(500);
+  assert.equal(
+    await page.$eval('#hero .hero-copy', (el) => el.style.transform || ''),
+    '', 'hero copy must not carry a scroll parallax transform'
   );
-  const after = await page.$eval('#hero .hero-copy', (el) => ({
-    transform: el.style.transform, opacity: getComputedStyle(el).opacity,
-  }));
-  assert.ok(Number(after.opacity) < Number(before.opacity), 'hero copy did not fade on scroll');
+  const after = await page.$$eval('#hero-net-labels .hero-net-label',
+    (els) => els.map((el) => [parseFloat(el.style.left), parseFloat(el.style.top)]));
+  const moved = before.map((p, i) => Math.hypot(after[i][0] - p[0], after[i][1] - p[1]));
+  assert.ok(Math.max(...moved) < 70, `nodes shifted ${Math.max(...moved).toFixed(0)}px across a scroll round-trip`);
   await page.close();
 });
 
