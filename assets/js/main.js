@@ -668,28 +668,8 @@ document.addEventListener('DOMContentLoaded', function () {
 (function () {
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  // ---- Hero parallax (scroll) ----
-  var hero = document.getElementById('hero');
-  if (hero && !reduce) {
-    var copy = hero.querySelector('.hero-copy');
-    var ticking = false;
-
-    function apply() {
-      ticking = false;
-      var sy = window.scrollY || window.pageYOffset || 0;
-      var h = hero.offsetHeight || window.innerHeight;
-      var prog = Math.min(Math.max(sy / h, 0), 1);
-      if (copy) {
-        copy.style.transform = 'translate3d(0,' + (sy * 0.32) + 'px,0)';
-        copy.style.opacity = String(Math.max(1 - prog * 1.15, 0));
-      }
-    }
-    function requestTick() { if (!ticking) { ticking = true; requestAnimationFrame(apply); } }
-
-    window.addEventListener('scroll', requestTick, { passive: true });
-    window.addEventListener('resize', requestTick, { passive: true });
-    apply();
-  }
+  // (hero copy scroll-parallax removed — the page scrolls rigidly, so
+  // nothing in the hero ever moves relative to anything else on scroll)
 
   // ---- Scroll reveals ----
   // Position-checked on each (rAF-throttled) scroll instead of
@@ -796,15 +776,22 @@ document.addEventListener('DOMContentLoaded', function () {
   var LABELS = ['CRM', 'POS', 'ASR', 'TTS', 'LLM', 'IVR'];
   var nodes = [], labelEls = [];
   var pulses = [], nextPulse = 0.9; // signals travelling along the links
+  // The graph is laid out against these frozen dimensions — NOT the live
+  // canvas size. In-app browser toolbars change the hero height on every
+  // scroll; keying node positions to the live height made the whole
+  // cluster breathe with it. Layout dims only re-adopt on a real width
+  // change (rotation / window resize) or a drastic height change.
+  var layoutW = 0, layoutH = 0;
   // eased state for the node-lit name ink
   var nameEl = hero.querySelector('.hero-name');
   var inkX = 62, inkR = 180, inkG = 96, inkB = 42;
   var inkNode = null, nextInkSwitch = 1.6;
 
   function bounds() {
+    var bw = layoutW || W, bh = layoutH || H;
     return isMobile()
-      ? { x0: W * 0.05, x1: W * 0.95, y0: H * 0.52, y1: H * 0.94 }
-      : { x0: W * 0.44, x1: W * 0.97, y0: H * 0.08, y1: H * 0.92 };
+      ? { x0: bw * 0.05, x1: bw * 0.95, y0: bh * 0.52, y1: bh * 0.94 }
+      : { x0: bw * 0.44, x1: bw * 0.97, y0: bh * 0.08, y1: bh * 0.92 };
   }
   // Where the breathing hairline starts — always OUTSIDE the copy
   // block (below it on phones, to its right on desktop) so the line
@@ -844,7 +831,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // home as FRACTIONS of the hero size — recomputed every frame,
         // so the graph tracks container resizes continuously (iOS
         // delivers resize events late during scroll; fractions don't care)
-        fx: x / W, fy: y / H,
+        fx: x / (layoutW || W), fy: y / (layoutH || H),
         x: x, y: y,
         a1: (special ? 10 : 16) + Math.random() * (special ? 8 : 16),
         a2: 5 + Math.random() * 7,
@@ -932,9 +919,16 @@ document.addEventListener('DOMContentLoaded', function () {
     canvas.style.height = H + 'px';
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     updateCopyRect();
-    // The graph is seeded exactly once; homes are fractions of W/H,
-    // so a resize needs no node bookkeeping at all.
-    if (!nodes.length) makeNodes();
+    if (!nodes.length) {
+      layoutW = W;
+      layoutH = H;
+      makeNodes();
+    } else if (Math.abs(W - layoutW) > 1 || Math.abs(H - layoutH) > layoutH * 0.25) {
+      // real layout change (rotation, desktop window resize) — re-anchor;
+      // toolbar-sized height churn is deliberately ignored
+      layoutW = W;
+      layoutH = H;
+    }
   }
 
   if (finePointer) {
@@ -970,8 +964,8 @@ document.addEventListener('DOMContentLoaded', function () {
       // amplitudes scale with the hero so 2K screens feel as alive
       // as phones (fixed px reads tiny on a wide canvas)
       var A = ampScale;
-      n.x = n.fx * W + A * (n.a1 * Math.sin(time * n.f1 + n.p1) + n.a2 * Math.sin(time * n.f2 + n.p2));
-      n.y = n.fy * H + A * (n.a1 * Math.cos(time * n.f1 * 0.83 + n.p3) + n.a2 * Math.sin(time * n.f2 * 1.27 + n.p4));
+      n.x = n.fx * layoutW + A * (n.a1 * Math.sin(time * n.f1 + n.p1) + n.a2 * Math.sin(time * n.f2 + n.p2));
+      n.y = n.fy * layoutH + A * (n.a1 * Math.cos(time * n.f1 * 0.83 + n.p3) + n.a2 * Math.sin(time * n.f2 * 1.27 + n.p4));
 
       // entrance: fly in + fade in, staggered — the network assembles
       // itself in the first ~2s (skipped under reduced motion)
