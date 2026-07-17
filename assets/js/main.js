@@ -912,12 +912,22 @@ document.addEventListener('DOMContentLoaded', function () {
     W = rect.width;
     H = rect.height;
     DPR = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width = Math.round(W * DPR);
-    canvas.height = Math.round(H * DPR);
-    // explicit CSS size — never rely on stretch alone
-    canvas.style.width = W + 'px';
-    canvas.style.height = H + 'px';
-    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    var bw = Math.round(W * DPR), bh = Math.round(H * DPR);
+    // Setting canvas.width WIPES the bitmap even when the value is
+    // unchanged — a resize() storm (Firefox reports fractional sizes
+    // that oscillate) then flashes blank frames. Only realloc when the
+    // bitmap really changes, and repaint in the same tick so there is
+    // never a blank gap on screen.
+    var bitmapChanged = canvas.width !== bw || canvas.height !== bh;
+    if (bitmapChanged) {
+      canvas.width = bw;
+      canvas.height = bh;
+      canvas.style.width = W + 'px';
+      canvas.style.height = H + 'px';
+    }
+    // exact device-pixel mapping — fractional DPRs (Windows 125%/150%)
+    // otherwise leave thin lines shimmering between pixels
+    ctx.setTransform(bw / W, 0, 0, bh / H, 0, 0);
     updateCopyRect();
     if (!nodes.length) {
       layoutW = W;
@@ -929,6 +939,7 @@ document.addEventListener('DOMContentLoaded', function () {
       layoutW = W;
       layoutH = H;
     }
+    if (bitmapChanged && nodes.length) drawFrame(lastDrawT);
   }
 
   if (finePointer) {
@@ -1142,17 +1153,19 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  var running = false, t0 = null;
+  var running = false, t0 = null, lastDrawT = 0.01;
   function loop(ts) {
     if (!running) return;
     if (t0 === null) t0 = ts;
     // iOS batches resize events until scroll momentum ends; catch the
     // container changing size the moment it happens instead
-    if (Math.abs(hero.clientWidth - W) > 1 || Math.abs(hero.clientHeight - H) > 1) resize();
+    // (tolerance 2px: fractional-layout jitter must not trigger it)
+    if (Math.abs(hero.clientWidth - W) > 2 || Math.abs(hero.clientHeight - H) > 2) resize();
     // Under reduced motion the scene drifts at half speed (no pulses,
     // no assembly) — never a hard freeze, and the continuous paint
     // keeps the canvas backing store alive on iOS/WKWebView.
-    drawFrame((ts - t0) / (reduce ? 2000 : 1000));
+    lastDrawT = (ts - t0) / (reduce ? 2000 : 1000);
+    drawFrame(lastDrawT);
     requestAnimationFrame(loop);
   }
 
