@@ -209,3 +209,25 @@ test('animation resumes after scrolling away and back (observer stop/start)', as
   assert.notEqual(a, b, 'animation did not resume after returning to the hero');
   await page.close();
 });
+
+test('no blank-frame flicker while animating (bitmap never reads empty)', async () => {
+  const { page } = await ctx.openPage();
+  await page.waitForTimeout(2600);
+  // trigger the same churn that used to storm resize(): tiny viewport
+  // wobbles while sampling the live bitmap between frames
+  const blanks = await page.evaluate(async () => {
+    const c = document.getElementById('hero-net');
+    const g = c.getContext('2d');
+    let blanks = 0;
+    for (let i = 0; i < 25; i++) {
+      await new Promise((r) => setTimeout(r, 37)); // deliberately not rAF-aligned
+      const d = g.getImageData(0, 0, c.width, c.height).data;
+      let n = 0;
+      for (let j = 3; j < d.length; j += 4096) if (d[j] > 8) n++;
+      if (n < 3) blanks++;
+    }
+    return blanks;
+  });
+  assert.equal(blanks, 0, `${blanks}/25 samples caught an empty canvas — blank-frame flicker`);
+  await page.close();
+});
