@@ -671,6 +671,35 @@ document.addEventListener('DOMContentLoaded', function () {
   // (hero copy scroll-parallax removed — the page scrolls rigidly, so
   // nothing in the hero ever moves relative to anything else on scroll)
 
+  // Freeze the hero's height. In-app browsers (Facebook/LINE) resize
+  // the viewport on every toolbar collapse; a vh/svh-sized hero then
+  // stretches and shrinks mid-scroll, shoving every section below it
+  // up and down. Measure once, pin in px; re-measure only on a real
+  // layout change (width change / rotation / drastic height change).
+  var heroLock = document.getElementById('hero');
+  if (heroLock) {
+    var lockW = 0, lockH = 0;
+    var lockHero = function () {
+      var w = window.innerWidth;
+      heroLock.style.height = '';
+      heroLock.style.minHeight = '';
+      var h = heroLock.getBoundingClientRect().height;
+      if (h > 100) {
+        lockW = w;
+        lockH = h;
+        heroLock.style.height = h + 'px';
+        heroLock.style.minHeight = h + 'px';
+      }
+    };
+    var maybeRelock = function () {
+      var w = window.innerWidth, h = window.innerHeight;
+      if (!lockH || Math.abs(w - lockW) > 1 || Math.abs(h - lockH) > lockH * 0.25) lockHero();
+    };
+    lockHero();
+    window.addEventListener('resize', maybeRelock, { passive: true });
+    window.addEventListener('orientationchange', function () { lockH = 0; maybeRelock(); }, { passive: true });
+  }
+
   // ---- Scroll reveals ----
   // Position-checked on each (rAF-throttled) scroll instead of
   // IntersectionObserver: IO can skip an element entirely when a fast
