@@ -97,11 +97,10 @@ section {
   overflow: hidden;
 }
 
-/* Performance: skip rendering off-screen sections until needed */
-#resume, #skill, #portfolio, #certificates, #experience {
-  content-visibility: auto;
-  contain-intrinsic-size: 0 800px;
-}
+/* NOTE: content-visibility:auto was removed here on purpose — its
+   800px placeholder heights swapped to real heights mid-scroll, making
+   the page length jump around. Images already lazy-load, which covers
+   the meaningful part of the perf win. */
 
 .section-title {
   text-align: center;
@@ -521,6 +520,8 @@ button {
   display: block;
   width: 100%;
   height: 100%;
+  /* reserve the box before the lazy image arrives — no layout shift */
+  aspect-ratio: 4 / 3;
   object-fit: contain;
   border-radius: 8px;
 }
@@ -738,16 +739,21 @@ button {
 }
 .hero-name-line {
   display: block;
-  background-image: linear-gradient(100deg,
-    #1d1d1f 0%,
-    #1d1d1f calc(var(--ink-x) - 30%),
-    var(--ink-c) var(--ink-x),
-    #1d1d1f calc(var(--ink-x) + 30%),
-    #1d1d1f 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--color-text); /* fallback: solid ink, never invisible text */
   animation: name-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .hero-name-line {
+    background-image: linear-gradient(100deg,
+      #1d1d1f 0%,
+      #1d1d1f calc(var(--ink-x) - 30%),
+      var(--ink-c) var(--ink-x),
+      #1d1d1f calc(var(--ink-x) + 30%),
+      #1d1d1f 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
 }
 .hero-name-line:nth-child(2) {
   animation-delay: 0.14s;

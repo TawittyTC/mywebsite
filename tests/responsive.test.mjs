@@ -128,3 +128,24 @@ test('viewport churn never changes the hero height or shoves sections around', a
     `resume section moved ${(after.resumeTop - before.resumeTop).toFixed(0)}px during viewport churn`);
   await page.close();
 });
+
+test('page length is stable while scrolling (no placeholder/CLS jumps)', async () => {
+  for (const width of [390, 1440]) {
+    const { page } = await ctx.openPage({
+      viewport: { width, height: 850 }, isMobile: width < 800, hasTouch: width < 800,
+    });
+    await page.waitForTimeout(800);
+    const before = await page.evaluate(() => document.body.scrollHeight);
+    await page.evaluate(async () => {
+      for (let y = 0; y <= document.body.scrollHeight; y += 500) {
+        window.scrollTo(0, y);
+        await new Promise((r) => setTimeout(r, 60));
+      }
+    });
+    await page.waitForTimeout(600);
+    const after = await page.evaluate(() => document.body.scrollHeight);
+    assert.ok(Math.abs(after - before) <= 32,
+      `${width}px: page height jumped ${before} → ${after} while scrolling`);
+    await page.close();
+  }
+});

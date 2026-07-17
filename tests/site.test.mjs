@@ -145,6 +145,15 @@ test('certificates section renders every certificate and all images decode', asy
   await page.waitForFunction(
     (n) => document.querySelectorAll('#images-list img').length === n, expected
   );
+  // images are lazy — walk through the whole grid so every one loads
+  await page.evaluate(async () => {
+    const sec = document.getElementById('certificates');
+    const from = sec.offsetTop, to = from + sec.offsetHeight;
+    for (let y = from; y <= to; y += 600) {
+      window.scrollTo(0, y);
+      await new Promise((r) => setTimeout(r, 80));
+    }
+  });
   await page.waitForFunction(() =>
     [...document.querySelectorAll('#images-list img')].every((i) => i.complete && i.naturalWidth > 0)
   );

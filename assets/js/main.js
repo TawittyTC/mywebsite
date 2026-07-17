@@ -290,7 +290,9 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 });
 
-// Load cert images only when section scrolls into view (performance)
+// Certificate grid: the DOM is built immediately so the page has its
+// final length from the start (deferring it made the page grow ~4000px
+// mid-scroll — the scrollbar jumped). Only the IMAGES stay lazy.
 document.addEventListener("DOMContentLoaded", function () {
   const imagesList = document.getElementById("images-list");
   if (!imagesList) return;
@@ -333,14 +335,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  if ("IntersectionObserver" in window) {
-    const obs = new IntersectionObserver(function(entries) {
-      if (entries.some(function (e) { return e.isIntersecting; })) { buildCerts(); obs.disconnect(); }
-    }, { rootMargin: "200px" });
-    obs.observe(imagesList);
-  } else {
-    buildCerts();
-  }
+  buildCerts();
 });
 
 
@@ -880,6 +875,7 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     }
     pulses = [];
+    inkNode = null;
   }
 
   function makeLabels() {
@@ -987,6 +983,10 @@ document.addEventListener('DOMContentLoaded', function () {
     new ResizeObserver(function () { resize(); }).observe(hero);
   }
   window.addEventListener('load', function () { updateCopyRect(); resize(); }, { passive: true });
+  // web fonts can reflow the copy block after first paint
+  if (document.fonts && document.fonts.ready && document.fonts.ready.then) {
+    document.fonts.ready.then(updateCopyRect);
+  }
   // iOS/WKWebView can purge a canvas backing store while the page is
   // hidden or restored from the back-forward cache — repaint on return
   window.addEventListener('pageshow', resize, { passive: true });
