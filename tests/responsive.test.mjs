@@ -102,3 +102,29 @@ test('desktop window resize: graph rescales without reshuffling', async () => {
     `label ${i} moved from ${(f * 100).toFixed(1)}% to ${(fx2[i] * 100).toFixed(1)}% of width`));
   await page.close();
 });
+
+test('viewport churn never changes the hero height or shoves sections around', async () => {
+  const { page } = await ctx.openPage({
+    viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true,
+  });
+  await page.waitForTimeout(1500);
+  const before = await page.evaluate(() => ({
+    hero: document.getElementById('hero').offsetHeight,
+    resumeTop: document.getElementById('resume').getBoundingClientRect().top + window.scrollY,
+  }));
+  // in-app toolbar collapse/expand cycles while scrolled mid-page
+  await page.evaluate(() => window.scrollTo(0, 1200));
+  for (const h of [944, 844, 944, 844]) {
+    await page.setViewportSize({ width: 390, height: h });
+    await page.waitForTimeout(120);
+  }
+  const after = await page.evaluate(() => ({
+    hero: document.getElementById('hero').offsetHeight,
+    resumeTop: document.getElementById('resume').getBoundingClientRect().top + window.scrollY,
+  }));
+  assert.ok(Math.abs(after.hero - before.hero) <= 2,
+    `hero height changed ${before.hero} → ${after.hero} during viewport churn`);
+  assert.ok(Math.abs(after.resumeTop - before.resumeTop) <= 2,
+    `resume section moved ${(after.resumeTop - before.resumeTop).toFixed(0)}px during viewport churn`);
+  await page.close();
+});
