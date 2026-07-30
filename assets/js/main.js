@@ -704,13 +704,13 @@ document.addEventListener('DOMContentLoaded', function () {
   // styles are cleared so CSS hover transforms take over.
   if (!reduce) {
     var GROUPS = [
-      { sel: '.section-title', travel: 48, scale: 0 },
-      { sel: '#resume .data-box', travel: 36, scale: 1 },
-      { sel: '#experience .data-box', travel: 36, scale: 1 },
-      { sel: '#skill .boxWhyScg', travel: 36, scale: 1 },
-      { sel: '#portfolio .rf-cards-scroller-item', travel: 36, scale: 1, stagger: 0.035 },
-      { sel: '#images-list .cert-card', travel: 28, scale: 1, stagger: 0.04, mod: 3 },
-      { sel: '.closing-cta .cta-inner', travel: 44, scale: 0 }
+      { sel: '.section-title', travel: 64, scale: 0 },
+      { sel: '#resume .data-box', travel: 56, scale: 1 },
+      { sel: '#experience .data-box', travel: 56, scale: 1 },
+      { sel: '#skill .boxWhyScg', travel: 56, scale: 1 },
+      { sel: '#portfolio .rf-cards-scroller-item', travel: 56, scale: 1, stagger: 0.05 },
+      { sel: '#images-list .cert-card', travel: 44, scale: 1, stagger: 0.06, mod: 3 },
+      { sel: '.closing-cta .cta-inner', travel: 56, scale: 0 }
     ];
     var items = [];
     GROUPS.forEach(function (g) {
@@ -719,63 +719,59 @@ document.addEventListener('DOMContentLoaded', function () {
         if (els[i].getBoundingClientRect().top < window.innerHeight * 0.92) continue; // in view at load — leave as-is
         els[i].classList.add('js-reveal');
         items.push({
-          el: els[i], travel: g.travel, scale: g.scale, top: 0, done: false,
+          el: els[i], travel: g.travel, scale: g.scale, done: false, curY: 0, lastP: -1,
           // shift the scrub window per column/index so grids cascade
           shift: (g.mod ? (i % g.mod) : Math.min(i, 5)) * (g.stagger || 0)
         });
       }
     });
     if (items.length) {
-      // Untransformed document offsets (offset chain ignores our own
-      // translateY — measuring via getBoundingClientRect mid-scrub would
-      // bake the animation into the geometry).
-      function measureAll() {
-        items.forEach(function (it) {
-          var el = it.el, y = 0;
-          while (el) { y += el.offsetTop; el = el.offsetParent; }
-          it.top = y;
-        });
-      }
-      var scrubTicking = false;
+      // Continuous rAF loop, like the hero canvas: progress is recomputed
+      // from live viewport geometry every frame, so it needs no scroll
+      // events, no scrollY, and no cached offsets — in-app webviews that
+      // deliver scroll/resize events erratically still animate correctly.
+      // Position reads subtract our own applied translate so the
+      // animation never pollutes the measurement.
       function scrubFrame() {
-        scrubTicking = false;
         var vh = window.innerHeight;
-        var sy = window.scrollY || window.pageYOffset || 0;
+        var se = document.scrollingElement || document.documentElement;
         // at the very end of the page nothing can travel further — settle all
-        var atEnd = sy + vh >= document.documentElement.scrollHeight - 2;
-        var end = vh * 0.60;
-        for (var i = 0; i < items.length; i++) {
+        var atEnd = se.scrollTop + vh >= se.scrollHeight - 2;
+        var end = vh * 0.58;
+        var i, tops = [];
+        for (i = 0; i < items.length; i++) { // read pass — no writes until all rects are taken
+          tops.push(items[i].el.getBoundingClientRect().top - items[i].curY);
+        }
+        for (i = 0; i < items.length; i++) {
           var it = items[i];
           var start = vh * (1.02 - it.shift);
-          var p = atEnd ? 1 : (start - (it.top - sy)) / (start - end);
-          if (p >= 1) {
+          var p = atEnd ? 1 : (start - tops[i]) / (start - end);
+          if (p > 1) p = 1;
+          if (p < 0) p = 0;
+          if (p === it.lastP) continue;
+          it.lastP = p;
+          if (p === 1) {
             if (!it.done) {
               it.done = true;
+              it.curY = 0;
               it.el.classList.add('is-visible');
               it.el.style.transition = '';
               it.el.style.opacity = '';
               it.el.style.transform = '';
             }
           } else {
-            if (p < 0) p = 0;
             var e = 1 - Math.pow(1 - p, 3);
             if (it.done) { it.done = false; it.el.classList.remove('is-visible'); }
+            it.curY = it.travel * (1 - e);
             it.el.style.transition = 'none';
             it.el.style.opacity = e.toFixed(3);
-            it.el.style.transform = 'translateY(' + (it.travel * (1 - e)).toFixed(1) + 'px)' +
-              (it.scale ? ' scale(' + (0.965 + 0.035 * e).toFixed(4) + ')' : '');
+            it.el.style.transform = 'translateY(' + it.curY.toFixed(1) + 'px)' +
+              (it.scale ? ' scale(' + (0.94 + 0.06 * e).toFixed(4) + ')' : '');
           }
         }
+        requestAnimationFrame(scrubFrame);
       }
-      function onScrub() { if (!scrubTicking) { scrubTicking = true; requestAnimationFrame(scrubFrame); } }
-      function remeasure() { measureAll(); onScrub(); }
-      window.addEventListener('scroll', onScrub, { passive: true });
-      window.addEventListener('resize', remeasure, { passive: true });
-      window.addEventListener('orientationchange', remeasure, { passive: true });
-      window.addEventListener('load', remeasure, { passive: true });
-      if (document.fonts && document.fonts.ready) { document.fonts.ready.then(remeasure); }
-      measureAll();
-      scrubFrame();
+      requestAnimationFrame(scrubFrame);
     }
   }
 })();
