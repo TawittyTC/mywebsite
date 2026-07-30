@@ -191,6 +191,45 @@ test('scrolling the whole page leaves no reveal-hidden content behind', async ()
   await page.close();
 });
 
+test('scroll-scrub: entering elements animate with scroll, then settle clean', async () => {
+  const { page } = await openPage();
+  await page.waitForTimeout(600);
+  // park a mid-page card just inside the scrub window (top at ~88% of viewport)
+  // (bootstrap sets scroll-behavior: smooth, so wait for the scroll to arrive)
+  const park = (frac) => page.evaluate(async (f) => {
+    const el = document.querySelector('#experience .data-box.js-reveal');
+    let y = 0;
+    for (let n = el; n; n = n.offsetParent) y += n.offsetTop;
+    const target = Math.max(0, Math.round(y - window.innerHeight * f));
+    window.scrollTo(0, target);
+    await new Promise((resolve) => {
+      const t0 = performance.now();
+      (function poll() {
+        if (Math.abs(window.scrollY - target) <= 2 || performance.now() - t0 > 5000) resolve();
+        else setTimeout(poll, 50);
+      })();
+    });
+  }, frac);
+  await park(0.88);
+  await page.waitForTimeout(200);
+  const mid = await page.$eval('#experience .data-box.js-reveal',
+    (el) => ({ opacity: el.style.opacity, transform: el.style.transform }));
+  const midOpacity = parseFloat(mid.opacity);
+  assert.ok(midOpacity > 0 && midOpacity < 0.99,
+    `mid-entry element should be partially faded, got opacity "${mid.opacity}"`);
+  assert.ok(mid.transform.includes('translateY'),
+    `mid-entry element should be translated, got "${mid.transform}"`);
+  // scroll it well past the settle line — inline styles must clear (hover CSS owns it again)
+  await park(0.25);
+  await page.waitForTimeout(200);
+  const done = await page.$eval('#experience .data-box.js-reveal',
+    (el) => ({ visible: el.classList.contains('is-visible'), transform: el.style.transform, opacity: el.style.opacity }));
+  assert.ok(done.visible, 'element should be settled (is-visible) past the scrub window');
+  assert.equal(done.transform, '', 'inline transform must be cleared after settling');
+  assert.equal(done.opacity, '', 'inline opacity must be cleared after settling');
+  await page.close();
+});
+
 test('prefers-reduced-motion: no parallax, no reveal-gating, titles visible', async () => {
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
   await page.emulateMedia({ reducedMotion: 'reduce' });
