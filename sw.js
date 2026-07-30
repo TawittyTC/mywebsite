@@ -1,4 +1,4 @@
-const CACHE = 'v44';
+const CACHE = 'v45';
 const PRECACHE = [
   'assets/css/style.min.css?v=1.82.0',
   'assets/fonts/inter-latin.woff2',
