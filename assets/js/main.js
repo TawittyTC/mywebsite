@@ -769,9 +769,13 @@ document.addEventListener('DOMContentLoaded', function () {
               (it.scale ? ' scale(' + (0.94 + 0.06 * e).toFixed(4) + ')' : '');
           }
         }
-        requestAnimationFrame(scrubFrame);
       }
-      requestAnimationFrame(scrubFrame);
+      function tick() { scrubFrame(); requestAnimationFrame(tick); }
+      requestAnimationFrame(tick);
+      // Safety net: headless/battery-saver browsers can stall rAF while the
+      // screen is visually idle; a timer keeps settle-correctness independent
+      // of frame delivery (styles are only written when progress changes).
+      setInterval(scrubFrame, 250);
     }
   }
 })();
