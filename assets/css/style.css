@@ -15,6 +15,13 @@
   --r-capsule: 980px;
 }
 
+/* Bootstrap turns on global smooth scrolling; with no anchor nav left it
+   only makes programmatic scrolls laggy (and headless browsers can stall
+   mid-animation). Back-to-top opts into smooth explicitly via JS. */
+:root {
+  scroll-behavior: auto;
+}
+
 /*--------------------------------------------------------------
 # General
 --------------------------------------------------------------*/
