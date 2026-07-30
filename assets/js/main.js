@@ -695,43 +695,88 @@ document.addEventListener('DOMContentLoaded', function () {
     window.addEventListener('orientationchange', function () { lockH = 0; maybeRelock(); }, { passive: true });
   }
 
-  // ---- Scroll reveals ----
-  // Position-checked on each (rAF-throttled) scroll instead of
-  // IntersectionObserver: IO can skip an element entirely when a fast
-  // scroll jumps past it in one frame (worse with content-visibility),
-  // leaving it stuck hidden. A position check can't miss.
+  // ---- Scroll-scrub reveals (Apple product-page feel) ----
+  // Progress is a pure function of where the element sits in the
+  // viewport, so entrances scrub with the scroll in both directions and
+  // can never desync or be skipped (no IntersectionObserver, no one-shot
+  // state). Elements ease from translate/scale/fade to identity as they
+  // travel from the viewport bottom to ~60% up; once settled the inline
+  // styles are cleared so CSS hover transforms take over.
   if (!reduce) {
-    var targets = [];
-    document.querySelectorAll('.section-title').forEach(function (el) { targets.push(el); });
-    ['#resume .data-box', '#experience .data-box', '#skill .boxWhyScg',
-     '#portfolio .rf-cards-scroller-item', '.closing-cta .cta-inner'].forEach(function (sel) {
-      var group = document.querySelectorAll(sel);
-      group.forEach(function (el, i) { el.style.setProperty('--reveal-delay', Math.min(i, 5) * 0.06 + 's'); targets.push(el); });
-    });
-    var armed = [];
-    targets.forEach(function (el) {
-      if (el.getBoundingClientRect().top < window.innerHeight * 0.92) { return; } // already in view — leave visible
-      el.classList.add('js-reveal');
-      armed.push(el);
-    });
-    var revealTicking = false;
-    function checkReveal() {
-      revealTicking = false;
-      if (!armed.length) return;
-      var fold = window.innerHeight * 0.92;
-      armed = armed.filter(function (el) {
-        if (el.getBoundingClientRect().top < fold) { el.classList.add('is-visible'); return false; }
-        return true;
-      });
-      if (!armed.length) {
-        window.removeEventListener('scroll', onRevealScroll);
-        window.removeEventListener('resize', onRevealScroll);
+    var GROUPS = [
+      { sel: '.section-title', travel: 48, scale: 0 },
+      { sel: '#resume .data-box', travel: 36, scale: 1 },
+      { sel: '#experience .data-box', travel: 36, scale: 1 },
+      { sel: '#skill .boxWhyScg', travel: 36, scale: 1 },
+      { sel: '#portfolio .rf-cards-scroller-item', travel: 36, scale: 1, stagger: 0.035 },
+      { sel: '#images-list .cert-card', travel: 28, scale: 1, stagger: 0.04, mod: 3 },
+      { sel: '.closing-cta .cta-inner', travel: 44, scale: 0 }
+    ];
+    var items = [];
+    GROUPS.forEach(function (g) {
+      var els = document.querySelectorAll(g.sel);
+      for (var i = 0; i < els.length; i++) {
+        if (els[i].getBoundingClientRect().top < window.innerHeight * 0.92) continue; // in view at load — leave as-is
+        els[i].classList.add('js-reveal');
+        items.push({
+          el: els[i], travel: g.travel, scale: g.scale, top: 0, done: false,
+          // shift the scrub window per column/index so grids cascade
+          shift: (g.mod ? (i % g.mod) : Math.min(i, 5)) * (g.stagger || 0)
+        });
       }
+    });
+    if (items.length) {
+      // Untransformed document offsets (offset chain ignores our own
+      // translateY — measuring via getBoundingClientRect mid-scrub would
+      // bake the animation into the geometry).
+      function measureAll() {
+        items.forEach(function (it) {
+          var el = it.el, y = 0;
+          while (el) { y += el.offsetTop; el = el.offsetParent; }
+          it.top = y;
+        });
+      }
+      var scrubTicking = false;
+      function scrubFrame() {
+        scrubTicking = false;
+        var vh = window.innerHeight;
+        var sy = window.scrollY || window.pageYOffset || 0;
+        // at the very end of the page nothing can travel further — settle all
+        var atEnd = sy + vh >= document.documentElement.scrollHeight - 2;
+        var end = vh * 0.60;
+        for (var i = 0; i < items.length; i++) {
+          var it = items[i];
+          var start = vh * (1.02 - it.shift);
+          var p = atEnd ? 1 : (start - (it.top - sy)) / (start - end);
+          if (p >= 1) {
+            if (!it.done) {
+              it.done = true;
+              it.el.classList.add('is-visible');
+              it.el.style.transition = '';
+              it.el.style.opacity = '';
+              it.el.style.transform = '';
+            }
+          } else {
+            if (p < 0) p = 0;
+            var e = 1 - Math.pow(1 - p, 3);
+            if (it.done) { it.done = false; it.el.classList.remove('is-visible'); }
+            it.el.style.transition = 'none';
+            it.el.style.opacity = e.toFixed(3);
+            it.el.style.transform = 'translateY(' + (it.travel * (1 - e)).toFixed(1) + 'px)' +
+              (it.scale ? ' scale(' + (0.965 + 0.035 * e).toFixed(4) + ')' : '');
+          }
+        }
+      }
+      function onScrub() { if (!scrubTicking) { scrubTicking = true; requestAnimationFrame(scrubFrame); } }
+      function remeasure() { measureAll(); onScrub(); }
+      window.addEventListener('scroll', onScrub, { passive: true });
+      window.addEventListener('resize', remeasure, { passive: true });
+      window.addEventListener('orientationchange', remeasure, { passive: true });
+      window.addEventListener('load', remeasure, { passive: true });
+      if (document.fonts && document.fonts.ready) { document.fonts.ready.then(remeasure); }
+      measureAll();
+      scrubFrame();
     }
-    function onRevealScroll() { if (!revealTicking) { revealTicking = true; requestAnimationFrame(checkReveal); } }
-    window.addEventListener('scroll', onRevealScroll, { passive: true });
-    window.addEventListener('resize', onRevealScroll, { passive: true });
-    checkReveal();
   }
 })();
 
