@@ -704,7 +704,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var targets = [];
     document.querySelectorAll('.section-title').forEach(function (el) { targets.push(el); });
     ['#resume .data-box', '#experience .data-box', '#skill .boxWhyScg',
-     '#portfolio .rf-cards-scroller-item'].forEach(function (sel) {
+     '#portfolio .rf-cards-scroller-item', '.closing-cta .cta-inner'].forEach(function (sel) {
       var group = document.querySelectorAll(sel);
       group.forEach(function (el, i) { el.style.setProperty('--reveal-delay', Math.min(i, 5) * 0.06 + 's'); targets.push(el); });
     });

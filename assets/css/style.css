@@ -113,20 +113,58 @@ section {
 }
 
 .section-title h2 {
-  font-size: 48px;
-  font-weight: 600;
-  letter-spacing: -0.003em;
-  line-height: 1.08;
+  font-size: 56px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.06;
   color: var(--color-text);
-  margin-bottom: 12px;
+  margin-bottom: 14px;
   padding-bottom: 0;
 }
 
 .section-title p {
-  font-size: 17px;
+  font-size: 19px;
   color: var(--color-text-secondary);
   line-height: 1.6;
   margin-bottom: 0;
+}
+
+/* Section eyebrow — the hero constellation motif landing in each section:
+   amber node, fading hairline, mono label (same vocabulary as .hero-net-label) */
+.section-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  color: #B4602A;
+  margin-bottom: 18px;
+}
+.se-node {
+  position: relative;
+  width: 7px;
+  height: 7px;
+  margin-right: 36px;
+  border-radius: 50%;
+  background: #D99043;
+  box-shadow: 0 0 0 3px rgba(217, 144, 67, 0.2);
+}
+.se-node::after {
+  content: '';
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  width: 20px;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(180, 96, 42, 0.55), rgba(180, 96, 42, 0));
+}
+@media (prefers-reduced-motion: no-preference) {
+  .se-node { animation: se-breathe 3.2s ease-in-out infinite; }
+}
+@keyframes se-breathe {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(217, 144, 67, 0.22); }
+  50%      { box-shadow: 0 0 0 7px rgba(217, 144, 67, 0.07); }
 }
 
 /*--------------------------------------------------------------
@@ -202,11 +240,11 @@ section {
   padding: 48px;
   background-color: #fff;
   margin: 40px auto;
-  transition: transform 0.3s ease-in-out;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
 
 .data-box:hover {
-  box-shadow: none;
+  box-shadow: 0 24px 60px rgba(29, 29, 31, 0.08);
   transform: translateY(-4px);
 }
 
@@ -531,6 +569,7 @@ button {
   aspect-ratio: 4 / 3;
   object-fit: contain;
   border-radius: 8px;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* Certificate Grid — CSS Grid (bypasses Bootstrap col system entirely) */
@@ -588,6 +627,14 @@ button {
   background: var(--color-fill);
   border-radius: var(--r-card-sm);
   overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.cert-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 44px rgba(29, 29, 31, 0.10);
+}
+.cert-card:hover .cert-img img {
+  transform: scale(1.025);
 }
 
 /* Expand button */
@@ -661,11 +708,16 @@ button {
   box-shadow: none;
   transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
+.rf-cards-scroller-item {
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
 #portfolio .rf-cards-scroller-item:hover {
   transform: translateY(-8px);
+  box-shadow: 0 22px 52px rgba(29, 29, 31, 0.10);
 }
 #skill .rf-cards-scroller-item:hover {
   transform: translateY(-6px);
+  box-shadow: 0 22px 52px rgba(29, 29, 31, 0.08);
 }
 
 /* Project tag pill */
@@ -900,6 +952,94 @@ button {
 
 
 /*--------------------------------------------------------------
+# Closing CTA
+--------------------------------------------------------------*/
+.closing-cta {
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+  padding: 140px 0 150px;
+  background: #fff;
+}
+.closing-cta::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  transform: translate(-50%, -50%);
+  width: 960px;
+  max-width: 100vw;
+  height: 560px;
+  background: radial-gradient(closest-side, rgba(217, 144, 67, 0.08) 0%, rgba(217, 144, 67, 0.03) 55%, rgba(217, 144, 67, 0) 100%);
+  pointer-events: none;
+}
+.cta-inner { position: relative; }
+.cta-headline {
+  font-size: clamp(42px, 7vw, 76px);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  line-height: 1.05;
+  color: var(--color-text);
+  margin: 0 0 22px;
+}
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .cta-headline {
+    background-image: linear-gradient(100deg,
+      #1d1d1f 0%,
+      #1d1d1f 42%,
+      #B4602A 58%,
+      #D99043 66%,
+      #1d1d1f 88%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+}
+.cta-sub {
+  font-size: 19px;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  max-width: 560px;
+  margin: 0 auto 40px;
+}
+.cta-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+}
+.cta-mail {
+  display: inline-flex;
+  align-items: center;
+  min-height: 50px;
+  padding: 12px 30px;
+  border-radius: var(--r-capsule);
+  background: var(--color-text);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 500;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+.cta-mail:hover {
+  color: #fff;
+  background: #000;
+  transform: translateY(-2px);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.18);
+}
+.cta-tel {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  padding: 12px 6px;
+}
+.cta-tel:hover { color: var(--color-text); }
+@media (max-width: 735px) {
+  .closing-cta { padding: 96px 0 104px; }
+  .cta-sub { font-size: 17px; margin-bottom: 32px; }
+}
+
+/*--------------------------------------------------------------
 # Profile Featured Card
 --------------------------------------------------------------*/
 .data-box.profile-featured {
@@ -949,14 +1089,15 @@ h1, h2, h3, h4, h5, h6 { color: var(--color-text); }
 .text-dark { color: var(--color-text) !important; }
 
 /* ── Typography Scale: Apple HIG Responsive Headings ── */
-/* Desktop >1068px: 48px / 600 / -0.003em / 1.08 */
-/* Tablet 735–1068px: 40px / 600 / 0 / 1.1 */
+/* Desktop >1068px: 56px / 700 / -0.01em / 1.06 */
+/* Tablet 735–1068px: 44px */
 @media (max-width: 1068px) {
-  .section-title h2 { font-size: 40px; letter-spacing: 0; line-height: 1.1; }
+  .section-title h2 { font-size: 44px; letter-spacing: -0.004em; line-height: 1.1; }
 }
-/* Mobile <735px: 32px / 600 / +0.004em / 1.125 */
+/* Mobile <735px: 34px */
 @media (max-width: 735px) {
-  .section-title h2 { font-size: 32px; letter-spacing: 0.004em; line-height: 1.125; }
+  .section-title h2 { font-size: 34px; letter-spacing: 0; line-height: 1.12; }
+  .section-title p { font-size: 17px; }
   section { padding: 72px 0; }
   .section-title { padding-bottom: 32px; }
 }
