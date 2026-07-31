@@ -13,6 +13,9 @@
   --r-card-sm: 18px;
   --r-min: 12px;
   --r-capsule: 980px;
+  /* Swift decelerating ease — fast start, gentle landing; everything stays
+     interruptible because these are plain CSS transitions */
+  --ease-swift: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 /* Bootstrap turns on global smooth scrolling; with no anchor nav left it
@@ -682,6 +685,7 @@ button {
 }
 .cert-lightbox.open {
   display: flex;
+  animation: lb-fade 0.25s var(--ease-swift);
 }
 .cert-lightbox img {
   max-width: 92vw;
@@ -689,6 +693,11 @@ button {
   object-fit: contain;
   border-radius: 8px;
 }
+.cert-lightbox.open img {
+  animation: lb-zoom 0.4s var(--ease-swift);
+}
+@keyframes lb-fade { from { opacity: 0; } }
+@keyframes lb-zoom { from { opacity: 0; transform: scale(0.94); } }
 .cert-lightbox-close {
   position: fixed;
   top: 20px;
@@ -713,10 +722,7 @@ button {
 /* Project & Skill cards */
 .rf-cards-scroller-item {
   box-shadow: none;
-  transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-.rf-cards-scroller-item {
-  transition: transform 0.35s ease, box-shadow 0.35s ease;
+  transition: transform 0.35s var(--ease-swift), box-shadow 0.35s var(--ease-swift);
 }
 #portfolio .rf-cards-scroller-item:hover {
   transform: translateY(-8px);
@@ -742,17 +748,39 @@ button {
 
 
 
-/* Mobile: active tap feedback */
+/* Press feedback — instant down, swift release; every pointer type.
+   The :active duration is shorter than the release so touches feel
+   tactile without ever lagging the finger. */
+.exp-filter-chip,
+.cert-expand-btn,
+.cert-lightbox-close,
+.exp-lightbox-close,
+.paddlenav-arrow {
+  transition: transform 0.25s var(--ease-swift), background 0.2s ease, color 0.2s ease, box-shadow 0.25s var(--ease-swift);
+}
+.filter-btn:active,
+.exp-filter-chip:active,
+.cta-mail:active,
+.cert-expand-btn:active,
+.cert-lightbox-close:active,
+.exp-lightbox-close:active {
+  transform: scale(0.96);
+  transition-duration: 0.08s;
+}
+.paddlenav-arrow:active {
+  transform: translateY(-50%) scale(0.94);
+  transition-duration: 0.08s;
+}
+#back-to-top.visible:active {
+  transform: scale(0.92);
+  transition-duration: 0.08s;
+}
+
+/* Mobile: whole-card tap feedback */
 @media (max-width: 768px) {
-  #portfolio .rf-cards-scroller-item:active {
-    transform: scale(0.97);
-  }
+  #portfolio .rf-cards-scroller-item:active,
   #skill .rf-cards-scroller-item:active {
     transform: scale(0.97);
-  }
-  .filter-btn:active {
-    transform: scale(0.95);
-    opacity: 0.85;
   }
 }
 
@@ -1026,7 +1054,7 @@ button {
   color: #fff;
   font-size: 16px;
   font-weight: 500;
-  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+  transition: transform 0.25s var(--ease-swift), box-shadow 0.25s var(--ease-swift), background 0.25s ease;
 }
 .cta-mail:hover {
   color: #fff;
@@ -1117,12 +1145,12 @@ h1, h2, h3, h4, h5, h6 { color: var(--color-text); }
 }
 .paddlenav-arrow { min-width: 44px; min-height: 44px; }
 
-/* ── Transitions: 250–400ms ease-in-out (Apple HIG) ── */
+/* ── Transitions: swift ease-out, 300–350ms ── */
 .data-box,
 .boxWhyScg,
 .rf-cards-scroller-item,
 .filter-btn {
-  transition-timing-function: ease-in-out;
+  transition-timing-function: var(--ease-swift);
   transition-duration: 0.3s;
 }
 
