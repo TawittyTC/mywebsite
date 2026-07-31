@@ -621,7 +621,7 @@ button {
   font-size: 16px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: transform 0.25s var(--ease-swift), background 0.2s ease, color 0.2s ease;
 }
 
 .filter-btn:hover,
@@ -782,6 +782,25 @@ button {
   #skill .rf-cards-scroller-item:active {
     transform: scale(0.97);
   }
+  #experience .data-box[data-exp]:active {
+    transform: scale(0.985);
+  }
+}
+
+/* Touch devices fire :hover on tap and it sticks — keep lift/zoom motion
+   for real pointers only; press feedback covers touch. */
+@media (hover: none), (pointer: coarse) {
+  .data-box:hover,
+  #portfolio .rf-cards-scroller-item:hover,
+  #skill .rf-cards-scroller-item:hover,
+  .cert-card:hover,
+  .cta-mail:hover,
+  .cert-expand-btn:hover {
+    transform: none;
+    box-shadow: none;
+  }
+  .cert-card:hover .cert-img img { transform: none; }
+  #experience .data-box[data-exp]:hover::after { transform: translateX(-160%); }
 }
 
 /*==============================================================
@@ -1298,7 +1317,7 @@ select:focus-visible {
 # Scroll reveals
 --------------------------------------------------------------*/
 /* Hero copy gets a subtle scroll transform from JS */
-#hero .hero-copy { position: relative; z-index: 2; will-change: transform, opacity; }
+#hero .hero-copy { position: relative; z-index: 2; }
 
 /* Scroll reveal — only armed by JS (adds .js-reveal), so no-JS content stays visible */
 .js-reveal {
