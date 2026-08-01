@@ -108,7 +108,8 @@ a:hover {
 # Sections General
 --------------------------------------------------------------*/
 section {
-  padding: 120px 0;
+  /* Apple-scale air between chapters */
+  padding: 180px 0;
   overflow: hidden;
 }
 
@@ -119,7 +120,7 @@ section {
 
 .section-title {
   text-align: center;
-  padding-bottom: 64px;
+  padding-bottom: 96px;
 }
 
 .section-title h2 {
@@ -157,8 +158,8 @@ section {
   background: var(--color-background-alt);
   color: var(--color-text-secondary);
   font-size: 14px;
-  padding-top: 80px;
-  padding-bottom: max(80px, calc(60px + env(safe-area-inset-bottom)));
+  padding-top: 120px;
+  padding-bottom: max(120px, calc(100px + env(safe-area-inset-bottom)));
 }
 
 
@@ -211,7 +212,7 @@ section {
   box-shadow: none;
   padding: 48px;
   background-color: #fff;
-  margin: 40px auto;
+  margin: 56px auto;
   transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
 
@@ -552,7 +553,7 @@ button {
   padding: 0 0.75rem;
 }
 @media (min-width: 768px) {
-  .images-list { grid-template-columns: repeat(3, 1fr); }
+  .images-list { grid-template-columns: repeat(3, 1fr); gap: 2.25rem; }
 }
 /* Reset Bootstrap col padding — grid gap handles spacing */
 .images-list > div {
@@ -974,7 +975,7 @@ button {
   position: relative;
   overflow: hidden;
   text-align: center;
-  padding: 140px 0 150px;
+  padding: 200px 0 210px;
   background: #fff;
 }
 .closing-cta::before {
@@ -1051,7 +1052,7 @@ button {
 }
 .cta-tel:hover { color: var(--color-text); }
 @media (max-width: 735px) {
-  .closing-cta { padding: 96px 0 104px; }
+  .closing-cta { padding: 128px 0 136px; }
   .cta-sub { font-size: 17px; margin-bottom: 32px; }
 }
 
@@ -1114,8 +1115,8 @@ h1, h2, h3, h4, h5, h6 { color: var(--color-text); }
 @media (max-width: 735px) {
   .section-title h2 { font-size: 34px; letter-spacing: 0; line-height: 1.12; }
   .section-title p { font-size: 17px; }
-  section { padding: 72px 0; }
-  .section-title { padding-bottom: 32px; }
+  section { padding: 104px 0; }
+  .section-title { padding-bottom: 56px; }
 }
 
 /* ── Touch Targets: 44×44px minimum (Apple HIG) ── */
