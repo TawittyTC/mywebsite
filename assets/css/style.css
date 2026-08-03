@@ -4,8 +4,8 @@
 :root {
   --color-text: #1D1D1F;
   --color-text-secondary: #6E6E73;
-  --color-link: #0071E3;
-  --color-link-hover: #0077ED;
+  --color-link: #B4602A;
+  --color-link-hover: #C97335;
   --color-fill: #F5F5F7;
   --color-background-alt: #F8F8F8;
   /* Concentric radii: inner radius = outer radius − gap, floored at --r-min */
@@ -16,6 +16,9 @@
   /* Swift decelerating ease — fast start, gentle landing; everything stays
      interruptible because these are plain CSS transitions */
   --ease-swift: cubic-bezier(0.32, 0.72, 0, 1);
+  /* Resting card definition on the all-white canvas (60/30/10: white
+     canvas dominates, neutral surfaces structure, amber accents) */
+  --shadow-rest: 0 1px 2px rgba(29, 29, 31, 0.04), 0 10px 28px rgba(29, 29, 31, 0.05);
 }
 
 /* Bootstrap turns on global smooth scrolling; with no anchor nav left it
@@ -155,7 +158,7 @@ section {
 # Footer
 --------------------------------------------------------------*/
 #footer {
-  background: var(--color-background-alt);
+  background: var(--color-fill);
   color: var(--color-text-secondary);
   font-size: 14px;
   padding-top: 120px;
@@ -209,7 +212,7 @@ section {
 
 .data-box {
   border-radius: var(--r-card);
-  box-shadow: none;
+  box-shadow: var(--shadow-rest);
   padding: 48px;
   background-color: #fff;
   margin: 56px auto;
@@ -684,7 +687,7 @@ button {
 
 /* Project & Skill cards */
 .rf-cards-scroller-item {
-  box-shadow: none;
+  box-shadow: var(--shadow-rest);
   transition: transform 0.35s var(--ease-swift), box-shadow 0.35s var(--ease-swift);
 }
 #portfolio .rf-cards-scroller-item:hover {
@@ -702,7 +705,7 @@ button {
   margin: 14px 20px 0;
   padding: 4px 12px;
   border-radius: var(--r-capsule);
-  background: #e8f1ff;
+  background: rgba(180, 96, 42, 0.08);
   color: var(--color-link);
   font-size: 12px;
   font-weight: 500;
@@ -755,7 +758,10 @@ button {
 @media (hover: none), (pointer: coarse) {
   .data-box:hover,
   #portfolio .rf-cards-scroller-item:hover,
-  #skill .rf-cards-scroller-item:hover,
+  #skill .rf-cards-scroller-item:hover {
+    transform: none;
+    box-shadow: var(--shadow-rest);
+  }
   .cert-card:hover,
   .cta-mail:hover,
   .cert-expand-btn:hover {
@@ -777,7 +783,9 @@ button {
 
 /* Section backgrounds */
 #resume, #skill, #certificates { background: #fff; }
-#experience, #portfolio { background: var(--color-background-alt); }
+/* 60/30/10: the canvas stays white everywhere — structure comes from
+   neutral card surfaces and resting shadows, not tinted sections */
+#certificates.bg-light { background-color: #fff !important; }
 
 /* Card colors per section */
 #resume .data-box { background: var(--color-fill); }
@@ -928,7 +936,7 @@ button {
   padding: 48px;
   height: 100%;
   border: none;
-  box-shadow: none;
+  box-shadow: var(--shadow-rest);
   transition: transform 0.3s ease-in-out;
 }
 .boxWhyScg:hover {
