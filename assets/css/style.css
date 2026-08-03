@@ -34,7 +34,7 @@ body {
   font-weight: 400;
   color: var(--color-text);
   letter-spacing: -.022em;
-  line-height: 1.6;
+  line-height: 1.65;
 }
 
 a {
@@ -127,7 +127,7 @@ section {
   font-size: 56px;
   font-weight: 700;
   letter-spacing: -0.01em;
-  line-height: 1.06;
+  line-height: 1.1;
   color: var(--color-text);
   margin-bottom: 14px;
   padding-bottom: 0;
@@ -799,7 +799,7 @@ button {
   font-size: clamp(48px, 6.4vw, 98px);
   font-weight: 700;
   letter-spacing: -0.03em;
-  line-height: 1.03;
+  line-height: 1.08;
   color: var(--color-text);
 }
 /* The name is lit by the constellation: a colored glow sits in the
@@ -914,7 +914,7 @@ button {
   #hero .hero-copy { text-align: center; margin: 0 auto; }
   #hero .hero-copy::before { left: 50%; transform: translate(-50%, -50%); width: 480px; height: 480px; }
   #hero .hero-eyebrow { font-size: 11px; letter-spacing: 0.1em; margin-bottom: 14px; }
-  #hero h1.hero-name { font-size: clamp(38px, 10.5vw, 48px); line-height: 1.08; }
+  #hero h1.hero-name { font-size: clamp(38px, 10.5vw, 48px); line-height: 1.12; }
   .hero-net-label { font-size: 9px; }
   .hero-scroll-hint { display: none; }
 }
@@ -963,7 +963,7 @@ button {
 #skill .rf-cards-scroller-item .skill-desc {
   font-size: 13px;
   color: var(--color-text-secondary);
-  line-height: 1.5;
+  line-height: 1.6;
   margin: 0;
 }
 
@@ -995,7 +995,7 @@ button {
   font-size: clamp(42px, 7vw, 76px);
   font-weight: 700;
   letter-spacing: -0.015em;
-  line-height: 1.05;
+  line-height: 1.08;
   color: var(--color-text);
   margin: 0 0 22px;
 }
@@ -1015,7 +1015,7 @@ button {
 .cta-sub {
   font-size: 19px;
   color: var(--color-text-secondary);
-  line-height: 1.6;
+  line-height: 1.65;
   max-width: 560px;
   margin: 0 auto 40px;
 }
@@ -1074,8 +1074,8 @@ button {
   object-fit: cover;
 }
 .profile-featured-body { flex: 1; }
-.profile-bio { font-size: 16px; color: var(--color-text-secondary); margin: 0; line-height: 1.6; }
-.profile-bio-small { font-size: 13px; color: var(--color-text-secondary); margin: 0; line-height: 1.6; }
+.profile-bio { font-size: 16px; color: var(--color-text-secondary); margin: 0; line-height: 1.7; }
+.profile-bio-small { font-size: 13px; color: var(--color-text-secondary); margin: 0; line-height: 1.7; }
 
 @media (max-width: 576px) {
   .data-box.profile-featured {
@@ -1109,11 +1109,11 @@ h1, h2, h3, h4, h5, h6 { color: var(--color-text); }
 /* Desktop >1068px: 56px / 700 / -0.01em / 1.06 */
 /* Tablet 735–1068px: 44px */
 @media (max-width: 1068px) {
-  .section-title h2 { font-size: 44px; letter-spacing: -0.004em; line-height: 1.1; }
+  .section-title h2 { font-size: 44px; letter-spacing: -0.004em; line-height: 1.12; }
 }
 /* Mobile <735px: 34px */
 @media (max-width: 735px) {
-  .section-title h2 { font-size: 34px; letter-spacing: 0; line-height: 1.12; }
+  .section-title h2 { font-size: 34px; letter-spacing: 0; line-height: 1.16; }
   .section-title p { font-size: 17px; }
   section { padding: 104px 0; }
   .section-title { padding-bottom: 56px; }
