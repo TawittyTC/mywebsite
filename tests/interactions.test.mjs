@@ -42,17 +42,22 @@ test('project filters hide non-matching cards and All restores them', async () =
   const result = await page.evaluate(() => {
     const btn = document.querySelector('.filter-btn[data-filter]:not([data-filter="all"])');
     btn.click();
-    const items = [...document.querySelectorAll('.rf-cards-scroller-item')];
+    const items = [...document.querySelectorAll('#portfolio .rf-cards-scroller-item')];
     const wrong = items.filter(
       (i) => i.style.display !== 'none' && i.getAttribute('data-tech') !== btn.dataset.filter
     ).length;
     const shown = items.filter((i) => i.style.display !== 'none').length;
+    // filtering projects must NEVER touch the skills scroller
+    const skillsHidden = [...document.querySelectorAll('#skill .rf-cards-scroller-item')]
+      .filter((i) => i.style.display === 'none').length;
     document.querySelector('.filter-btn[data-filter="all"]').click();
     const restored = items.filter((i) => i.style.display !== 'none').length;
-    return { filter: btn.dataset.filter, wrong, shown, restored, total: items.length };
+    return { filter: btn.dataset.filter, wrong, shown, skillsHidden, restored, total: items.length };
   });
   assert.equal(result.wrong, 0, `cards not matching '${result.filter}' stayed visible`);
   assert.ok(result.shown >= 1, 'filter hid everything');
+  assert.equal(result.skillsHidden, 0,
+    `project filter hid ${result.skillsHidden} skill cards — selector leaked outside #portfolio`);
   assert.equal(result.restored, result.total, "'All' did not restore every card");
   await page.close();
 });
