@@ -339,72 +339,93 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
-document.addEventListener('DOMContentLoaded', function () {
-  const prevBtn = document.querySelector('.paddlenav-arrow-previous');
-  const nextBtn = document.querySelector('.paddlenav-arrow-next');
-  const scroller = document.getElementById('scroller');
+/**
+ * CardScroller — reusable horizontal card-scroller component.
+ *
+ * Markup contract (copy-paste into any section, no extra JS needed):
+ *
+ *   <div class="rf-cards-scroller">
+ *     <div class="rf-cards-scroller-overflow" data-card-scroller>
+ *       <div class="rf-cards-scroller-item">…card…</div>
+ *       …
+ *     </div>
+ *     <div class="paddlenav">
+ *       <button class="paddlenav-arrow" data-scroller-prev>…</button>
+ *       <button class="paddlenav-arrow" data-scroller-next>…</button>
+ *     </div>
+ *   </div>
+ *
+ * Every [data-card-scroller] initializes itself on DOMContentLoaded:
+ * arrow paging, arrow disabled-state sync, and the mobile swipe-hint
+ * loop. Arrows are resolved from [data-scroller-prev]/[data-scroller-next]
+ * inside the same <section> (or passed via options). Optional
+ * data-scroller-step="480" overrides the paging distance.
+ * The instance is exposed on el._cardScroller as { update, reset }.
+ */
+function createCardScroller(scroller, options) {
+  var opts = options || {};
+  var root = scroller.closest('section') || document;
+  var prevBtn = opts.prev || root.querySelector('[data-scroller-prev]');
+  var nextBtn = opts.next || root.querySelector('[data-scroller-next]');
+  var step = parseInt(scroller.getAttribute('data-scroller-step'), 10) || opts.step || 400;
 
-  function updateScrollerButtons() {
-    const scrollLeft = scroller.scrollLeft;
-    const maxScrollLeft = scroller.scrollWidth - scroller.clientWidth;
-    prevBtn.disabled = scrollLeft <= 0;
-    prevBtn.classList.toggle('disabled', scrollLeft <= 0);
-    nextBtn.disabled = scrollLeft >= maxScrollLeft - 1;
-    nextBtn.classList.toggle('disabled', scrollLeft >= maxScrollLeft - 1);
+  function update() {
+    if (!prevBtn || !nextBtn) return;
+    var left = scroller.scrollLeft;
+    var max = scroller.scrollWidth - scroller.clientWidth;
+    prevBtn.disabled = left <= 0;
+    prevBtn.classList.toggle('disabled', left <= 0);
+    nextBtn.disabled = left >= max - 1;
+    nextBtn.classList.toggle('disabled', left >= max - 1);
   }
 
-  // เมื่อกดปุ่ม "Previous" เลื่อนกลับไป 1 ช่อง
-  prevBtn.addEventListener('click', function () {
-    scroller.scrollBy({ left: -400, behavior: 'smooth' });
-  });
+  if (prevBtn) {
+    prevBtn.addEventListener('click', function () {
+      scroller.scrollBy({ left: -step, behavior: 'smooth' });
+    });
+  }
+  if (nextBtn) {
+    nextBtn.addEventListener('click', function () {
+      scroller.scrollBy({ left: step, behavior: 'smooth' });
+    });
+  }
+  scroller.addEventListener('scroll', update, { passive: true });
+  window.addEventListener('load', update); // re-sync once images have sized the row
+  update();
+  setTimeout(update, 500);
 
-  // เมื่อกดปุ่ม "Next" เลื่อนไปข้างหน้า 1 ช่อง
-  nextBtn.addEventListener('click', function () {
-    scroller.scrollBy({ left: 400, behavior: 'smooth' });
-  });
+  // Mobile: nudge the row left-and-back every few seconds to hint that
+  // it scrolls horizontally; pause while (and shortly after) the user
+  // interacts, and fire the first hint when the row enters the viewport.
+  if (window.innerWidth <= 1024) {
+    var hintDistance = 80;
+    var duration = 250;
+    var userScrolling = false;
+    var isAnimating = false;
+    var scrollEndTimer = null;
+    var hintInterval = null;
 
-  // อัปเดตปุ่มเมื่อ scroll
-  scroller.addEventListener('scroll', updateScrollerButtons, { passive: true });
-  window.addEventListener('load', updateScrollerButtons); // เช็กตอนโหลดหน้า
-
-  // เช็กสถานะปุ่มทันทีหลังจาก DOM loaded
-  updateScrollerButtons();
-
-  // เช็กอีกครั้งหลังจากรูปโหลดเสร็จ
-  setTimeout(updateScrollerButtons, 500);
-
-  // Hint animation บน mobile: เลื่อนการ์ดซ้ายแล้วกลับ วน loop ทุก 3 วิ
-  if (window.innerWidth <= 1024 && scroller) {
-    const hintDistance = 80;
-    const duration = 250;
-    let userScrolling = false;
-    let isAnimating = false;
-    let scrollEndTimer = null;
-    let hintInterval = null;
-
-    function easeInOut(t) {
+    var easeInOut = function (t) {
       return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
-    }
+    };
 
-    function runHint() {
+    var runHint = function () {
       if (userScrolling || isAnimating) return;
-
-      const maxScrollLeft = scroller.scrollWidth - scroller.clientWidth;
-      const atRightEnd = scroller.scrollLeft >= maxScrollLeft - 1;
-      const dir = atRightEnd ? -1 : 1; // ขวาสุด → hint ซ้าย, อื่นๆ → hint ขวา
-
+      var maxScrollLeft = scroller.scrollWidth - scroller.clientWidth;
+      var atRightEnd = scroller.scrollLeft >= maxScrollLeft - 1;
+      var dir = atRightEnd ? -1 : 1;
       isAnimating = true;
-      const baseScroll = scroller.scrollLeft;
-      const fwdStart = performance.now();
+      var baseScroll = scroller.scrollLeft;
+      var fwdStart = performance.now();
       function forward(ts) {
         if (userScrolling) { isAnimating = false; return; }
-        const p = Math.min((ts - fwdStart) / duration, 1);
+        var p = Math.min((ts - fwdStart) / duration, 1);
         scroller.scrollLeft = baseScroll + dir * hintDistance * easeInOut(p);
         if (p < 1) { requestAnimationFrame(forward); return; }
-        const bkStart = performance.now();
+        var bkStart = performance.now();
         function back(ts2) {
           if (userScrolling) { isAnimating = false; return; }
-          const p2 = Math.min((ts2 - bkStart) / duration, 1);
+          var p2 = Math.min((ts2 - bkStart) / duration, 1);
           scroller.scrollLeft = baseScroll + dir * hintDistance * (1 - easeInOut(p2));
           if (p2 < 1) { requestAnimationFrame(back); return; }
           isAnimating = false;
@@ -412,14 +433,14 @@ document.addEventListener('DOMContentLoaded', function () {
         requestAnimationFrame(back);
       }
       requestAnimationFrame(forward);
-    }
+    };
 
-    function startHintLoop() {
+    var startHintLoop = function () {
       clearInterval(hintInterval);
       hintInterval = setInterval(runHint, 3000);
-    }
+    };
 
-    function onUserScroll() {
+    var onUserScroll = function () {
       if (isAnimating) return;
       userScrolling = true;
       clearInterval(hintInterval);
@@ -429,14 +450,13 @@ document.addEventListener('DOMContentLoaded', function () {
         userScrolling = false;
         startHintLoop();
       }, 10000);
-    }
+    };
 
     scroller.addEventListener('touchstart', onUserScroll, { passive: true });
     scroller.addEventListener('scroll', onUserScroll, { passive: true });
 
-    // Trigger hint immediately when section scrolls into view
     var hintStarted = false;
-    var hintObs = new IntersectionObserver(function(entries) {
+    var hintObs = new IntersectionObserver(function (entries) {
       if (entries.some(function (e) { return e.isIntersecting; }) && !hintStarted) {
         hintStarted = true;
         hintObs.disconnect();
@@ -447,6 +467,23 @@ document.addEventListener('DOMContentLoaded', function () {
     hintObs.observe(scroller);
   }
 
+  var api = {
+    update: update,
+    // jump back to the start and re-sync the arrows (e.g. after filtering)
+    reset: function () {
+      scroller.scrollLeft = 0;
+      setTimeout(update, 100);
+    }
+  };
+  scroller._cardScroller = api;
+  return api;
+}
+
+// Auto-init every card scroller on the page
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('[data-card-scroller]').forEach(function (el) {
+    createCardScroller(el);
+  });
 });
 
 
@@ -471,116 +508,9 @@ document.addEventListener('DOMContentLoaded', function () {
       });
 
       const scroller = document.getElementById('scroller');
-      if (scroller) {
-        scroller.scrollLeft = 0;
-        setTimeout(() => {
-          const maxScrollLeft = scroller.scrollWidth - scroller.clientWidth;
-          const prevBtn = document.querySelector('.paddlenav-arrow-previous');
-          const nextBtn = document.querySelector('.paddlenav-arrow-next');
-          if (prevBtn) { prevBtn.disabled = true; prevBtn.classList.add('disabled'); }
-          if (nextBtn) {
-            nextBtn.disabled = maxScrollLeft <= 0;
-            nextBtn.classList.toggle('disabled', maxScrollLeft <= 0);
-          }
-        }, 100);
-      }
+      if (scroller && scroller._cardScroller) scroller._cardScroller.reset();
     });
   });
-});
-
-// Skill Scroller
-document.addEventListener('DOMContentLoaded', function () {
-  const prevBtn = document.querySelector('.skill-paddlenav-arrow-previous');
-  const nextBtn = document.querySelector('.skill-paddlenav-arrow-next');
-  const scroller = document.getElementById('skill-scroller');
-  if (!prevBtn || !nextBtn || !scroller) return;
-
-  function updateButtons() {
-    const scrollLeft = scroller.scrollLeft;
-    const maxScrollLeft = scroller.scrollWidth - scroller.clientWidth;
-    prevBtn.disabled = scrollLeft <= 0;
-    prevBtn.classList.toggle('disabled', scrollLeft <= 0);
-    nextBtn.disabled = scrollLeft >= maxScrollLeft - 1;
-    nextBtn.classList.toggle('disabled', scrollLeft >= maxScrollLeft - 1);
-  }
-
-  prevBtn.addEventListener('click', function () {
-    scroller.scrollBy({ left: -400, behavior: 'smooth' });
-  });
-  nextBtn.addEventListener('click', function () {
-    scroller.scrollBy({ left: 400, behavior: 'smooth' });
-  });
-  scroller.addEventListener('scroll', updateButtons, { passive: true });
-  window.addEventListener('load', updateButtons);
-  setTimeout(updateButtons, 500);
-
-  if (window.innerWidth <= 1024) {
-    const hintDistance = 80;
-    const duration = 250;
-    let userScrolling = false;
-    let isAnimating = false;
-    let scrollEndTimer = null;
-    let hintInterval = null;
-
-    function easeInOut(t) {
-      return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
-    }
-    function runHint() {
-      if (userScrolling || isAnimating) return;
-      const maxScrollLeft = scroller.scrollWidth - scroller.clientWidth;
-      const atRightEnd = scroller.scrollLeft >= maxScrollLeft - 1;
-      const dir = atRightEnd ? -1 : 1;
-      isAnimating = true;
-      const baseScroll = scroller.scrollLeft;
-      const fwdStart = performance.now();
-      function forward(ts) {
-        if (userScrolling) { isAnimating = false; return; }
-        const p = Math.min((ts - fwdStart) / duration, 1);
-        scroller.scrollLeft = baseScroll + dir * hintDistance * easeInOut(p);
-        if (p < 1) { requestAnimationFrame(forward); return; }
-        const bkStart = performance.now();
-        function back(ts2) {
-          if (userScrolling) { isAnimating = false; return; }
-          const p2 = Math.min((ts2 - bkStart) / duration, 1);
-          scroller.scrollLeft = baseScroll + dir * hintDistance * (1 - easeInOut(p2));
-          if (p2 < 1) { requestAnimationFrame(back); return; }
-          isAnimating = false;
-        }
-        requestAnimationFrame(back);
-      }
-      requestAnimationFrame(forward);
-    }
-    function startHintLoop() {
-      clearInterval(hintInterval);
-      hintInterval = setInterval(runHint, 3000);
-    }
-    function onUserScroll() {
-      if (isAnimating) return;
-      userScrolling = true;
-      clearInterval(hintInterval);
-      hintInterval = null;
-      clearTimeout(scrollEndTimer);
-      scrollEndTimer = setTimeout(function () {
-        userScrolling = false;
-        startHintLoop();
-      }, 10000);
-    }
-    scroller.addEventListener('touchstart', onUserScroll, { passive: true });
-    scroller.addEventListener('scroll', onUserScroll, { passive: true });
-
-    // Trigger hint immediately when section scrolls into view
-    var hintStarted = false;
-    var hintObs = new IntersectionObserver(function(entries) {
-      if (entries.some(function (e) { return e.isIntersecting; }) && !hintStarted) {
-        hintStarted = true;
-        hintObs.disconnect();
-        runHint();
-        startHintLoop();
-      }
-    }, { threshold: 0.3 });
-    hintObs.observe(scroller);
-  }
-
 });
 
 // Hero animation now handled by CSS (@keyframes heroFadeIn) — no GSAP needed

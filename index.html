@@ -1380,7 +1380,7 @@
   </script>
 
   <!-- Preload deferred JS to start downloading before parser reaches script tags -->
-  <link rel="preload" href="assets/js/main.min.js?v=1.90.0" as="script">
+  <link rel="preload" href="assets/js/main.min.js?v=1.91.0" as="script">
 
   <script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="233b92be-5a2d-492b-b093-9c3ed14c9063"
     type="text/javascript" async></script>
@@ -1843,7 +1843,7 @@
         </div>
 
         <div class="rf-cards-scroller">
-          <div class="rf-cards-scroller-overflow" id="skill-scroller">
+          <div class="rf-cards-scroller-overflow" id="skill-scroller" data-card-scroller>
 
             <div class="rf-cards-scroller-item">
               <img src="assets/icon/img16.avif" class="skill-icon" alt="Web Design skill icon" loading="lazy"
@@ -1917,7 +1917,7 @@
           </div>
 
           <div class="paddlenav paddlenav-alpha paddlenav-framed paddlenav-elevated">
-            <button type="button" class="paddlenav-arrow skill-paddlenav-arrow-previous" aria-label="Previous Skill">
+            <button type="button" class="paddlenav-arrow skill-paddlenav-arrow-previous" aria-label="Previous Skill" data-scroller-prev>
               <span>
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36">
                   <path
@@ -1927,7 +1927,7 @@
               </span>
               <span class="visuallyhidden"></span>
             </button>
-            <button type="button" class="paddlenav-arrow skill-paddlenav-arrow-next" aria-label="Next Skill">
+            <button type="button" class="paddlenav-arrow skill-paddlenav-arrow-next" aria-label="Next Skill" data-scroller-next>
               <span>
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36">
                   <path
@@ -1963,7 +1963,7 @@
 
         <!-- Project Scroller Wrapper -->
         <div class="rf-cards-scroller">
-          <div class="rf-cards-scroller-overflow" id="scroller">
+          <div class="rf-cards-scroller-overflow" id="scroller" data-card-scroller>
             <!-- Project 1 -->
             <div class="rf-cards-scroller-item" role="region" aria-labelledby="project1-title" data-tech="iot">
               <div class="project-img">
@@ -2016,7 +2016,7 @@
           <!-- Navigation Arrows for Scroller -->
           <div class="paddlenav paddlenav-alpha paddlenav-framed paddlenav-elevated">
             <!-- Previous Arrow -->
-            <button type="button" class="paddlenav-arrow paddlenav-arrow-previous" aria-label="Previous Project">
+            <button type="button" class="paddlenav-arrow paddlenav-arrow-previous" aria-label="Previous Project" data-scroller-prev>
               <span>
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36">
                   <path
@@ -2028,7 +2028,7 @@
             </button>
 
             <!-- Next Arrow -->
-            <button type="button" class="paddlenav-arrow paddlenav-arrow-next" aria-label="Next Project">
+            <button type="button" class="paddlenav-arrow paddlenav-arrow-next" aria-label="Next Project" data-scroller-next>
               <span>
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36">
                   <path
@@ -2204,7 +2204,7 @@
   </button>
 
   <!-- Main JS -->
-  <script defer src="assets/js/main.min.js?v=1.90.0"></script>
+  <script defer src="assets/js/main.min.js?v=1.91.0"></script>
   <!-- Service Worker: cache assets for repeat visits -->
   <script>if ('serviceWorker' in navigator) { var _sw = function () { navigator.serviceWorker.register('sw.js') }; 'requestIdleCallback' in window ? requestIdleCallback(_sw) : window.addEventListener('load', _sw) }</script>
 
