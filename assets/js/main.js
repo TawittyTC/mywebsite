@@ -455,7 +455,9 @@ document.addEventListener('DOMContentLoaded', function () {
 // Project Filters
 document.addEventListener('DOMContentLoaded', function () {
   const filterBtns = document.querySelectorAll('.filter-btn');
-  const projectItems = document.querySelectorAll('.rf-cards-scroller-item');
+  // Scoped to the portfolio scroller — skill cards share the same class
+  // and must never be touched by project filtering.
+  const projectItems = document.querySelectorAll('#portfolio .rf-cards-scroller-item');
   if (!filterBtns.length) return;
 
   filterBtns.forEach(btn => {
