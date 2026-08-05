@@ -397,8 +397,10 @@ button {
   width: 300px;
   margin-right: 56px;
   border-radius: var(--r-card);
+  /* no resting shadow here: the horizontal scroller clips overflow and
+     would smear it — the neutral fill separates the card instead */
   box-shadow: none;
-  background-color: #fff;
+  background-color: var(--color-fill);
   padding: 0;
   overflow: hidden;
 }
@@ -687,16 +689,14 @@ button {
 
 /* Project & Skill cards */
 .rf-cards-scroller-item {
-  box-shadow: var(--shadow-rest);
+  box-shadow: none;
   transition: transform 0.35s var(--ease-swift), box-shadow 0.35s var(--ease-swift);
 }
 #portfolio .rf-cards-scroller-item:hover {
   transform: translateY(-8px);
-  box-shadow: 0 22px 52px rgba(29, 29, 31, 0.10);
 }
 #skill .rf-cards-scroller-item:hover {
   transform: translateY(-6px);
-  box-shadow: 0 22px 52px rgba(29, 29, 31, 0.08);
 }
 
 /* Project tag pill */
@@ -756,12 +756,12 @@ button {
 /* Touch devices fire :hover on tap and it sticks — keep lift/zoom motion
    for real pointers only; press feedback covers touch. */
 @media (hover: none), (pointer: coarse) {
-  .data-box:hover,
-  #portfolio .rf-cards-scroller-item:hover,
-  #skill .rf-cards-scroller-item:hover {
+  .data-box:hover {
     transform: none;
     box-shadow: var(--shadow-rest);
   }
+  #portfolio .rf-cards-scroller-item:hover,
+  #skill .rf-cards-scroller-item:hover,
   .cert-card:hover,
   .cta-mail:hover,
   .cert-expand-btn:hover {
