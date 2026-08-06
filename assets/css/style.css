@@ -4,8 +4,8 @@
 :root {
   --color-text: #1D1D1F;
   --color-text-secondary: #6E6E73;
-  --color-link: #B4602A;
-  --color-link-hover: #C97335;
+  --color-link: #1877F2;
+  --color-link-hover: #166FE5;
   --color-fill: #F5F5F7;
   --color-background-alt: #F8F8F8;
   /* Concentric radii: inner radius = outer radius − gap, floored at --r-min */
@@ -17,7 +17,7 @@
      interruptible because these are plain CSS transitions */
   --ease-swift: cubic-bezier(0.32, 0.72, 0, 1);
   /* Resting card definition on the all-white canvas (60/30/10: white
-     canvas dominates, neutral surfaces structure, amber accents) */
+     canvas dominates, neutral gray surfaces structure, facebook-blue accents) */
   --shadow-rest: 0 1px 2px rgba(29, 29, 31, 0.04), 0 10px 28px rgba(29, 29, 31, 0.05);
 }
 
@@ -705,7 +705,7 @@ button {
   margin: 14px 20px 0;
   padding: 4px 12px;
   border-radius: var(--r-capsule);
-  background: rgba(180, 96, 42, 0.08);
+  background: rgba(24, 119, 242, 0.08);
   color: var(--color-link);
   font-size: 12px;
   font-weight: 500;
@@ -815,7 +815,7 @@ button {
    ink — JS eases --ink-x / --ink-c toward it every frame. */
 #hero .hero-name {
   --ink-x: 62%;
-  --ink-c: #B4602A;
+  --ink-c: #1877F2;
 }
 .hero-name-line {
   display: block;
@@ -905,7 +905,7 @@ button {
   width: 640px;
   height: 640px;
   background: radial-gradient(circle,
-    rgba(232, 168, 124, 0.14) 0%,
+    rgba(90, 167, 255, 0.12) 0%,
     rgba(252, 252, 253, 0) 62%);
   z-index: -1;
   pointer-events: none;
@@ -995,7 +995,7 @@ button {
   width: 960px;
   max-width: 100vw;
   height: 560px;
-  background: radial-gradient(closest-side, rgba(217, 144, 67, 0.08) 0%, rgba(217, 144, 67, 0.03) 55%, rgba(217, 144, 67, 0) 100%);
+  background: radial-gradient(closest-side, rgba(24, 119, 242, 0.08) 0%, rgba(24, 119, 242, 0.03) 55%, rgba(24, 119, 242, 0) 100%);
   pointer-events: none;
 }
 .cta-inner { position: relative; }
@@ -1012,8 +1012,8 @@ button {
     background-image: linear-gradient(100deg,
       #1d1d1f 0%,
       #1d1d1f 42%,
-      #B4602A 58%,
-      #D99043 66%,
+      #1877F2 58%,
+      #5AA7FF 66%,
       #1d1d1f 88%);
     -webkit-background-clip: text;
     background-clip: text;

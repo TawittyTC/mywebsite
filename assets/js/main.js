@@ -777,7 +777,7 @@ document.addEventListener('DOMContentLoaded', function () {
   function hexToRgb(h) {
     return { r: parseInt(h.slice(1, 3), 16), g: parseInt(h.slice(3, 5), 16), b: parseInt(h.slice(5, 7), 16) };
   }
-  var WARM1 = hexToRgb('#B4602A'), WARM2 = hexToRgb('#D99043'), COOL = hexToRgb('#3F6EA6');
+  var WARM1 = hexToRgb('#1877F2'), WARM2 = hexToRgb('#5AA7FF'), COOL = hexToRgb('#64748B');
   function lerp(a, b, t) { return a + (b - a) * t; }
   function mix(c1, c2, t) {
     return { r: Math.round(lerp(c1.r, c2.r, t)), g: Math.round(lerp(c1.g, c2.g, t)), b: Math.round(lerp(c1.b, c2.b, t)) };
