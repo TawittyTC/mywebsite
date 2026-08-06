@@ -118,13 +118,20 @@ test('viewport churn never changes the hero height or shoves sections around', a
     await page.setViewportSize({ width: 390, height: h });
     await page.waitForTimeout(120);
   }
-  // let deferred resize handlers finish before measuring (CI runners can
-  // lag rAF-scheduled work under load, which flaked this as ±few px)
-  await page.waitForTimeout(500);
-  const after = await page.evaluate(() => ({
+  // wait until layout is actually STABLE (two identical consecutive
+  // measurements) — fixed waits flaked under full-suite CPU load when
+  // rAF-deferred resize work landed late
+  const measure = () => page.evaluate(() => ({
     hero: document.getElementById('hero').offsetHeight,
-    resumeTop: document.getElementById('resume').getBoundingClientRect().top + window.scrollY,
+    resumeTop: Math.round(document.getElementById('resume').getBoundingClientRect().top + window.scrollY),
   }));
+  let after = await measure();
+  for (let i = 0; i < 10; i++) {
+    await page.waitForTimeout(300);
+    const next = await measure();
+    if (next.hero === after.hero && next.resumeTop === after.resumeTop) { after = next; break; }
+    after = next;
+  }
   assert.ok(Math.abs(after.hero - before.hero) <= 3,
     `hero height changed ${before.hero} → ${after.hero} during viewport churn`);
   assert.ok(Math.abs(after.resumeTop - before.resumeTop) <= 3,
