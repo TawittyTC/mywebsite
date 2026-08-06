@@ -36,17 +36,26 @@
 `el._cardScroller.update()` / `el._cardScroller.reset()`
 หรือเรียก `createCardScroller(el, { prev, next, step })` เองก็ได้
 
-## 2. Filter Chips (ปุ่มกรองการ์ดใน scroller)
+## 2. Filter Chips (ปุ่มกรองการ์ดใน scroller — ใช้กับ section ไหนก็ได้)
 
-ใช้อยู่ที่: My Projects — กรองเฉพาะการ์ดใน `#portfolio` เท่านั้น
+ใช้อยู่ที่: My Projects — แต่เป็น component คู่กับ Card Scroller: วางกลุ่ม
+`.project-filters` ใน section ไหน มันจะกรอง **การ์ดของ section นั้นเท่านั้น**
+และ rewind scroller ของ section นั้นให้เอง (ไม่ผูกกับ id ใดๆ อยาก
+ให้ Skills กรองได้ก็แค่เพิ่มกลุ่มปุ่ม + data-tech ที่การ์ด)
 
 ```html
-<div class="project-filters">
-  <button class="filter-btn active" data-filter="all">All</button>
-  <button class="filter-btn" data-filter="iot">IoT / AWS</button>
-</div>
-<!-- การ์ดที่จะถูกกรอง ใส่ data-tech ให้ตรงกับ data-filter -->
-<div class="rf-cards-scroller-item" data-tech="iot">…</div>
+<section id="any-section">
+  <div class="project-filters">
+    <button class="filter-btn active" data-filter="all">All</button>
+    <button class="filter-btn" data-filter="iot">IoT / AWS</button>
+  </div>
+  <div class="rf-cards-scroller">
+    <div class="rf-cards-scroller-overflow" data-card-scroller>
+      <!-- การ์ดใส่ data-tech ให้ตรงกับ data-filter ของปุ่ม -->
+      <div class="rf-cards-scroller-item" data-tech="iot">…</div>
+    </div>
+  </div>
+</section>
 ```
 
 ## 3. Project Card (การ์ดผลงาน มีรูป + แท็ก + ชื่อ)

@@ -145,8 +145,10 @@
     document.body.style.overflow = "hidden";
   }
   function closeLightbox() {
+    if (!lightbox.classList.contains("open")) return; // Escape pressed elsewhere
     lightbox.classList.remove("open");
-    document.body.style.overflow = "";
+    // only release the scroll lock if no other overlay is holding it
+    if (!document.querySelector(".exp-lightbox.open")) document.body.style.overflow = "";
   }
   closeBtn.addEventListener("click", closeLightbox);
   lightbox.addEventListener("click", function (e) {
@@ -174,8 +176,16 @@
   document.body.appendChild(lightbox);
 
   function closeExp() {
+    if (!lightbox.classList.contains('open')) return; // Escape pressed elsewhere
     lightbox.classList.remove('open');
-    setTimeout(function() { document.body.style.overflow = ''; }, 220);
+    setTimeout(function () {
+      // deferred for the exit animation — but by now another overlay
+      // (cert lightbox) may have opened and taken the scroll lock
+      if (!lightbox.classList.contains('open') &&
+          !document.querySelector('.cert-lightbox.open')) {
+        document.body.style.overflow = '';
+      }
+    }, 220);
   }
   closeBtn.addEventListener('click', function(e) {
     e.stopPropagation();
@@ -489,26 +499,33 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
-// Project Filters
+/**
+ * CardFilter — companion component to CardScroller.
+ *
+ * A .project-filters chip group filters the scroller cards inside ITS
+ * OWN <section> only (chips carry data-filter, cards carry data-tech,
+ * "all" shows everything) and rewinds that section's scroller. Drop the
+ * group into any section with a card scroller and it just works — no
+ * ids, no extra JS.
+ */
 document.addEventListener('DOMContentLoaded', function () {
-  const filterBtns = document.querySelectorAll('.filter-btn');
-  // Scoped to the portfolio scroller — skill cards share the same class
-  // and must never be touched by project filtering.
-  const projectItems = document.querySelectorAll('#portfolio .rf-cards-scroller-item');
-  if (!filterBtns.length) return;
+  document.querySelectorAll('.project-filters').forEach(function (group) {
+    var root = group.closest('section') || document;
+    var btns = group.querySelectorAll('.filter-btn');
+    var items = root.querySelectorAll('.rf-cards-scroller-item');
+    var scroller = root.querySelector('[data-card-scroller]');
+    if (!btns.length || !items.length) return;
 
-  filterBtns.forEach(btn => {
-    btn.addEventListener('click', function () {
-      filterBtns.forEach(b => b.classList.remove('active'));
-      this.classList.add('active');
-
-      const filter = this.getAttribute('data-filter');
-      projectItems.forEach(item => {
-        item.style.display = (filter === 'all' || item.getAttribute('data-tech') === filter) ? '' : 'none';
+    btns.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        btns.forEach(function (b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        var filter = btn.getAttribute('data-filter');
+        items.forEach(function (item) {
+          item.style.display = (filter === 'all' || item.getAttribute('data-tech') === filter) ? '' : 'none';
+        });
+        if (scroller && scroller._cardScroller) scroller._cardScroller.reset();
       });
-
-      const scroller = document.getElementById('scroller');
-      if (scroller && scroller._cardScroller) scroller._cardScroller.reset();
     });
   });
 });
