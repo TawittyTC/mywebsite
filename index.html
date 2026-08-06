@@ -1842,24 +1842,31 @@
           <p>The technologies and tools I bring to every project.</p>
         </div>
 
+        <div class="project-filters">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="web">Web</button>
+          <button class="filter-btn" data-filter="ai">AI</button>
+          <button class="filter-btn" data-filter="eng">Engineering</button>
+        </div>
+
         <div class="rf-cards-scroller">
           <div class="rf-cards-scroller-overflow" id="skill-scroller" data-card-scroller>
 
-            <div class="rf-cards-scroller-item">
+            <div class="rf-cards-scroller-item" data-tech="web">
               <img src="assets/icon/img16.avif" class="skill-icon" alt="Web Design skill icon" loading="lazy"
                 decoding="async" width="170" height="170">
               <div class="title h3">Web Design</div>
               <p class="skill-desc fw-light">UX/UI, Graphic &amp; Responsive Design</p>
             </div>
 
-            <div class="rf-cards-scroller-item">
+            <div class="rf-cards-scroller-item" data-tech="web">
               <img src="assets/icon/img1.avif" class="skill-icon" alt="Web Development skill icon" loading="lazy"
                 decoding="async" width="170" height="170">
               <div class="title h3">Web Development</div>
               <p class="skill-desc fw-light">Full-stack from front-end to back-end APIs and databases</p>
             </div>
 
-            <div class="rf-cards-scroller-item">
+            <div class="rf-cards-scroller-item" data-tech="ai">
               <svg class="skill-icon" viewBox="0 0 170 170" fill="none" aria-hidden="true" role="img">
                 <circle cx="85" cy="50" r="22" stroke="#3b4cca" stroke-width="5" />
                 <circle cx="85" cy="50" r="8" fill="#B4602A" />
@@ -1874,7 +1881,7 @@
                 business automation</p>
             </div>
 
-            <div class="rf-cards-scroller-item">
+            <div class="rf-cards-scroller-item" data-tech="ai">
               <svg class="skill-icon" viewBox="0 0 170 170" fill="none" aria-hidden="true" role="img">
                 <rect x="28" y="38" width="114" height="76" rx="20" stroke="#3b4cca" stroke-width="5" />
                 <path d="M62 132l-8 18 30-18" fill="none" stroke="#3b4cca" stroke-width="5" stroke-linejoin="round" />
@@ -1886,28 +1893,28 @@
                 LLM-powered IVR &amp; chatbots</p>
             </div>
 
-            <div class="rf-cards-scroller-item">
+            <div class="rf-cards-scroller-item" data-tech="web">
               <img src="assets/icon/img2.avif" class="skill-icon" alt="Web Security skill icon" loading="lazy"
                 decoding="async" width="170" height="170">
               <div class="title h3">Web Security</div>
               <p class="skill-desc fw-light">XSS, SQL Injection, CSRF prevention &amp; SSL/TLS configuration</p>
             </div>
 
-            <div class="rf-cards-scroller-item">
+            <div class="rf-cards-scroller-item" data-tech="eng">
               <img src="assets/icon/img7.avif" class="skill-icon" alt="Version Control skill icon" loading="lazy"
                 decoding="async" width="170" height="170">
               <div class="title h3">Version Control</div>
               <p class="skill-desc fw-light">Git, Subversion &amp; Mercurial for source code management</p>
             </div>
 
-            <div class="rf-cards-scroller-item">
+            <div class="rf-cards-scroller-item" data-tech="eng">
               <img src="assets/icon/img4.avif" class="skill-icon" alt="Problem Solving skill icon" loading="lazy"
                 decoding="async" width="170" height="170">
               <div class="title h3">Problem Solving</div>
               <p class="skill-desc fw-light">Fast learning, debugging &amp; utilizing modern developer tools</p>
             </div>
 
-            <div class="rf-cards-scroller-item">
+            <div class="rf-cards-scroller-item" data-tech="eng">
               <img src="assets/icon/img3.avif" class="skill-icon" alt="Project Management skill icon" loading="lazy"
                 decoding="async" width="170" height="170">
               <div class="title h3">Project Management</div>
