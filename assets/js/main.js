@@ -783,7 +783,9 @@ document.addEventListener('DOMContentLoaded', function () {
     return { r: Math.round(lerp(c1.r, c2.r, t)), g: Math.round(lerp(c1.g, c2.g, t)), b: Math.round(lerp(c1.b, c2.b, t)) };
   }
   function rgba(c, a) { return 'rgba(' + c.r + ',' + c.g + ',' + c.b + ',' + a + ')'; }
-  function isMobile() { return W < 992; }
+  // "compact" layout — phones AND iPads (≤1024px) get the graph
+  // surrounding the copy; past iPad it's the desktop right-side field
+  function isMobile() { return W < 1025; }
   // warm on one side of the cluster blending to cool on the other
   function colorForX(x) {
     var b = bounds();
@@ -877,7 +879,7 @@ document.addEventListener('DOMContentLoaded', function () {
   function makeNodes() {
     nodes = [];
     var b = bounds();
-    var total = isMobile() ? 46 : 55;
+    var total = isMobile() ? 50 : 55;
     for (var i = 0; i < total; i++) {
       var special = i < LABELS.length;
       var x, y;
@@ -891,6 +893,24 @@ document.addEventListener('DOMContentLoaded', function () {
         var cx = (sb.x0 + sb.x1) / 2, cy = (sb.y0 + sb.y1) / 2;
         x = cx + Math.cos(ang) * (sb.x1 - sb.x0) * 0.3 + (Math.random() - 0.5) * 40;
         y = cy + Math.sin(ang) * (sb.y1 - sb.y0) * 0.32 + (Math.random() - 0.5) * 40;
+      } else if (isMobile()) {
+        // ambient nodes RING the copy: top band, left/right strips, and
+        // the main field below — instead of uniform scatter (which puts
+        // half of them behind the text where the keep-out erases them)
+        var bw2 = layoutW || W, bh2 = layoutH || H, zone = Math.random();
+        if (zone < 0.22) {        // above the copy
+          x = bw2 * (0.06 + Math.random() * 0.88);
+          y = bh2 * (0.04 + Math.random() * 0.10);
+        } else if (zone < 0.34) { // left strip beside the copy
+          x = bw2 * (0.02 + Math.random() * 0.07);
+          y = bh2 * (0.14 + Math.random() * 0.40);
+        } else if (zone < 0.46) { // right strip beside the copy
+          x = bw2 * (0.91 + Math.random() * 0.07);
+          y = bh2 * (0.14 + Math.random() * 0.40);
+        } else {                  // the field below
+          x = bw2 * (0.06 + Math.random() * 0.88);
+          y = bh2 * (0.55 + Math.random() * 0.39);
+        }
       } else {
         x = b.x0 + ((Math.random() + Math.random()) / 2) * (b.x1 - b.x0);
         y = b.y0 + Math.random() * (b.y1 - b.y0);
@@ -967,14 +987,17 @@ document.addEventListener('DOMContentLoaded', function () {
     var cr = copyEl.getBoundingClientRect();
     copyRect = { x0: cr.left - hr.left, y0: cr.top - hr.top, x1: cr.right - hr.left, y1: cr.bottom - hr.top };
   }
-  // 1 = fully visible, 0 = gone (within 24px of the text block);
-  // the ramp runs over the next 130px
+  // 1 = fully visible, 0 = gone near the text block. Compact layouts
+  // use a shorter ramp — the strips above/beside the copy are narrow,
+  // and the long desktop ramp would swallow them entirely.
   function fadeAt(x, y) {
     if (!copyRect) return 1;
     var dx = Math.max(copyRect.x0 - x, 0, x - copyRect.x1);
     var dy = Math.max(copyRect.y0 - y, 0, y - copyRect.y1);
     var d = Math.sqrt(dx * dx + dy * dy);
-    return Math.max(0, Math.min(1, (d - 30) / 130));
+    var m = isMobile() ? 26 : 30;
+    var ramp = isMobile() ? 84 : 130;
+    return Math.max(0, Math.min(1, (d - m) / ramp));
   }
 
   function resize() {
