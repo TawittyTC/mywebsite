@@ -802,13 +802,64 @@ document.addEventListener('DOMContentLoaded', function () {
   var layoutW = 0, layoutH = 0;
   // eased state for the node-lit name ink
   var nameEl = hero.querySelector('.hero-name');
-  var inkX = 62, inkR = 180, inkG = 96, inkB = 42;
+  var inkX = 62, inkR = 24, inkG = 119, inkB = 242;
   var inkNode = null, nextInkSwitch = 1.6;
+
+  // ── Big-bang intro: the whole graph starts as one clustered blob,
+  // trembles harder and harder, then detonates outward — every node
+  // overshoots to its home (Duolingo-inspired burst). ──
+  var SHAKE_END = 0.85, EXPLODE_DUR = 0.5, INTRO_END = SHAKE_END + EXPLODE_DUR;
+  var introCluster = null, boomPlayed = false;
+  function clusterPoint() {
+    if (isMobile()) {
+      return copyRect
+        ? { x: (copyRect.x0 + copyRect.x1) / 2, y: copyRect.y1 + 70 }
+        : { x: W * 0.5, y: H * 0.58 };
+    }
+    var b = bounds();
+    return { x: (b.x0 + b.x1) / 2, y: (b.y0 + b.y1) / 2 };
+  }
+  // Cheerful synthesized pop (Duolingo-flavored: soft thump + three
+  // bright rising notes). No audio asset. Browsers block autoplay
+  // audio before the first user gesture — in that case we skip
+  // silently rather than error.
+  function playBoom() {
+    try {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      var ac = new AC();
+      if (ac.state !== 'running') { ac.close(); return; }
+      var t = ac.currentTime;
+      var o1 = ac.createOscillator(), g1 = ac.createGain();
+      o1.type = 'sine';
+      o1.frequency.setValueAtTime(220, t);
+      o1.frequency.exponentialRampToValueAtTime(70, t + 0.18);
+      g1.gain.setValueAtTime(0.16, t);
+      g1.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
+      o1.connect(g1); g1.connect(ac.destination);
+      o1.start(t); o1.stop(t + 0.24);
+      [1046.5, 1318.5, 1568].forEach(function (fq, k) { // C6 E6 G6
+        var o = ac.createOscillator(), g = ac.createGain();
+        o.type = 'triangle';
+        o.frequency.value = fq;
+        var ts = t + 0.02 + k * 0.055;
+        g.gain.setValueAtTime(0.0001, ts);
+        g.gain.exponentialRampToValueAtTime(0.1, ts + 0.015);
+        g.gain.exponentialRampToValueAtTime(0.001, ts + 0.16);
+        o.connect(g); g.connect(ac.destination);
+        o.start(ts); o.stop(ts + 0.18);
+      });
+      setTimeout(function () { ac.close(); }, 800);
+    } catch (e) { /* no sound is fine */ }
+  }
 
   function bounds() {
     var bw = layoutW || W, bh = layoutH || H;
+    // Mobile: the graph SURROUNDS the copy (full canvas) — the keep-out
+    // fade carves the text hole, so nodes ring the words instead of
+    // pooling underneath them.
     return isMobile()
-      ? { x0: bw * 0.05, x1: bw * 0.95, y0: bh * 0.52, y1: bh * 0.94 }
+      ? { x0: bw * 0.06, x1: bw * 0.94, y0: bh * 0.06, y1: bh * 0.94 }
       : { x0: bw * 0.44, x1: bw * 0.97, y0: bh * 0.08, y1: bh * 0.92 };
   }
   // Where the breathing hairline starts — always OUTSIDE the copy
@@ -826,15 +877,20 @@ document.addEventListener('DOMContentLoaded', function () {
   function makeNodes() {
     nodes = [];
     var b = bounds();
-    var total = isMobile() ? 36 : 55;
+    var total = isMobile() ? 46 : 55;
     for (var i = 0; i < total; i++) {
       var special = i < LABELS.length;
       var x, y;
       if (special) { // seed specials on a loose ring so labels spread out
+        // On mobile the labeled nodes stay in the band BELOW the copy —
+        // anywhere else the keep-out fade would swallow their labels.
+        var sb = isMobile()
+          ? { x0: b.x0, x1: b.x1, y0: (layoutH || H) * 0.55, y1: (layoutH || H) * 0.92 }
+          : b;
         var ang = (i / LABELS.length) * Math.PI * 2 + 0.5;
-        var cx = (b.x0 + b.x1) / 2, cy = (b.y0 + b.y1) / 2;
-        x = cx + Math.cos(ang) * (b.x1 - b.x0) * 0.3 + (Math.random() - 0.5) * 40;
-        y = cy + Math.sin(ang) * (b.y1 - b.y0) * 0.32 + (Math.random() - 0.5) * 40;
+        var cx = (sb.x0 + sb.x1) / 2, cy = (sb.y0 + sb.y1) / 2;
+        x = cx + Math.cos(ang) * (sb.x1 - sb.x0) * 0.3 + (Math.random() - 0.5) * 40;
+        y = cy + Math.sin(ang) * (sb.y1 - sb.y0) * 0.32 + (Math.random() - 0.5) * 40;
       } else {
         x = b.x0 + ((Math.random() + Math.random()) / 2) * (b.x1 - b.x0);
         y = b.y0 + Math.random() * (b.y1 - b.y0);
@@ -870,6 +926,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     pulses = [];
     inkNode = null;
+    introCluster = null; // re-pick on relayout (only matters mid-intro)
   }
 
   function makeLabels() {
@@ -1001,16 +1058,31 @@ document.addEventListener('DOMContentLoaded', function () {
       n.x = n.fx * layoutW + A * (n.a1 * Math.sin(time * n.f1 + n.p1) + n.a2 * Math.sin(time * n.f2 + n.p2));
       n.y = n.fy * layoutH + A * (n.a1 * Math.cos(time * n.f1 * 0.83 + n.p3) + n.a2 * Math.sin(time * n.f2 * 1.27 + n.p4));
 
-      // entrance: fly in + fade in, staggered — the network assembles
-      // itself in the first ~2s (skipped under reduced motion)
-      if (n.iv < 1) {
-        if (reduce) { n.iv = 1; }
-        else {
-          var ip = Math.min(Math.max((time - n.st) / 0.7, 0), 1);
-          n.iv = 1 - Math.pow(1 - ip, 3); // easeOutCubic
-          var away = (1 - n.iv) * 80;
-          n.x += n.ix * away;
-          n.y += n.iy * away;
+      // entrance: cluster → violent shake → detonation (skipped under
+      // reduced motion). Deterministic per-node phases keep it smooth.
+      if (reduce || time >= INTRO_END) {
+        n.iv = 1;
+      } else {
+        if (!introCluster) introCluster = clusterPoint();
+        var cox = n.ix * (5 + n.r * 2.2); // tight per-node spot in the blob
+        var coy = n.iy * (5 + n.r * 2.2);
+        var jx = Math.sin(time * 43 + n.p1 * 7);
+        var jy = Math.cos(time * 39 + n.p2 * 7);
+        if (time < SHAKE_END) {
+          // wind-up: trembling ramps to a violent shake
+          var w = time / SHAKE_END;
+          var amp = 1.5 + w * w * w * 24;
+          n.x = introCluster.x + cox + jx * amp;
+          n.y = introCluster.y + coy + jy * amp;
+          n.iv = Math.min(time / 0.25, 1) * 0.85;
+        } else {
+          // detonation: overshoot out to the homes computed above
+          var ep = (time - SHAKE_END) / EXPLODE_DUR;
+          var eb = 1 + 2.70158 * Math.pow(ep - 1, 3) + 1.70158 * Math.pow(ep - 1, 2); // easeOutBack
+          var res = (1 - ep) * 6; // shake residue dies out mid-flight
+          n.x = introCluster.x + cox + (n.x - introCluster.x - cox) * eb + jx * res;
+          n.y = introCluster.y + coy + (n.y - introCluster.y - coy) * eb + jy * res;
+          n.iv = 0.85 + 0.15 * ep;
         }
       }
 
@@ -1029,6 +1101,21 @@ document.addEventListener('DOMContentLoaded', function () {
       n.py += (ty - n.py) * 0.08;
       // how visible this node is near the copy block (0 gone → 1 full)
       n.f = fadeAt(n.x + n.px, n.y + n.py) * n.iv;
+    }
+
+    // detonation moment: pop sound + expanding shockwave ring
+    if (!reduce && !boomPlayed && time >= SHAKE_END) {
+      boomPlayed = true;
+      playBoom();
+    }
+    if (!reduce && introCluster && time >= SHAKE_END && time < SHAKE_END + 0.7) {
+      var rp = (time - SHAKE_END) / 0.7;
+      ctx.strokeStyle = rgba(WARM1, (1 - rp) * 0.35);
+      ctx.lineWidth = 2 - rp;
+      ctx.beginPath();
+      ctx.arc(introCluster.x, introCluster.y, 10 + rp * rp * 340, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.lineWidth = 1;
     }
 
     // signals: bright dots travelling along links — the system talking
@@ -1128,6 +1215,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // nodes (clearer: brighter cores, wider halos on specials);
     // near the copy block they shrink with their fade and disappear
+    // (labels stay hidden until just after the detonation — a crowd of
+    // words inside the shaking blob would be noise)
+    var labelGate = (reduce || time >= SHAKE_END + 0.45) ? 1
+      : (time <= SHAKE_END ? 0 : (time - SHAKE_END) / 0.45);
     var li = 0;
     for (var m = 0; m < nodes.length; m++) {
       var nm = nodes[m];
@@ -1138,7 +1229,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (el) {
           el.style.left = nx + 'px';
           el.style.top = ny + 'px';
-          el.style.opacity = String(f);
+          el.style.opacity = String(f * labelGate);
         }
         if (f <= 0.02) continue;
         var col = colorForX(nx);
