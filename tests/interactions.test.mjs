@@ -38,9 +38,9 @@ test('experience modal: opens from a card, filters by client, closes with Escape
 test('project filters hide non-matching cards and All restores them', async () => {
   const { page } = await ctx.openPage();
   await page.evaluate(() => document.getElementById('portfolio').scrollIntoView());
-  await page.waitForSelector('.filter-btn[data-filter]:not([data-filter="all"])');
+  await page.waitForSelector('#portfolio .filter-btn[data-filter]:not([data-filter="all"])');
   const result = await page.evaluate(() => {
-    const btn = document.querySelector('.filter-btn[data-filter]:not([data-filter="all"])');
+    const btn = document.querySelector('#portfolio .filter-btn[data-filter]:not([data-filter="all"])');
     btn.click();
     const items = [...document.querySelectorAll('#portfolio .rf-cards-scroller-item')];
     const wrong = items.filter(
@@ -50,7 +50,7 @@ test('project filters hide non-matching cards and All restores them', async () =
     // filtering projects must NEVER touch the skills scroller
     const skillsHidden = [...document.querySelectorAll('#skill .rf-cards-scroller-item')]
       .filter((i) => i.style.display === 'none').length;
-    document.querySelector('.filter-btn[data-filter="all"]').click();
+    document.querySelector('#portfolio .filter-btn[data-filter="all"]').click();
     const restored = items.filter((i) => i.style.display !== 'none').length;
     return { filter: btn.dataset.filter, wrong, shown, skillsHidden, restored, total: items.length };
   });

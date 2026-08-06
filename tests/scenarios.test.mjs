@@ -104,14 +104,14 @@ test('filter cycle leaves every project card visible, settled, and the row rewou
   await settle(page, 700);
   // scroll the row, then run through every filter and land back on All
   await page.evaluate(() => { document.getElementById('scroller').scrollLeft = 500; });
-  const nBtns = await page.$$eval('.filter-btn', (b) => b.length);
+  const nBtns = await page.$$eval('#portfolio .filter-btn', (b) => b.length);
   for (let i = 1; i < nBtns; i++) {
-    await page.$$eval('.filter-btn', (btns, idx) => btns[idx].click(), i);
+    await page.$$eval('#portfolio .filter-btn', (btns, idx) => btns[idx].click(), i);
     await settle(page, 250);
     const rewound = await page.evaluate(() => document.getElementById('scroller').scrollLeft);
     assert.ok(rewound <= 1, `filter did not rewind the scroller (at ${rewound}px)`);
   }
-  await page.$eval('.filter-btn[data-filter="all"]', (el) => el.click());
+  await page.$eval('#portfolio .filter-btn[data-filter="all"]', (el) => el.click());
   await settle(page, 600);
   const state = await page.evaluate(() => {
     const items = [...document.querySelectorAll('#portfolio .rf-cards-scroller-item')];
@@ -124,6 +124,32 @@ test('filter cycle leaves every project card visible, settled, and the row rewou
   assert.equal(state.hidden, 0, `${state.hidden} cards still hidden after All`);
   assert.equal(state.dim, 0, `${state.dim} cards stuck semi-transparent after filtering`);
   assert.equal(state.prevDisabled, true, 'prev arrow should be disabled after rewind');
+  await page.close();
+});
+
+test('skills filter shows only its category and never touches project cards', async () => {
+  const { page } = await ctx.openPage();
+  await page.$eval('#skill .section-title', (el) => el.scrollIntoView());
+  await settle(page, 500);
+  await page.$eval('#skill .filter-btn[data-filter="ai"]', (el) => el.click());
+  await settle(page, 300);
+  const state = await page.evaluate(() => ({
+    shown: [...document.querySelectorAll('#skill .rf-cards-scroller-item')]
+      .filter((i) => i.style.display !== 'none').length,
+    wrong: [...document.querySelectorAll('#skill .rf-cards-scroller-item')]
+      .filter((i) => i.style.display !== 'none' && i.dataset.tech !== 'ai').length,
+    projectsHidden: [...document.querySelectorAll('#portfolio .rf-cards-scroller-item')]
+      .filter((i) => i.style.display === 'none').length,
+  }));
+  assert.ok(state.shown >= 1, 'AI filter hid every skill card');
+  assert.equal(state.wrong, 0, 'non-AI skill cards remained visible');
+  assert.equal(state.projectsHidden, 0, 'skills filter leaked into project cards');
+  await page.$eval('#skill .filter-btn[data-filter="all"]', (el) => el.click());
+  await settle(page, 300);
+  const restored = await page.evaluate(() =>
+    [...document.querySelectorAll('#skill .rf-cards-scroller-item')]
+      .filter((i) => i.style.display !== 'none').length);
+  assert.equal(restored, 8, 'All did not restore every skill card');
   await page.close();
 });
 
