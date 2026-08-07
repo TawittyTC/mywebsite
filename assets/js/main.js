@@ -813,13 +813,11 @@ document.addEventListener('DOMContentLoaded', function () {
   var SHAKE_END = 0.85, EXPLODE_DUR = 0.5, INTRO_END = SHAKE_END + EXPLODE_DUR;
   var introCluster = null, boomPlayed = false;
   function clusterPoint() {
-    if (isMobile()) {
-      return copyRect
-        ? { x: (copyRect.x0 + copyRect.x1) / 2, y: copyRect.y1 + 70 }
-        : { x: W * 0.5, y: H * 0.58 };
+    // the blob forms dead-center BEHIND the name, then detonates out
+    if (copyRect) {
+      return { x: (copyRect.x0 + copyRect.x1) / 2, y: (copyRect.y0 + copyRect.y1) / 2 };
     }
-    var b = bounds();
-    return { x: (b.x0 + b.x1) / 2, y: (b.y0 + b.y1) / 2 };
+    return isMobile() ? { x: W * 0.5, y: H * 0.34 } : { x: W * 0.24, y: H * 0.46 };
   }
   // Cheerful synthesized pop (Duolingo-flavored: soft thump + three
   // bright rising notes). No audio asset. Browsers block autoplay
@@ -1071,6 +1069,9 @@ document.addEventListener('DOMContentLoaded', function () {
   function drawFrame(time) {
     ctx.clearRect(0, 0, W, H);
     var ampScale = Math.max(1, Math.min(W / 1100, 2));
+    // The blob lives BEHIND the name, so the keep-out fade is suspended
+    // during the shake and blends back in while the nodes fly out.
+    var koBlend = reduce ? 1 : Math.min(Math.max((time - SHAKE_END) / EXPLODE_DUR, 0), 1);
 
     for (var i = 0; i < nodes.length; i++) {
       var n = nodes[i];
@@ -1097,7 +1098,7 @@ document.addEventListener('DOMContentLoaded', function () {
           var amp = 1.5 + w * w * w * 24;
           n.x = introCluster.x + cox + jx * amp;
           n.y = introCluster.y + coy + jy * amp;
-          n.iv = Math.min(time / 0.25, 1) * 0.85;
+          n.iv = Math.min(time / 0.25, 1) * 0.75; // dim enough to read the name through
         } else {
           // detonation: overshoot out to the homes computed above
           var ep = (time - SHAKE_END) / EXPLODE_DUR;
@@ -1122,8 +1123,10 @@ document.addEventListener('DOMContentLoaded', function () {
       }
       n.px += (tx - n.px) * 0.08;
       n.py += (ty - n.py) * 0.08;
-      // how visible this node is near the copy block (0 gone → 1 full)
-      n.f = fadeAt(n.x + n.px, n.y + n.py) * n.iv;
+      // how visible this node is near the copy block (0 gone → 1 full);
+      // keep-out is suspended while the intro blob sits behind the name
+      var fk = fadeAt(n.x + n.px, n.y + n.py);
+      n.f = (koBlend < 1 ? (1 - koBlend) + koBlend * fk : fk) * n.iv;
     }
 
     // detonation moment: pop sound + expanding shockwave ring
@@ -1291,9 +1294,17 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   var running = false, t0 = null, lastDrawT = 0.01;
+  var curtainUp = false;
   function loop(ts) {
     if (!running) return;
     if (t0 === null) t0 = ts;
+    // Hold the intro clock at zero until the page loader curtain lifts —
+    // otherwise the cluster/shake plays hidden behind the overlay and
+    // visitors only catch the tail of the explosion.
+    if (!curtainUp) {
+      if (document.querySelector('.loader')) { t0 = ts; }
+      else { curtainUp = true; }
+    }
     // iOS batches resize events until scroll momentum ends; catch the
     // container changing size the moment it happens instead
     // (tolerance 2px: fractional-layout jitter must not trigger it)
