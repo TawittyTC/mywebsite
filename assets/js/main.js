@@ -1367,8 +1367,8 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!run) { raf = null; return; }
     var t = ts / 1000;
     if (!hover) { // idle: a slow left-right sway, like the Apple Card promo
-      tx = Math.sin(t * 0.85) * 10;
-      ty = Math.cos(t * 0.6) * 5;
+      tx = Math.sin(t * 0.85) * 17;
+      ty = Math.cos(t * 0.6) * 8;
       gx = 50 + Math.sin(t * 0.85) * 32;
       gy = 40 + Math.cos(t * 0.6) * 16;
     }
@@ -1379,6 +1379,8 @@ document.addEventListener('DOMContentLoaded', function () {
     card.style.transform = 'rotateY(' + cx.toFixed(2) + 'deg) rotateX(' + cy.toFixed(2) + 'deg)';
     card.style.setProperty('--gx', cgx.toFixed(1) + '%');
     card.style.setProperty('--gy', cgy.toFixed(1) + '%');
+    // the metal band rides the tilt — light sweeps across as the card turns
+    card.style.setProperty('--shx', (50 + cx * 3.2).toFixed(1) + '%');
     raf = requestAnimationFrame(frame);
   }
 
@@ -1388,8 +1390,8 @@ document.addEventListener('DOMContentLoaded', function () {
       var px = (e.clientX - r.left) / r.width - 0.5;
       var py = (e.clientY - r.top) / r.height - 0.5;
       hover = true;
-      tx = px * 24;
-      ty = -py * 16;
+      tx = px * 34;
+      ty = -py * 22;
       gx = 50 + px * 90;
       gy = 42 + py * 70;
     });
