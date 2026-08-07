@@ -1345,3 +1345,61 @@ document.addEventListener('DOMContentLoaded', function () {
     requestAnimationFrame(loop);
   }
 })();
+
+/**
+ * BizCard — Apple Card-style 3D tilt.
+ * Fine pointers tilt the card directly; elsewhere it sways gently on
+ * its own. A specular glare tracks the tilt via --gx/--gy. Runs only
+ * while visible; skipped entirely under reduced motion.
+ */
+(function () {
+  var card = document.getElementById('biz-card');
+  var scene = document.getElementById('biz-scene');
+  if (!card || !scene) return;
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduce) return; // the card is fully readable standing still
+
+  var run = false, raf = null, hover = false;
+  var tx = 0, ty = 0, cx = 0, cy = 0;
+  var gx = 50, gy = 38, cgx = 50, cgy = 38;
+
+  function frame(ts) {
+    if (!run) { raf = null; return; }
+    var t = ts / 1000;
+    if (!hover) { // idle: a slow left-right sway, like the Apple Card promo
+      tx = Math.sin(t * 0.85) * 10;
+      ty = Math.cos(t * 0.6) * 5;
+      gx = 50 + Math.sin(t * 0.85) * 32;
+      gy = 40 + Math.cos(t * 0.6) * 16;
+    }
+    cx += (tx - cx) * 0.08;
+    cy += (ty - cy) * 0.08;
+    cgx += (gx - cgx) * 0.08;
+    cgy += (gy - cgy) * 0.08;
+    card.style.transform = 'rotateY(' + cx.toFixed(2) + 'deg) rotateX(' + cy.toFixed(2) + 'deg)';
+    card.style.setProperty('--gx', cgx.toFixed(1) + '%');
+    card.style.setProperty('--gy', cgy.toFixed(1) + '%');
+    raf = requestAnimationFrame(frame);
+  }
+
+  if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    scene.addEventListener('pointermove', function (e) {
+      var r = scene.getBoundingClientRect();
+      var px = (e.clientX - r.left) / r.width - 0.5;
+      var py = (e.clientY - r.top) / r.height - 0.5;
+      hover = true;
+      tx = px * 24;
+      ty = -py * 16;
+      gx = 50 + px * 90;
+      gy = 42 + py * 70;
+    });
+    scene.addEventListener('pointerleave', function () { hover = false; });
+  }
+
+  var io = new IntersectionObserver(function (entries) {
+    var vis = entries[entries.length - 1].isIntersecting;
+    if (vis && !run) { run = true; if (!raf) raf = requestAnimationFrame(frame); }
+    else if (!vis) { run = false; }
+  }, { threshold: 0.1 });
+  io.observe(scene);
+})();

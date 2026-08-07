@@ -1123,10 +1123,10 @@
   </style>
 
   <!-- Full CSS loaded async: no render blocking (bootstrap merged in) -->
-  <link rel="preload" href="assets/css/style.min.css?v=1.91.0" as="style"
+  <link rel="preload" href="assets/css/style.min.css?v=1.92.0" as="style"
     onload="this.onload=null;this.rel='stylesheet'">
   <noscript>
-    <link href="assets/css/style.min.css?v=1.91.0" rel="stylesheet">
+    <link href="assets/css/style.min.css?v=1.92.0" rel="stylesheet">
   </noscript>
 
 
@@ -1380,7 +1380,7 @@
   </script>
 
   <!-- Preload deferred JS to start downloading before parser reaches script tags -->
-  <link rel="preload" href="assets/js/main.min.js?v=1.96.0" as="script">
+  <link rel="preload" href="assets/js/main.min.js?v=1.97.0" as="script">
 
   <script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="233b92be-5a2d-492b-b093-9c3ed14c9063"
     type="text/javascript" async></script>
@@ -2076,8 +2076,29 @@
           <p class="cta-sub">Open to full-time roles and freelance projects — web apps, CRM &amp; POS systems, and AI
             voice agents.</p>
           <div class="cta-actions">
-            <a class="cta-mail" href="mailto:tanapol.ch@rmutsvmail.com">tanapol.ch@rmutsvmail.com</a>
-            <a class="cta-tel" href="tel:+66962437210">+66 962 437 210</a>
+            <div class="biz-scene" id="biz-scene">
+              <div class="biz-card" id="biz-card">
+                <div class="biz-glare" aria-hidden="true"></div>
+                <div class="biz-row">
+                  <span class="biz-logo">TC</span>
+                  <svg class="biz-net" width="46" height="30" viewBox="0 0 46 30" fill="none" aria-hidden="true">
+                    <path d="M7 23 L21 8 L39 15" stroke="rgba(24,119,242,.5)" stroke-width="1" />
+                    <path d="M7 23 L39 15" stroke="rgba(24,119,242,.22)" stroke-width="1" />
+                    <circle cx="7" cy="23" r="2.4" fill="#5AA7FF" />
+                    <circle cx="21" cy="8" r="3" fill="#1877F2" />
+                    <circle cx="39" cy="15" r="2.4" fill="#64748B" />
+                  </svg>
+                </div>
+                <div>
+                  <div class="biz-name">Tanapol Chamnanhan</div>
+                  <div class="biz-role">Full-Stack Developer · CRM, POS &amp; AI Voice Agents</div>
+                </div>
+                <div class="biz-row biz-contacts">
+                  <a href="mailto:tanapol.ch@rmutsvmail.com">tanapol.ch@rmutsvmail.com</a>
+                  <a href="tel:+66962437210">+66 962 437 210</a>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -2211,7 +2232,7 @@
   </button>
 
   <!-- Main JS -->
-  <script defer src="assets/js/main.min.js?v=1.96.0"></script>
+  <script defer src="assets/js/main.min.js?v=1.97.0"></script>
   <!-- Service Worker: cache assets for repeat visits -->
   <script>if ('serviceWorker' in navigator) { var _sw = function () { navigator.serviceWorker.register('sw.js') }; 'requestIdleCallback' in window ? requestIdleCallback(_sw) : window.addEventListener('load', _sw) }</script>
 
