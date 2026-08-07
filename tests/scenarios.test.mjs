@@ -215,6 +215,29 @@ test('certificate lightbox shows the exact card clicked, replays, and unlocks sc
   await page.close();
 });
 
+test('3D business card sways on its own and stays static under reduced motion', async () => {
+  const { page } = await ctx.openPage();
+  await page.$eval('#biz-scene', (el) => el.scrollIntoView({ block: 'center' }));
+  await page.waitForTimeout(700);
+  const a = await page.$eval('#biz-card', (el) => el.style.transform);
+  await page.waitForTimeout(500);
+  const b = await page.$eval('#biz-card', (el) => el.style.transform);
+  assert.ok(a.includes('rotate'), `card is not tilting (transform: "${a}")`);
+  assert.notEqual(a, b, 'card transform frozen — sway loop not running');
+  // contacts on the card are real links
+  const links = await page.$$eval('#biz-card a', (els) => els.map((e) => e.getAttribute('href')));
+  assert.ok(links.some((h) => h.startsWith('mailto:')), 'no mailto link on the card');
+  assert.ok(links.some((h) => h.startsWith('tel:')), 'no tel link on the card');
+  await page.close();
+
+  const { page: rp } = await ctx.openPage({ reducedMotion: 'reduce' });
+  await rp.$eval('#biz-scene', (el) => el.scrollIntoView({ block: 'center' }));
+  await rp.waitForTimeout(600);
+  assert.equal(await rp.$eval('#biz-card', (el) => el.style.transform), '',
+    'card must stand still under reduced motion');
+  await rp.close();
+});
+
 test('320px (small phones): no horizontal overflow anywhere', async () => {
   const { page } = await ctx.openPage({
     viewport: { width: 320, height: 680 }, isMobile: true, hasTouch: true,
