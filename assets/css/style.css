@@ -1044,10 +1044,11 @@ button {
 .biz-card {
   --gx: 50%;
   --gy: 38%;
+  --shx: 50%;
   position: relative;
   aspect-ratio: 1.586; /* real credit-card proportions */
   border-radius: var(--r-card-sm);
-  background: linear-gradient(135deg, #ffffff 0%, #f2f4f8 52%, #e6ebf2 100%);
+  background: linear-gradient(135deg, #ffffff 0%, #f1f3f7 52%, #e4e9f0 100%);
   border: 1px solid rgba(29, 29, 31, 0.08);
   box-shadow: 0 30px 60px rgba(29, 29, 31, 0.16), 0 4px 12px rgba(29, 29, 31, 0.08);
   transform-style: preserve-3d;
@@ -1058,14 +1059,35 @@ button {
   text-align: left;
   padding: 6.5% 7.5%;
 }
+/* brushed-titanium grain: hairline vertical strokes, barely there */
+.biz-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: repeating-linear-gradient(90deg,
+    rgba(29, 29, 31, 0.016) 0 1px,
+    rgba(255, 255, 255, 0.02) 1px 2px,
+    transparent 2px 4px);
+}
+/* metal reflection: a soft diagonal light band that sweeps with the
+   tilt (position driven by --shx), over a faint ambient highlight */
 .biz-glare {
   position: absolute;
   inset: 0;
   border-radius: inherit;
   pointer-events: none;
   background:
-    radial-gradient(380px circle at var(--gx) var(--gy), rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0) 58%),
-    linear-gradient(115deg, transparent 32%, rgba(90, 167, 255, 0.09) 48%, transparent 64%);
+    linear-gradient(105deg,
+      transparent 34%,
+      rgba(255, 255, 255, 0.85) 45%,
+      rgba(203, 213, 228, 0.55) 50%,
+      rgba(255, 255, 255, 0.8) 55%,
+      transparent 66%),
+    radial-gradient(420px circle at var(--gx) var(--gy), rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0) 60%);
+  background-size: 240% 100%, 100% 100%;
+  background-position: var(--shx) 0, 0 0;
 }
 .biz-row {
   display: flex;
@@ -1080,10 +1102,10 @@ button {
   color: var(--color-text-secondary);
 }
 .biz-name {
-  font-size: clamp(17px, 4.6vw, 22px);
+  font-size: clamp(20px, 5.6vw, 27px);
   font-weight: 600;
-  letter-spacing: -0.01em;
-  line-height: 1.2;
+  letter-spacing: -0.012em;
+  line-height: 1.18;
   color: var(--color-text);
 }
 .biz-role {
