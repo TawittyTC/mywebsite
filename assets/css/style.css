@@ -1042,9 +1042,6 @@ button {
   margin: 10px auto 0;
 }
 .biz-card {
-  --gx: 50%;
-  --gy: 38%;
-  --shx: 50%;
   position: relative;
   aspect-ratio: 1.586; /* real credit-card proportions */
   border-radius: var(--r-card-sm);
@@ -1070,24 +1067,6 @@ button {
     rgba(29, 29, 31, 0.016) 0 1px,
     rgba(255, 255, 255, 0.02) 1px 2px,
     transparent 2px 4px);
-}
-/* metal reflection: a soft diagonal light band that sweeps with the
-   tilt (position driven by --shx), over a faint ambient highlight */
-.biz-glare {
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  background:
-    linear-gradient(105deg,
-      transparent 34%,
-      rgba(255, 255, 255, 0.85) 45%,
-      rgba(203, 213, 228, 0.55) 50%,
-      rgba(255, 255, 255, 0.8) 55%,
-      transparent 66%),
-    radial-gradient(420px circle at var(--gx) var(--gy), rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0) 60%);
-  background-size: 240% 100%, 100% 100%;
-  background-position: var(--shx) 0, 0 0;
 }
 .biz-row {
   display: flex;
