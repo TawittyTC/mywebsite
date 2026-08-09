@@ -197,6 +197,7 @@ test('certificate lightbox shows the exact card clicked, replays, and unlocks sc
   const { page } = await ctx.openPage();
   await page.$eval('#images-list', (el) => el.scrollIntoView());
   await page.waitForSelector('#images-list .cert-card img');
+  await page.$eval('.certs-more', (btn) => btn.click()); // disclose the full grid
   for (const idx of [3, 7]) {
     const expected = await page.$$eval('#images-list .cert-card img', (imgs, i) => imgs[i].src, idx);
     await page.$$eval('#images-list .cert-card', (cards, i) => {
@@ -236,6 +237,37 @@ test('3D business card sways on its own and stays static under reduced motion', 
   assert.equal(await rp.$eval('#biz-card', (el) => el.style.transform), '',
     'card must stand still under reduced motion');
   await rp.close();
+});
+
+test('progressive disclosure: certs open at six, expand on demand; exp teasers clamp', async () => {
+  const { page } = await ctx.openPage();
+  await page.$eval('#certificates', (el) => el.scrollIntoView());
+  await page.waitForSelector('#images-list .cert-card');
+  const before = await page.evaluate(() => ({
+    visible: [...document.querySelectorAll('#images-list > div')]
+      .filter((d) => getComputedStyle(d).display !== 'none').length,
+    total: document.querySelectorAll('#images-list > div').length,
+    btn: document.querySelector('.certs-more').textContent,
+  }));
+  assert.equal(before.visible, 6, `expected 6 visible cert cards, got ${before.visible}`);
+  assert.ok(before.total > 6, 'grid should hold the full set behind the fold');
+  assert.match(before.btn, new RegExp(`Show all ${before.total}`), 'button should state the real total');
+  await page.$eval('.certs-more', (b) => b.click());
+  const after = await page.evaluate(() => ({
+    visible: [...document.querySelectorAll('#images-list > div')]
+      .filter((d) => getComputedStyle(d).display !== 'none').length,
+    btnGone: !document.querySelector('.certs-more'),
+  }));
+  assert.equal(after.visible, before.total, 'expand did not reveal every certificate');
+  assert.ok(after.btnGone, 'the Show-all button should remove itself');
+  // experience teaser clamps to three lines; the modal carries the full story
+  const clamp = await page.$$eval('#experience .data-box[data-exp] .profile-bio-small',
+    (els) => els
+      .map((el) => ({ clamped: getComputedStyle(el).webkitLineClamp, h: el.offsetHeight, sh: el.scrollHeight }))
+      .sort((a, b) => (b.sh - b.h) - (a.sh - a.h))[0]); // the most-overflowing card
+  assert.equal(String(clamp.clamped), '3', 'experience description is not line-clamped');
+  assert.ok(clamp.h < clamp.sh, 'clamp has no effect — teaser shows everything');
+  await page.close();
 });
 
 test('320px (small phones): no horizontal overflow anywhere', async () => {

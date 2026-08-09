@@ -146,6 +146,8 @@ test('certificates section renders every certificate and all images decode', asy
   await page.waitForFunction(
     (n) => document.querySelectorAll('#images-list img').length === n, expected
   );
+  // progressive disclosure: expand the grid first, then walk it
+  await page.$eval('.certs-more', (btn) => btn.click());
   // images are lazy — walk through the whole grid so every one loads
   await page.evaluate(async () => {
     const sec = document.getElementById('certificates');
