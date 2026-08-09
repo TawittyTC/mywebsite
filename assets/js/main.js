@@ -307,12 +307,19 @@ document.addEventListener("DOMContentLoaded", function () {
   const imagesList = document.getElementById("images-list");
   if (!imagesList) return;
 
+  // Progressive disclosure: the grid opens with the first six
+  // certificates; the rest stay unbuilt-into-view (and their images
+  // unfetched) until "Show all" is pressed.
+  const VISIBLE_CERTS = 6;
   function buildCerts() {
     if (imagesList.dataset.loaded) return;
     imagesList.dataset.loaded = "1";
+    let total = 0;
     for (let i = 1; i <= 33; i++) {
+      total++;
       const colDiv = document.createElement("div");
       colDiv.classList.add("col-6", "col-md-4", "mb-5");
+      if (i > VISIBLE_CERTS) colDiv.classList.add("cert-extra");
       const card = document.createElement("div");
       card.classList.add("cert-card");
       const wrapper = document.createElement("div");
@@ -342,6 +349,22 @@ document.addEventListener("DOMContentLoaded", function () {
       card.appendChild(expandBtn);
       colDiv.appendChild(card);
       imagesList.appendChild(colDiv);
+    }
+    if (total > VISIBLE_CERTS) {
+      const wrap = document.createElement("div");
+      wrap.className = "certs-more-wrap";
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "certs-more";
+      btn.textContent = "Show all " + total + " certificates";
+      btn.addEventListener("click", function () {
+        imagesList.querySelectorAll(".cert-extra").forEach(function (el) {
+          el.classList.remove("cert-extra");
+        });
+        wrap.remove();
+      });
+      wrap.appendChild(btn);
+      imagesList.parentNode.insertBefore(wrap, imagesList.nextSibling);
     }
   }
 
