@@ -16,6 +16,8 @@
   /* Swift decelerating ease — fast start, gentle landing; everything stays
      interruptible because these are plain CSS transitions */
   --ease-swift: cubic-bezier(0.32, 0.72, 0, 1);
+  /* Springy overshoot for button releases — the Apple "alive" pop */
+  --spring-pop: cubic-bezier(0.34, 1.56, 0.64, 1);
   /* Resting card definition on the all-white canvas (60/30/10: white
      canvas dominates, neutral gray surfaces structure, facebook-blue accents) */
   --shadow-rest: 0 1px 2px rgba(29, 29, 31, 0.04), 0 10px 28px rgba(29, 29, 31, 0.05);
@@ -745,15 +747,36 @@ button {
 
 
 
-/* Press feedback — instant down, swift release; every pointer type.
+/* Press feedback — instant down, springy release; every pointer type.
    The :active duration is shorter than the release so touches feel
-   tactile without ever lagging the finger. */
+   tactile, and the release overshoots slightly (Apple-style pop). */
+.filter-btn,
+.certs-more,
 .exp-filter-chip,
 .cert-expand-btn,
 .cert-lightbox-close,
 .exp-lightbox-close,
-.paddlenav-arrow {
-  transition: transform 0.25s var(--ease-swift), background 0.2s ease, color 0.2s ease, box-shadow 0.25s var(--ease-swift);
+.paddlenav-arrow,
+#back-to-top {
+  transition: transform 0.4s var(--spring-pop), background 0.2s ease, color 0.2s ease, box-shadow 0.25s var(--ease-swift), opacity 0.25s ease;
+}
+
+/* Hover lift — real pointers only (touch keeps press feedback) */
+@media (hover: hover) and (pointer: fine) {
+  .filter-btn:hover,
+  .certs-more:hover,
+  .exp-filter-chip:hover {
+    transform: scale(1.05);
+  }
+  .cert-expand-btn:hover {
+    transform: scale(1.12);
+  }
+  .paddlenav-arrow:not(:disabled):hover {
+    transform: translateY(-50%) scale(1.1);
+  }
+  #back-to-top.visible:hover {
+    transform: scale(1.1);
+  }
 }
 .filter-btn:active,
 .exp-filter-chip:active,
@@ -1235,11 +1258,11 @@ h1, h2, h3, h4, h5, h6 { color: var(--color-text); }
 }
 .paddlenav-arrow { min-width: 44px; min-height: 44px; }
 
-/* ── Transitions: swift ease-out, 300–350ms ── */
+/* ── Transitions: swift ease-out, 300–350ms (buttons carry their own
+   springy transform timing and are not grouped here) ── */
 .data-box,
 .boxWhyScg,
-.rf-cards-scroller-item,
-.filter-btn {
+.rf-cards-scroller-item {
   transition-timing-function: var(--ease-swift);
   transition-duration: 0.3s;
 }
@@ -1375,7 +1398,7 @@ select:focus-visible {
   opacity: 0;
   transform: translateY(8px);
   pointer-events: none;
-  transition: opacity 0.25s ease, transform 0.25s ease;
+  transition: opacity 0.25s ease, transform 0.4s var(--spring-pop);
 }
 #back-to-top.visible {
   opacity: 1;
