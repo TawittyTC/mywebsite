@@ -624,8 +624,10 @@ button {
 .certs-more:active { transform: scale(0.96); transition-duration: 0.08s; }
 
 /* Progressive disclosure — experience cards: the description is a
-   three-line teaser; the full story lives in the Read-more modal */
-#experience .data-box[data-exp] .profile-bio-small {
+   three-line teaser; the full story lives in the Read-more modal.
+   (:not() guard: the highlight-chip row shares the type class and must
+   keep its flex layout — clamping it shattered the pills.) */
+#experience .data-box[data-exp] .profile-bio-small:not(.exp-card-highlights) {
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
