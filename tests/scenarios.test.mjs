@@ -267,6 +267,12 @@ test('progressive disclosure: certs open at six, expand on demand; exp teasers c
       .sort((a, b) => (b.sh - b.h) - (a.sh - a.h))[0]); // the most-overflowing card
   assert.equal(String(clamp.clamped), '3', 'experience description is not line-clamped');
   assert.ok(clamp.h < clamp.sh, 'clamp has no effect — teaser shows everything');
+  // the highlight-chip row shares the type class but must stay flex —
+  // clamping it once shattered the pills across lines
+  const chips = await page.$eval('#experience .data-box[data-exp] .exp-card-highlights',
+    (el) => ({ display: getComputedStyle(el).display, clamp: getComputedStyle(el).webkitLineClamp }));
+  assert.equal(chips.display, 'flex', 'chip row lost its flex layout');
+  assert.notEqual(String(chips.clamp), '3', 'chip row must not be line-clamped');
   await page.close();
 });
 
