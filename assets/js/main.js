@@ -835,6 +835,13 @@ document.addEventListener('DOMContentLoaded', function () {
   // overshoots to its home (Duolingo-inspired burst). ──
   var SHAKE_END = 0.85, EXPLODE_DUR = 0.5, INTRO_END = SHAKE_END + EXPLODE_DUR;
   var introCluster = null, boomPlayed = false;
+  // Intro plays in its own clock (time - introT0) so it can REPLAY:
+  // iOS restores tabs from the back-forward cache without reloading,
+  // which used to mean no intro at all on "reopening" the site.
+  var introT0 = 0, replayQueued = false;
+  window.addEventListener('pageshow', function (e) {
+    if (e.persisted) replayQueued = true;
+  });
   function clusterPoint() {
     // the blob forms dead-center BEHIND the name, then detonates out
     if (copyRect) {
@@ -1094,7 +1101,8 @@ document.addEventListener('DOMContentLoaded', function () {
     var ampScale = Math.max(1, Math.min(W / 1100, 2));
     // The blob lives BEHIND the name, so the keep-out fade is suspended
     // during the shake and blends back in while the nodes fly out.
-    var koBlend = reduce ? 1 : Math.min(Math.max((time - SHAKE_END) / EXPLODE_DUR, 0), 1);
+    var it = time - introT0; // intro-relative clock (replayable)
+    var koBlend = reduce ? 1 : Math.min(Math.max((it - SHAKE_END) / EXPLODE_DUR, 0), 1);
 
     for (var i = 0; i < nodes.length; i++) {
       var n = nodes[i];
@@ -1107,7 +1115,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
       // entrance: cluster → violent shake → detonation (skipped under
       // reduced motion). Deterministic per-node phases keep it smooth.
-      if (reduce || time >= INTRO_END) {
+      if (reduce || it >= INTRO_END) {
         n.iv = 1;
       } else {
         if (!introCluster) introCluster = clusterPoint();
@@ -1115,16 +1123,16 @@ document.addEventListener('DOMContentLoaded', function () {
         var coy = n.iy * (5 + n.r * 2.2);
         var jx = Math.sin(time * 43 + n.p1 * 7);
         var jy = Math.cos(time * 39 + n.p2 * 7);
-        if (time < SHAKE_END) {
+        if (it < SHAKE_END) {
           // wind-up: trembling ramps to a violent shake
-          var w = time / SHAKE_END;
+          var w = it / SHAKE_END;
           var amp = 1.5 + w * w * w * 24;
           n.x = introCluster.x + cox + jx * amp;
           n.y = introCluster.y + coy + jy * amp;
-          n.iv = Math.min(time / 0.25, 1) * 0.75; // dim enough to read the name through
+          n.iv = Math.min(it / 0.25, 1) * 0.75; // dim enough to read the name through
         } else {
           // detonation: overshoot out to the homes computed above
-          var ep = (time - SHAKE_END) / EXPLODE_DUR;
+          var ep = (it - SHAKE_END) / EXPLODE_DUR;
           var eb = 1 + 2.70158 * Math.pow(ep - 1, 3) + 1.70158 * Math.pow(ep - 1, 2); // easeOutBack
           var res = (1 - ep) * 6; // shake residue dies out mid-flight
           n.x = introCluster.x + cox + (n.x - introCluster.x - cox) * eb + jx * res;
@@ -1153,12 +1161,12 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // detonation moment: pop sound + expanding shockwave ring
-    if (!reduce && !boomPlayed && time >= SHAKE_END) {
+    if (!reduce && !boomPlayed && it >= SHAKE_END) {
       boomPlayed = true;
       playBoom();
     }
-    if (!reduce && introCluster && time >= SHAKE_END && time < SHAKE_END + 0.7) {
-      var rp = (time - SHAKE_END) / 0.7;
+    if (!reduce && introCluster && it >= SHAKE_END && it < SHAKE_END + 0.7) {
+      var rp = (it - SHAKE_END) / 0.7;
       ctx.strokeStyle = rgba(WARM1, (1 - rp) * 0.35);
       ctx.lineWidth = 2 - rp;
       ctx.beginPath();
@@ -1168,7 +1176,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // signals: bright dots travelling along links — the system talking
-    if (!reduce && time > 1.4) {
+    if (!reduce && it > 1.4) {
       if (time >= nextPulse && pulses.length < 4) {
         var A = nodes[(Math.random() * nodes.length) | 0];
         if (A && A.f > 0.35) {
@@ -1266,8 +1274,8 @@ document.addEventListener('DOMContentLoaded', function () {
     // near the copy block they shrink with their fade and disappear
     // (labels stay hidden until just after the detonation — a crowd of
     // words inside the shaking blob would be noise)
-    var labelGate = (reduce || time >= SHAKE_END + 0.45) ? 1
-      : (time <= SHAKE_END ? 0 : (time - SHAKE_END) / 0.45);
+    var labelGate = (reduce || it >= SHAKE_END + 0.45) ? 1
+      : (it <= SHAKE_END ? 0 : (it - SHAKE_END) / 0.45);
     var li = 0;
     for (var m = 0; m < nodes.length; m++) {
       var nm = nodes[m];
@@ -1336,6 +1344,12 @@ document.addEventListener('DOMContentLoaded', function () {
     // no assembly) — never a hard freeze, and the continuous paint
     // keeps the canvas backing store alive on iOS/WKWebView.
     lastDrawT = (ts - t0) / (reduce ? 2000 : 1000);
+    if (replayQueued) { // bfcache reopen: restart the intro on this clock
+      replayQueued = false;
+      introT0 = lastDrawT;
+      boomPlayed = false;
+      introCluster = null;
+    }
     drawFrame(lastDrawT);
     requestAnimationFrame(loop);
   }

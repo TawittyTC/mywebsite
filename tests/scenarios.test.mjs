@@ -239,6 +239,25 @@ test('3D business card sways on its own and stays static under reduced motion', 
   await rp.close();
 });
 
+test('hero intro replays when the page returns from the back-forward cache', async () => {
+  const { page } = await ctx.openPage();
+  await page.waitForTimeout(2400); // first intro fully done
+  const before = await page.$$eval('#hero-net-labels .hero-net-label',
+    (els) => Math.max(...els.map((e) => parseFloat(e.style.opacity || '1'))));
+  assert.ok(before > 0.4, 'labels should be visible after the first intro');
+  // iOS-style bfcache restore
+  await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true })));
+  await page.waitForTimeout(350); // mid-shake of the replay
+  const during = await page.$$eval('#hero-net-labels .hero-net-label',
+    (els) => Math.max(...els.map((e) => parseFloat(e.style.opacity || '1'))));
+  assert.ok(during < 0.1, `labels should hide during the replayed shake (got ${during})`);
+  await page.waitForTimeout(1700); // replay finished
+  const after = await page.$$eval('#hero-net-labels .hero-net-label',
+    (els) => Math.max(...els.map((e) => parseFloat(e.style.opacity || '1'))));
+  assert.ok(after > 0.4, 'labels should return after the replayed intro');
+  await page.close();
+});
+
 test('progressive disclosure: certs open at six, expand on demand; exp teasers clamp', async () => {
   const { page } = await ctx.openPage();
   await page.$eval('#certificates', (el) => el.scrollIntoView());
