@@ -241,20 +241,17 @@ test('3D business card sways on its own and stays static under reduced motion', 
 
 test('hero intro replays when the page returns from the back-forward cache', async () => {
   const { page } = await ctx.openPage();
-  await page.waitForTimeout(2400); // first intro fully done
-  const before = await page.$$eval('#hero-net-labels .hero-net-label',
-    (els) => Math.max(...els.map((e) => parseFloat(e.style.opacity || '1'))));
-  assert.ok(before > 0.4, 'labels should be visible after the first intro');
+  const labelsVisible = () => page.waitForFunction(() =>
+    Math.max(...[...document.querySelectorAll('#hero-net-labels .hero-net-label')]
+      .map((e) => parseFloat(e.style.opacity || '1'))) > 0.4, null, { timeout: 10000 });
+  await labelsVisible(); // first intro fully done (slow CI runners take a while)
   // iOS-style bfcache restore
   await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true })));
-  await page.waitForTimeout(350); // mid-shake of the replay
-  const during = await page.$$eval('#hero-net-labels .hero-net-label',
-    (els) => Math.max(...els.map((e) => parseFloat(e.style.opacity || '1'))));
-  assert.ok(during < 0.1, `labels should hide during the replayed shake (got ${during})`);
-  await page.waitForTimeout(1700); // replay finished
-  const after = await page.$$eval('#hero-net-labels .hero-net-label',
-    (els) => Math.max(...els.map((e) => parseFloat(e.style.opacity || '1'))));
-  assert.ok(after > 0.4, 'labels should return after the replayed intro');
+  // during the replayed shake every label hides
+  await page.waitForFunction(() =>
+    Math.max(...[...document.querySelectorAll('#hero-net-labels .hero-net-label')]
+      .map((e) => parseFloat(e.style.opacity || '1'))) < 0.1, null, { timeout: 5000 });
+  await labelsVisible(); // and they bloom back after the detonation
   await page.close();
 });
 
