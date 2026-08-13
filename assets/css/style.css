@@ -601,28 +601,6 @@ button {
 }
 
 
-/* Progressive disclosure — certificates: first six show, the rest wait
-   behind one calm button (their lazy images stay unfetched too) */
-.cert-extra { display: none; }
-.certs-more-wrap {
-  text-align: center;
-  margin-top: 8px;
-}
-.certs-more {
-  min-height: 44px;
-  padding: 12px 28px;
-  border: none;
-  border-radius: var(--r-capsule);
-  background: var(--color-fill);
-  color: var(--color-text);
-  font-size: 16px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: transform 0.25s var(--ease-swift), background 0.2s ease;
-}
-.certs-more:hover { background: #e8e8ed; }
-.certs-more:active { transform: scale(0.96); transition-duration: 0.08s; }
-
 /* Progressive disclosure — experience cards: the description is a
    three-line teaser; the full story lives in the Read-more modal.
    (:not() guard: the highlight-chip row shares the type class and must
@@ -753,7 +731,6 @@ button {
    The :active duration is shorter than the release so touches feel
    tactile, and the release overshoots slightly (Apple-style pop). */
 .filter-btn,
-.certs-more,
 .exp-filter-chip,
 .cert-expand-btn,
 .cert-lightbox-close,
@@ -766,7 +743,6 @@ button {
 /* Hover lift — real pointers only (touch keeps press feedback) */
 @media (hover: hover) and (pointer: fine) {
   .filter-btn:hover,
-  .certs-more:hover,
   .exp-filter-chip:hover {
     transform: scale(1.05);
   }

@@ -197,7 +197,6 @@ test('certificate lightbox shows the exact card clicked, replays, and unlocks sc
   const { page } = await ctx.openPage();
   await page.$eval('#images-list', (el) => el.scrollIntoView());
   await page.waitForSelector('#images-list .cert-card img');
-  await page.$eval('.certs-more', (btn) => btn.click()); // disclose the full grid
   for (const idx of [3, 7]) {
     const expected = await page.$$eval('#images-list .cert-card img', (imgs, i) => imgs[i].src, idx);
     await page.$$eval('#images-list .cert-card', (cards, i) => {
@@ -255,27 +254,18 @@ test('hero intro replays when the page returns from the back-forward cache', asy
   await page.close();
 });
 
-test('progressive disclosure: certs open at six, expand on demand; exp teasers clamp', async () => {
+test('cert grid shows everything at once; exp teasers clamp to three lines', async () => {
   const { page } = await ctx.openPage();
   await page.$eval('#certificates', (el) => el.scrollIntoView());
   await page.waitForSelector('#images-list .cert-card');
-  const before = await page.evaluate(() => ({
-    visible: [...document.querySelectorAll('#images-list > div')]
-      .filter((d) => getComputedStyle(d).display !== 'none').length,
-    total: document.querySelectorAll('#images-list > div').length,
-    btn: document.querySelector('.certs-more').textContent,
+  // the Show-all disclosure was removed on request — every card visible, no button
+  const grid = await page.evaluate(() => ({
+    hidden: [...document.querySelectorAll('#images-list > div')]
+      .filter((d) => getComputedStyle(d).display === 'none').length,
+    btn: !!document.querySelector('.certs-more'),
   }));
-  assert.equal(before.visible, 6, `expected 6 visible cert cards, got ${before.visible}`);
-  assert.ok(before.total > 6, 'grid should hold the full set behind the fold');
-  assert.match(before.btn, new RegExp(`Show all ${before.total}`), 'button should state the real total');
-  await page.$eval('.certs-more', (b) => b.click());
-  const after = await page.evaluate(() => ({
-    visible: [...document.querySelectorAll('#images-list > div')]
-      .filter((d) => getComputedStyle(d).display !== 'none').length,
-    btnGone: !document.querySelector('.certs-more'),
-  }));
-  assert.equal(after.visible, before.total, 'expand did not reveal every certificate');
-  assert.ok(after.btnGone, 'the Show-all button should remove itself');
+  assert.equal(grid.hidden, 0, `${grid.hidden} cert cards hidden — disclosure should be gone`);
+  assert.equal(grid.btn, false, 'the Show-all button should no longer exist');
   // experience teaser clamps to three lines; the modal carries the full story
   const clamp = await page.$$eval('#experience .data-box[data-exp] .profile-bio-small',
     (els) => els
