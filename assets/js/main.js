@@ -641,7 +641,12 @@ document.addEventListener('DOMContentLoaded', function () {
     };
     lockHero();
     window.addEventListener('resize', maybeRelock, { passive: true });
-    window.addEventListener('orientationchange', function () { lockH = 0; maybeRelock(); }, { passive: true });
+    // Some engines fire orientationchange on ANY viewport resize (toolbar
+    // churn included). A real rotation always swaps the width — only then
+    // is the lock reset; otherwise this is churn and the pin must hold.
+    window.addEventListener('orientationchange', function () {
+      if (Math.abs(window.innerWidth - lockW) > 1) { lockH = 0; maybeRelock(); }
+    }, { passive: true });
   }
 
   // ---- Scroll-scrub reveals (Apple product-page feel) ----
