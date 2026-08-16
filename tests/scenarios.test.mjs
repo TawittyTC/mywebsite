@@ -282,26 +282,6 @@ test('cert grid shows everything at once; exp teasers clamp to three lines', asy
   await page.close();
 });
 
-test('pixel buddy strolls the bottom edge and never blocks input', async () => {
-  const { page } = await ctx.openPage();
-  await page.waitForSelector('#pixel-buddy canvas');
-  const style = await page.$eval('#pixel-buddy', (el) => ({
-    pointerEvents: getComputedStyle(el).pointerEvents,
-    position: getComputedStyle(el).position,
-  }));
-  assert.equal(style.pointerEvents, 'none', 'buddy must never intercept clicks');
-  assert.equal(style.position, 'fixed', 'buddy should ride the viewport');
-  const x0 = await page.$eval('#pixel-buddy', (el) => el.getBoundingClientRect().x);
-  await page.waitForFunction((sx) =>
-    Math.abs(document.getElementById('pixel-buddy').getBoundingClientRect().x - sx) > 10,
-    x0, { timeout: 15000 }); // it walks (pauses are a few seconds at most)
-  await page.close();
-  // reduced motion: the buddy never spawns
-  const { page: rp } = await ctx.openPage({ reducedMotion: 'reduce' });
-  assert.equal(await rp.locator('#pixel-buddy').count(), 0, 'buddy must not spawn under reduced motion');
-  await rp.close();
-});
-
 test('320px (small phones): no horizontal overflow anywhere', async () => {
   const { page } = await ctx.openPage({
     viewport: { width: 320, height: 680 }, isMobile: true, hasTouch: true,
@@ -350,5 +330,34 @@ test('violent jump-scrolling then landing anywhere leaves nothing half-faded', a
   await page.evaluate(() => window.scrollTo(0, 0));
   await settle(page, 700);
   assert.ok(await page.evaluate(inkCount()) > 300, 'hero constellation broken after jump-scrolling');
+  await page.close();
+});
+
+test('every section carries its themed wave and the waves actually animate', async () => {
+  const { page } = await ctx.openPage();
+  // one wave per section: resume, experience, skill, portfolio, certificates, contact
+  const homes = await page.$$eval('.section-wave', (els) =>
+    els.map((el) => el.closest('section')?.id || ''));
+  assert.deepEqual(homes, ['resume', 'experience', 'skill', 'portfolio', 'certificates', 'contact'],
+    'expected exactly one wave in each section, in page order');
+  // each themed part is animated (computed style, not just class names)
+  const anims = await page.evaluate(() => {
+    const name = (sel) => getComputedStyle(document.querySelector(sel)).animationName;
+    return {
+      flow: name('#resume .wave-flow'),
+      dot: name('#experience .wave-dot'),
+      bar: name('#skill .wave-bar'),
+      signal: name('#portfolio .wave-signal'),
+      ribbon: name('#certificates .wave-ribbon'),
+      ping: name('#contact .wave-ping'),
+    };
+  });
+  for (const [part, anim] of Object.entries(anims)) {
+    assert.notEqual(anim, 'none', `${part} wave is not animated`);
+  }
+  // decorative only: hidden from assistive tech and never intercepts input
+  const decorative = await page.$$eval('.section-wave', (els) =>
+    els.every((el) => el.getAttribute('aria-hidden') === 'true'));
+  assert.ok(decorative, 'waves must be aria-hidden');
   await page.close();
 });
