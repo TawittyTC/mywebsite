@@ -1009,6 +1009,23 @@ button {
 
 
 /*--------------------------------------------------------------
+# PixelBuddy — decorative 2-bit robot strolling the bottom edge
+--------------------------------------------------------------*/
+#pixel-buddy {
+  position: fixed;
+  bottom: 6px;
+  left: 0;
+  z-index: 800; /* under back-to-top (900) and every overlay */
+  pointer-events: none;
+}
+#pixel-buddy canvas {
+  display: block;
+  width: 48px;
+  height: 48px;
+  image-rendering: pixelated;
+}
+
+/*--------------------------------------------------------------
 # Closing CTA
 --------------------------------------------------------------*/
 .closing-cta {

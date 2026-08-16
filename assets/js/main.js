@@ -1408,3 +1408,89 @@ document.addEventListener('DOMContentLoaded', function () {
   }, { threshold: 0.1 });
   io.observe(scene);
 })();
+
+/**
+ * PixelBuddy — a tiny 2-bit robot that wanders the bottom edge of the
+ * screen. True 2-bit: a four-color palette (theme blues + ink + white),
+ * sprite painted into a 12x12 canvas from pixel maps — no image assets.
+ * Purely decorative: pointer-events none, hidden under reduced motion.
+ */
+(function () {
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduce) return;
+
+  var PAL = { B: '#1877F2', L: '#5AA7FF', D: '#1D1D1F', W: '#FFFFFF' };
+  var HEAD = [
+    '.....LL.....',
+    '.....DD.....',
+    '..DDDDDDDD..',
+    '..DBBBBBBD..'
+  ];
+  var EYES_OPEN = '..DBWBBWBD..';
+  var EYES_SHUT = '..DBBBBBBD..';
+  var TORSO = [
+    '..DBBBBBBD..',
+    '..DDDDDDDD..',
+    '..DLLBBLLD..',
+    '..DLBBBBLD..',
+    '..DDDDDDDD..'
+  ];
+  var LEGS_A = ['...DD..DD...', '...DD..DD...'];
+  var LEGS_B = ['..DD....DD..', '..DD....DD..'];
+
+  function sprite(eyes, legs) {
+    return HEAD.concat([eyes], TORSO, legs);
+  }
+
+  var host = document.createElement('div');
+  host.id = 'pixel-buddy';
+  var cv = document.createElement('canvas');
+  cv.width = 12;
+  cv.height = 12;
+  host.appendChild(cv);
+  document.body.appendChild(host);
+  var ctx = cv.getContext('2d');
+
+  function draw(map) {
+    ctx.clearRect(0, 0, 12, 12);
+    for (var y = 0; y < map.length; y++) {
+      for (var x = 0; x < map[y].length; x++) {
+        var c = PAL[map[y][x]];
+        if (c) { ctx.fillStyle = c; ctx.fillRect(x, y, 1, 1); }
+      }
+    }
+  }
+
+  var x = -60, dir = 1, walking = true, stepA = true, blink = false;
+  var stateUntil = 5 + Math.random() * 4;
+  var frameTimer = 0, blinkTimer = 2.5;
+  var SPEED = 26; // px/s — a relaxed stroll
+  var last = null;
+
+  function tick(ts) {
+    if (last === null) last = ts;
+    var dt = Math.min((ts - last) / 1000, 0.1);
+    last = ts;
+    stateUntil -= dt;
+
+    if (walking) {
+      x += dir * SPEED * dt;
+      var max = window.innerWidth - 60;
+      if (x > max) { x = max; dir = -1; }
+      if (x < 12) { x = 12; dir = 1; }
+      frameTimer -= dt;
+      if (frameTimer <= 0) { frameTimer = 0.18; stepA = !stepA; }
+      if (stateUntil <= 0) { walking = false; stateUntil = 2 + Math.random() * 2.5; }
+    } else {
+      stepA = true;
+      blinkTimer -= dt;
+      if (blinkTimer <= 0) { blink = !blink; blinkTimer = blink ? 0.15 : 1.4 + Math.random() * 1.6; }
+      if (stateUntil <= 0) { walking = true; blink = false; stateUntil = 5 + Math.random() * 5; }
+    }
+
+    draw(sprite(blink ? EYES_SHUT : EYES_OPEN, stepA ? LEGS_A : LEGS_B));
+    host.style.transform = 'translateX(' + x.toFixed(1) + 'px) scaleX(' + dir + ')';
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();

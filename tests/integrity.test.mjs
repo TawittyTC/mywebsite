@@ -74,6 +74,8 @@ test('asset size budgets hold', () => {
 test('main.min.js ships clean (no console.log, no unsupported syntax)', () => {
   const min = readFileSync(join(ROOT, 'assets/js/main.min.js'), 'utf8');
   assert.doesNotMatch(min, /console\.log/, 'stray console.log in production bundle');
-  assert.doesNotMatch(min, /\?\./, 'optional chaining breaks older Safari');
+  // `?.` followed by a digit is a ternary + decimal (e.g. `x?.15:1`),
+  // which the spec explicitly excludes from optional chaining
+  assert.doesNotMatch(min, /\?\.(?![0-9])/, 'optional chaining breaks older Safari');
   assert.doesNotMatch(min, /\w\?\?\w/, 'nullish coalescing breaks older Safari');
 });
