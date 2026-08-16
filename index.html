@@ -1123,10 +1123,10 @@
   </style>
 
   <!-- Full CSS loaded async: no render blocking (bootstrap merged in) -->
-  <link rel="preload" href="assets/css/style.min.css?v=2.0.0" as="style"
+  <link rel="preload" href="assets/css/style.min.css?v=2.1.0" as="style"
     onload="this.onload=null;this.rel='stylesheet'">
   <noscript>
-    <link href="assets/css/style.min.css?v=2.0.0" rel="stylesheet">
+    <link href="assets/css/style.min.css?v=2.1.0" rel="stylesheet">
   </noscript>
 
 
@@ -1434,10 +1434,21 @@
         <div class="section-title">
           <h2>Resume</h2>
           <p>Background and education.</p>
-          <div class="section-wave" aria-hidden="true">
+          <div class="section-wave section-wave-fade" aria-hidden="true">
             <svg viewBox="0 0 220 24" fill="none">
-              <path class="wave-flow" d="M2 12 Q 15.5 2, 29 12 T 56 12 T 83 12 T 110 12 T 137 12 T 164 12 T 191 12 T 218 12"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+              <defs>
+                <linearGradient id="wg-resume" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0" stop-color="#5AA7FF" />
+                  <stop offset=".5" stop-color="#1877F2" />
+                  <stop offset="1" stop-color="#5AA7FF" />
+                </linearGradient>
+              </defs>
+              <path class="wave-flow wave-flow-echo"
+                d="M-56 15 Q -42 9, -28 15 T 0 15 T 28 15 T 56 15 T 84 15 T 112 15 T 140 15 T 168 15 T 196 15 T 224 15 T 252 15 T 280 15"
+                stroke="#5AA7FF" stroke-opacity=".3" stroke-width="2" stroke-linecap="round" />
+              <path class="wave-flow"
+                d="M-56 10 Q -42 3, -28 10 T 0 10 T 28 10 T 56 10 T 84 10 T 112 10 T 140 10 T 168 10 T 196 10 T 224 10 T 252 10 T 280 10"
+                stroke="url(#wg-resume)" stroke-width="2.4" stroke-linecap="round" />
             </svg>
           </div>
         </div>
@@ -1612,11 +1623,21 @@
           <p>Where I've built and grown.</p>
           <div class="section-wave" aria-hidden="true">
             <svg viewBox="0 0 220 24" fill="none">
-              <path class="wave-flow wave-journey" d="M2 18 C 30 18, 40 6, 68 6 S 106 18, 134 18 S 190 6, 218 6"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-              <circle class="wave-dot" cx="35" cy="12" r="3.2" fill="currentColor" />
-              <circle class="wave-dot wave-dot-2" cx="110" cy="12" r="3.2" fill="currentColor" />
-              <circle class="wave-dot wave-dot-3" cx="185" cy="12" r="3.2" fill="currentColor" />
+              <defs>
+                <linearGradient id="wg-exp" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0" stop-color="#5AA7FF" />
+                  <stop offset="1" stop-color="#1877F2" />
+                </linearGradient>
+              </defs>
+              <path class="wave-journey" d="M6 18 C 34 18, 44 6, 72 6 S 108 18, 136 18 S 186 6, 214 6"
+                stroke="url(#wg-exp)" stroke-opacity=".4" stroke-width="2" stroke-linecap="round" />
+              <circle class="wave-dot" cx="72" cy="6" r="3.2" fill="currentColor" />
+              <circle class="wave-dot wave-dot-2" cx="136" cy="18" r="3.2" fill="currentColor" />
+              <circle class="wave-dot wave-dot-3" cx="214" cy="6" r="3.2" fill="currentColor" />
+              <circle class="wave-spark" r="3" fill="#1877F2">
+                <animateMotion dur="4.2s" repeatCount="indefinite" calcMode="spline" keyTimes="0;1"
+                  keySplines=".45 0 .55 1" path="M6 18 C 34 18, 44 6, 72 6 S 108 18, 136 18 S 186 6, 214 6" />
+              </circle>
             </svg>
           </div>
         </div>
@@ -1980,10 +2001,21 @@
         <div class="section-title" id="portfolio-title">
           <h2>My Projects</h2>
           <p>Selected work I'm proud of.</p>
-          <div class="section-wave" aria-hidden="true">
+          <div class="section-wave section-wave-fade" aria-hidden="true">
             <svg viewBox="0 0 220 24" fill="none">
-              <path class="wave-flow wave-signal" d="M2 12 L 26 12 L 36 4 L 50 20 L 64 4 L 78 20 L 88 12 L 132 12 L 142 4 L 156 20 L 170 4 L 184 20 L 194 12 L 218 12"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              <defs>
+                <linearGradient id="wg-proj" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0" stop-color="#1877F2" />
+                  <stop offset=".5" stop-color="#5AA7FF" />
+                  <stop offset="1" stop-color="#1877F2" />
+                </linearGradient>
+              </defs>
+              <path class="wave-signal-echo"
+                d="M-56 13 Q -42 19, -28 13 T 0 13 T 28 13 T 56 13 T 84 13 T 112 13 T 140 13 T 168 13 T 196 13 T 224 13 T 252 13 T 280 13"
+                stroke="#5AA7FF" stroke-opacity=".28" stroke-width="2" stroke-linecap="round" />
+              <path class="wave-signal"
+                d="M-28 11 Q -21 3, -14 11 T 0 11 T 14 11 T 28 11 T 42 11 T 56 11 T 70 11 T 84 11 T 98 11 T 112 11 T 126 11 T 140 11 T 154 11 T 168 11 T 182 11 T 196 11 T 210 11 T 224 11 T 238 11 T 252 11"
+                stroke="url(#wg-proj)" stroke-width="2.2" stroke-linecap="round" />
             </svg>
           </div>
         </div>
@@ -2089,15 +2121,22 @@
         <div class="section-title">
           <h2>Certificates</h2>
           <p>Credentials that speak for themselves.</p>
-          <div class="section-wave" aria-hidden="true">
+          <div class="section-wave section-wave-fade" aria-hidden="true">
             <svg viewBox="0 0 220 24" fill="none">
+              <defs>
+                <linearGradient id="wg-cert" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0" stop-color="#5AA7FF" />
+                  <stop offset=".5" stop-color="#1877F2" />
+                  <stop offset="1" stop-color="#5AA7FF" />
+                </linearGradient>
+              </defs>
               <g class="wave-ribbon">
                 <path d="M-58 8 Q -44 2, -30 8 T -2 8 T 26 8 T 54 8 T 82 8 T 110 8 T 138 8 T 166 8 T 194 8 T 222 8 T 250 8 T 278 8"
-                  stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                  stroke="url(#wg-cert)" stroke-width="2.4" stroke-linecap="round" />
               </g>
               <g class="wave-ribbon wave-ribbon-2">
                 <path d="M-58 16 Q -44 22, -30 16 T -2 16 T 26 16 T 54 16 T 82 16 T 110 16 T 138 16 T 166 16 T 194 16 T 222 16 T 250 16 T 278 16"
-                  stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".45" />
+                  stroke="#5AA7FF" stroke-width="2" stroke-linecap="round" opacity=".4" />
               </g>
             </svg>
           </div>
@@ -2120,7 +2159,7 @@
             voice agents.</p>
           <div class="section-wave section-wave-ping" aria-hidden="true">
             <svg viewBox="0 0 220 44" fill="none">
-              <circle cx="110" cy="22" r="4" fill="currentColor" />
+              <circle class="wave-core" cx="110" cy="22" r="4" fill="currentColor" />
               <circle class="wave-ping" cx="110" cy="22" r="6" stroke="currentColor" stroke-width="1.6" />
               <circle class="wave-ping wave-ping-2" cx="110" cy="22" r="6" stroke="currentColor" stroke-width="1.6" />
               <circle class="wave-ping wave-ping-3" cx="110" cy="22" r="6" stroke="currentColor" stroke-width="1.6" />
