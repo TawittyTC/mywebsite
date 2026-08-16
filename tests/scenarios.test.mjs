@@ -282,6 +282,26 @@ test('cert grid shows everything at once; exp teasers clamp to three lines', asy
   await page.close();
 });
 
+test('pixel buddy strolls the bottom edge and never blocks input', async () => {
+  const { page } = await ctx.openPage();
+  await page.waitForSelector('#pixel-buddy canvas');
+  const style = await page.$eval('#pixel-buddy', (el) => ({
+    pointerEvents: getComputedStyle(el).pointerEvents,
+    position: getComputedStyle(el).position,
+  }));
+  assert.equal(style.pointerEvents, 'none', 'buddy must never intercept clicks');
+  assert.equal(style.position, 'fixed', 'buddy should ride the viewport');
+  const x0 = await page.$eval('#pixel-buddy', (el) => el.getBoundingClientRect().x);
+  await page.waitForFunction((sx) =>
+    Math.abs(document.getElementById('pixel-buddy').getBoundingClientRect().x - sx) > 10,
+    x0, { timeout: 15000 }); // it walks (pauses are a few seconds at most)
+  await page.close();
+  // reduced motion: the buddy never spawns
+  const { page: rp } = await ctx.openPage({ reducedMotion: 'reduce' });
+  assert.equal(await rp.locator('#pixel-buddy').count(), 0, 'buddy must not spawn under reduced motion');
+  await rp.close();
+});
+
 test('320px (small phones): no horizontal overflow anywhere', async () => {
   const { page } = await ctx.openPage({
     viewport: { width: 320, height: 680 }, isMobile: true, hasTouch: true,
