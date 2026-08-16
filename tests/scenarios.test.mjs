@@ -355,6 +355,12 @@ test('every section carries its themed wave and the waves actually animate', asy
   for (const [part, anim] of Object.entries(anims)) {
     assert.notEqual(anim, 'none', `${part} wave is not animated`);
   }
+  // solid strokes only — dashed lines were rejected as visually noisy
+  const dashed = await page.$$eval('.section-wave path', (els) =>
+    els.filter((el) => getComputedStyle(el).strokeDasharray !== 'none').length);
+  assert.equal(dashed, 0, `${dashed} wave paths still use dashed strokes`);
+  // the Experience spark exists for the SMIL journey animation
+  assert.ok(await page.$('#experience .wave-spark'), 'experience spark missing');
   // decorative only: hidden from assistive tech and never intercepts input
   const decorative = await page.$$eval('.section-wave', (els) =>
     els.every((el) => el.getAttribute('aria-hidden') === 'true'));
