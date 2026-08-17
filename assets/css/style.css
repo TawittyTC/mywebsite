@@ -1026,11 +1026,6 @@ button {
   height: 100%;
 }
 
-.section-wave-ping {
-  height: 44px;
-  margin-top: 26px;
-}
-
 /* Soft fade at both ends so drifting lines never hard-stop at an edge */
 .section-wave-fade {
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 20%, #000 80%, transparent);
@@ -1174,45 +1169,6 @@ button {
   }
 }
 
-/* Contact — center dot breathing while rings ripple outward */
-.wave-core {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: wave-pulse 2.7s ease-in-out infinite;
-}
-
-.wave-ping {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: wave-ping 2.7s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
-  opacity: 0;
-}
-
-.wave-ping-2 {
-  animation-delay: .9s;
-}
-
-.wave-ping-3 {
-  animation-delay: 1.8s;
-}
-
-@keyframes wave-ping {
-  0% {
-    transform: scale(.5);
-    opacity: .9;
-  }
-
-  80% {
-    transform: scale(3.4);
-    opacity: 0;
-  }
-
-  100% {
-    transform: scale(3.4);
-    opacity: 0;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
 
   .wave-flow,
@@ -1222,14 +1178,8 @@ button {
   .wave-dot,
   .wave-bar,
   .wave-ribbon,
-  .wave-ribbon-2,
-  .wave-core,
-  .wave-ping {
+  .wave-ribbon-2 {
     animation: none;
-  }
-
-  .wave-ping {
-    opacity: .35;
   }
 
   /* SMIL ignores media queries — hide the traveling spark outright */
