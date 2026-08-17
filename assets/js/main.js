@@ -522,7 +522,9 @@ document.addEventListener('DOMContentLoaded', function () {
         btn.classList.add('active');
         var filter = btn.getAttribute('data-filter');
         items.forEach(function (item) {
-          item.style.display = (filter === 'all' || item.getAttribute('data-tech') === filter) ? '' : 'none';
+          // data-tech may hold several space-separated categories
+          var tags = (item.getAttribute('data-tech') || '').split(/\s+/);
+          item.style.display = (filter === 'all' || tags.indexOf(filter) !== -1) ? '' : 'none';
         });
         if (scroller && scroller._cardScroller) scroller._cardScroller.reset();
       });
