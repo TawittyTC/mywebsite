@@ -113,8 +113,9 @@ a:hover {
 # Sections General
 --------------------------------------------------------------*/
 section {
-  /* Apple-scale air between chapters */
-  padding: 180px 0;
+  /* Apple-scale air between chapters — bands alternate white/gray, so
+     the padding IS the visible breathing room between sections */
+  padding: 220px 0;
   overflow: hidden;
 }
 
@@ -813,17 +814,31 @@ button {
 # Apple Colors + Typography
 --------------------------------------------------------------*/
 
-/* Section backgrounds */
-#resume, #skill, #certificates { background: #fff; }
-/* 60/30/10: the canvas stays white everywhere — structure comes from
-   neutral card surfaces and resting shadows, not tinted sections */
-#certificates.bg-light { background-color: #fff !important; }
+/* 60/30 alternating bands: white and gray swap section by section down
+   the page (hero W → resume G → experience W → skill G → portfolio W →
+   certificates G → CTA W → footer G), and card surfaces always invert
+   against their band so every card reads clearly off its canvas */
+#resume, #skill { background: var(--color-fill); }
+#experience, #portfolio { background: #fff; }
+#certificates.bg-light { background-color: var(--color-fill) !important; }
 
-/* Card colors per section */
-#resume .data-box { background: var(--color-fill); }
-#experience .data-box { background: #fff; }
-#skill .boxWhyScg { background: var(--color-fill); color: var(--color-text); }
+/* Gray bands → white cards */
+#resume .data-box { background: #fff; }
+#skill .rf-cards-scroller-item { background: #fff; }
+#skill .boxWhyScg { background: #fff; color: var(--color-text); }
+#certificates .cert-card { background: #fff; }
 #certificates .data-box, #certificates .boxWhyScg { background: #fff; color: var(--color-text); }
+
+/* White bands → gray cards (portfolio scroller already uses the fill) */
+#experience .data-box { background: var(--color-fill); }
+
+/* Chips inside gray experience cards flip to white so they stay visible */
+#experience .exp-duration,
+#experience .exp-card-highlights .hl,
+#experience .exp-badge-chip {
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, .05);
+}
 /* Eyebrow + stacked editorial name over the constellation.
    Three quiet elements only: who / the name / what he builds. */
 #hero .hero-eyebrow {
@@ -982,7 +997,8 @@ button {
   width: 340px;
   min-height: 450px;
   padding: 48px;
-  background-color: var(--color-fill);
+  /* white card on the gray #skill band (60/30 alternation) */
+  background-color: #fff;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1405,7 +1421,7 @@ h1, h2, h3, h4, h5, h6 { color: var(--color-text); }
 @media (max-width: 735px) {
   .section-title h2 { font-size: 34px; letter-spacing: 0; line-height: 1.16; }
   .section-title p { font-size: 17px; }
-  section { padding: 104px 0; }
+  section { padding: 128px 0; }
   .section-title { padding-bottom: 56px; }
 }
 
