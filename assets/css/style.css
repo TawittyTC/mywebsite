@@ -216,6 +216,8 @@ section {
 .data-box {
   border-radius: var(--r-card);
   box-shadow: var(--shadow-rest);
+  /* hairline keeps a white card crisp on the white canvas */
+  border: 1px solid rgba(0, 0, 0, .06);
   padding: 48px;
   background-color: #fff;
   margin: 56px auto;
@@ -401,9 +403,10 @@ button {
   margin-right: 56px;
   border-radius: var(--r-card);
   /* no resting shadow here: the horizontal scroller clips overflow and
-     would smear it — the neutral fill separates the card instead */
+     would smear it — a hairline border separates the white card instead */
   box-shadow: none;
-  background-color: var(--color-fill);
+  background-color: #fff;
+  border: 1px solid rgba(0, 0, 0, .07);
   padding: 0;
   overflow: hidden;
 }
@@ -616,7 +619,8 @@ button {
 /* Cert card wrapper */
 .cert-card {
   position: relative;
-  background: var(--color-fill);
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, .07);
   border-radius: var(--r-card-sm);
   overflow: hidden;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -814,31 +818,19 @@ button {
 # Apple Colors + Typography
 --------------------------------------------------------------*/
 
-/* 60/30 alternating bands: white and gray swap section by section down
-   the page (hero W → resume G → experience W → skill G → portfolio W →
-   certificates G → CTA W → footer G), and card surfaces always invert
-   against their band so every card reads clearly off its canvas */
-#resume, #skill { background: var(--color-fill); }
-#experience, #portfolio { background: #fff; }
-#certificates.bg-light { background-color: var(--color-fill) !important; }
+/* 60/30/10 — white canvas AND white cards everywhere. The 30% neutral
+   gray lives in the details instead of section tints: hairline card
+   borders, chip and stat fills, dividers, secondary text, and the
+   footer. Blue stays the lone 10% accent. */
+#resume, #skill, #experience, #portfolio { background: #fff; }
+#certificates.bg-light { background-color: #fff !important; }
 
-/* Gray bands → white cards */
-#resume .data-box { background: #fff; }
+#resume .data-box,
+#experience .data-box { background: #fff; }
 #skill .rf-cards-scroller-item { background: #fff; }
 #skill .boxWhyScg { background: #fff; color: var(--color-text); }
 #certificates .cert-card { background: #fff; }
 #certificates .data-box, #certificates .boxWhyScg { background: #fff; color: var(--color-text); }
-
-/* White bands → gray cards (portfolio scroller already uses the fill) */
-#experience .data-box { background: var(--color-fill); }
-
-/* Chips inside gray experience cards flip to white so they stay visible */
-#experience .exp-duration,
-#experience .exp-card-highlights .hl,
-#experience .exp-badge-chip {
-  background: #fff;
-  border: 1px solid rgba(0, 0, 0, .05);
-}
 /* Eyebrow + stacked editorial name over the constellation.
    Three quiet elements only: who / the name / what he builds. */
 #hero .hero-eyebrow {
