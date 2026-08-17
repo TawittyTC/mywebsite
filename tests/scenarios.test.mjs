@@ -146,10 +146,11 @@ test('skills filter shows only its category and never touches project cards', as
   assert.equal(state.projectsHidden, 0, 'skills filter leaked into project cards');
   await page.$eval('#skill .filter-btn[data-filter="all"]', (el) => el.click());
   await settle(page, 300);
-  const restored = await page.evaluate(() =>
-    [...document.querySelectorAll('#skill .rf-cards-scroller-item')]
-      .filter((i) => i.style.display !== 'none').length);
-  assert.equal(restored, 8, 'All did not restore every skill card');
+  const { restored, total } = await page.evaluate(() => {
+    const cards = [...document.querySelectorAll('#skill .rf-cards-scroller-item')];
+    return { restored: cards.filter((i) => i.style.display !== 'none').length, total: cards.length };
+  });
+  assert.equal(restored, total, 'All did not restore every skill card');
   await page.close();
 });
 
