@@ -677,6 +677,48 @@
       border-color: rgba(0, 0, 0, .1)
     }
 
+    /* LinkedIn-style role timeline inside a grouped company card */
+    #experience .exp-roles {
+      margin-top: 14px;
+    }
+
+    #experience .exp-role {
+      position: relative;
+      padding-left: 26px;
+      padding-bottom: 6px;
+    }
+
+    #experience .exp-role::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 7px;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #c3cad3;
+    }
+
+    #experience .exp-role:first-child::before {
+      background: #1877F2;
+    }
+
+    #experience .exp-role:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: 4px;
+      top: 22px;
+      bottom: -2px;
+      width: 1.5px;
+      background: rgba(0, 0, 0, .08);
+    }
+
+    #experience .exp-role-period {
+      font-weight: 600;
+      color: #1d1d1f;
+      margin: 0 0 5px;
+    }
+
     /* Stats bar inside experience cards */
     .exp-card-stats {
       display: flex;
@@ -1717,11 +1759,21 @@
                     <img src="assets/img/scg-logo.avif" alt="SCG The Siam Cement Group" class="company-logo"
                       loading="lazy" decoding="async" width="320" height="113">
                   </div>
-                  <p class="fw-light profile-bio-small  mt-3">Two internships, 6 production internal platforms for one of
-                    Thailand's largest industrial conglomerates — a software license approval workflow, company-wide
-                    asset lifecycle tracking, a smart reservation system, document reference tracker, area-based job
-                    dispatch platform, and an event e-commerce store. Worked within a professional engineering team
-                    through full SDLC: requirements, design, development, UAT, and deployment.</p>
+                  <div class="exp-roles">
+                    <div class="exp-role">
+                      <div class="exp-role-period profile-bio-small">December 2023 - March 2024 &middot; 4 mos</div>
+                      <p class="fw-light profile-bio-small">Delivered 4 production internal apps with the 'Center of
+                        Excellence &amp; Data Driven' department — a smart reservation system, document reference
+                        tracker, area-based job dispatch platform, and an event e-commerce store with inventory
+                        management.</p>
+                    </div>
+                    <div class="exp-role">
+                      <div class="exp-role-period profile-bio-small">April 2023 - July 2023 &middot; 4 mos</div>
+                      <p class="fw-light profile-bio-small">Built 2 enterprise platforms used group-wide — a software
+                        license procurement &amp; approval workflow and a company-wide IT asset tracking platform with
+                        full lifecycle management.</p>
+                    </div>
+                  </div>
                   <div class="exp-card-stats">
                     <div class="exp-stat-item">
                       <div class="exp-stat-num"><span class="js-count" data-count="6">6</span></div>
@@ -2910,7 +2962,7 @@
     </div>
 
     <div class="exp-modal-section">
-      <h3>Projects — Second Internship</h3>
+      <h3>Projects — Second Internship (Dec 2023 – Mar 2024)</h3>
       <div class="exp-client-section" style="border:none;padding:14px 0;display:block">
         <div class="exp-client-section-header">
           <h3>Project Booking — Internal Reservation System</h3>
@@ -2961,7 +3013,7 @@
     </div>
 
     <div class="exp-modal-section">
-      <h3>Projects — First Internship</h3>
+      <h3>Projects — First Internship (Apr – Jul 2023)</h3>
       <div class="exp-client-section" style="border:none;padding:14px 0;display:block">
         <div class="exp-client-section-header">
           <h3>Project License — Software License Management System</h3>
