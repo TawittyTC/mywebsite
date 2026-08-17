@@ -349,11 +349,12 @@ test('violent jump-scrolling then landing anywhere leaves nothing half-faded', a
 
 test('every section carries its themed wave and the waves actually animate', async () => {
   const { page } = await ctx.openPage();
-  // one wave per section: resume, experience, skill, portfolio, certificates, contact
+  // one wave per section: resume, experience, skill, portfolio, certificates
+  // (the closing CTA deliberately has none)
   const homes = await page.$$eval('.section-wave', (els) =>
     els.map((el) => el.closest('section')?.id || ''));
-  assert.deepEqual(homes, ['resume', 'experience', 'skill', 'portfolio', 'certificates', 'contact'],
-    'expected exactly one wave in each section, in page order');
+  assert.deepEqual(homes, ['resume', 'experience', 'skill', 'portfolio', 'certificates'],
+    'expected exactly one wave in each content section, in page order');
   // each themed part is animated (computed style, not just class names)
   const anims = await page.evaluate(() => {
     const name = (sel) => getComputedStyle(document.querySelector(sel)).animationName;
@@ -363,7 +364,6 @@ test('every section carries its themed wave and the waves actually animate', asy
       bar: name('#skill .wave-bar'),
       signal: name('#portfolio .wave-signal'),
       ribbon: name('#certificates .wave-ribbon'),
-      ping: name('#contact .wave-ping'),
     };
   });
   for (const [part, anim] of Object.entries(anims)) {
