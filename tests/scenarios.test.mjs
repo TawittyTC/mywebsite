@@ -144,6 +144,19 @@ test('skills filter shows only its category and never touches project cards', as
   assert.ok(state.shown >= 1, 'AI filter hid every skill card');
   assert.equal(state.wrong, 0, 'non-AI skill cards remained visible');
   assert.equal(state.projectsHidden, 0, 'skills filter leaked into project cards');
+  // multi-category cards (data-tech="web eng") must appear under BOTH filters
+  for (const cat of ['web', 'eng']) {
+    await page.$eval(`#skill .filter-btn[data-filter="${cat}"]`, (el) => el.click());
+    await settle(page, 300);
+    const bad = await page.evaluate((c) =>
+      [...document.querySelectorAll('#skill .rf-cards-scroller-item')]
+        .filter((i) => {
+          const visible = i.style.display !== 'none';
+          const belongs = i.dataset.tech.split(/\s+/).includes(c);
+          return visible !== belongs;
+        }).length, cat);
+    assert.equal(bad, 0, `${cat} filter shows/hides the wrong cards`);
+  }
   await page.$eval('#skill .filter-btn[data-filter="all"]', (el) => el.click());
   await settle(page, 300);
   const { restored, total } = await page.evaluate(() => {
