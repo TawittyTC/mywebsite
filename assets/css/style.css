@@ -215,17 +215,15 @@ section {
 
 .data-box {
   border-radius: var(--r-card);
-  box-shadow: var(--shadow-rest);
-  /* hairline keeps a white card crisp on the white canvas */
+  /* flat cards: the hairline alone defines the surface — no shadows */
   border: 1px solid rgba(0, 0, 0, .06);
   padding: 48px;
   background-color: #fff;
   margin: 56px auto;
-  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  transition: transform 0.3s ease-in-out;
 }
 
 .data-box:hover {
-  box-shadow: 0 24px 60px rgba(29, 29, 31, 0.08);
   transform: translateY(-4px);
 }
 
@@ -627,7 +625,6 @@ button {
 }
 .cert-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 18px 44px rgba(29, 29, 31, 0.10);
 }
 .cert-card:hover .cert-img img {
   transform: scale(1.025);
@@ -795,7 +792,6 @@ button {
 @media (hover: none), (pointer: coarse) {
   .data-box:hover {
     transform: none;
-    box-shadow: var(--shadow-rest);
   }
   #portfolio .rf-cards-scroller-item:hover,
   #skill .rf-cards-scroller-item:hover,
@@ -974,8 +970,7 @@ button {
   border-radius: var(--r-card);
   padding: 48px;
   height: 100%;
-  border: none;
-  box-shadow: var(--shadow-rest);
+  border: 1px solid rgba(0, 0, 0, .06);
   transition: transform 0.3s ease-in-out;
 }
 .boxWhyScg:hover {
