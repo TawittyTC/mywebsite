@@ -107,7 +107,11 @@ test('viewport churn never changes the hero height or shoves sections around', a
   const { page } = await ctx.openPage({
     viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true,
   });
-  await page.waitForTimeout(1500);
+  // wait for heroLock to actually pin (inline height set) before measuring —
+  // under CI load the initial lock can land >1.5s in, and churning the
+  // viewport before it engages would legitimately lock the churned height
+  await page.waitForFunction(() => document.getElementById('hero').style.height !== '');
+  await page.waitForTimeout(400);
   const before = await page.evaluate(() => ({
     hero: document.getElementById('hero').offsetHeight,
     resumeTop: document.getElementById('resume').getBoundingClientRect().top + window.scrollY,
