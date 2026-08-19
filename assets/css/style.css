@@ -1350,6 +1350,74 @@ button {
 }
 
 /*--------------------------------------------------------------
+# Contact strip (Resume) — icon + label + value rows in one card
+--------------------------------------------------------------*/
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+}
+
+.info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  text-decoration: none;
+}
+
+.info-icon {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(24, 119, 242, .08);
+  color: var(--color-link);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.info-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.info-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  margin-bottom: 2px;
+}
+
+.info-value {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text);
+  line-height: 1.5;
+  transition: color .2s ease;
+}
+
+a.info-item:hover .info-value {
+  color: var(--color-link);
+}
+
+.info-sub {
+  font-size: 12.5px;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  margin-top: 2px;
+}
+
+@media (max-width: 768px) {
+  .info-grid {
+    grid-template-columns: 1fr;
+    gap: 26px;
+  }
+}
+
+/*--------------------------------------------------------------
 # Profile Featured Card
 --------------------------------------------------------------*/
 .data-box.profile-featured {
