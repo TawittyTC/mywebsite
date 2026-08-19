@@ -815,7 +815,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // ── Big-bang intro: the whole graph starts as one clustered blob,
   // trembles harder and harder, then detonates outward — every node
   // overshoots to its home (Duolingo-inspired burst). ──
-  var SHAKE_END = 0.85, EXPLODE_DUR = 0.5, INTRO_END = SHAKE_END + EXPLODE_DUR;
+  var SHAKE_END = 0.5, EXPLODE_DUR = 0.5, INTRO_END = SHAKE_END + EXPLODE_DUR;
   var introCluster = null, boomPlayed = false;
   // Intro plays in its own clock (time - introT0) so it can REPLAY:
   // iOS restores tabs from the back-forward cache without reloading,
