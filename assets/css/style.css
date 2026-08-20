@@ -1425,8 +1425,9 @@ a.info-item:hover .info-value {
     font-size: 12.5px;
   }
 
-  /* phones keep the compact reading sizes — desktop-only bumps above */
-  .profile-bio-small { font-size: 13px; }
+  /* phones keep the compact reading sizes — desktop-only bumps above
+     (.profile-bio/.profile-bio-small are overridden next to their base
+     rules further down: source order decides ties in specificity) */
   #skill .rf-cards-scroller-item .skill-desc { font-size: 13px; }
   .rf-cards-scroller-item p.fw-light { font-size: 14px; }
   .project-tag { font-size: 12px; }
@@ -1452,6 +1453,13 @@ a.info-item:hover .info-value {
 .profile-featured-body { flex: 1; }
 .profile-bio { font-size: 16px; color: var(--color-text-secondary); margin: 0; line-height: 1.7; }
 .profile-bio-small { font-size: 15px; color: var(--color-text-secondary); margin: 0; line-height: 1.7; }
+
+/* Phones read both bio tiers at the same compact 13px (these overrides
+   MUST come after the base rules above — equal specificity, last wins) */
+@media (max-width: 768px) {
+  .profile-bio { font-size: 13px; }
+  .profile-bio-small { font-size: 13px; }
+}
 
 @media (max-width: 576px) {
   .data-box.profile-featured {
