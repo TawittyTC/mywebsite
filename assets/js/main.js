@@ -646,11 +646,18 @@ document.addEventListener('DOMContentLoaded', function () {
       if (!lockH || Math.abs(w - lockW) > 1) lockHero();
     };
     lockHero();
-    // A real rotation always swaps the width, which the resize handler
-    // already treats as a relock. No orientationchange listener: engines
-    // fire it on ANY viewport resize (toolbar churn included), and a
-    // transient width reading there could re-pin the hero mid-churn.
-    window.addEventListener('resize', maybeRelock, { passive: true });
+    // Decide only once the viewport has SETTLED: mid-resize, innerWidth
+    // and layout can read transient values that slip past the width
+    // guard and re-pin the hero at a churned height. Debouncing means
+    // transient readings are never sampled — a real rotation relocks
+    // ~150ms after the storm ends, toolbar churn ends with the same
+    // width and never relocks at all. (No orientationchange listener:
+    // engines fire it on ANY viewport resize.)
+    var relockTimer = null;
+    window.addEventListener('resize', function () {
+      if (relockTimer) clearTimeout(relockTimer);
+      relockTimer = setTimeout(maybeRelock, 150);
+    }, { passive: true });
   }
 
   // ---- Scroll-scrub reveals (Apple product-page feel) ----
