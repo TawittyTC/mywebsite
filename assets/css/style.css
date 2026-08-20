@@ -1392,10 +1392,10 @@ button {
 }
 
 .info-value {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
   color: var(--color-text);
-  line-height: 1.5;
+  line-height: 1.6;
   transition: color .2s ease;
 }
 
@@ -1404,9 +1404,10 @@ a.info-item:hover .info-value {
 }
 
 .info-sub {
-  font-size: 12.5px;
+  /* desktop: same reading size as .profile-bio */
+  font-size: 16px;
   color: var(--color-text-secondary);
-  line-height: 1.6;
+  line-height: 1.7;
   margin-top: 2px;
 }
 
@@ -1414,6 +1415,14 @@ a.info-item:hover .info-value {
   .info-grid {
     grid-template-columns: 1fr;
     gap: 26px;
+  }
+
+  .info-value {
+    font-size: 14px;
+  }
+
+  .info-sub {
+    font-size: 12.5px;
   }
 }
 
