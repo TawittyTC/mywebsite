@@ -834,6 +834,23 @@
       transition: transform .4s cubic-bezier(.32, .72, 0, 1), opacity .25s ease-out
     }
 
+    @media (max-width: 768px) {
+      .exp-lightbox {
+        padding: 12px
+      }
+
+      .exp-lightbox-inner {
+        padding: 26px 20px;
+        border-radius: 22px;
+        max-height: 92vh
+      }
+
+      .exp-client-section {
+        padding: 18px 16px;
+        border-radius: 14px
+      }
+    }
+
     .exp-lightbox-close {
       position: sticky;
       top: 0;
@@ -927,8 +944,8 @@
       color: #3a3a3c;
       background: #f5f5f7;
       border-radius: 980px;
-      padding: 4px 12px;
-      border: 1px solid rgba(0, 0, 0, .04)
+      padding: 5px 13px;
+      border: 1px solid rgba(0, 0, 0, .05)
     }
 
     .exp-modal-overview {
@@ -1007,26 +1024,23 @@
       }
     }
 
-    /* ── Apple HIG: Client sections — horizontal dividers, no colored left border ── */
+    /* Each project/client reads as its own gray sub-card — the same
+       fill-surface language the rest of the site uses */
     .exp-client-section {
-      margin-top: 0;
-      margin-bottom: 0;
-      padding: 36px 0;
-      border-top: 1px solid #f2f2f7;
-      border-left: none;
+      background: #f5f5f7;
+      border-radius: 18px;
+      padding: 22px 24px;
+      margin: 0 0 14px;
+      border: none;
       transition: background .2s
     }
 
     .exp-client-section:first-of-type {
-      border-top: 1px solid #e5e5e7;
       margin-top: 16px
     }
 
     .exp-client-section:hover {
-      background: rgba(24, 119, 242, .015);
-      border-radius: 12px;
-      padding-left: 12px;
-      padding-right: 12px
+      background: #f0f0f3
     }
 
     /* Header: logo + name + tag */
@@ -1090,7 +1104,7 @@
       top: 8px;
       width: 5px;
       height: 5px;
-      background: #c7c7cc;
+      background: rgba(24, 119, 242, .35);
       border-radius: 50%;
       flex-shrink: 0
     }
@@ -1106,11 +1120,24 @@
     }
 
     .exp-modal-section h3 {
-      font-size: 17px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
       font-weight: 700;
       color: #1d1d1f;
-      margin: 0 0 14px;
+      margin: 0 0 16px;
       letter-spacing: -.2px
+    }
+
+    /* small blue tick anchors each section for fast scanning */
+    .exp-modal-section h3::before {
+      content: '';
+      width: 4px;
+      height: 16px;
+      border-radius: 2px;
+      background: var(--color-link);
+      flex-shrink: 0
     }
 
     .exp-modal-section ul {
@@ -1135,7 +1162,7 @@
       top: 8px;
       width: 5px;
       height: 5px;
-      background: #c7c7cc;
+      background: rgba(24, 119, 242, .35);
       border-radius: 50%
     }
 
@@ -2401,18 +2428,6 @@
         </div>
       </div>
       <div class="exp-modal-period">June 2024 – Present</div>
-      <div class="exp-modal-tech">
-        <span>PHP</span><span>MySQL</span><span>JavaScript</span><span>jQuery</span><span>HTML5/CSS3</span>
-        <span>RESTful API</span><span>OWASP Security</span><span>Git</span><span>Docker</span>
-        <span>AJAX</span><span>JSON</span><span>Bootstrap</span><span>DataTables</span><span>Select2</span>
-        <span>Moment.js</span><span>Chart.js</span>
-        <span>PhpSpreadsheet</span><span>OAuth2</span><span>Webhook</span><span>LINE Messaging API</span>
-        <span>Python</span><span>Asterisk PBX</span><span>AGI</span><span>AMI</span><span>Dialplan</span>
-        <span>Telegram Bot API</span><span>Huawei OBS</span><span>Zabbix</span><span>Navicat</span>
-        <span>Linux</span><span>Shell Script</span><span>Crontab</span><span>npm</span>
-        <span>LLM (GPT · Gemini · Claude)</span><span>ASR</span><span>TTS</span><span>Speech-to-Speech (STS)</span>
-        <span>AI Agents</span><span>Multi-Agent Orchestration</span><span>Prompt Engineering</span>
-      </div>
     </div>
 
     <div class="exp-modal-section">
@@ -2983,6 +2998,21 @@
         </ul>
       </div>
     </div>
+    <div class="exp-modal-section">
+      <h3>Tech Stack</h3>
+        <div class="exp-modal-tech">
+          <span>PHP</span><span>MySQL</span><span>JavaScript</span><span>jQuery</span><span>HTML5/CSS3</span>
+          <span>RESTful API</span><span>OWASP Security</span><span>Git</span><span>Docker</span>
+          <span>AJAX</span><span>JSON</span><span>Bootstrap</span><span>DataTables</span><span>Select2</span>
+          <span>Moment.js</span><span>Chart.js</span>
+          <span>PhpSpreadsheet</span><span>OAuth2</span><span>Webhook</span><span>LINE Messaging API</span>
+          <span>Python</span><span>Asterisk PBX</span><span>AGI</span><span>AMI</span><span>Dialplan</span>
+          <span>Telegram Bot API</span><span>Huawei OBS</span><span>Zabbix</span><span>Navicat</span>
+          <span>Linux</span><span>Shell Script</span><span>Crontab</span><span>npm</span>
+          <span>LLM (GPT · Gemini · Claude)</span><span>ASR</span><span>TTS</span><span>Speech-to-Speech (STS)</span>
+          <span>AI Agents</span><span>Multi-Agent Orchestration</span><span>Prompt Engineering</span>
+        </div>
+    </div>
   </template>
 
   <template id="exp-scg">
@@ -2996,11 +3026,6 @@
         </div>
       </div>
       <div class="exp-modal-period">April 2023 – March 2024</div>
-      <div class="exp-modal-tech">
-        <span>PHP</span><span>MSSQL</span><span>JavaScript</span><span>jQuery</span><span>HTML5/CSS3</span>
-        <span>RESTful API</span><span>OWASP Security</span><span>Git</span><span>Docker</span>
-        <span>AJAX</span><span>JSON</span><span>Bootstrap</span><span>DataTables</span><span>Glide Apps</span>
-      </div>
     </div>
 
     <div class="exp-modal-section">
@@ -3027,7 +3052,7 @@
 
     <div class="exp-modal-section">
       <h3>Projects — Second Internship (Dec 2023 – Mar 2024)</h3>
-      <div class="exp-client-section" style="border:none;padding:14px 0;display:block">
+      <div class="exp-client-section">
         <div class="exp-client-section-header">
           <h3>Project Booking — Internal Reservation System</h3>
         </div>
@@ -3040,7 +3065,7 @@
             and reviewing approval queues.</li>
         </ul>
       </div>
-      <div class="exp-client-section" style="border:none;padding:14px 0;display:block">
+      <div class="exp-client-section">
         <div class="exp-client-section-header">
           <h3>Project Ref Number — Reference Code Generator</h3>
         </div>
@@ -3052,7 +3077,7 @@
           <li>Search and audit history — trace the lifecycle and usage of any reference code.</li>
         </ul>
       </div>
-      <div class="exp-client-section" style="border:none;padding:14px 0;display:block">
+      <div class="exp-client-section">
         <div class="exp-client-section-header">
           <h3>Project Job South — Regional Job Management</h3>
         </div>
@@ -3063,7 +3088,7 @@
           <li>Regional summaries reporting job completion rates and workload distribution across teams.</li>
         </ul>
       </div>
-      <div class="exp-client-section" style="border:none;padding:14px 0;display:block">
+      <div class="exp-client-section">
         <div class="exp-client-section-header">
           <h3>Project Family Day Shop — Event E-Commerce</h3>
         </div>
@@ -3078,7 +3103,7 @@
 
     <div class="exp-modal-section">
       <h3>Projects — First Internship (Apr – Jul 2023)</h3>
-      <div class="exp-client-section" style="border:none;padding:14px 0;display:block">
+      <div class="exp-client-section">
         <div class="exp-client-section-header">
           <h3>Project License — Software License Management System</h3>
         </div>
@@ -3091,7 +3116,7 @@
             and department-level cost allocation.</li>
         </ul>
       </div>
-      <div class="exp-client-section" style="border:none;padding:14px 0;display:block">
+      <div class="exp-client-section">
         <div class="exp-client-section-header">
           <h3>Project Assets — Enterprise Asset Management Platform</h3>
         </div>
@@ -3107,6 +3132,14 @@
         </ul>
       </div>
     </div>
+    <div class="exp-modal-section">
+      <h3>Tech Stack</h3>
+        <div class="exp-modal-tech">
+          <span>PHP</span><span>MSSQL</span><span>JavaScript</span><span>jQuery</span><span>HTML5/CSS3</span>
+          <span>RESTful API</span><span>OWASP Security</span><span>Git</span><span>Docker</span>
+          <span>AJAX</span><span>JSON</span><span>Bootstrap</span><span>DataTables</span><span>Glide Apps</span>
+        </div>
+    </div>
   </template>
 
   <template id="exp-advice">
@@ -3120,9 +3153,6 @@
         </div>
       </div>
       <div class="exp-modal-period">September 2019 – December 2019</div>
-      <div class="exp-modal-tech">
-        <span>Hardware Troubleshooting</span><span>Windows OS</span><span>System Maintenance</span>
-      </div>
     </div>
 
     <div class="exp-modal-section">
@@ -3146,6 +3176,12 @@
         <li>Advised on product selection (laptops, desktops, peripherals) matched to customer use-case and budget;
           handled warranty claims and data recovery risk communication.</li>
       </ul>
+    </div>
+    <div class="exp-modal-section">
+      <h3>Tech Stack</h3>
+        <div class="exp-modal-tech">
+          <span>Hardware Troubleshooting</span><span>Windows OS</span><span>System Maintenance</span>
+        </div>
     </div>
   </template>
 
