@@ -722,7 +722,7 @@ button {
   border-radius: var(--r-capsule);
   background: rgba(24, 119, 242, 0.08);
   color: var(--color-link);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
   letter-spacing: 0.1px;
 }
@@ -977,7 +977,7 @@ button {
   transform: translateY(-4px);
 }
 .rf-cards-scroller-item h4 { font-weight: 600; color: var(--color-text); letter-spacing: -0.2px; padding: 24px 28px 8px; }
-.rf-cards-scroller-item p.fw-light { color: var(--color-text-secondary); font-size: 14px; padding: 0 28px 28px; }
+.rf-cards-scroller-item p.fw-light { color: var(--color-text-secondary); font-size: 15px; padding: 0 28px 28px; }
 
 /* Skill cards override */
 #skill .rf-cards-scroller-item {
@@ -1004,7 +1004,7 @@ button {
   margin-bottom: 12px;
 }
 #skill .rf-cards-scroller-item .skill-desc {
-  font-size: 13px;
+  font-size: 15px;
   color: var(--color-text-secondary);
   line-height: 1.6;
   margin: 0;
@@ -1424,6 +1424,12 @@ a.info-item:hover .info-value {
   .info-sub {
     font-size: 12.5px;
   }
+
+  /* phones keep the compact reading sizes — desktop-only bumps above */
+  .profile-bio-small { font-size: 13px; }
+  #skill .rf-cards-scroller-item .skill-desc { font-size: 13px; }
+  .rf-cards-scroller-item p.fw-light { font-size: 14px; }
+  .project-tag { font-size: 12px; }
 }
 
 /*--------------------------------------------------------------
@@ -1445,7 +1451,7 @@ a.info-item:hover .info-value {
 }
 .profile-featured-body { flex: 1; }
 .profile-bio { font-size: 16px; color: var(--color-text-secondary); margin: 0; line-height: 1.7; }
-.profile-bio-small { font-size: 13px; color: var(--color-text-secondary); margin: 0; line-height: 1.7; }
+.profile-bio-small { font-size: 15px; color: var(--color-text-secondary); margin: 0; line-height: 1.7; }
 
 @media (max-width: 576px) {
   .data-box.profile-featured {
