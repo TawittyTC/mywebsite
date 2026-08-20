@@ -474,7 +474,7 @@
     }
 
     .exp-card-highlights .hl {
-      font-size: 10px;
+      font-size: 12px;
       font-weight: 400;
       color: #3a3a3c;
       background: #f5f5f7;
@@ -552,7 +552,7 @@
     /* Duration badge */
     .exp-duration {
       display: inline-block;
-      font-size: 11px;
+      font-size: 12px;
       color: #6e6e73;
       font-weight: 400;
       background: #f5f5f7;
@@ -770,7 +770,7 @@
     }
 
     .exp-stat-label {
-      font-size: 11px;
+      font-size: 12.5px;
       color: #6e6e73;
       font-weight: 400;
       margin-top: 6px;
@@ -903,7 +903,7 @@
     /* Period as a subtle inline badge */
     .exp-modal-period {
       display: inline-block;
-      font-size: 12px;
+      font-size: 13px;
       color: #1877F2;
       font-weight: 600;
       background: rgba(24, 119, 242, .08);
@@ -922,7 +922,7 @@
     }
 
     .exp-modal-tech span {
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 500;
       color: #3a3a3c;
       background: #f5f5f7;
@@ -932,7 +932,7 @@
     }
 
     .exp-modal-overview {
-      font-size: 13px;
+      font-size: 15px;
       color: var(--color-text-secondary);
       line-height: 1.7;
       margin: 0
@@ -1071,7 +1071,7 @@
     .exp-client-section ul {
       margin: 0;
       padding-left: 0;
-      font-size: 13px;
+      font-size: 15px;
       line-height: 1.7;
       color: var(--color-text-secondary);
       list-style: none
@@ -1116,7 +1116,7 @@
     .exp-modal-section ul {
       margin: 0;
       padding-left: 0;
-      font-size: 13px;
+      font-size: 15px;
       line-height: 1.7;
       color: var(--color-text-secondary);
       list-style: none
@@ -1142,6 +1142,19 @@
     .exp-modal-section li strong {
       color: #1d1d1f;
       font-weight: 600
+    }
+
+    /* Phones keep the compact sizes the user signed off on;
+       the bumps above are desktop-only. */
+    @media (max-width: 768px) {
+      .exp-card-highlights .hl { font-size: 10px; }
+      .exp-duration { font-size: 11px; }
+      .exp-stat-label { font-size: 11px; }
+      .exp-modal-overview { font-size: 13px; }
+      .exp-client-section ul { font-size: 13px; }
+      .exp-modal-section ul { font-size: 13px; }
+      .exp-modal-tech span { font-size: 11px; }
+      .exp-modal-period { font-size: 12px; }
     }
 
     /* Cert card clickable */
@@ -1173,10 +1186,10 @@
   </style>
 
   <!-- Full CSS loaded async: no render blocking (bootstrap merged in) -->
-  <link rel="preload" href="assets/css/style.min.css?v=2.7.0" as="style"
+  <link rel="preload" href="assets/css/style.min.css?v=2.8.0" as="style"
     onload="this.onload=null;this.rel='stylesheet'">
   <noscript>
-    <link href="assets/css/style.min.css?v=2.7.0" rel="stylesheet">
+    <link href="assets/css/style.min.css?v=2.8.0" rel="stylesheet">
   </noscript>
 
 
