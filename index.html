@@ -1047,7 +1047,8 @@
     .exp-client-section-header {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px 10px;
+      flex-wrap: wrap;
       margin-bottom: 16px
     }
 
@@ -1065,7 +1066,9 @@
       font-weight: 600;
       color: #1d1d1f;
       margin: 0;
-      line-height: 1.3
+      line-height: 1.45;
+      flex: 1 1 auto;
+      min-width: 0
     }
 
     /* Category tag: Apple blue-tinted pill */
@@ -1119,7 +1122,7 @@
       margin-bottom: 32px
     }
 
-    .exp-modal-section h3 {
+    .exp-modal-section > h3 {
       display: flex;
       align-items: center;
       gap: 10px;
@@ -1131,7 +1134,7 @@
     }
 
     /* small blue tick anchors each section for fast scanning */
-    .exp-modal-section h3::before {
+    .exp-modal-section > h3::before {
       content: '';
       width: 4px;
       height: 16px;
@@ -2431,6 +2434,22 @@
     </div>
 
     <div class="exp-modal-section">
+      <h3>Skills</h3>
+        <div class="exp-modal-tech">
+          <span>PHP</span><span>MySQL</span><span>JavaScript</span><span>jQuery</span><span>HTML5/CSS3</span>
+          <span>RESTful API</span><span>OWASP Security</span><span>Git</span><span>Docker</span>
+          <span>AJAX</span><span>JSON</span><span>Bootstrap</span><span>DataTables</span><span>Select2</span>
+          <span>Moment.js</span><span>Chart.js</span>
+          <span>PhpSpreadsheet</span><span>OAuth2</span><span>Webhook</span><span>LINE Messaging API</span>
+          <span>Python</span><span>Asterisk PBX</span><span>AGI</span><span>AMI</span><span>Dialplan</span>
+          <span>Telegram Bot API</span><span>Huawei OBS</span><span>Zabbix</span><span>Navicat</span>
+          <span>Linux</span><span>Shell Script</span><span>Crontab</span><span>npm</span>
+          <span>LLM (GPT · Gemini · Claude)</span><span>ASR</span><span>TTS</span><span>Speech-to-Speech (STS)</span>
+          <span>AI Agents</span><span>Multi-Agent Orchestration</span><span>Prompt Engineering</span>
+        </div>
+    </div>
+
+    <div class="exp-modal-section">
       <h3>Role Overview</h3>
       <p class="exp-modal-overview">Architected and deployed customized CRM solutions for 10+ enterprise clients across
         Healthcare, Finance, Insurance, and E-Commerce industries. Served as sole full-stack developer managing the
@@ -2998,21 +3017,6 @@
         </ul>
       </div>
     </div>
-    <div class="exp-modal-section">
-      <h3>Skills</h3>
-        <div class="exp-modal-tech">
-          <span>PHP</span><span>MySQL</span><span>JavaScript</span><span>jQuery</span><span>HTML5/CSS3</span>
-          <span>RESTful API</span><span>OWASP Security</span><span>Git</span><span>Docker</span>
-          <span>AJAX</span><span>JSON</span><span>Bootstrap</span><span>DataTables</span><span>Select2</span>
-          <span>Moment.js</span><span>Chart.js</span>
-          <span>PhpSpreadsheet</span><span>OAuth2</span><span>Webhook</span><span>LINE Messaging API</span>
-          <span>Python</span><span>Asterisk PBX</span><span>AGI</span><span>AMI</span><span>Dialplan</span>
-          <span>Telegram Bot API</span><span>Huawei OBS</span><span>Zabbix</span><span>Navicat</span>
-          <span>Linux</span><span>Shell Script</span><span>Crontab</span><span>npm</span>
-          <span>LLM (GPT · Gemini · Claude)</span><span>ASR</span><span>TTS</span><span>Speech-to-Speech (STS)</span>
-          <span>AI Agents</span><span>Multi-Agent Orchestration</span><span>Prompt Engineering</span>
-        </div>
-    </div>
   </template>
 
   <template id="exp-scg">
@@ -3026,6 +3030,15 @@
         </div>
       </div>
       <div class="exp-modal-period">April 2023 – March 2024</div>
+    </div>
+
+    <div class="exp-modal-section">
+      <h3>Skills</h3>
+        <div class="exp-modal-tech">
+          <span>PHP</span><span>MSSQL</span><span>JavaScript</span><span>jQuery</span><span>HTML5/CSS3</span>
+          <span>RESTful API</span><span>OWASP Security</span><span>Git</span><span>Docker</span>
+          <span>AJAX</span><span>JSON</span><span>Bootstrap</span><span>DataTables</span><span>Glide Apps</span>
+        </div>
     </div>
 
     <div class="exp-modal-section">
@@ -3132,14 +3145,6 @@
         </ul>
       </div>
     </div>
-    <div class="exp-modal-section">
-      <h3>Skills</h3>
-        <div class="exp-modal-tech">
-          <span>PHP</span><span>MSSQL</span><span>JavaScript</span><span>jQuery</span><span>HTML5/CSS3</span>
-          <span>RESTful API</span><span>OWASP Security</span><span>Git</span><span>Docker</span>
-          <span>AJAX</span><span>JSON</span><span>Bootstrap</span><span>DataTables</span><span>Glide Apps</span>
-        </div>
-    </div>
   </template>
 
   <template id="exp-advice">
@@ -3153,6 +3158,13 @@
         </div>
       </div>
       <div class="exp-modal-period">September 2019 – December 2019</div>
+    </div>
+
+    <div class="exp-modal-section">
+      <h3>Skills</h3>
+        <div class="exp-modal-tech">
+          <span>Hardware Troubleshooting</span><span>Windows OS</span><span>System Maintenance</span>
+        </div>
     </div>
 
     <div class="exp-modal-section">
@@ -3176,12 +3188,6 @@
         <li>Advised on product selection (laptops, desktops, peripherals) matched to customer use-case and budget;
           handled warranty claims and data recovery risk communication.</li>
       </ul>
-    </div>
-    <div class="exp-modal-section">
-      <h3>Skills</h3>
-        <div class="exp-modal-tech">
-          <span>Hardware Troubleshooting</span><span>Windows OS</span><span>System Maintenance</span>
-        </div>
     </div>
   </template>
 
