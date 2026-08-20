@@ -638,8 +638,12 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     };
     var maybeRelock = function () {
-      var w = window.innerWidth, h = window.innerHeight;
-      if (!lockH || Math.abs(w - lockW) > 1 || Math.abs(h - lockH) > lockH * 0.25) lockHero();
+      // Relock ONLY on width changes (a real rotation always changes the
+      // width). Height-only changes are toolbar churn — the exact thing
+      // the pin exists to absorb — and transient innerHeight readings
+      // during resizes have re-pinned the hero at the churned height.
+      var w = window.innerWidth;
+      if (!lockH || Math.abs(w - lockW) > 1) lockHero();
     };
     lockHero();
     // A real rotation always swaps the width, which the resize handler
