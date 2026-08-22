@@ -263,6 +263,7 @@ ul.fw-light li:last-child { margin-bottom: 0; }
 html {
   font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Noto Sans Thai', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-size: 17px;
+  font-optical-sizing: auto;
   quotes: "\201C" "\201D";
 }
 
@@ -784,6 +785,10 @@ button {
   }
   #experience .data-box[data-exp]:active {
     transform: scale(0.985);
+  }
+
+  #images-list .cert-card:active {
+    transform: scale(0.97);
   }
 }
 
@@ -1626,6 +1631,15 @@ select:focus-visible {
 # Hero copy — role line & subline
 --------------------------------------------------------------*/
 
+
+/* Users who turn off transparency get solid surfaces, no blur */
+@media (prefers-reduced-transparency: reduce) {
+  #back-to-top {
+    background: #fbfbfd;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
 
 /*--------------------------------------------------------------
 # Back to top
