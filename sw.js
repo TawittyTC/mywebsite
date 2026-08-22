@@ -1,6 +1,6 @@
-const CACHE = 'v89';
+const CACHE = 'v90';
 const PRECACHE = [
-  'assets/css/style.min.css?v=2.9.0',
+  'assets/css/style.min.css?v=2.10.0',
   'assets/fonts/inter-latin.woff2',
   'assets/fonts/notosansthai-thai.woff2',
   'assets/fonts/notosansthai-latin.woff2',
