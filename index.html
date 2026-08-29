@@ -4,6 +4,9 @@
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <!-- Light-only site: opt out of browser forced/auto dark theming -->
+  <meta name="color-scheme" content="only light">
+  <meta name="theme-color" content="#ffffff">
 
   <title>ธนพล ชำนาญหาญ | รับทำเว็บไซต์ รับพัฒนา AI Agent กรุงเทพ | Full-Stack & AI Developer</title>
   <meta name="description"
@@ -170,6 +173,10 @@
     }
 
     /* ── Site critical CSS (hero section) ── */
+    :root {
+      color-scheme: only light;
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -1233,10 +1240,10 @@
   </style>
 
   <!-- Full CSS loaded async: no render blocking (bootstrap merged in) -->
-  <link rel="preload" href="assets/css/style.min.css?v=2.12.1" as="style"
+  <link rel="preload" href="assets/css/style.min.css?v=2.12.2" as="style"
     onload="this.onload=null;this.rel='stylesheet'">
   <noscript>
-    <link href="assets/css/style.min.css?v=2.12.1" rel="stylesheet">
+    <link href="assets/css/style.min.css?v=2.12.2" rel="stylesheet">
   </noscript>
 
 
@@ -1490,7 +1497,7 @@
   </script>
 
   <!-- Preload deferred JS to start downloading before parser reaches script tags -->
-  <link rel="preload" href="assets/js/main.min.js?v=2.12.1" as="script">
+  <link rel="preload" href="assets/js/main.min.js?v=2.12.2" as="script">
 
   <script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="233b92be-5a2d-492b-b093-9c3ed14c9063"
     type="text/javascript" async></script>
@@ -2435,7 +2442,7 @@
   </button>
 
   <!-- Main JS -->
-  <script defer src="assets/js/main.min.js?v=2.12.1"></script>
+  <script defer src="assets/js/main.min.js?v=2.12.2"></script>
   <!-- Service Worker: cache assets for repeat visits -->
   <script>if ('serviceWorker' in navigator) { var _sw = function () { navigator.serviceWorker.register('sw.js') }; 'requestIdleCallback' in window ? requestIdleCallback(_sw) : window.addEventListener('load', _sw) }</script>
 
