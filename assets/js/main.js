@@ -129,6 +129,9 @@
 (function () {
   const lightbox = document.createElement("div");
   lightbox.className = "cert-lightbox";
+  lightbox.setAttribute("role", "dialog");
+  lightbox.setAttribute("aria-modal", "true");
+  lightbox.setAttribute("aria-label", "Certificate preview");
   const lbImg = document.createElement("img");
   const closeBtn = document.createElement("button");
   closeBtn.className = "cert-lightbox-close";
@@ -138,17 +141,22 @@
   lightbox.appendChild(closeBtn);
   document.body.appendChild(lightbox);
 
+  let lastFocus = null;
   function openLightbox(src, alt) {
     lbImg.src = src;
     lbImg.alt = alt;
     lightbox.classList.add("open");
     document.body.style.overflow = "hidden";
+    lastFocus = document.activeElement;
+    closeBtn.focus();
   }
   function closeLightbox() {
     if (!lightbox.classList.contains("open")) return; // Escape pressed elsewhere
     lightbox.classList.remove("open");
     // only release the scroll lock if no other overlay is holding it
     if (!document.querySelector(".exp-lightbox.open")) document.body.style.overflow = "";
+    if (lastFocus && typeof lastFocus.focus === "function") lastFocus.focus();
+    lastFocus = null;
   }
   closeBtn.addEventListener("click", closeLightbox);
   lightbox.addEventListener("click", function (e) {
@@ -156,6 +164,11 @@
   });
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape") closeLightbox();
+    // the close button is the dialog's only focusable control — keep Tab on it
+    if (e.key === "Tab" && lightbox.classList.contains("open")) {
+      e.preventDefault();
+      closeBtn.focus();
+    }
   });
 
   window._certLightboxOpen = openLightbox;
@@ -165,6 +178,9 @@
 (function () {
   const lightbox = document.createElement('div');
   lightbox.className = 'exp-lightbox';
+  lightbox.setAttribute('role', 'dialog');
+  lightbox.setAttribute('aria-modal', 'true');
+  lightbox.setAttribute('aria-label', 'Experience details');
   const inner = document.createElement('div');
   inner.className = 'exp-lightbox-inner';
   const closeBtn = document.createElement('button');
@@ -175,9 +191,12 @@
   lightbox.appendChild(inner);
   document.body.appendChild(lightbox);
 
+  let lastFocus = null;
   function closeExp() {
     if (!lightbox.classList.contains('open')) return; // Escape pressed elsewhere
     lightbox.classList.remove('open');
+    if (lastFocus && typeof lastFocus.focus === 'function') lastFocus.focus();
+    lastFocus = null;
     setTimeout(function () {
       // deferred for the exit animation — but by now another overlay
       // (cert lightbox) may have opened and taken the scroll lock
@@ -196,6 +215,28 @@
   });
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') closeExp();
+    // trap Tab inside the open dialog (WCAG: modal focus containment);
+    // yield to the cert lightbox if it is layered on top
+    if (e.key === 'Tab' && lightbox.classList.contains('open') &&
+        !document.querySelector('.cert-lightbox.open')) {
+      var focusables = Array.prototype.filter.call(
+        inner.querySelectorAll('button, [href], [tabindex]:not([tabindex="-1"])'),
+        function (el) { return el.offsetParent !== null; }
+      );
+      if (!focusables.length) return;
+      var first = focusables[0];
+      var last = focusables[focusables.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      } else if (!inner.contains(document.activeElement)) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
   });
 
   window._expLightboxOpen = function (html) {
@@ -203,8 +244,20 @@
     const content = document.createElement('div');
     content.innerHTML = html;
     inner.appendChild(content);
+    // label the dialog by its title so screen readers announce which role opened
+    var title = inner.querySelector('.exp-modal-title');
+    if (title) {
+      title.id = 'exp-lightbox-title';
+      lightbox.setAttribute('aria-labelledby', 'exp-lightbox-title');
+      lightbox.removeAttribute('aria-label');
+    } else {
+      lightbox.setAttribute('aria-label', 'Experience details');
+      lightbox.removeAttribute('aria-labelledby');
+    }
     lightbox.classList.add('open');
     document.body.style.overflow = 'hidden';
+    lastFocus = document.activeElement;
+    closeBtn.focus();
 
     // Initialize client filter chips
     var chips = inner.querySelectorAll('.exp-filter-chip');
