@@ -1725,3 +1725,37 @@ select:focus-visible {
   .hero-name-line { animation: none; opacity: 1; transform: none; }
   .js-reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
 }
+
+/* ── Resolution-tiered desktop type ──
+   Baseline (HD notebooks) carries +1 over the original scale;
+   wider screens step up: FHD +2, 2K +3, 4K +4. Phones untouched. */
+@media (min-width: 1500px) {
+  .fw-light { font-size: 17px; }
+  .profile-bio { font-size: 18px; }
+  .profile-bio-small { font-size: 17px; }
+  #skill .rf-cards-scroller-item .skill-desc { font-size: 17px; }
+  .rf-cards-scroller-item p.fw-light { font-size: 17px; }
+  .project-tag { font-size: 15px; }
+  .info-value { font-size: 18px; }
+  .info-sub { font-size: 18px; }
+}
+@media (min-width: 2000px) {
+  .fw-light { font-size: 18px; }
+  .profile-bio { font-size: 19px; }
+  .profile-bio-small { font-size: 18px; }
+  #skill .rf-cards-scroller-item .skill-desc { font-size: 18px; }
+  .rf-cards-scroller-item p.fw-light { font-size: 18px; }
+  .project-tag { font-size: 16px; }
+  .info-value { font-size: 19px; }
+  .info-sub { font-size: 19px; }
+}
+@media (min-width: 3000px) {
+  .fw-light { font-size: 19px; }
+  .profile-bio { font-size: 20px; }
+  .profile-bio-small { font-size: 19px; }
+  #skill .rf-cards-scroller-item .skill-desc { font-size: 19px; }
+  .rf-cards-scroller-item p.fw-light { font-size: 19px; }
+  .project-tag { font-size: 17px; }
+  .info-value { font-size: 20px; }
+  .info-sub { font-size: 20px; }
+}

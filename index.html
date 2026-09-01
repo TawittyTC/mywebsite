@@ -1215,6 +1215,51 @@
       .exp-client-section-header h3 { font-size: 15px; }
     }
 
+
+    /* Resolution-tiered desktop type: HD +1 (base), FHD +2, 2K +3, 4K +4 */
+    @media (min-width: 1500px) {
+      .exp-card-cta-label { font-size: 16px; }
+      .exp-card-highlights .hl { font-size: 14px; }
+      .exp-stat-label { font-size: 14.5px; }
+      .exp-duration { font-size: 14px; }
+      .exp-modal-company { font-size: 17px; }
+      .exp-modal-overview { font-size: 17px; }
+      .exp-modal-tech span { font-size: 14px; }
+      .exp-modal-period { font-size: 15px; }
+      .exp-filter-chip { font-size: 15px; }
+      .exp-client-section-header h3 { font-size: 17px; }
+      .exp-client-section ul { font-size: 17px; }
+      .exp-modal-section ul { font-size: 17px; }
+    }
+    @media (min-width: 2000px) {
+      .exp-card-cta-label { font-size: 17px; }
+      .exp-card-highlights .hl { font-size: 15px; }
+      .exp-stat-label { font-size: 15.5px; }
+      .exp-duration { font-size: 15px; }
+      .exp-modal-company { font-size: 18px; }
+      .exp-modal-overview { font-size: 18px; }
+      .exp-modal-tech span { font-size: 15px; }
+      .exp-modal-period { font-size: 16px; }
+      .exp-filter-chip { font-size: 16px; }
+      .exp-client-section-header h3 { font-size: 18px; }
+      .exp-client-section ul { font-size: 18px; }
+      .exp-modal-section ul { font-size: 18px; }
+    }
+    @media (min-width: 3000px) {
+      .exp-card-cta-label { font-size: 18px; }
+      .exp-card-highlights .hl { font-size: 16px; }
+      .exp-stat-label { font-size: 16.5px; }
+      .exp-duration { font-size: 16px; }
+      .exp-modal-company { font-size: 19px; }
+      .exp-modal-overview { font-size: 19px; }
+      .exp-modal-tech span { font-size: 16px; }
+      .exp-modal-period { font-size: 17px; }
+      .exp-filter-chip { font-size: 17px; }
+      .exp-client-section-header h3 { font-size: 19px; }
+      .exp-client-section ul { font-size: 19px; }
+      .exp-modal-section ul { font-size: 19px; }
+    }
+
     /* Cert card clickable */
     .cert-card {
       cursor: pointer
@@ -1244,10 +1289,10 @@
   </style>
 
   <!-- Full CSS loaded async: no render blocking (bootstrap merged in) -->
-  <link rel="preload" href="assets/css/style.min.css?v=2.13.0" as="style"
+  <link rel="preload" href="assets/css/style.min.css?v=2.14.0" as="style"
     onload="this.onload=null;this.rel='stylesheet'">
   <noscript>
-    <link href="assets/css/style.min.css?v=2.13.0" rel="stylesheet">
+    <link href="assets/css/style.min.css?v=2.14.0" rel="stylesheet">
   </noscript>
 
 
@@ -1501,7 +1546,7 @@
   </script>
 
   <!-- Preload deferred JS to start downloading before parser reaches script tags -->
-  <link rel="preload" href="assets/js/main.min.js?v=2.13.0" as="script">
+  <link rel="preload" href="assets/js/main.min.js?v=2.14.0" as="script">
 
   <script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="233b92be-5a2d-492b-b093-9c3ed14c9063"
     type="text/javascript" async></script>
@@ -2446,7 +2491,7 @@
   </button>
 
   <!-- Main JS -->
-  <script defer src="assets/js/main.min.js?v=2.13.0"></script>
+  <script defer src="assets/js/main.min.js?v=2.14.0"></script>
   <!-- Service Worker: cache assets for repeat visits -->
   <script>if ('serviceWorker' in navigator) { var _sw = function () { navigator.serviceWorker.register('sw.js') }; 'requestIdleCallback' in window ? requestIdleCallback(_sw) : window.addEventListener('load', _sw) }</script>
 
