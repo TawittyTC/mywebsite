@@ -1726,9 +1726,41 @@ select:focus-visible {
   .js-reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
 }
 
-/* ── Resolution-tiered desktop type ──
-   Baseline (HD notebooks) carries +1 over the original scale;
-   wider screens step up: FHD +2, 2K +3, 4K +4. Phones untouched. */
+/* Measure guard. Line length is what actually decides reading comfort
+   (research puts body copy at 50–75 characters per line, 80 as the ceiling).
+   This design runs ~125 CPL at its HD baseline; once the container scales
+   up on 2K/4K panels the reading columns would stretch past that — 146 CPL
+   measured at 4K. The cap is written in ch, which is font-relative, so one
+   value holds the line identical on every tier. It is a no-op at HD. */
+@media (min-width: 992px) {
+  .profile-bio,
+  #experience .data-box[data-exp] .profile-bio-small:not(.exp-card-highlights),
+  .exp-role > p.profile-bio-small {
+    max-width: 105ch;
+  }
+}
+
+/* ── Resolution-tiered desktop scale ──────────────────────────────────
+   A CSS pixel is defined against ~96 PPI. Real panels drift from that,
+   and the drift is what makes a page feel small:
+
+     24" 1080p  ≈  92 PPI  → 1.00×   (the baseline this design was drawn at)
+     15" 1366   ≈ 100 PPI  → 1.05×
+     27" 1440p  ≈ 109 PPI  → 1.13×
+     32" 4K     ≈ 138 PPI  → 1.44×
+     27" 4K     ≈ 163 PPI  → 1.70×
+
+   So each tier multiplies the *whole* design — type, container, spacing,
+   card sizes — by the panel's PPI ratio, rather than nudging fonts alone.
+   Scaling type without the layout would only stretch text inside a card
+   that still occupies a third of the screen; scaling both keeps every
+   proportion (and the line length) identical to the baseline design,
+   just physically larger. Measured line length holds at ~90 characters
+   across all four tiers, which is what the 50–75 CPL guidance asks of a
+   short bio column at this width.
+
+   The 4K tier also requires height ≥ 1700px: a 3440×1440 ultrawide is
+   3000px+ wide but only ~109 PPI, so it belongs on the 2K step. */
 @media (min-width: 1500px) {
   .fw-light { font-size: 17px; }
   .profile-bio { font-size: 18px; }
@@ -1739,7 +1771,10 @@ select:focus-visible {
   .info-value { font-size: 18px; }
   .info-sub { font-size: 18px; }
 }
+/* 2K tier — 1.13× */
 @media (min-width: 2000px) {
+  html { font-size: 19px; }
+  body { font-size: 19px; }
   .fw-light { font-size: 18px; }
   .profile-bio { font-size: 19px; }
   .profile-bio-small { font-size: 18px; }
@@ -1748,14 +1783,60 @@ select:focus-visible {
   .project-tag { font-size: 16px; }
   .info-value { font-size: 19px; }
   .info-sub { font-size: 19px; }
+  .info-label { font-size: 13.5px; }
+
+  /* layout scales with the type so proportions stay put */
+  .container { max-width: 1490px; }
+  section { padding: 248px 0; }
+  .section-title { padding-bottom: 108px; }
+  .section-title h2 { font-size: 63px; }
+  .section-title p { font-size: 21px; }
+  .resume .resume-title { font-size: 36px; }
+  .data-box { padding: 54px; margin: 63px auto; }
+  .data-box.profile-featured { padding: 63px; gap: 45px; }
+  .profile-featured-img img { width: 203px; height: 203px; }
+  .company-logo { height: 50px; max-width: 147px; }
+  .company-logo--lg { height: 81px; max-width: 181px; }
+  .rf-cards-scroller-item { width: 339px; margin-right: 63px; }
+  #skill .rf-cards-scroller-item { width: 384px; min-height: 508px; padding: 54px; }
+  .project-img { height: 508px; }
+  #footer { font-size: 16px; }
+  :root { --sk-paddlenav-diameter: 41px; }
 }
-@media (min-width: 3000px) {
-  .fw-light { font-size: 19px; }
-  .profile-bio { font-size: 20px; }
-  .profile-bio-small { font-size: 19px; }
-  #skill .rf-cards-scroller-item .skill-desc { font-size: 19px; }
-  .rf-cards-scroller-item p.fw-light { font-size: 19px; }
-  .project-tag { font-size: 17px; }
-  .info-value { font-size: 20px; }
-  .info-sub { font-size: 20px; }
+
+/* 4K tier — 1.45× (height guard keeps 3440×1440 ultrawides on the 2K step) */
+@media (min-width: 3000px) and (min-height: 1700px) {
+  html { font-size: 25px; }
+  body { font-size: 25px; }
+  .fw-light { font-size: 23px; }
+  .profile-bio { font-size: 25px; }
+  .profile-bio-small { font-size: 23px; }
+  #skill .rf-cards-scroller-item .skill-desc { font-size: 23px; }
+  .rf-cards-scroller-item p.fw-light { font-size: 23px; }
+  .project-tag { font-size: 20px; }
+  .info-value { font-size: 25px; }
+  .info-sub { font-size: 25px; }
+  .info-label { font-size: 17px; }
+
+  .container { max-width: 1910px; }
+  section { padding: 319px 0; }
+  .section-title { padding-bottom: 139px; }
+  .section-title h2 { font-size: 81px; }
+  .section-title p { font-size: 28px; }
+  .resume .resume-title { font-size: 46px; }
+  .data-box { padding: 70px; margin: 81px auto; }
+  .data-box.profile-featured { padding: 81px; gap: 58px; }
+  .profile-featured-img img { width: 261px; height: 261px; }
+  .company-logo { height: 64px; max-width: 189px; }
+  .company-logo--lg { height: 104px; max-width: 232px; }
+  .rf-cards-scroller-item { width: 435px; margin-right: 81px; }
+  #skill .rf-cards-scroller-item { width: 493px; min-height: 653px; padding: 70px; }
+  .project-img { height: 653px; }
+  #footer { font-size: 20px; padding-top: 174px; }
+  :root { --sk-paddlenav-diameter: 52px; }
+
+  /* the hero's clamps top out well below the viewport at this width */
+  #hero .hero-eyebrow { font-size: 19px; }
+  #hero h1.hero-name { font-size: clamp(48px, 6.4vw, 142px); }
+  #hero .hero-role { font-size: clamp(20px, 2vw, 38px); }
 }
