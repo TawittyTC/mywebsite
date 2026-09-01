@@ -256,7 +256,7 @@ section {
 
 
 .fw-light {
-  font-size: 15px;
+  font-size: 16px;
 }
 
 ul.fw-light li { margin-bottom: 10px; line-height: 1.7; }
@@ -725,7 +725,7 @@ button {
   border-radius: var(--r-capsule);
   background: rgba(24, 119, 242, 0.08);
   color: var(--color-link);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
   letter-spacing: 0.1px;
 }
@@ -984,7 +984,7 @@ button {
   transform: translateY(-4px);
 }
 #portfolio .rf-cards-scroller-item h3 { font-weight: 600; color: var(--color-text); letter-spacing: -0.2px; padding: 24px 28px 8px; }
-.rf-cards-scroller-item p.fw-light { color: var(--color-text-secondary); font-size: 15px; padding: 0 28px 28px; }
+.rf-cards-scroller-item p.fw-light { color: var(--color-text-secondary); font-size: 16px; padding: 0 28px 28px; }
 
 /* Skill cards override */
 #skill .rf-cards-scroller-item {
@@ -1011,7 +1011,7 @@ button {
   margin-bottom: 12px;
 }
 #skill .rf-cards-scroller-item .skill-desc {
-  font-size: 15px;
+  font-size: 16px;
   color: var(--color-text-secondary);
   line-height: 1.6;
   margin: 0;
@@ -1399,7 +1399,7 @@ button {
 }
 
 .info-value {
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 500;
   color: var(--color-text);
   line-height: 1.6;
@@ -1412,7 +1412,7 @@ a.info-item:hover .info-value {
 
 .info-sub {
   /* desktop: same reading size as .profile-bio */
-  font-size: 16px;
+  font-size: 17px;
   color: var(--color-text-secondary);
   line-height: 1.7;
   margin-top: 2px;
@@ -1438,6 +1438,7 @@ a.info-item:hover .info-value {
   #skill .rf-cards-scroller-item .skill-desc { font-size: 13px; }
   .rf-cards-scroller-item p.fw-light { font-size: 14px; }
   .project-tag { font-size: 12px; }
+  .fw-light { font-size: 15px; }
 }
 
 /*--------------------------------------------------------------
@@ -1458,8 +1459,8 @@ a.info-item:hover .info-value {
   object-fit: cover;
 }
 .profile-featured-body { flex: 1; }
-.profile-bio { font-size: 16px; color: var(--color-text-secondary); margin: 0; line-height: 1.7; }
-.profile-bio-small { font-size: 15px; color: var(--color-text-secondary); margin: 0; line-height: 1.7; }
+.profile-bio { font-size: 17px; color: var(--color-text-secondary); margin: 0; line-height: 1.7; }
+.profile-bio-small { font-size: 16px; color: var(--color-text-secondary); margin: 0; line-height: 1.7; }
 
 /* Phones read both bio tiers at the same compact 13px (these overrides
    MUST come after the base rules above — equal specificity, last wins) */
