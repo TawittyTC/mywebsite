@@ -423,7 +423,7 @@
     }
 
     .exp-card-cta-label {
-      font-size: 14px;
+      font-size: 15px;
       font-weight: 600;
       color: #1264CE;
       transition: opacity .2s
@@ -485,7 +485,7 @@
     }
 
     .exp-card-highlights .hl {
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 400;
       color: #3a3a3c;
       background: #f5f5f7;
@@ -563,7 +563,7 @@
     /* Duration badge */
     .exp-duration {
       display: inline-block;
-      font-size: 12px;
+      font-size: 13px;
       color: #6e6e73;
       font-weight: 400;
       background: #f5f5f7;
@@ -724,6 +724,75 @@
       background: rgba(0, 0, 0, .08);
     }
 
+    /* A blue pulse rides the connector upward — oldest entry to newest —
+       so the timeline reads in the direction the career actually moved.
+       The track matches the connector exactly, so the orb's `top: 100% → 0`
+       travel spans dot to dot whatever the entries' heights are. */
+    .exp-role-spark {
+      position: absolute;
+      left: 4px;
+      top: 22px;
+      bottom: -2px;
+      width: 1.5px;
+      pointer-events: none;
+    }
+
+    /* the last entry has no connector below it, so nothing to ride */
+    .exp-role:last-child .exp-role-spark {
+      display: none;
+    }
+
+    .exp-role-spark::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 100%;
+      width: 7px;
+      height: 7px;
+      margin: -3.5px 0 0 -2.75px;
+      border-radius: 50%;
+      background: #1264CE;
+      box-shadow: 0 0 7px rgba(18, 100, 206, .45);
+      opacity: 0;
+    }
+
+    /* starts only once the card has revealed itself */
+    .data-box.card-visible .exp-role-spark::after {
+      animation: exp-role-spark 4s cubic-bezier(.45, .05, .3, 1) infinite;
+    }
+
+    @keyframes exp-role-spark {
+      0% {
+        top: 100%;
+        opacity: 0;
+        transform: scale(.4)
+      }
+
+      12% {
+        opacity: 1;
+        transform: scale(1)
+      }
+
+      60% {
+        top: 0;
+        opacity: 1;
+        transform: scale(1)
+      }
+
+      70%,
+      100% {
+        top: 0;
+        opacity: 0;
+        transform: scale(.4)
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .exp-role-spark {
+        display: none
+      }
+    }
+
     .exp-role-period {
       font-weight: 600;
       color: #1d1d1f;
@@ -781,7 +850,7 @@
     }
 
     .exp-stat-label {
-      font-size: 12.5px;
+      font-size: 13.5px;
       color: #6e6e73;
       font-weight: 400;
       margin-top: 6px;
@@ -935,7 +1004,7 @@
     }
 
     .exp-modal-company {
-      font-size: 15px;
+      font-size: 16px;
       color: #6e6e73;
       font-weight: 400;
       line-height: 1.4
@@ -944,7 +1013,7 @@
     /* Period as a subtle inline badge */
     .exp-modal-period {
       display: inline-block;
-      font-size: 13px;
+      font-size: 14px;
       color: #1264CE;
       font-weight: 600;
       background: rgba(24, 119, 242, .08);
@@ -963,7 +1032,7 @@
     }
 
     .exp-modal-tech span {
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 500;
       color: #3a3a3c;
       background: #f5f5f7;
@@ -973,7 +1042,7 @@
     }
 
     .exp-modal-overview {
-      font-size: 15px;
+      font-size: 16px;
       color: var(--color-text-secondary);
       line-height: 1.7;
       margin: 0
@@ -992,7 +1061,7 @@
       border: none;
       border-radius: 980px;
       padding: 6px 16px;
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 500;
       color: #1d1d1f;
       cursor: pointer;
@@ -1086,7 +1155,7 @@
     }
 
     .exp-client-section-header h3 {
-      font-size: 15px;
+      font-size: 16px;
       font-weight: 600;
       color: #1d1d1f;
       margin: 0;
@@ -1112,7 +1181,7 @@
     .exp-client-section ul {
       margin: 0;
       padding-left: 0;
-      font-size: 15px;
+      font-size: 16px;
       line-height: 1.7;
       color: var(--color-text-secondary);
       list-style: none
@@ -1170,7 +1239,7 @@
     .exp-modal-section ul {
       margin: 0;
       padding-left: 0;
-      font-size: 15px;
+      font-size: 16px;
       line-height: 1.7;
       color: var(--color-text-secondary);
       list-style: none
@@ -1209,6 +1278,68 @@
       .exp-modal-section ul { font-size: 13px; }
       .exp-modal-tech span { font-size: 11px; }
       .exp-modal-period { font-size: 12px; }
+      .exp-card-cta-label { font-size: 14px; }
+      .exp-modal-company { font-size: 15px; }
+      .exp-filter-chip { font-size: 13px; }
+      .exp-client-section-header h3 { font-size: 15px; }
+    }
+
+
+    /* Resolution-tiered desktop scale — see the PPI table in style.css.
+       Each tier multiplies the baseline design: FHD 1.06x, 2K 1.13x, 4K 1.45x. */
+    @media (min-width: 1500px) {
+      .exp-card-cta-label { font-size: 16px; }
+      .exp-card-highlights .hl { font-size: 14px; }
+      .exp-stat-label { font-size: 14.5px; }
+      .exp-duration { font-size: 14px; }
+      .exp-modal-company { font-size: 17px; }
+      .exp-modal-overview { font-size: 17px; }
+      .exp-modal-tech span { font-size: 14px; }
+      .exp-modal-period { font-size: 15px; }
+      .exp-filter-chip { font-size: 15px; }
+      .exp-client-section-header h3 { font-size: 17px; }
+      .exp-client-section ul { font-size: 17px; }
+      .exp-modal-section ul { font-size: 17px; }
+    }
+    @media (min-width: 2000px) {
+      .exp-card-cta-label { font-size: 17px; }
+      .exp-card-highlights .hl { font-size: 15px; }
+      .exp-stat-label { font-size: 15px; }
+      .exp-duration { font-size: 15px; }
+      .exp-modal-company { font-size: 18px; }
+      .exp-modal-overview { font-size: 18px; }
+      .exp-modal-tech span { font-size: 15px; }
+      .exp-modal-period { font-size: 16px; }
+      .exp-filter-chip { font-size: 16px; }
+      .exp-client-section-header h3 { font-size: 18px; }
+      .exp-client-section ul { font-size: 18px; }
+      .exp-modal-section ul { font-size: 18px; }
+      .exp-modal-title { font-size: 27px; }
+      .exp-modal-section > h3 { font-size: 18px; }
+      .exp-role-title { font-size: 18px; }
+      .exp-work-item { font-size: 15px; }
+      .exp-stat-num { font-size: 34px; }
+      .exp-lightbox-inner { max-width: 836px; padding: 41px 45px; }
+    }
+    @media (min-width: 3000px) and (min-height: 1700px) {
+      .exp-card-cta-label { font-size: 22px; }
+      .exp-card-highlights .hl { font-size: 19px; }
+      .exp-stat-label { font-size: 20px; }
+      .exp-duration { font-size: 19px; }
+      .exp-modal-company { font-size: 23px; }
+      .exp-modal-overview { font-size: 23px; }
+      .exp-modal-tech span { font-size: 19px; }
+      .exp-modal-period { font-size: 20px; }
+      .exp-filter-chip { font-size: 20px; }
+      .exp-client-section-header h3 { font-size: 23px; }
+      .exp-client-section ul { font-size: 23px; }
+      .exp-modal-section ul { font-size: 23px; }
+      .exp-modal-title { font-size: 35px; }
+      .exp-modal-section > h3 { font-size: 23px; }
+      .exp-role-title { font-size: 23px; }
+      .exp-work-item { font-size: 20px; }
+      .exp-stat-num { font-size: 44px; }
+      .exp-lightbox-inner { max-width: 1073px; padding: 52px 58px; }
     }
 
     /* Cert card clickable */
@@ -1240,10 +1371,10 @@
   </style>
 
   <!-- Full CSS loaded async: no render blocking (bootstrap merged in) -->
-  <link rel="preload" href="assets/css/style.min.css?v=2.12.2" as="style"
+  <link rel="preload" href="assets/css/style.min.css?v=2.16.0" as="style"
     onload="this.onload=null;this.rel='stylesheet'">
   <noscript>
-    <link href="assets/css/style.min.css?v=2.12.2" rel="stylesheet">
+    <link href="assets/css/style.min.css?v=2.16.0" rel="stylesheet">
   </noscript>
 
 
@@ -1497,7 +1628,7 @@
   </script>
 
   <!-- Preload deferred JS to start downloading before parser reaches script tags -->
-  <link rel="preload" href="assets/js/main.min.js?v=2.12.2" as="script">
+  <link rel="preload" href="assets/js/main.min.js?v=2.16.0" as="script">
 
   <script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="233b92be-5a2d-492b-b093-9c3ed14c9063"
     type="text/javascript" async></script>
@@ -1835,6 +1966,7 @@
                   </div>
                   <div class="exp-roles">
                     <div class="exp-role">
+                      <span class="exp-role-spark" aria-hidden="true"></span>
                       <div class="exp-role-period profile-bio-small">December 2023 - March 2024 &middot; 4 mos</div>
                       <p class="fw-light profile-bio-small">Delivered 4 production internal apps with the 'Center of
                         Excellence &amp; Data Driven' department — a smart reservation system, document reference
@@ -1842,6 +1974,7 @@
                         management.</p>
                     </div>
                     <div class="exp-role">
+                      <span class="exp-role-spark" aria-hidden="true"></span>
                       <div class="exp-role-period profile-bio-small">April 2023 - July 2023 &middot; 4 mos</div>
                       <p class="fw-light profile-bio-small">Built 2 enterprise platforms used group-wide — a software
                         license procurement &amp; approval workflow and a company-wide IT asset tracking platform with
@@ -2442,7 +2575,7 @@
   </button>
 
   <!-- Main JS -->
-  <script defer src="assets/js/main.min.js?v=2.12.2"></script>
+  <script defer src="assets/js/main.min.js?v=2.16.0"></script>
   <!-- Service Worker: cache assets for repeat visits -->
   <script>if ('serviceWorker' in navigator) { var _sw = function () { navigator.serviceWorker.register('sw.js') }; 'requestIdleCallback' in window ? requestIdleCallback(_sw) : window.addEventListener('load', _sw) }</script>
 
