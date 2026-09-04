@@ -381,3 +381,37 @@ test('every section carries its themed wave and the waves actually animate', asy
   assert.ok(decorative, 'waves must be aria-hidden');
   await page.close();
 });
+
+test('the SCG timeline pulse rides the connector from the oldest entry to the newest', async () => {
+  const { page } = await ctx.openPage();
+  const card = '#experience [data-exp="scg"]';
+  // the reveal observer arms the animation; scroll the card into view first
+  await page.$eval(card, (el) => el.scrollIntoView());
+  await page.waitForFunction((sel) => document.querySelector(sel).classList.contains('card-visible'), card);
+
+  // one pulse per connector: the last entry has none below it
+  const sparks = await page.$$eval(`${card} .exp-role-spark`, (els) =>
+    els.map((el) => getComputedStyle(el).display));
+  assert.equal(sparks.length, 2, 'expected a pulse element on each timeline entry');
+  assert.deepEqual(sparks, ['block', 'none'], 'only the entry with a connector may show a pulse');
+
+  const orb = await page.$eval(`${card} .exp-role-spark`, (el) => {
+    const cs = getComputedStyle(el, '::after');
+    const track = el.getBoundingClientRect();
+    return { anim: cs.animationName, radius: cs.borderTopLeftRadius, trackH: track.height };
+  });
+  assert.notEqual(orb.anim, 'none', 'the timeline pulse is not animated');
+  assert.ok(parseFloat(orb.radius) >= 3, 'the pulse must be round');
+
+  // it travels upward: sample the orb's offset early and late in one cycle
+  const sampleTop = () => page.$eval(`${card} .exp-role-spark`, (el) =>
+    parseFloat(getComputedStyle(el, '::after').top));
+  const early = await sampleTop();
+  await page.waitForTimeout(900);
+  const later = await sampleTop();
+  assert.ok(later < early,
+    `pulse must move up the connector (sampled ${early}px then ${later}px)`);
+  assert.ok(early <= orb.trackH + 1 && later >= -4,
+    'pulse must stay on the connector between the two dots');
+  await page.close();
+});

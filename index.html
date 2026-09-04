@@ -724,6 +724,75 @@
       background: rgba(0, 0, 0, .08);
     }
 
+    /* A blue pulse rides the connector upward — oldest entry to newest —
+       so the timeline reads in the direction the career actually moved.
+       The track matches the connector exactly, so the orb's `top: 100% → 0`
+       travel spans dot to dot whatever the entries' heights are. */
+    .exp-role-spark {
+      position: absolute;
+      left: 4px;
+      top: 22px;
+      bottom: -2px;
+      width: 1.5px;
+      pointer-events: none;
+    }
+
+    /* the last entry has no connector below it, so nothing to ride */
+    .exp-role:last-child .exp-role-spark {
+      display: none;
+    }
+
+    .exp-role-spark::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 100%;
+      width: 7px;
+      height: 7px;
+      margin: -3.5px 0 0 -2.75px;
+      border-radius: 50%;
+      background: #1264CE;
+      box-shadow: 0 0 7px rgba(18, 100, 206, .45);
+      opacity: 0;
+    }
+
+    /* starts only once the card has revealed itself */
+    .data-box.card-visible .exp-role-spark::after {
+      animation: exp-role-spark 4s cubic-bezier(.45, .05, .3, 1) infinite;
+    }
+
+    @keyframes exp-role-spark {
+      0% {
+        top: 100%;
+        opacity: 0;
+        transform: scale(.4)
+      }
+
+      12% {
+        opacity: 1;
+        transform: scale(1)
+      }
+
+      60% {
+        top: 0;
+        opacity: 1;
+        transform: scale(1)
+      }
+
+      70%,
+      100% {
+        top: 0;
+        opacity: 0;
+        transform: scale(.4)
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .exp-role-spark {
+        display: none
+      }
+    }
+
     .exp-role-period {
       font-weight: 600;
       color: #1d1d1f;
@@ -1302,10 +1371,10 @@
   </style>
 
   <!-- Full CSS loaded async: no render blocking (bootstrap merged in) -->
-  <link rel="preload" href="assets/css/style.min.css?v=2.15.1" as="style"
+  <link rel="preload" href="assets/css/style.min.css?v=2.16.0" as="style"
     onload="this.onload=null;this.rel='stylesheet'">
   <noscript>
-    <link href="assets/css/style.min.css?v=2.15.1" rel="stylesheet">
+    <link href="assets/css/style.min.css?v=2.16.0" rel="stylesheet">
   </noscript>
 
 
@@ -1559,7 +1628,7 @@
   </script>
 
   <!-- Preload deferred JS to start downloading before parser reaches script tags -->
-  <link rel="preload" href="assets/js/main.min.js?v=2.15.1" as="script">
+  <link rel="preload" href="assets/js/main.min.js?v=2.16.0" as="script">
 
   <script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="233b92be-5a2d-492b-b093-9c3ed14c9063"
     type="text/javascript" async></script>
@@ -1897,6 +1966,7 @@
                   </div>
                   <div class="exp-roles">
                     <div class="exp-role">
+                      <span class="exp-role-spark" aria-hidden="true"></span>
                       <div class="exp-role-period profile-bio-small">December 2023 - March 2024 &middot; 4 mos</div>
                       <p class="fw-light profile-bio-small">Delivered 4 production internal apps with the 'Center of
                         Excellence &amp; Data Driven' department — a smart reservation system, document reference
@@ -1904,6 +1974,7 @@
                         management.</p>
                     </div>
                     <div class="exp-role">
+                      <span class="exp-role-spark" aria-hidden="true"></span>
                       <div class="exp-role-period profile-bio-small">April 2023 - July 2023 &middot; 4 mos</div>
                       <p class="fw-light profile-bio-small">Built 2 enterprise platforms used group-wide — a software
                         license procurement &amp; approval workflow and a company-wide IT asset tracking platform with
@@ -2504,7 +2575,7 @@
   </button>
 
   <!-- Main JS -->
-  <script defer src="assets/js/main.min.js?v=2.15.1"></script>
+  <script defer src="assets/js/main.min.js?v=2.16.0"></script>
   <!-- Service Worker: cache assets for repeat visits -->
   <script>if ('serviceWorker' in navigator) { var _sw = function () { navigator.serviceWorker.register('sw.js') }; 'requestIdleCallback' in window ? requestIdleCallback(_sw) : window.addEventListener('load', _sw) }</script>
 
