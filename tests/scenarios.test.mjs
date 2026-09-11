@@ -436,7 +436,14 @@ test('the chapter bar names the section being read and materializes as glass on 
   const atTop = await page.$eval('#chapter-nav', (el) => getComputedStyle(el).backgroundColor);
   assert.match(atTop, /rgba\(0, 0, 0, 0\)|transparent/, 'the bar must not paint over the hero');
   await page.evaluate(() => window.scrollTo(0, 600));
-  await page.waitForFunction(() => document.getElementById('chapter-nav').classList.contains('is-solid'));
+  // the class lands first and the material fades in over 0.4s — wait for the
+  // fill itself, or this reads a mid-transition frame that is still clear
+  await page.waitForFunction(() => {
+    const nav = document.getElementById('chapter-nav');
+    if (!nav.classList.contains('is-solid')) return false;
+    const parts = (getComputedStyle(nav).backgroundColor.match(/[\d.]+/g) || []).map(Number);
+    return parts.length === 4 && parts[0] > 250 && parts[3] > 0.5;
+  });
   const scrolled = await page.$eval('#chapter-nav', (el) => {
     const cs = getComputedStyle(el);
     return { bg: cs.backgroundColor, blur: cs.backdropFilter || cs.webkitBackdropFilter };
