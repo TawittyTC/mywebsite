@@ -105,7 +105,7 @@
 
     body {
       margin: 0;
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Noto Sans Thai", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Inter', 'Noto Sans Thai', 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 1rem;
       font-weight: 400;
       line-height: 1.5;
@@ -185,7 +185,7 @@
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Noto Sans Thai', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Inter', 'Noto Sans Thai', 'Helvetica Neue', Helvetica, Arial, sans-serif;
       line-height: 1.6;
       color: #1d1d1f;
       font-size: 17px;
@@ -731,8 +731,12 @@
     .exp-role-spark {
       position: absolute;
       left: 4px;
-      top: 22px;
-      bottom: -2px;
+      /* the track is dot-centre to dot-centre, not the drawn line: each dot
+         sits at top 7px and is 9px across, so its centre is 11.5px in, and
+         the next entry's dot is the same 11.5px past this one's bottom edge.
+         That makes the orb's 100% → 0 travel land exactly on both nodes. */
+      top: 11.5px;
+      bottom: -11.5px;
       width: 1.5px;
       pointer-events: none;
     }
@@ -751,8 +755,9 @@
       height: 7px;
       margin: -3.5px 0 0 -2.75px;
       border-radius: 50%;
-      background: #1264CE;
-      box-shadow: 0 0 7px rgba(18, 100, 206, .45);
+      /* leaves the older node wearing its colour and arrives as the new one */
+      background: #c3cad3;
+      box-shadow: none;
       opacity: 0;
     }
 
@@ -765,25 +770,35 @@
       0% {
         top: 100%;
         opacity: 0;
-        transform: scale(.4)
+        transform: scale(.4);
+        background: #c3cad3;
+        box-shadow: 0 0 0 rgba(18, 100, 206, 0)
       }
 
-      12% {
+      10% {
         opacity: 1;
-        transform: scale(1)
+        transform: scale(1);
+        background: #c3cad3;
+        box-shadow: 0 0 0 rgba(18, 100, 206, 0)
       }
 
-      60% {
+      /* colour interpolates across the whole climb: grey at the old node,
+         fully blue by the time it reaches the current one */
+      62% {
         top: 0;
         opacity: 1;
-        transform: scale(1)
+        transform: scale(1);
+        background: #1264CE;
+        box-shadow: 0 0 7px rgba(18, 100, 206, .45)
       }
 
-      70%,
+      72%,
       100% {
         top: 0;
         opacity: 0;
-        transform: scale(.4)
+        transform: scale(.4);
+        background: #1264CE;
+        box-shadow: 0 0 7px rgba(18, 100, 206, .45)
       }
     }
 
@@ -1371,10 +1386,10 @@
   </style>
 
   <!-- Full CSS loaded async: no render blocking (bootstrap merged in) -->
-  <link rel="preload" href="assets/css/style.min.css?v=2.17.0" as="style"
+  <link rel="preload" href="assets/css/style.min.css?v=2.18.0" as="style"
     onload="this.onload=null;this.rel='stylesheet'">
   <noscript>
-    <link href="assets/css/style.min.css?v=2.17.0" rel="stylesheet">
+    <link href="assets/css/style.min.css?v=2.18.0" rel="stylesheet">
   </noscript>
 
 
@@ -1628,7 +1643,7 @@
   </script>
 
   <!-- Preload deferred JS to start downloading before parser reaches script tags -->
-  <link rel="preload" href="assets/js/main.min.js?v=2.17.0" as="script">
+  <link rel="preload" href="assets/js/main.min.js?v=2.18.0" as="script">
 
   <script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="233b92be-5a2d-492b-b093-9c3ed14c9063"
     type="text/javascript" async></script>
@@ -1647,20 +1662,6 @@
 
 <body>
   <a class="skip-link" href="#main-content">Skip to content</a>
-
-  <nav class="chapter-nav" id="chapter-nav" aria-label="Page sections">
-    <div class="chapter-nav-inner">
-      <a class="chapter-brand" href="#hero">Tanapol Chamnanhan</a>
-      <ul class="chapter-links">
-        <li><a href="#resume">Resume</a></li>
-        <li><a href="#experience">Experience</a></li>
-        <li><a href="#skill">Skills</a></li>
-        <li><a href="#portfolio">Projects</a></li>
-        <li><a href="#certificates">Certificates</a></li>
-      </ul>
-      <a class="btn-pill btn-pill--sm chapter-cta" href="#contact">Get in touch</a>
-    </div>
-  </nav>
   <div class="loader" aria-hidden="true"></div>
 
   <main id="main-content">
@@ -1695,8 +1696,8 @@
       <div class="container" data-aos="fade-up">
 
         <div class="section-title">
-          <div class="section-eyebrow">Resume</div>
-          <h2>Background and education.</h2>
+          <h2>Resume</h2>
+          <p>Background and education.</p>
           <div class="section-wave section-wave-fade" aria-hidden="true">
             <svg viewBox="0 0 220 24" fill="none">
               <defs>
@@ -1879,8 +1880,8 @@
       <div class="container" data-aos="fade-up">
 
         <div class="section-title">
-          <div class="section-eyebrow">Experience</div>
-          <h2>Where I've built and grown.</h2>
+          <h2>Experience</h2>
+          <p>Where I've built and grown.</p>
           <div class="section-wave" aria-hidden="true">
             <svg viewBox="0 0 220 24" fill="none">
               <defs>
@@ -2096,8 +2097,8 @@
     <section id="skill">
       <div class="container p-4">
         <div class="section-title">
-          <div class="section-eyebrow">Skills</div>
-          <h2>The tools I build with.</h2>
+          <h2>Skills</h2>
+          <p>The technologies and tools I bring to every project.</p>
           <div class="section-wave section-wave-eq" aria-hidden="true">
             <svg viewBox="0 0 220 24" fill="none">
               <rect class="wave-bar" x="76" y="4" width="5" height="16" rx="2.5" fill="currentColor" />
@@ -2275,8 +2276,8 @@
     <section id="portfolio" class="portfolio section-bg mb-5" aria-labelledby="portfolio-title">
       <div class="container mb-5" data-aos="fade-up">
         <div class="section-title" id="portfolio-title">
-          <div class="section-eyebrow">Projects</div>
-          <h2>Selected work I'm proud of.</h2>
+          <h2>My Projects</h2>
+          <p>Selected work I'm proud of.</p>
           <div class="section-wave section-wave-fade" aria-hidden="true">
             <svg viewBox="0 0 220 24" fill="none">
               <defs>
@@ -2395,8 +2396,8 @@
     <section id="certificates" class="certificates bg-light">
       <div class="container">
         <div class="section-title">
-          <div class="section-eyebrow">Certificates</div>
-          <h2>Credentials that speak for themselves.</h2>
+          <h2>Certificates</h2>
+          <p>Credentials that speak for themselves.</p>
           <div class="section-wave section-wave-fade" aria-hidden="true">
             <svg viewBox="0 0 220 24" fill="none">
               <defs>
@@ -2590,7 +2591,7 @@
   </button>
 
   <!-- Main JS -->
-  <script defer src="assets/js/main.min.js?v=2.17.0"></script>
+  <script defer src="assets/js/main.min.js?v=2.18.0"></script>
   <!-- Service Worker: cache assets for repeat visits -->
   <script>if ('serviceWorker' in navigator) { var _sw = function () { navigator.serviceWorker.register('sw.js') }; 'requestIdleCallback' in window ? requestIdleCallback(_sw) : window.addEventListener('load', _sw) }</script>
 

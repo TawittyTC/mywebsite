@@ -820,65 +820,6 @@ document.addEventListener('DOMContentLoaded', function () {
     window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
   });
 })();
-
-
-/**
- * Chapter nav — the thin bar a product page keeps at the top.
- * Three jobs: stay invisible over the hero and materialize as glass once
- * the page moves, mark the chapter currently being read, and glide to a
- * chapter when its link is used (smooth scroll is opted into here rather
- * than globally, which would slow every programmatic scroll on the page).
- */
-(function () {
-  var nav = document.getElementById('chapter-nav');
-  if (!nav) return;
-  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var links = Array.prototype.slice.call(nav.querySelectorAll('.chapter-links a'));
-
-  // glass appears as soon as content slides under the bar
-  var ticking = false;
-  function paint() {
-    ticking = false;
-    nav.classList.toggle('is-solid', (window.scrollY || 0) > 40);
-  }
-  function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(paint); } }
-  window.addEventListener('scroll', onScroll, { passive: true });
-  paint();
-
-  // smooth glide, and the hash still lands in the address bar for sharing
-  links.concat(Array.prototype.slice.call(nav.querySelectorAll('.chapter-brand, .chapter-cta')))
-    .forEach(function (link) {
-      var href = link.getAttribute('href') || '';
-      if (href.charAt(0) !== '#' || href === '#') return;
-      link.addEventListener('click', function (e) {
-        var target = document.querySelector(href);
-        if (!target) return;
-        e.preventDefault();
-        target.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
-        if (history.replaceState) history.replaceState(null, '', href);
-      });
-    });
-
-  // mark the chapter being read: the section closest to the top of the
-  // viewport that has actually been reached
-  var sections = links.map(function (l) { return document.querySelector(l.getAttribute('href')); });
-  if (!('IntersectionObserver' in window)) return;
-  var seen = {};
-  var spy = new IntersectionObserver(function (entries) {
-    entries.forEach(function (entry) { seen[entry.target.id] = entry.isIntersecting; });
-    // walk from the bottom: a long section above can still clip the band,
-    // and the chapter you have most recently reached is the one you read
-    var currentIndex = -1;
-    for (var i = sections.length - 1; i >= 0; i--) {
-      if (sections[i] && seen[sections[i].id]) { currentIndex = i; break; }
-    }
-    links.forEach(function (l, i) { l.classList.toggle('is-current', i === currentIndex); });
-  }, { rootMargin: '-60px 0px -55% 0px' });
-  sections.forEach(function (sec) { if (sec) spy.observe(sec); });
-})();
-
-
-
 /**
  * Hero constellation — his multi-agent systems as a living graph.
  * Nodes drift and connect; six labeled nodes (CRM/POS/ASR/TTS/LLM/IVR);
