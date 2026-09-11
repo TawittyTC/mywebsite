@@ -415,3 +415,73 @@ test('the SCG timeline pulse rides the connector from the oldest entry to the ne
     'pulse must stay on the connector between the two dots');
   await page.close();
 });
+
+test('the chapter bar names the section being read and materializes as glass on scroll', async () => {
+  const { page } = await ctx.openPage();
+
+  // it is real navigation landmark, not a decorated div
+  const nav = await page.$eval('#chapter-nav', (el) => ({
+    tag: el.tagName, label: el.getAttribute('aria-label'),
+  }));
+  assert.equal(nav.tag, 'NAV', 'the chapter bar must be a nav landmark');
+  assert.ok(nav.label, 'the chapter bar needs an accessible name');
+
+  // every chapter link points at a section that exists, in page order
+  const chapters = await page.$$eval('.chapter-links a', (els) =>
+    els.map((el) => ({ href: el.getAttribute('href'), exists: !!document.querySelector(el.getAttribute('href')) })));
+  assert.ok(chapters.length >= 4, 'expected the page chapters in the bar');
+  assert.ok(chapters.every((c) => c.exists), 'a chapter link points at a missing section');
+
+  // invisible chrome over the hero, glass once content slides under it
+  const atTop = await page.$eval('#chapter-nav', (el) => getComputedStyle(el).backgroundColor);
+  assert.match(atTop, /rgba\(0, 0, 0, 0\)|transparent/, 'the bar must not paint over the hero');
+  await page.evaluate(() => window.scrollTo(0, 600));
+  await page.waitForFunction(() => document.getElementById('chapter-nav').classList.contains('is-solid'));
+  const scrolled = await page.$eval('#chapter-nav', (el) => {
+    const cs = getComputedStyle(el);
+    return { bg: cs.backgroundColor, blur: cs.backdropFilter || cs.webkitBackdropFilter };
+  });
+  assert.match(scrolled.bg, /rgba\(255, 255, 255/, 'the scrolled bar must be a translucent white material');
+  assert.match(scrolled.blur, /blur/, 'the material needs a backdrop blur, not a flat fill');
+
+  // the marked chapter follows the reader
+  for (const id of ['resume', 'experience', 'skill', 'portfolio', 'certificates']) {
+    await page.evaluate((s) => document.querySelector('#' + s).scrollIntoView(), id);
+    await page.waitForTimeout(450);
+    const current = await page.$$eval('.chapter-links a.is-current', (els) =>
+      els.map((el) => el.getAttribute('href')));
+    assert.deepEqual(current, ['#' + id], `at #${id} the bar should mark that chapter`);
+  }
+
+  // the action reads as an action: filled capsule, legible, big enough to hit
+  const pill = await page.$eval('.chapter-cta', (el) => {
+    const cs = getComputedStyle(el);
+    const r = el.getBoundingClientRect();
+    return { bg: cs.backgroundColor, color: cs.color, radius: parseFloat(cs.borderTopLeftRadius), h: r.height };
+  });
+  assert.equal(pill.color, 'rgb(255, 255, 255)', 'pill label must be white on the blue fill');
+  assert.equal(pill.bg, 'rgb(18, 100, 206)', 'pill must use the accessible link blue');
+  assert.ok(pill.radius >= pill.h / 2, 'pill must be a full capsule');
+  assert.ok(pill.h >= 24, `pill is ${pill.h}px tall, under the 24px target minimum`);
+  await page.close();
+});
+
+test('every chapter opens with a label over a statement headline', async () => {
+  const { page } = await ctx.openPage();
+  const heads = await page.$$eval('.section-title', (els) =>
+    els.map((el) => ({
+      eyebrow: el.querySelector('.section-eyebrow')?.textContent.trim() || null,
+      headline: el.querySelector('h2')?.textContent.trim() || null,
+      size: parseFloat(getComputedStyle(el.querySelector('h2')).fontSize),
+      tracking: parseFloat(getComputedStyle(el.querySelector('h2')).letterSpacing),
+    })));
+  assert.equal(heads.length, 5, 'expected five chapter headers');
+  for (const h of heads) {
+    assert.ok(h.eyebrow, 'each chapter needs its label');
+    assert.ok(h.headline && h.headline.endsWith('.'), `headline should be a sentence: ${h.headline}`);
+    assert.ok(h.size >= 40, `display headline is only ${h.size}px at desktop width`);
+    // large type wants negative tracking — it reads loose otherwise
+    assert.ok(h.tracking < 0, `display headline tracking should tighten, got ${h.tracking}px`);
+  }
+  await page.close();
+});
