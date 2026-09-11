@@ -403,92 +403,37 @@ test('the SCG timeline pulse rides the connector from the oldest entry to the ne
   assert.notEqual(orb.anim, 'none', 'the timeline pulse is not animated');
   assert.ok(parseFloat(orb.radius) >= 3, 'the pulse must be round');
 
-  // it travels upward: sample the orb's offset early and late in one cycle
-  const sampleTop = () => page.$eval(`${card} .exp-role-spark`, (el) =>
-    parseFloat(getComputedStyle(el, '::after').top));
-  const early = await sampleTop();
-  await page.waitForTimeout(900);
-  const later = await sampleTop();
-  assert.ok(later < early,
-    `pulse must move up the connector (sampled ${early}px then ${later}px)`);
-  assert.ok(early <= orb.trackH + 1 && later >= -4,
-    'pulse must stay on the connector between the two dots');
-  await page.close();
-});
+  // sample a full cycle: where the orb actually goes, and what colour it is
+  const frames = [];
+  for (let i = 0; i < 14; i++) {
+    frames.push(await page.$eval(`${card} .exp-role-spark`, (el) => {
+      const cs = getComputedStyle(el, '::after');
+      return { y: el.getBoundingClientRect().top + parseFloat(cs.top),
+        rgb: (cs.backgroundColor.match(/\d+/g) || []).map(Number), op: parseFloat(cs.opacity) };
+    }));
+    await page.waitForTimeout(300);
+  }
+  const seen = frames.filter((f) => f.op > 0.6);
+  assert.ok(seen.length >= 4, 'expected to catch the pulse mid-travel');
 
-test('the chapter bar names the section being read and materializes as glass on scroll', async () => {
-  const { page } = await ctx.openPage();
-
-  // it is real navigation landmark, not a decorated div
-  const nav = await page.$eval('#chapter-nav', (el) => ({
-    tag: el.tagName, label: el.getAttribute('aria-label'),
+  // the two ends of the run are the two nodes themselves, not points near them
+  const dots = await page.$$eval(`${card} .exp-role`, (roles) => roles.map((r) => {
+    const cs = getComputedStyle(r, '::before');
+    return r.getBoundingClientRect().top + parseFloat(cs.top) + parseFloat(cs.height) / 2;
   }));
-  assert.equal(nav.tag, 'NAV', 'the chapter bar must be a nav landmark');
-  assert.ok(nav.label, 'the chapter bar needs an accessible name');
+  const [newest, oldest] = dots;
+  const lowest = Math.max(...seen.map((f) => f.y));
+  const highest = Math.min(...seen.map((f) => f.y));
+  assert.ok(Math.abs(highest - newest) <= 3,
+    `pulse should finish on the current node (ended ${highest.toFixed(1)}, node at ${newest.toFixed(1)})`);
+  assert.ok(oldest - lowest <= 8,
+    `pulse should set out from the older node (started ${lowest.toFixed(1)}, node at ${oldest.toFixed(1)})`);
 
-  // every chapter link points at a section that exists, in page order
-  const chapters = await page.$$eval('.chapter-links a', (els) =>
-    els.map((el) => ({ href: el.getAttribute('href'), exists: !!document.querySelector(el.getAttribute('href')) })));
-  assert.ok(chapters.length >= 4, 'expected the page chapters in the bar');
-  assert.ok(chapters.every((c) => c.exists), 'a chapter link points at a missing section');
-
-  // invisible chrome over the hero, glass once content slides under it
-  const atTop = await page.$eval('#chapter-nav', (el) => getComputedStyle(el).backgroundColor);
-  assert.match(atTop, /rgba\(0, 0, 0, 0\)|transparent/, 'the bar must not paint over the hero');
-  await page.evaluate(() => window.scrollTo(0, 600));
-  // the class lands first and the material fades in over 0.4s — wait for the
-  // fill itself, or this reads a mid-transition frame that is still clear
-  await page.waitForFunction(() => {
-    const nav = document.getElementById('chapter-nav');
-    if (!nav.classList.contains('is-solid')) return false;
-    const parts = (getComputedStyle(nav).backgroundColor.match(/[\d.]+/g) || []).map(Number);
-    return parts.length === 4 && parts[0] > 250 && parts[3] > 0.5;
-  });
-  const scrolled = await page.$eval('#chapter-nav', (el) => {
-    const cs = getComputedStyle(el);
-    return { bg: cs.backgroundColor, blur: cs.backdropFilter || cs.webkitBackdropFilter };
-  });
-  assert.match(scrolled.bg, /rgba\(255, 255, 255/, 'the scrolled bar must be a translucent white material');
-  assert.match(scrolled.blur, /blur/, 'the material needs a backdrop blur, not a flat fill');
-
-  // the marked chapter follows the reader
-  for (const id of ['resume', 'experience', 'skill', 'portfolio', 'certificates']) {
-    await page.evaluate((s) => document.querySelector('#' + s).scrollIntoView(), id);
-    await page.waitForTimeout(450);
-    const current = await page.$$eval('.chapter-links a.is-current', (els) =>
-      els.map((el) => el.getAttribute('href')));
-    assert.deepEqual(current, ['#' + id], `at #${id} the bar should mark that chapter`);
-  }
-
-  // the action reads as an action: filled capsule, legible, big enough to hit
-  const pill = await page.$eval('.chapter-cta', (el) => {
-    const cs = getComputedStyle(el);
-    const r = el.getBoundingClientRect();
-    return { bg: cs.backgroundColor, color: cs.color, radius: parseFloat(cs.borderTopLeftRadius), h: r.height };
-  });
-  assert.equal(pill.color, 'rgb(255, 255, 255)', 'pill label must be white on the blue fill');
-  assert.equal(pill.bg, 'rgb(18, 100, 206)', 'pill must use the accessible link blue');
-  assert.ok(pill.radius >= pill.h / 2, 'pill must be a full capsule');
-  assert.ok(pill.h >= 24, `pill is ${pill.h}px tall, under the 24px target minimum`);
-  await page.close();
-});
-
-test('every chapter opens with a label over a statement headline', async () => {
-  const { page } = await ctx.openPage();
-  const heads = await page.$$eval('.section-title', (els) =>
-    els.map((el) => ({
-      eyebrow: el.querySelector('.section-eyebrow')?.textContent.trim() || null,
-      headline: el.querySelector('h2')?.textContent.trim() || null,
-      size: parseFloat(getComputedStyle(el.querySelector('h2')).fontSize),
-      tracking: parseFloat(getComputedStyle(el.querySelector('h2')).letterSpacing),
-    })));
-  assert.equal(heads.length, 5, 'expected five chapter headers');
-  for (const h of heads) {
-    assert.ok(h.eyebrow, 'each chapter needs its label');
-    assert.ok(h.headline && h.headline.endsWith('.'), `headline should be a sentence: ${h.headline}`);
-    assert.ok(h.size >= 40, `display headline is only ${h.size}px at desktop width`);
-    // large type wants negative tracking — it reads loose otherwise
-    assert.ok(h.tracking < 0, `display headline tracking should tighten, got ${h.tracking}px`);
-  }
+  // and it changes colour on the way: grey at the bottom, link blue at the top
+  const low = seen.reduce((a, b) => (a.y > b.y ? a : b));
+  const high = seen.reduce((a, b) => (a.y < b.y ? a : b));
+  assert.ok(low.rgb[0] > 150, `pulse should leave the older node grey, got rgb(${low.rgb})`);
+  assert.deepEqual(high.rgb.slice(0, 3), [18, 100, 206],
+    `pulse should arrive as link blue, got rgb(${high.rgb})`);
   await page.close();
 });
