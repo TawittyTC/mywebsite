@@ -717,7 +717,9 @@
     .exp-role:not(:last-child)::after {
       content: '';
       position: absolute;
-      left: 4px;
+      /* dots are 9px at left:0, so their axis is x = 4.5 — a 1.5px line
+         centres on it at 3.75, not at 4 */
+      left: 3.75px;
       top: 22px;
       bottom: -2px;
       width: 1.5px;
@@ -730,7 +732,7 @@
        travel spans dot to dot whatever the entries' heights are. */
     .exp-role-spark {
       position: absolute;
-      left: 4px;
+      left: 3.75px;
       /* the track is dot-centre to dot-centre, not the drawn line: each dot
          sits at top 7px and is 9px across, so its centre is 11.5px in, and
          the next entry's dot is the same 11.5px past this one's bottom edge.
@@ -753,7 +755,7 @@
       top: 100%;
       width: 7px;
       height: 7px;
-      margin: -3.5px 0 0 -2.75px;
+      margin: -3.5px 0 0 -3.5px;
       border-radius: 50%;
       /* leaves the older node wearing its colour and arrives as the new one */
       background: #c3cad3;
@@ -1386,10 +1388,10 @@
   </style>
 
   <!-- Full CSS loaded async: no render blocking (bootstrap merged in) -->
-  <link rel="preload" href="assets/css/style.min.css?v=2.18.0" as="style"
+  <link rel="preload" href="assets/css/style.min.css?v=2.18.1" as="style"
     onload="this.onload=null;this.rel='stylesheet'">
   <noscript>
-    <link href="assets/css/style.min.css?v=2.18.0" rel="stylesheet">
+    <link href="assets/css/style.min.css?v=2.18.1" rel="stylesheet">
   </noscript>
 
 
@@ -1643,7 +1645,7 @@
   </script>
 
   <!-- Preload deferred JS to start downloading before parser reaches script tags -->
-  <link rel="preload" href="assets/js/main.min.js?v=2.18.0" as="script">
+  <link rel="preload" href="assets/js/main.min.js?v=2.18.1" as="script">
 
   <script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="233b92be-5a2d-492b-b093-9c3ed14c9063"
     type="text/javascript" async></script>
@@ -2591,7 +2593,7 @@
   </button>
 
   <!-- Main JS -->
-  <script defer src="assets/js/main.min.js?v=2.18.0"></script>
+  <script defer src="assets/js/main.min.js?v=2.18.1"></script>
   <!-- Service Worker: cache assets for repeat visits -->
   <script>if ('serviceWorker' in navigator) { var _sw = function () { navigator.serviceWorker.register('sw.js') }; 'requestIdleCallback' in window ? requestIdleCallback(_sw) : window.addEventListener('load', _sw) }</script>
 
