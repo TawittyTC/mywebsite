@@ -403,6 +403,28 @@ test('the SCG timeline pulse rides the connector from the oldest entry to the ne
   assert.notEqual(orb.anim, 'none', 'the timeline pulse is not animated');
   assert.ok(parseFloat(orb.radius) >= 3, 'the pulse must be round');
 
+  // node, connector and pulse must sit on one vertical axis — a half-pixel
+  // of drift here is plainly visible against a 1.5px line
+  const axis = await page.$eval(`${card} .exp-role`, (role) => {
+    const mid = (pseudo) => {
+      const cs = getComputedStyle(role, pseudo);
+      return parseFloat(cs.left) + parseFloat(cs.width) / 2;
+    };
+    const track = role.querySelector('.exp-role-spark');
+    const ts = getComputedStyle(track);
+    const os = getComputedStyle(track, '::after');
+    return {
+      dot: mid('::before'),
+      line: mid('::after'),
+      orb: parseFloat(ts.left) + parseFloat(ts.width) / 2
+        + parseFloat(os.marginLeft) + parseFloat(os.width) / 2,
+    };
+  });
+  assert.ok(Math.abs(axis.line - axis.dot) < 0.5,
+    `connector is off the node axis by ${(axis.line - axis.dot).toFixed(2)}px`);
+  assert.ok(Math.abs(axis.orb - axis.dot) < 0.5,
+    `pulse is off the node axis by ${(axis.orb - axis.dot).toFixed(2)}px`);
+
   // sample a full cycle: where the orb actually goes, and what colour it is
   const frames = [];
   for (let i = 0; i < 14; i++) {
