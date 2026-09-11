@@ -131,14 +131,30 @@ section {
   padding-bottom: 96px;
 }
 
+/* The chapter label: small, spaced, quiet — it names the section so the
+   headline underneath is free to be a sentence instead of a noun. */
+.section-eyebrow {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  margin-bottom: 16px;
+}
+
+/* Display headline. Tracking is size-specific (it tightens as the type
+   grows), leading stays close to the cap height, and the line breaks are
+   balanced rather than ragged. */
 .section-title h2 {
-  font-size: 56px;
+  font-size: clamp(34px, 5.2vw, 76px);
   font-weight: 700;
-  letter-spacing: -0.01em;
-  line-height: 1.1;
+  letter-spacing: -0.018em;
+  line-height: 1.06;
   color: var(--color-text);
-  margin-bottom: 14px;
+  margin: 0 auto 14px;
   padding-bottom: 0;
+  max-width: 20ch;
+  text-wrap: balance;
 }
 
 .section-title p {
@@ -1501,11 +1517,12 @@ h1, h2, h3, h4, h5, h6 { color: var(--color-text); }
 /* Desktop >1068px: 56px / 700 / -0.01em / 1.06 */
 /* Tablet 735–1068px: 44px */
 @media (max-width: 1068px) {
-  .section-title h2 { font-size: 44px; letter-spacing: -0.004em; line-height: 1.12; }
+  .section-title h2 { letter-spacing: -0.012em; line-height: 1.08; }
 }
 /* Mobile <735px: 34px */
 @media (max-width: 735px) {
-  .section-title h2 { font-size: 34px; letter-spacing: 0; line-height: 1.16; }
+  .section-title h2 { letter-spacing: -0.008em; line-height: 1.12; max-width: 16ch; }
+  .section-eyebrow { font-size: 11px; margin-bottom: 12px; }
   .section-title p { font-size: 17px; }
   section { padding: 128px 0; }
   .section-title { padding-bottom: 56px; }
@@ -1789,7 +1806,8 @@ select:focus-visible {
   .container { max-width: 1490px; }
   section { padding: 248px 0; }
   .section-title { padding-bottom: 108px; }
-  .section-title h2 { font-size: 63px; }
+  .section-title h2 { font-size: 86px; }
+  .section-eyebrow { font-size: 13.5px; }
   .section-title p { font-size: 21px; }
   .resume .resume-title { font-size: 36px; }
   .data-box { padding: 54px; margin: 63px auto; }
@@ -1821,7 +1839,8 @@ select:focus-visible {
   .container { max-width: 1910px; }
   section { padding: 319px 0; }
   .section-title { padding-bottom: 139px; }
-  .section-title h2 { font-size: 81px; }
+  .section-title h2 { font-size: 110px; }
+  .section-eyebrow { font-size: 17px; }
   .section-title p { font-size: 28px; }
   .resume .resume-title { font-size: 46px; }
   .data-box { padding: 70px; margin: 81px auto; }
@@ -1839,4 +1858,133 @@ select:focus-visible {
   #hero .hero-eyebrow { font-size: 19px; }
   #hero h1.hero-name { font-size: clamp(48px, 6.4vw, 142px); }
   #hero .hero-role { font-size: clamp(20px, 2vw, 38px); }
+}
+
+/*--------------------------------------------------------------
+# Chapter nav — the thin translucent bar Apple puts on product pages
+--------------------------------------------------------------*/
+/* Over the hero it is invisible chrome; once the page scrolls it
+   materializes as glass (blur + saturation) with content passing
+   underneath, rather than an opaque strip that eats a band of screen. */
+.chapter-nav {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 900;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0);
+  border-bottom: 1px solid transparent;
+  transition: background 0.4s var(--ease-swift), backdrop-filter 0.4s var(--ease-swift),
+    border-color 0.4s var(--ease-swift);
+}
+
+.chapter-nav.is-solid {
+  background: rgba(255, 255, 255, 0.72);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
+  border-bottom-color: rgba(0, 0, 0, 0.07);
+}
+
+.chapter-nav-inner {
+  width: 100%;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 max(20px, env(safe-area-inset-left)) 0 max(20px, env(safe-area-inset-right));
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.chapter-brand {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.012em;
+  color: var(--color-text);
+  white-space: nowrap;
+}
+
+.chapter-brand:hover { color: var(--color-text); }
+
+.chapter-links {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+  margin-left: auto;
+  list-style: none;
+  padding: 0;
+}
+
+.chapter-links a {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--color-text-secondary);
+  letter-spacing: -0.004em;
+  padding: 6px 0;
+  transition: color 0.2s ease;
+}
+
+.chapter-links a:hover { color: var(--color-text); }
+
+/* the chapter you are actually reading */
+.chapter-links a.is-current {
+  color: var(--color-text);
+  font-weight: 500;
+}
+
+.chapter-cta { margin-left: 4px; }
+
+/*--------------------------------------------------------------
+# Pill button — filled capsule, the one shape Apple uses for actions
+--------------------------------------------------------------*/
+.btn-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 24px;
+  border: 0;
+  border-radius: var(--r-capsule);
+  background: var(--color-link);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  /* feedback lands on the press, not the release */
+  transition: background 0.2s ease, transform 0.12s ease-out;
+}
+
+.btn-pill:hover { background: var(--color-link-hover); color: #fff; }
+.btn-pill:active { transform: scale(0.97); }
+
+/* the nav's copy of it sits in a 52px bar, so it runs one size down */
+.btn-pill--sm {
+  min-height: 32px;
+  padding: 0 16px;
+  font-size: 13px;
+}
+
+/* anchor jumps land below the fixed bar instead of under it */
+section[id] { scroll-margin-top: 72px; }
+
+@media (max-width: 900px) {
+  /* narrow bars keep the identity and the action; chapters stay reachable
+     by scrolling, which is what the page is for */
+  .chapter-links { display: none; }
+  .chapter-cta { margin-left: auto; }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .chapter-nav.is-solid {
+    background: #fff;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chapter-nav { transition: none; }
+  .btn-pill { transition: background 0.2s ease; }
+  .btn-pill:active { transform: none; }
 }
