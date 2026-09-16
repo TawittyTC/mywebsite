@@ -1380,8 +1380,8 @@ button {
   height: 44px;
   border-radius: 50%;
   background: rgba(24, 119, 242, .08);
-  /* solid glyphs in ink, not hairline outlines */
-  color: var(--color-text);
+  /* solid glyphs, carried in the theme accent rather than hairline outlines */
+  color: var(--color-link);
   display: flex;
   align-items: center;
   justify-content: center;
