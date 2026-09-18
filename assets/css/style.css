@@ -37,7 +37,7 @@
 --------------------------------------------------------------*/
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Inter', 'Noto Sans Thai', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  font-size: 17px;
+  font-size: 1rem;
   font-weight: 400;
   color: var(--color-text);
   letter-spacing: -.022em;
@@ -132,7 +132,7 @@ section {
 }
 
 .section-title h2 {
-  font-size: 56px;
+  font-size: 3.2941rem;
   font-weight: 700;
   letter-spacing: -0.01em;
   line-height: 1.1;
@@ -142,7 +142,7 @@ section {
 }
 
 .section-title p {
-  font-size: 19px;
+  font-size: 1.1176rem;
   color: var(--color-text-secondary);
   line-height: 1.6;
   margin-bottom: 0;
@@ -152,7 +152,7 @@ section {
 # Resume
 --------------------------------------------------------------*/
 .resume .resume-title {
-  font-size: 32px;
+  font-size: 1.8824rem;
   font-weight: 700;
   margin-top: 20px;
   margin-bottom: 8px;
@@ -165,7 +165,7 @@ section {
 #footer {
   background: var(--color-fill);
   color: var(--color-text-secondary);
-  font-size: 14px;
+  font-size: 0.8235rem;
   padding-top: 120px;
   padding-bottom: max(120px, calc(100px + env(safe-area-inset-bottom)));
 }
@@ -256,7 +256,7 @@ section {
 
 
 .fw-light {
-  font-size: 16px;
+  font-size: 0.9412rem;
 }
 
 ul.fw-light li { margin-bottom: 10px; line-height: 1.7; }
@@ -264,7 +264,9 @@ ul.fw-light li:last-child { margin-bottom: 0; }
 
 html {
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Inter', 'Noto Sans Thai', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  font-size: 17px;
+  /* 17px when the browser default is 16px — and it grows when the reader
+     has asked for larger text, which a fixed px root would simply ignore */
+  font-size: 106.25%;
   font-optical-sizing: auto;
   quotes: "\201C" "\201D";
 }
@@ -595,7 +597,7 @@ button {
   border-radius: var(--r-capsule);
   background: var(--color-fill);
   color: var(--color-text);
-  font-size: 16px;
+  font-size: 0.9412rem;
   font-weight: 500;
   cursor: pointer;
   transition: transform 0.25s var(--ease-swift), background 0.2s ease, color 0.2s ease;
@@ -649,7 +651,7 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 17px;
+  font-size: 1rem;
   line-height: 1;
   color: var(--color-text);
   box-shadow: none;
@@ -696,7 +698,7 @@ button {
   background: rgba(255,255,255,0.15);
   border: none;
   cursor: pointer;
-  font-size: 22px;
+  font-size: 1.2941rem;
   color: #fff;
   display: flex;
   align-items: center;
@@ -727,7 +729,7 @@ button {
   border-radius: var(--r-capsule);
   background: rgba(24, 119, 242, 0.08);
   color: var(--color-link);
-  font-size: 14px;
+  font-size: 0.8235rem;
   font-weight: 500;
   letter-spacing: 0.1px;
 }
@@ -840,7 +842,7 @@ button {
    Three quiet elements only: who / the name / what he builds. */
 #hero .hero-eyebrow {
   margin: 0 0 22px;
-  font-size: 13px;
+  font-size: 0.7647rem;
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -924,7 +926,7 @@ button {
   position: absolute;
   transform: translate(12px, -50%);
   font-family: ui-monospace, 'SF Mono', Menlo, monospace;
-  font-size: 10px;
+  font-size: 0.5882rem;
   font-weight: 600;
   letter-spacing: 0.14em;
   color: var(--color-text-secondary);
@@ -965,9 +967,9 @@ button {
   #hero .hero-grid { margin: 0; padding-top: calc(48px + 9vh); }
   #hero .hero-copy { text-align: center; margin: 0 auto; }
   #hero .hero-copy::before { left: 50%; transform: translate(-50%, -50%); width: 480px; height: 480px; }
-  #hero .hero-eyebrow { font-size: 11px; letter-spacing: 0.1em; margin-bottom: 14px; }
+  #hero .hero-eyebrow { font-size: 0.6471rem; letter-spacing: 0.1em; margin-bottom: 14px; }
   #hero h1.hero-name { font-size: clamp(38px, 10.5vw, 48px); line-height: 1.12; }
-  .hero-net-label { font-size: 9px; }
+  .hero-net-label { font-size: 0.5294rem; }
   .hero-scroll-hint { display: none; }
 }
 
@@ -986,7 +988,7 @@ button {
   transform: translateY(-4px);
 }
 #portfolio .rf-cards-scroller-item h3 { font-weight: 600; color: var(--color-text); letter-spacing: -0.2px; padding: 24px 28px 8px; }
-.rf-cards-scroller-item p.fw-light { color: var(--color-text-secondary); font-size: 16px; padding: 0 28px 28px; }
+.rf-cards-scroller-item p.fw-light { color: var(--color-text-secondary); font-size: 0.9412rem; padding: 0 28px 28px; }
 
 /* Skill cards override */
 #skill .rf-cards-scroller-item {
@@ -1013,7 +1015,7 @@ button {
   margin-bottom: 12px;
 }
 #skill .rf-cards-scroller-item .skill-desc {
-  font-size: 16px;
+  font-size: 0.9412rem;
   color: var(--color-text-secondary);
   line-height: 1.6;
   margin: 0;
@@ -1246,7 +1248,7 @@ button {
   }
 }
 .cta-sub {
-  font-size: 19px;
+  font-size: 1.1176rem;
   color: var(--color-text-secondary);
   line-height: 1.65;
   max-width: 560px;
@@ -1300,7 +1302,7 @@ button {
 }
 .biz-logo {
   font-family: ui-monospace, 'SF Mono', Menlo, monospace;
-  font-size: 13px;
+  font-size: 0.7647rem;
   font-weight: 700;
   letter-spacing: 0.22em;
   color: var(--color-text-secondary);
@@ -1313,7 +1315,7 @@ button {
   color: var(--color-text);
 }
 .biz-role {
-  font-size: 12px;
+  font-size: 0.7059rem;
   color: var(--color-text-secondary);
   margin-top: 4px;
 }
@@ -1323,7 +1325,7 @@ button {
 }
 .biz-contacts a {
   font-family: ui-monospace, 'SF Mono', Menlo, monospace;
-  font-size: 11.5px;
+  font-size: 0.6765rem;
   color: var(--color-text-secondary);
 }
 .biz-contacts a:hover { color: var(--color-link); }
@@ -1336,7 +1338,7 @@ button {
   border-radius: var(--r-capsule);
   background: var(--color-text);
   color: #fff;
-  font-size: 16px;
+  font-size: 0.9412rem;
   font-weight: 500;
   transition: transform 0.25s var(--ease-swift), box-shadow 0.25s var(--ease-swift), background 0.25s ease;
 }
@@ -1347,7 +1349,7 @@ button {
   box-shadow: 0 14px 32px rgba(0, 0, 0, 0.18);
 }
 .cta-tel {
-  font-size: 16px;
+  font-size: 0.9412rem;
   font-weight: 500;
   color: var(--color-text-secondary);
   padding: 12px 6px;
@@ -1355,7 +1357,7 @@ button {
 .cta-tel:hover { color: var(--color-text); }
 @media (max-width: 735px) {
   .closing-cta { padding: 128px 0 136px; }
-  .cta-sub { font-size: 17px; margin-bottom: 32px; }
+  .cta-sub { font-size: 1rem; margin-bottom: 32px; }
 }
 
 /*--------------------------------------------------------------
@@ -1393,7 +1395,7 @@ button {
 }
 
 .info-label {
-  font-size: 12px;
+  font-size: 0.7059rem;
   font-weight: 600;
   letter-spacing: .02em;
   text-transform: uppercase;
@@ -1402,7 +1404,7 @@ button {
 }
 
 .info-value {
-  font-size: 17px;
+  font-size: 1rem;
   font-weight: 500;
   color: var(--color-text);
   line-height: 1.6;
@@ -1415,7 +1417,7 @@ a.info-item:hover .info-value {
 
 .info-sub {
   /* desktop: same reading size as .profile-bio */
-  font-size: 17px;
+  font-size: 1rem;
   color: var(--color-text-secondary);
   line-height: 1.7;
   margin-top: 2px;
@@ -1428,20 +1430,20 @@ a.info-item:hover .info-value {
   }
 
   .info-value {
-    font-size: 14px;
+    font-size: 0.8235rem;
   }
 
   .info-sub {
-    font-size: 12.5px;
+    font-size: 0.7353rem;
   }
 
   /* phones keep the compact reading sizes — desktop-only bumps above
      (.profile-bio/.profile-bio-small are overridden next to their base
      rules further down: source order decides ties in specificity) */
-  #skill .rf-cards-scroller-item .skill-desc { font-size: 13px; }
-  .rf-cards-scroller-item p.fw-light { font-size: 14px; }
-  .project-tag { font-size: 12px; }
-  .fw-light { font-size: 15px; }
+  #skill .rf-cards-scroller-item .skill-desc { font-size: 0.7647rem; }
+  .rf-cards-scroller-item p.fw-light { font-size: 0.8235rem; }
+  .project-tag { font-size: 0.7059rem; }
+  .fw-light { font-size: 0.8824rem; }
 }
 
 /*--------------------------------------------------------------
@@ -1462,14 +1464,14 @@ a.info-item:hover .info-value {
   object-fit: cover;
 }
 .profile-featured-body { flex: 1; }
-.profile-bio { font-size: 17px; color: var(--color-text-secondary); margin: 0; line-height: 1.7; }
-.profile-bio-small { font-size: 16px; color: var(--color-text-secondary); margin: 0; line-height: 1.7; }
+.profile-bio { font-size: 1rem; color: var(--color-text-secondary); margin: 0; line-height: 1.7; }
+.profile-bio-small { font-size: 0.9412rem; color: var(--color-text-secondary); margin: 0; line-height: 1.7; }
 
 /* Phones read both bio tiers at the same compact 13px (these overrides
    MUST come after the base rules above — equal specificity, last wins) */
 @media (max-width: 768px) {
-  .profile-bio { font-size: 13px; }
-  .profile-bio-small { font-size: 13px; }
+  .profile-bio { font-size: 0.7647rem; }
+  .profile-bio-small { font-size: 0.7647rem; }
 }
 
 @media (max-width: 576px) {
@@ -1504,12 +1506,12 @@ h1, h2, h3, h4, h5, h6 { color: var(--color-text); }
 /* Desktop >1068px: 56px / 700 / -0.01em / 1.06 */
 /* Tablet 735–1068px: 44px */
 @media (max-width: 1068px) {
-  .section-title h2 { font-size: 44px; letter-spacing: -0.004em; line-height: 1.12; }
+  .section-title h2 { font-size: 2.5882rem; letter-spacing: -0.004em; line-height: 1.12; }
 }
 /* Mobile <735px: 34px */
 @media (max-width: 735px) {
-  .section-title h2 { font-size: 34px; letter-spacing: 0; line-height: 1.16; }
-  .section-title p { font-size: 17px; }
+  .section-title h2 { font-size: 2rem; letter-spacing: 0; line-height: 1.16; }
+  .section-title p { font-size: 1rem; }
   section { padding: 128px 0; }
   .section-title { padding-bottom: 56px; }
 }
@@ -1765,36 +1767,23 @@ select:focus-visible {
    The 4K tier also requires height ≥ 1700px: a 3440×1440 ultrawide is
    3000px+ wide but only ~109 PPI, so it belongs on the 2K step. */
 @media (min-width: 1500px) {
-  .fw-light { font-size: 17px; }
-  .profile-bio { font-size: 18px; }
-  .profile-bio-small { font-size: 17px; }
-  #skill .rf-cards-scroller-item .skill-desc { font-size: 17px; }
-  .rf-cards-scroller-item p.fw-light { font-size: 17px; }
-  .project-tag { font-size: 15px; }
-  .info-value { font-size: 18px; }
-  .info-sub { font-size: 18px; }
+  .fw-light { font-size: 1rem; }
+  .profile-bio { font-size: 1.0588rem; }
+  .profile-bio-small { font-size: 1rem; }
+  #skill .rf-cards-scroller-item .skill-desc { font-size: 1rem; }
+  .rf-cards-scroller-item p.fw-light { font-size: 1rem; }
+  .project-tag { font-size: 0.8824rem; }
+  .info-value { font-size: 1.0588rem; }
+  .info-sub { font-size: 1.0588rem; }
 }
 /* 2K tier — 1.13× */
 @media (min-width: 2000px) {
-  html { font-size: 19px; }
-  body { font-size: 19px; }
-  .fw-light { font-size: 18px; }
-  .profile-bio { font-size: 19px; }
-  .profile-bio-small { font-size: 18px; }
-  #skill .rf-cards-scroller-item .skill-desc { font-size: 18px; }
-  .rf-cards-scroller-item p.fw-light { font-size: 18px; }
-  .project-tag { font-size: 16px; }
-  .info-value { font-size: 19px; }
-  .info-sub { font-size: 19px; }
-  .info-label { font-size: 13.5px; }
+  html { font-size: 118.75%; }
 
   /* layout scales with the type so proportions stay put */
   .container { max-width: 1490px; }
   section { padding: 248px 0; }
   .section-title { padding-bottom: 108px; }
-  .section-title h2 { font-size: 63px; }
-  .section-title p { font-size: 21px; }
-  .resume .resume-title { font-size: 36px; }
   .data-box { padding: 54px; margin: 63px auto; }
   .data-box.profile-featured { padding: 63px; gap: 45px; }
   .profile-featured-img img { width: 203px; height: 203px; }
@@ -1803,30 +1792,16 @@ select:focus-visible {
   .rf-cards-scroller-item { width: 339px; margin-right: 63px; }
   #skill .rf-cards-scroller-item { width: 384px; min-height: 508px; padding: 54px; }
   .project-img { height: 508px; }
-  #footer { font-size: 16px; }
   :root { --sk-paddlenav-diameter: 41px; }
 }
 
 /* 4K tier — 1.45× (height guard keeps 3440×1440 ultrawides on the 2K step) */
 @media (min-width: 3000px) and (min-height: 1700px) {
-  html { font-size: 25px; }
-  body { font-size: 25px; }
-  .fw-light { font-size: 23px; }
-  .profile-bio { font-size: 25px; }
-  .profile-bio-small { font-size: 23px; }
-  #skill .rf-cards-scroller-item .skill-desc { font-size: 23px; }
-  .rf-cards-scroller-item p.fw-light { font-size: 23px; }
-  .project-tag { font-size: 20px; }
-  .info-value { font-size: 25px; }
-  .info-sub { font-size: 25px; }
-  .info-label { font-size: 17px; }
+  html { font-size: 156.25%; }
 
   .container { max-width: 1910px; }
   section { padding: 319px 0; }
   .section-title { padding-bottom: 139px; }
-  .section-title h2 { font-size: 81px; }
-  .section-title p { font-size: 28px; }
-  .resume .resume-title { font-size: 46px; }
   .data-box { padding: 70px; margin: 81px auto; }
   .data-box.profile-featured { padding: 81px; gap: 58px; }
   .profile-featured-img img { width: 261px; height: 261px; }
@@ -1835,13 +1810,9 @@ select:focus-visible {
   .rf-cards-scroller-item { width: 435px; margin-right: 81px; }
   #skill .rf-cards-scroller-item { width: 493px; min-height: 653px; padding: 70px; }
   .project-img { height: 653px; }
-  #footer { font-size: 20px; padding-top: 174px; }
   :root { --sk-paddlenav-diameter: 52px; }
 
   /* the hero's clamps top out well below the viewport at this width */
-  #hero .hero-eyebrow { font-size: 19px; }
-  #hero h1.hero-name { font-size: clamp(48px, 6.4vw, 142px); }
-  #hero .hero-role { font-size: clamp(20px, 2vw, 38px); }
 }
 
 /*--------------------------------------------------------------
@@ -1857,7 +1828,7 @@ select:focus-visible {
   border-radius: var(--r-capsule);
   background: var(--color-link);
   color: #fff;
-  font-size: 15px;
+  font-size: 0.8824rem;
   font-weight: 500;
   letter-spacing: -0.01em;
   cursor: pointer;
