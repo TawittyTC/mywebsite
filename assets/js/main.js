@@ -125,6 +125,72 @@
 
 
 
+/**
+ * Two-parameter spring, the way Apple frames it: `response` is roughly how
+ * long the value takes to arrive, `damping` 1 lands it without overshoot.
+ * It integrates from whatever is on screen at this instant, so re-aiming
+ * mid-flight is continuous — grab a closing sheet and it comes back from
+ * where it actually is, carrying its velocity, instead of finishing the
+ * old animation first. That is the part a CSS transition cannot do.
+ */
+function createSpring(opts) {
+  var damping = opts.damping == null ? 1 : opts.damping;
+  var omega = 2 * Math.PI / (opts.response || 0.4);
+  var x = opts.from || 0;
+  var v = 0;
+  var target = x;
+  var raf = null;
+  var last = 0;
+
+  function frame(now) {
+    // a long tab-switch must not integrate one giant step
+    var dt = Math.min((now - last) / 1000, 1 / 30);
+    last = now;
+    var a = -omega * omega * (x - target) - 2 * damping * omega * v;
+    v += a * dt;
+    x += v * dt;
+    if (Math.abs(x - target) < 0.0015 && Math.abs(v) < 0.0015) {
+      x = target;
+      v = 0;
+      raf = null;
+      opts.onFrame(x);
+      if (opts.onRest) opts.onRest(x);
+      return;
+    }
+    opts.onFrame(x);
+    raf = requestAnimationFrame(frame);
+  }
+
+  return {
+    to: function (t) {
+      target = t;
+      if (raf === null) { last = performance.now(); raf = requestAnimationFrame(frame); }
+    },
+    // reduced motion, or any case where the move should not be animated
+    jump: function (t) {
+      target = x = t;
+      v = 0;
+      if (raf !== null) { cancelAnimationFrame(raf); raf = null; }
+      opts.onFrame(x);
+      if (opts.onRest) opts.onRest(x);
+    }
+  };
+}
+
+/**
+ * Point a surface's growth at the thing that opened it, so it emerges from
+ * that card rather than from the middle of the screen.
+ */
+function anchorOrigin(surface, source) {
+  if (!source) { surface.style.transformOrigin = ''; return; }
+  var from = source.getBoundingClientRect();
+  var box = surface.getBoundingClientRect();
+  if (!box.width || !box.height) { surface.style.transformOrigin = ''; return; }
+  var x = Math.max(0, Math.min(box.width, from.left + from.width / 2 - box.left));
+  var y = Math.max(0, Math.min(box.height, from.top + from.height / 2 - box.top));
+  surface.style.transformOrigin = x + 'px ' + y + 'px';
+}
+
 // Cert lightbox
 (function () {
   const lightbox = document.createElement("div");
@@ -142,19 +208,46 @@
   document.body.appendChild(lightbox);
 
   let lastFocus = null;
-  function openLightbox(src, alt) {
+  const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // same spring treatment as the experience sheet: the preview grows out of
+  // the thumbnail it came from, and can be re-aimed mid-flight
+  const motion = createSpring({
+    response: 0.32,
+    damping: 1,
+    onFrame: function (p) {
+      lightbox.style.opacity = Math.min(1, p * 1.25);
+      lbImg.style.transform = "scale(" + (0.9 + 0.1 * p).toFixed(4) + ")";
+      lbImg.style.opacity = Math.min(1, p * 1.4);
+    },
+    onRest: function (p) {
+      if (p !== 0) return;
+      lightbox.style.display = "";
+      lightbox.style.opacity = "";
+      lbImg.style.transform = "";
+      lbImg.style.opacity = "";
+      lbImg.style.transformOrigin = "";
+    }
+  });
+
+  function openLightbox(src, alt, source) {
     lbImg.src = src;
     lbImg.alt = alt;
     lightbox.classList.add("open");
+    lightbox.style.display = "flex";
     document.body.style.overflow = "hidden";
     lastFocus = document.activeElement;
+    anchorOrigin(lbImg, source);
+    if (reduce) motion.jump(1); else motion.to(1);
     closeBtn.focus();
   }
   function closeLightbox() {
     if (!lightbox.classList.contains("open")) return; // Escape pressed elsewhere
     lightbox.classList.remove("open");
-    // only release the scroll lock if no other overlay is holding it
+    // the overlay stays painted until the spring settles, so hold the frame
+    lightbox.style.display = "flex";
+    // scroll is handed back on the dismissal itself, not when the fade ends
     if (!document.querySelector(".exp-lightbox.open")) document.body.style.overflow = "";
+    if (reduce) motion.jump(0); else motion.to(0);
     if (lastFocus && typeof lastFocus.focus === "function") lastFocus.focus();
     lastFocus = null;
   }
@@ -192,19 +285,38 @@
   document.body.appendChild(lightbox);
 
   let lastFocus = null;
+  // One spring owns the whole presentation: backdrop, sheet scale and fade
+  // all read from it, so opening and closing are the same motion re-aimed.
+  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const motion = createSpring({
+    response: 0.34,
+    damping: 1,
+    onFrame: function (p) {
+      lightbox.style.visibility = p > 0.002 ? 'visible' : 'hidden';
+      lightbox.style.opacity = Math.min(1, p * 1.25);
+      inner.style.opacity = Math.min(1, p * 1.4);
+      inner.style.transform = 'translateY(' + ((1 - p) * 8).toFixed(2) + 'px) scale('
+        + (0.92 + 0.08 * p).toFixed(4) + ')';
+    },
+    onRest: function (p) {
+      if (p !== 0) return;
+      lightbox.style.visibility = '';
+      lightbox.style.opacity = '';
+      inner.style.opacity = '';
+      inner.style.transform = '';
+      inner.style.transformOrigin = '';
+    }
+  });
+
   function closeExp() {
     if (!lightbox.classList.contains('open')) return; // Escape pressed elsewhere
     lightbox.classList.remove('open');
     if (lastFocus && typeof lastFocus.focus === 'function') lastFocus.focus();
     lastFocus = null;
-    setTimeout(function () {
-      // deferred for the exit animation — but by now another overlay
-      // (cert lightbox) may have opened and taken the scroll lock
-      if (!lightbox.classList.contains('open') &&
-          !document.querySelector('.cert-lightbox.open')) {
-        document.body.style.overflow = '';
-      }
-    }, 220);
+    // the dismissal is honoured at once; the fade out is only the picture
+    // catching up, so the page is scrollable again immediately
+    if (!document.querySelector('.cert-lightbox.open')) document.body.style.overflow = '';
+    if (reduce) motion.jump(0); else motion.to(0);
   }
   closeBtn.addEventListener('click', function(e) {
     e.stopPropagation();
@@ -239,7 +351,7 @@
     }
   });
 
-  window._expLightboxOpen = function (html) {
+  window._expLightboxOpen = function (html, source) {
     while (inner.children.length > 1) inner.removeChild(inner.lastChild);
     const content = document.createElement('div');
     content.innerHTML = html;
@@ -257,6 +369,10 @@
     lightbox.classList.add('open');
     document.body.style.overflow = 'hidden';
     lastFocus = document.activeElement;
+    // make it measurable, then grow it out of the card that was clicked
+    lightbox.style.visibility = 'visible';
+    anchorOrigin(inner, source);
+    if (reduce) motion.jump(1); else motion.to(1);
     closeBtn.focus();
 
     // Initialize client filter chips
@@ -311,7 +427,7 @@ document.addEventListener('DOMContentLoaded', function () {
   document.querySelectorAll('#experience .data-box[data-exp]').forEach(function (card) {
     card.addEventListener('click', function () {
       var tmpl = document.getElementById('exp-' + card.dataset.exp);
-      if (tmpl) window._expLightboxOpen(tmpl.innerHTML);
+      if (tmpl) window._expLightboxOpen(tmpl.innerHTML, card);
     });
   });
 
@@ -384,11 +500,11 @@ document.addEventListener("DOMContentLoaded", function () {
       expandBtn.innerHTML = "+";
       expandBtn.addEventListener("click", function (e) {
         e.stopPropagation();
-        window._certLightboxOpen(src, alt);
+        window._certLightboxOpen(src, alt, card);
       });
       card.style.cursor = "pointer";
       card.addEventListener("click", function () {
-        window._certLightboxOpen(src, alt);
+        window._certLightboxOpen(src, alt, card);
       });
       wrapper.appendChild(imgElement);
       card.appendChild(wrapper);
