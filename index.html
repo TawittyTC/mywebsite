@@ -899,8 +899,8 @@
       box-sizing: border-box;
       opacity: 0;
       visibility: hidden;
-      pointer-events: none;
-      transition: opacity .22s ease, visibility .22s ease
+      pointer-events: none
+      /* the spring in main.js owns opacity and visibility from here */
     }
 
     .exp-lightbox.open {
@@ -919,16 +919,17 @@
       padding: 36px 40px;
       position: relative;
       box-shadow: 0 32px 80px rgba(0, 0, 0, .22);
-      transform: translateY(12px) scale(.96);
+      /* resting state only — the spring writes transform/opacity each frame,
+         and grows the sheet from the card that opened it */
+      transform: scale(.92);
       opacity: 0;
-      /* exit: snappier than entry — the system responds, the user decides */
-      transition: transform .25s cubic-bezier(.32, .72, 0, 1), opacity .18s ease-out
+      will-change: transform, opacity
     }
 
+    /* reduced motion still needs a visible end state if scripting is off */
     .exp-lightbox.open .exp-lightbox-inner {
-      transform: translateY(0) scale(1);
-      opacity: 1;
-      transition: transform .4s cubic-bezier(.32, .72, 0, 1), opacity .25s ease-out
+      transform: scale(1);
+      opacity: 1
     }
 
     /* Reduced transparency: solid modal, no glass */
@@ -1388,10 +1389,10 @@
   </style>
 
   <!-- Full CSS loaded async: no render blocking (bootstrap merged in) -->
-  <link rel="preload" href="assets/css/style.min.css?v=2.18.3" as="style"
+  <link rel="preload" href="assets/css/style.min.css?v=2.19.0" as="style"
     onload="this.onload=null;this.rel='stylesheet'">
   <noscript>
-    <link href="assets/css/style.min.css?v=2.18.3" rel="stylesheet">
+    <link href="assets/css/style.min.css?v=2.19.0" rel="stylesheet">
   </noscript>
 
 
@@ -1645,7 +1646,7 @@
   </script>
 
   <!-- Preload deferred JS to start downloading before parser reaches script tags -->
-  <link rel="preload" href="assets/js/main.min.js?v=2.18.3" as="script">
+  <link rel="preload" href="assets/js/main.min.js?v=2.19.0" as="script">
 
   <script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="233b92be-5a2d-492b-b093-9c3ed14c9063"
     type="text/javascript" async></script>
@@ -2588,7 +2589,7 @@
   </button>
 
   <!-- Main JS -->
-  <script defer src="assets/js/main.min.js?v=2.18.3"></script>
+  <script defer src="assets/js/main.min.js?v=2.19.0"></script>
   <!-- Service Worker: cache assets for repeat visits -->
   <script>if ('serviceWorker' in navigator) { var _sw = function () { navigator.serviceWorker.register('sw.js') }; 'requestIdleCallback' in window ? requestIdleCallback(_sw) : window.addEventListener('load', _sw) }</script>
 

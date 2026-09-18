@@ -459,3 +459,71 @@ test('the SCG timeline pulse rides the connector from the oldest entry to the ne
     `pulse should arrive as link blue, got rgb(${high.rgb})`);
   await page.close();
 });
+
+test('a sheet grows from the card that opened it and never jumps back when re-grabbed', async () => {
+  const { page } = await ctx.openPage();
+  const card = '#experience [data-exp="scg"]';
+  const scale = () => page.$eval('.exp-lightbox-inner', (el) =>
+    new DOMMatrixReadOnly(getComputedStyle(el).transform).a);
+
+  // park the card high in the viewport on purpose: centring it would put its
+  // middle on the sheet's own middle and make "is it anchored?" unanswerable
+  await page.$eval(card, (el) => el.scrollIntoView({ block: 'start' }));
+  await settle(page, 400);
+  await page.$eval(card, (el) => el.click());
+  await page.waitForSelector('.exp-lightbox.open');
+  await page.waitForFunction(() =>
+    new DOMMatrixReadOnly(getComputedStyle(document.querySelector('.exp-lightbox-inner')).transform).a > 0.995);
+
+  // The growth point must track the trigger. Pinning it to an exact pixel
+  // would be chasing sub-pixel reflow (the scroll lock and the reveal scrub
+  // both nudge the card as it opens), so prove the behaviour instead: move
+  // the trigger, and the origin has to travel with it and stay on the sheet.
+  const originOf = () => page.evaluate(() => {
+    const inner = document.querySelector('.exp-lightbox-inner');
+    const prev = inner.style.transform;
+    inner.style.transform = 'none';
+    const h = inner.getBoundingClientRect().height;
+    inner.style.transform = prev;
+    return { y: parseFloat(getComputedStyle(inner).transformOrigin.split(' ')[1]), h };
+  });
+  const first = await originOf();
+  assert.ok(first.y >= 0 && first.y <= first.h,
+    `growth origin ${first.y} sits outside the sheet (0..${first.h})`);
+
+  await page.keyboard.press('Escape');
+  await page.waitForFunction(() => !document.querySelector('.exp-lightbox.open'));
+  await page.evaluate(() => window.scrollBy(0, 140));
+  await settle(page, 250);
+  await page.$eval(card, (el) => el.click());
+  await page.waitForSelector('.exp-lightbox.open');
+  const second = await originOf();
+  assert.ok(Math.abs(second.y - first.y) > 40,
+    `growth origin barely moved (${first.y} -> ${second.y}) — it is not following the card`);
+  assert.ok(second.y >= 0 && second.y <= second.h,
+    `growth origin ${second.y} sits outside the sheet (0..${second.h})`);
+  await page.waitForFunction(() =>
+    new DOMMatrixReadOnly(getComputedStyle(document.querySelector('.exp-lightbox-inner')).transform).a > 0.995);
+
+  // catch it mid-close and re-open: the motion must carry on from where it
+  // is, not restart. Measured inside one frame pair so a slow runner cannot
+  // drift the reading.
+  await page.keyboard.press('Escape');
+  await page.waitForFunction(() =>
+    new DOMMatrixReadOnly(getComputedStyle(document.querySelector('.exp-lightbox-inner')).transform).a < 0.99);
+  const caught = await page.evaluate((sel) => new Promise((done) => {
+    const inner = document.querySelector('.exp-lightbox-inner');
+    const read = () => new DOMMatrixReadOnly(getComputedStyle(inner).transform).a;
+    const before = read();
+    document.querySelector(sel).click();
+    requestAnimationFrame(() => requestAnimationFrame(() => done({ before, after: read() })));
+  }), card);
+  assert.ok(caught.after >= caught.before - 0.01,
+    `sheet restarted instead of resuming (${caught.before.toFixed(3)} -> ${caught.after.toFixed(3)})`);
+
+  // and it still lands fully open
+  await page.waitForFunction(() =>
+    new DOMMatrixReadOnly(getComputedStyle(document.querySelector('.exp-lightbox-inner')).transform).a > 0.995);
+  assert.ok(await scale() > 0.995, 'sheet did not settle open after the interruption');
+  await page.close();
+});
