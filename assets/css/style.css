@@ -6,7 +6,7 @@
   color-scheme: only light;
   --color-text: #1D1D1F;
   --color-text-secondary: #6E6E73;
-  --color-link: #1264CE; /* WCAG AA: 5.62:1 on white (was #1877F2 at 4.23:1) */
+  --color-link: #1264CE; /* WCAG AA: 5.62:1 on white (the old #1877F2 managed only 4.23:1) */
   --color-link-hover: #166FE5;
   --color-fill: #F5F5F7;
   --color-background-alt: #F8F8F8;
@@ -218,7 +218,7 @@ section {
 .data-box {
   border-radius: var(--r-card);
   /* flat cards: the hairline alone defines the surface — no shadows */
-  border: 1px solid rgba(0, 0, 0, .06);
+  border: 1px solid rgba(0, 0, 0, .07);
   padding: 48px;
   background-color: #fff;
   margin: 56px auto;
@@ -557,8 +557,8 @@ button {
   /* reserve the box before the lazy image arrives — no layout shift */
   aspect-ratio: 4 / 3;
   object-fit: contain;
-  border-radius: 8px;
-  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  border-radius: var(--r-min);
+  transition: transform 0.4s var(--ease-swift);
 }
 
 /* Certificate Grid — CSS Grid (bypasses Bootstrap col system entirely) */
@@ -600,7 +600,7 @@ button {
   font-size: 0.9412rem;
   font-weight: 500;
   cursor: pointer;
-  transition: transform 0.25s var(--ease-swift), background 0.2s ease, color 0.2s ease;
+  transition: transform 0.3s var(--ease-swift), background 0.2s ease, color 0.2s ease;
 }
 
 .filter-btn:hover,
@@ -681,7 +681,7 @@ button {
   max-width: 92vw;
   max-height: 92vh;
   object-fit: contain;
-  border-radius: 8px;
+  border-radius: var(--r-min);
 }
 .cert-lightbox img {
   will-change: transform, opacity;
@@ -727,7 +727,7 @@ button {
   margin: 14px 20px 0;
   padding: 4px 12px;
   border-radius: var(--r-capsule);
-  background: rgba(24, 119, 242, 0.08);
+  background: rgba(18, 100, 206, 0.08);
   color: var(--color-link);
   font-size: 0.8235rem;
   font-weight: 500;
@@ -746,7 +746,7 @@ button {
 .exp-lightbox-close,
 .paddlenav-arrow,
 #back-to-top {
-  transition: transform 0.4s var(--spring-pop), background 0.2s ease, color 0.2s ease, box-shadow 0.25s var(--ease-swift), opacity 0.25s ease;
+  transition: transform 0.4s var(--spring-pop), background 0.2s ease, color 0.2s ease, box-shadow 0.3s var(--ease-swift), opacity 0.3s ease;
 }
 
 /* Hover lift — real pointers only (touch keeps press feedback) */
@@ -850,7 +850,7 @@ button {
 }
 #hero h1.hero-name {
   margin: 0;
-  font-size: clamp(48px, 6.4vw, 98px);
+  font-size: clamp(2.8235rem, 6.4vw, 5.7647rem);
   font-weight: 700;
   letter-spacing: -0.03em;
   line-height: 1.08;
@@ -861,7 +861,7 @@ button {
    ink — JS eases --ink-x / --ink-c toward it every frame. */
 #hero .hero-name {
   --ink-x: 62%;
-  --ink-c: #1877F2;
+  --ink-c: #1264CE;
 }
 .hero-name-line {
   display: block;
@@ -891,7 +891,7 @@ button {
 
 #hero .hero-role {
   margin: 18px 0 0;
-  font-size: clamp(20px, 2vw, 26px);
+  font-size: clamp(1.1765rem, 2vw, 1.5294rem);
   color: var(--color-text-secondary);
 }
 #hero .hero-role .typed { color: var(--color-link); }
@@ -926,7 +926,7 @@ button {
   position: absolute;
   transform: translate(12px, -50%);
   font-family: ui-monospace, 'SF Mono', Menlo, monospace;
-  font-size: 0.5882rem;
+  font-size: 0.6471rem;
   font-weight: 600;
   letter-spacing: 0.14em;
   color: var(--color-text-secondary);
@@ -968,7 +968,7 @@ button {
   #hero .hero-copy { text-align: center; margin: 0 auto; }
   #hero .hero-copy::before { left: 50%; transform: translate(-50%, -50%); width: 480px; height: 480px; }
   #hero .hero-eyebrow { font-size: 0.6471rem; letter-spacing: 0.1em; margin-bottom: 14px; }
-  #hero h1.hero-name { font-size: clamp(38px, 10.5vw, 48px); line-height: 1.12; }
+  #hero h1.hero-name { font-size: clamp(2.2353rem, 10.5vw, 2.8235rem); line-height: 1.12; }
   .hero-net-label { font-size: 0.5294rem; }
   .hero-scroll-hint { display: none; }
 }
@@ -981,7 +981,7 @@ button {
   border-radius: var(--r-card);
   padding: 48px;
   height: 100%;
-  border: 1px solid rgba(0, 0, 0, .06);
+  border: 1px solid rgba(0, 0, 0, .07);
   transition: transform 0.3s ease-in-out;
 }
 .boxWhyScg:hover {
@@ -1210,7 +1210,7 @@ button {
   position: relative;
   overflow: hidden;
   text-align: center;
-  padding: 200px 0 210px;
+  padding: 220px 0;
   background: #fff;
 }
 .closing-cta::before {
@@ -1222,12 +1222,12 @@ button {
   width: 960px;
   max-width: 100vw;
   height: 560px;
-  background: radial-gradient(closest-side, rgba(24, 119, 242, 0.08) 0%, rgba(24, 119, 242, 0.03) 55%, rgba(24, 119, 242, 0) 100%);
+  background: radial-gradient(closest-side, rgba(18, 100, 206, 0.08) 0%, rgba(18, 100, 206, 0.03) 55%, rgba(18, 100, 206, 0) 100%);
   pointer-events: none;
 }
 .cta-inner { position: relative; }
 .cta-headline {
-  font-size: clamp(42px, 7vw, 76px);
+  font-size: clamp(2.4706rem, 7vw, 4.4706rem);
   font-weight: 700;
   letter-spacing: -0.015em;
   line-height: 1.08;
@@ -1239,7 +1239,7 @@ button {
     background-image: linear-gradient(100deg,
       #1d1d1f 0%,
       #1d1d1f 42%,
-      #1877F2 58%,
+      #1264CE 58%,
       #5AA7FF 66%,
       #1d1d1f 88%);
     -webkit-background-clip: text;
@@ -1273,7 +1273,7 @@ button {
   aspect-ratio: 1.586; /* real credit-card proportions */
   border-radius: var(--r-card-sm);
   background: linear-gradient(135deg, #ffffff 0%, #f1f3f7 52%, #e4e9f0 100%);
-  border: 1px solid rgba(29, 29, 31, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.07);
   box-shadow: 0 30px 60px rgba(29, 29, 31, 0.16), 0 4px 12px rgba(29, 29, 31, 0.08);
   transform-style: preserve-3d;
   will-change: transform;
@@ -1308,7 +1308,7 @@ button {
   color: var(--color-text-secondary);
 }
 .biz-name {
-  font-size: clamp(20px, 5.6vw, 27px);
+  font-size: clamp(1.1765rem, 5.6vw, 1.5294rem);
   font-weight: 600;
   letter-spacing: -0.012em;
   line-height: 1.18;
@@ -1325,7 +1325,7 @@ button {
 }
 .biz-contacts a {
   font-family: ui-monospace, 'SF Mono', Menlo, monospace;
-  font-size: 0.6765rem;
+  font-size: 0.7059rem;
   color: var(--color-text-secondary);
 }
 .biz-contacts a:hover { color: var(--color-link); }
@@ -1340,7 +1340,7 @@ button {
   color: #fff;
   font-size: 0.9412rem;
   font-weight: 500;
-  transition: transform 0.25s var(--ease-swift), box-shadow 0.25s var(--ease-swift), background 0.25s ease;
+  transition: transform 0.3s var(--ease-swift), box-shadow 0.3s var(--ease-swift), background 0.3s ease;
 }
 .cta-mail:hover {
   color: #fff;
@@ -1356,7 +1356,7 @@ button {
 }
 .cta-tel:hover { color: var(--color-text); }
 @media (max-width: 735px) {
-  .closing-cta { padding: 128px 0 136px; }
+  .closing-cta { padding: 128px 0; }
   .cta-sub { font-size: 1rem; margin-bottom: 32px; }
 }
 
@@ -1381,7 +1381,7 @@ button {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: rgba(24, 119, 242, .08);
+  background: rgba(18, 100, 206, .08);
   /* solid glyphs, carried in the theme accent rather than hairline outlines */
   color: var(--color-link);
   display: flex;
@@ -1434,7 +1434,7 @@ a.info-item:hover .info-value {
   }
 
   .info-sub {
-    font-size: 0.7353rem;
+    font-size: 0.7647rem;
   }
 
   /* phones keep the compact reading sizes — desktop-only bumps above
@@ -1453,7 +1453,7 @@ a.info-item:hover .info-value {
   display: flex;
   align-items: center;
   gap: 40px;
-  padding: 56px;
+  padding: 48px;
 }
 .profile-featured-img { flex-shrink: 0; }
 .profile-featured-img img {
@@ -1700,7 +1700,7 @@ select:focus-visible {
   opacity: 0;
   transform: translateY(8px);
   pointer-events: none;
-  transition: opacity 0.25s ease, transform 0.4s var(--spring-pop);
+  transition: opacity 0.3s ease, transform 0.4s var(--spring-pop);
 }
 #back-to-top.visible {
   opacity: 1;
@@ -1833,7 +1833,7 @@ select:focus-visible {
   letter-spacing: -0.01em;
   cursor: pointer;
   /* feedback lands on the press, not the release */
-  transition: background 0.2s ease, transform 0.12s ease-out;
+  transition: background 0.2s ease, transform 0.2s ease-out;
 }
 
 .btn-pill:hover { background: var(--color-link-hover); color: #fff; }
@@ -1843,3 +1843,69 @@ select:focus-visible {
   .btn-pill { transition: background 0.2s ease; }
   .btn-pill:active { transform: none; }
 }
+
+/*--------------------------------------------------------------
+# Interaction: one answer for everything that can be pressed
+--------------------------------------------------------------*/
+/* An audit found 22 of 102 clickable elements with no transition at all —
+   social icons, the contact rows, footer links. They changed colour on
+   hover instantly while everything beside them eased, which reads as two
+   different interfaces. These give every interactive element the same
+   timing and the same press response. */
+a,
+button,
+[role="button"],
+.cert-card,
+.info-item,
+#experience .data-box[data-exp] {
+  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease,
+    opacity 0.2s ease, transform 0.2s var(--ease-swift);
+}
+
+/* pressing anything acknowledges the press itself, not the release */
+.social-links a:active,
+.social-links-footer a:active,
+.footer-contact-link:active,
+.biz-contacts a:active,
+.info-item:active {
+  transform: scale(0.96);
+}
+
+.social-links a,
+.social-links-footer a {
+  color: var(--color-text);
+}
+
+.social-links a:hover,
+.social-links-footer a:hover {
+  color: var(--color-link);
+}
+
+/* a link that is also a row: the whole row answers, not just the text */
+a.info-item:hover .info-value { color: var(--color-link); }
+
+@media (prefers-reduced-motion: reduce) {
+  a, button, [role="button"], .cert-card, .info-item,
+  #experience .data-box[data-exp] {
+    transition: color 0.2s ease, background-color 0.2s ease;
+  }
+  .social-links a:active,
+  .social-links-footer a:active,
+  .footer-contact-link:active,
+  .biz-contacts a:active,
+  .info-item:active { transform: none; }
+}
+
+/*--------------------------------------------------------------
+# Heading sizes on the type scale
+--------------------------------------------------------------*/
+/* Bootstrap's .h2/.h3/.h4 resolve to 2 / 1.75 / 1.5rem, which against this
+   root land at 34 / 29.75 / 25.5px — sitting a quarter-pixel away from the
+   34 / 30 / 26 the rest of the page uses. Same intent, two sets of numbers;
+   these pull them onto the one scale. */
+.h3, h3 { font-size: 1.7647rem; }   /* 30px */
+.h4, h4 { font-size: 1.5294rem; }   /* 26px */
+
+/* the footer rule came from Bootstrap's default palette — same line, a
+   different grey from every other divider on the page */
+#footer .border-top { border-top-color: rgba(0, 0, 0, 0.07) !important; }
