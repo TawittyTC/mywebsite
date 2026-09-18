@@ -527,3 +527,30 @@ test('a sheet grows from the card that opened it and never jumps back when re-gr
   assert.ok(await scale() > 0.995, 'sheet did not settle open after the interruption');
   await page.close();
 });
+
+test('type follows the reader\'s own text-size setting, layout and all', async () => {
+  const { page } = await ctx.openPage();
+  const read = () => page.evaluate(() => ({
+    root: parseFloat(getComputedStyle(document.documentElement).fontSize),
+    body: parseFloat(getComputedStyle(document.body).fontSize),
+    head: parseFloat(getComputedStyle(document.querySelector('.section-title h2')).fontSize),
+    small: parseFloat(getComputedStyle(document.querySelector('#footer')).fontSize),
+  }));
+  const normal = await read();
+  assert.ok(Math.abs(normal.root - 17) < 0.5, `default root should still be 17px, got ${normal.root}`);
+
+  // this is the browser's own "default font size" preference, the web's
+  // equivalent of Dynamic Type — a px root would simply ignore it
+  const cdp = await page.context().newCDPSession(page);
+  await cdp.send('Page.setFontSizes', { fontSizes: { standard: 24, fixed: 24 } });
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await page.waitForTimeout(400);
+  const larger = await read();
+
+  for (const key of ['root', 'body', 'head', 'small']) {
+    const ratio = larger[key] / normal[key];
+    assert.ok(Math.abs(ratio - 1.5) < 0.05,
+      `${key} should scale 1.5x with a 16 -> 24 setting, scaled x${ratio.toFixed(3)}`);
+  }
+  await page.close();
+});
