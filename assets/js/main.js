@@ -184,7 +184,14 @@ function createSpring(opts) {
 function anchorOrigin(surface, source) {
   if (!source) { surface.style.transformOrigin = ''; return; }
   var from = source.getBoundingClientRect();
+  // transform-origin is measured on the box BEFORE any transform, so the
+  // surface has to be read unscaled — reading it mid-scale puts the growth
+  // point off by whatever the current scale is. Restored in the same task,
+  // so nothing is painted in between.
+  var prev = surface.style.transform;
+  surface.style.transform = 'none';
   var box = surface.getBoundingClientRect();
+  surface.style.transform = prev;
   if (!box.width || !box.height) { surface.style.transformOrigin = ''; return; }
   var x = Math.max(0, Math.min(box.width, from.left + from.width / 2 - box.left));
   var y = Math.max(0, Math.min(box.height, from.top + from.height / 2 - box.top));
