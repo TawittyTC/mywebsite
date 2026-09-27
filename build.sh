@@ -9,3 +9,6 @@ npx --yes csso-cli assets/css/style.css --no-restructure -o /tmp/style-custom.mi
 cat assets/css/bootstrap-subset.min.css /tmp/style-custom.min.css > assets/css/style.min.css
 npx --yes terser assets/js/main.js --compress --mangle --comments false -o assets/js/main.min.js
 echo "built: assets/css/style.min.css ($(wc -c < assets/css/style.min.css) bytes), assets/js/main.min.js ($(wc -c < assets/js/main.min.js) bytes)"
+
+# Search engines read lastmod to decide when to recrawl; stamp it with every build.
+sed -i "s|<lastmod>[0-9-]*</lastmod>|<lastmod>$(date -u +%Y-%m-%d)</lastmod>|" sitemap.xml

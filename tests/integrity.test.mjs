@@ -31,6 +31,33 @@ test('essential metadata present (title, description, og:image, lang)', () => {
   assert.match(html, /<html[^>]+lang="/);
 });
 
+test('no content is hidden from people but served to search engines', () => {
+  // Google's spam policy on hidden text: a display:none block of copy is
+  // discounted at best and a manual action at worst.
+  const hidden = [...html.matchAll(/<(section|div|article)[^>]*style="[^"]*display:\s*none[^"]*"[^>]*>/g)];
+  assert.deepEqual(hidden.map((m) => m[0].slice(0, 80)), [], 'hidden content blocks');
+  assert.doesNotMatch(html, /<meta name="keywords"/, 'meta keywords is ignored by Google and read as stuffing by Bing');
+});
+
+test('every FAQPage question is visible on the page', () => {
+  // structured data has to describe content a visitor can see
+  const blocks = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map((m) => JSON.parse(m[1]));
+  const faq = blocks.find((b) => b['@type'] === 'FAQPage');
+  if (!faq) return;
+  const decode = (s) => s.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+  const shown = [...html.matchAll(/<summary>([\s\S]*?)<\/summary>/g)].map((m) => decode(m[1].trim()));
+  const missing = faq.mainEntity.map((q) => q.name).filter((q) => !shown.includes(q));
+  assert.deepEqual(missing, [], 'FAQ questions only in JSON-LD');
+});
+
+test('share image is a format every social crawler reads, at the size they crop to', () => {
+  const og = html.match(/<meta property="og:image" content="([^"]+)"/)[1];
+  assert.match(og, /\.(jpe?g|png)$/i, `og:image ${og} — Facebook, LINE and LinkedIn do not render AVIF/WebP previews`);
+  assert.ok(existsSync(join(ROOT, og.replace(/^https?:\/\/[^/]+\/mywebsite\//, ''))), 'og:image file missing');
+  assert.match(html, /<meta property="og:image:width" content="1200">/);
+  assert.match(html, /<meta property="og:image:height" content="630">/);
+});
+
 test('every <img> declares alt text', () => {
   const imgs = [...html.matchAll(/<img[^>]*>/g)].map((m) => m[0]);
   const missing = imgs.filter((t) => !/\balt=/.test(t));
