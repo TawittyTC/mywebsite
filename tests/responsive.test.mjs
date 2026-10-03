@@ -163,3 +163,44 @@ test('page length is stable while scrolling (no placeholder/CLS jumps)', async (
     await page.close();
   }
 });
+
+test('on a phone every control answers a 44px finger (Apple HIG)', async () => {
+  const { page } = await ctx.openPage({
+    viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, reducedMotion: 'reduce',
+  });
+  // the preloader covers the page until it is removed
+  await page.waitForFunction(() => !document.querySelector('.loader'), null, { timeout: 15000 });
+  const misses = await page.evaluate(async () => {
+    document.getElementById('back-to-top')?.style.setProperty('display', 'none');
+    const controls = [...document.querySelectorAll('a, button, summary, [role="button"]')].filter((e) => {
+      const r = e.getBoundingClientRect();
+      // carousel cards are whole-card targets; the skip link lives off-screen until focused
+      return r.width > 0 && r.height > 0 && !e.closest('[data-card-scroller]')
+        && !e.classList.contains('skip-link') && getComputedStyle(e).visibility !== 'hidden';
+    });
+    const out = [];
+    for (const el of controls) {
+      el.scrollIntoView({ block: 'center' });
+      await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+      const r = el.getBoundingClientRect();
+      const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+      // a finger landing 21px either side of centre still has to reach this control
+      const miss = [[-21, 0], [21, 0], [0, -21], [0, 21]].filter(([dx, dy]) => {
+        const hit = document.elementFromPoint(cx + dx, cy + dy);
+        return !(hit && (hit === el || el.contains(hit)));
+      });
+      if (miss.length) out.push(`${(el.getAttribute('aria-label') || el.innerText || el.className).trim().slice(0, 40)} (${Math.round(r.width)}×${Math.round(r.height)})`);
+    }
+    return out;
+  });
+  assert.deepEqual(misses, [], 'controls a fingertip can miss');
+  await page.close();
+});
+
+test('hero rotates three roles, strongest first', async () => {
+  const { page } = await ctx.openPage();
+  const items = await page.$eval('#hero .typed', (el) => el.dataset.typedItems.split(',').map((s) => s.trim()));
+  assert.equal(items[0], 'Full-Stack Developer', 'the first role a visitor sees is the headline one');
+  assert.ok(items.length <= 3, `${items.length} roles — most visitors scroll on after one or two`);
+  await page.close();
+});
