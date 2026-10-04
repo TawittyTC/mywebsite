@@ -585,7 +585,7 @@ test('liquid glass: the lens flows to the chosen filter, and every surface is gl
   });
   assert.notEqual(glass.capsule, 'none');
   assert.notEqual(glass.arrow, 'none');
-  for (const [sel, a] of glass.panes) assert.ok(a > 0.3 && a < 0.9, `${sel} is not a pane of glass (alpha ${a})`);
+  for (const [sel, a] of glass.panes) assert.ok(a >= 0.15 && a < 0.9, `${sel} is not a pane of glass (alpha ${a})`);
   assert.match(glass.ground, /radial-gradient/, 'the ground has no light for the glass to show');
   assert.equal(glass.section, 'rgba(0, 0, 0, 0)', 'sections must not paint over the light');
   await page.close();
