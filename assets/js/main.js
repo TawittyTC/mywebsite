@@ -692,10 +692,42 @@ document.addEventListener('DOMContentLoaded', function () {
     var scroller = root.querySelector('[data-card-scroller]');
     if (!btns.length || !items.length) return;
 
+    // Liquid Glass lens: a tinted drop that flows to the chosen chip
+    var lens = document.createElement('span');
+    lens.className = 'filter-lens';
+    lens.setAttribute('aria-hidden', 'true');
+    group.insertBefore(lens, group.firstChild);
+    group.classList.add('has-lens');
+    var lastLeft = null;
+    function placeLens(animate) {
+      var a = group.querySelector('.filter-btn.active');
+      if (!a) return;
+      var left = a.offsetLeft;
+      var right = group.clientWidth - (a.offsetLeft + a.offsetWidth);
+      if (animate && lastLeft !== null) {
+        // the edge in the direction of travel leaves first; the other follows
+        lens.style.transitionDelay = left > lastLeft ? '0.07s, 0s' : '0s, 0.07s';
+      } else {
+        lens.style.transition = 'none';
+      }
+      lens.style.left = left + 'px';
+      lens.style.right = right + 'px';
+      if (!animate || lastLeft === null) {
+        void lens.offsetWidth; // commit the jump before transitions return
+        lens.style.transition = '';
+      }
+      lastLeft = left;
+    }
+    placeLens(false);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { placeLens(false); });
+    window.addEventListener('load', function () { placeLens(false); });
+    window.addEventListener('resize', function () { placeLens(false); });
+
     btns.forEach(function (btn) {
       btn.addEventListener('click', function () {
         btns.forEach(function (b) { b.classList.remove('active'); });
         btn.classList.add('active');
+        placeLens(true);
         var filter = btn.getAttribute('data-filter');
         items.forEach(function (item) {
           // data-tech may hold several space-separated categories
@@ -1596,4 +1628,22 @@ document.addEventListener('DOMContentLoaded', function () {
     else if (!vis) { run = false; }
   }, { threshold: 0.1 });
   io.observe(scene);
+})();
+
+/**
+ * Liquid Glass light — the material brightens where the pointer or the
+ * finger is. CSS draws the light; this only tells it where to stand.
+ */
+(function () {
+  var GLASS = '.project-filters, .paddlenav-arrow, #back-to-top, .cert-expand-btn, ' +
+    '.exp-lightbox-close, .cert-lightbox-close, .btn-pill, .biz-card';
+  function light(e) {
+    var el = e.target && e.target.closest && e.target.closest(GLASS);
+    if (!el) return;
+    var r = el.getBoundingClientRect();
+    el.style.setProperty('--lx', (e.clientX - r.left) + 'px');
+    el.style.setProperty('--ly', (e.clientY - r.top) + 'px');
+  }
+  document.addEventListener('pointermove', light, { passive: true });
+  document.addEventListener('pointerdown', light, { passive: true });
 })();
