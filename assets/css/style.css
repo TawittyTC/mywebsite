@@ -5,7 +5,7 @@
   /* light-only site: block browser forced/auto dark theming */
   color-scheme: only light;
   --color-text: #1D1D1F;
-  --color-text-secondary: #6E6E73;
+  --color-text-secondary: #636366;
   --color-link: #1264CE; /* WCAG AA: 5.62:1 on white (the old #1877F2 managed only 4.23:1) */
   --color-link-hover: #166FE5;
   --color-fill: #F5F5F7;
@@ -830,7 +830,7 @@ button {
    borders, chip and stat fills, dividers, secondary text, and the
    footer. Blue stays the lone 10% accent. */
 #resume, #skill, #experience, #portfolio { background: #fff; }
-#certificates.bg-light { background-color: #fff !important; }
+#certificates.bg-light { background-color: transparent !important; }
 
 #resume .data-box,
 #experience .data-box { background: #fff; }
@@ -1991,4 +1991,497 @@ a.info-item:hover .info-value { color: var(--color-link); }
 }
 @media (prefers-reduced-motion: reduce) {
   .faq summary::after { transition: none; }
+}
+
+/*--------------------------------------------------------------
+# Touch targets
+  Every control answers a 44×44 finger (Apple HIG) while the mark keeps
+  its size: a centred hit-slop where there is room around it, and 44-pitch
+  spacing on touch screens where neighbours sit closer than that.
+--------------------------------------------------------------*/
+.social-links,
+.social-links-footer {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.cert-expand-btn::after,
+.exp-card-cta::after,
+.exp-lightbox-close::after,
+.biz-contacts a::after,
+.resume-exp-link::after,
+.footer-copy-link::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: max(100%, 44px);
+  height: max(100%, 44px);
+  transform: translate(-50%, -50%);
+}
+.biz-contacts a,
+.resume-exp-link,
+.footer-copy-link { position: relative; }
+
+.info-item { min-height: 44px; }
+
+@media (pointer: coarse) {
+  /* each icon owns a 44 square; the row is pulled back by the extra margin
+     so the first icon still lines up with the text above it */
+  .social-links,
+  .social-links-footer {
+    gap: 0;
+    margin: 8px 0 -8px -8px;
+  }
+  .social-links a,
+  .social-links-footer a {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  /* stacked lines: hit-slop would only overlap the neighbour, so the pitch grows */
+  .footer-contact-link { padding: 10.5px 0; }
+}
+
+/*--------------------------------------------------------------
+# Liquid Glass
+  Glass is the layer that floats over content — controls, the sheet,
+  the card you hold — never the content itself, which stays solid and
+  legible. Clear glass for controls, tinted glass for the one primary
+  action and the selected filter. Light catches the rim, and the
+  material brightens where a pointer or finger touches it.
+--------------------------------------------------------------*/
+:root {
+  --glass-fill: rgba(255, 255, 255, 0.5);
+  --glass-blur: blur(14px) saturate(180%);
+  /* the rim: a bright top edge where light lands, a fainter one below,
+     and a soft inner glow where the material thickens at the edge */
+  --glass-rim:
+    inset 0 1px 1px rgba(255, 255, 255, 0.9),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.35),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.6),
+    inset 0 0 12px rgba(255, 255, 255, 0.35);
+  --glass-lift:
+    0 0 0 0.5px rgba(0, 0, 0, 0.07),
+    0 2px 6px rgba(0, 0, 0, 0.06),
+    0 10px 28px rgba(0, 0, 0, 0.08);
+  --glass-tint: rgba(18, 100, 206, 0.9);
+  --glass-tint-rim:
+    inset 0 1px 1px rgba(255, 255, 255, 0.55),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.18),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.25),
+    inset 0 0 10px rgba(255, 255, 255, 0.18);
+}
+
+/* clear glass — floating controls */
+.project-filters,
+.paddlenav-arrow,
+.paddlenav-arrow:hover,
+.paddlenav-arrow:active,
+#back-to-top,
+.cert-expand-btn,
+.cert-expand-btn:hover,
+.exp-lightbox-close,
+.exp-lightbox-close:hover {
+  background: var(--glass-fill);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  box-shadow: var(--glass-rim), var(--glass-lift);
+  isolation: isolate;
+}
+
+/* dark glass — the same material over the certificate viewer's black */
+.cert-lightbox-close,
+.cert-lightbox-close:hover {
+  background: rgba(255, 255, 255, 0.16);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.45),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.22),
+    0 8px 24px rgba(0, 0, 0, 0.3);
+  isolation: isolate;
+}
+
+/* tinted glass — the primary action */
+.btn-pill {
+  position: relative;
+  isolation: isolate;
+  background: var(--glass-tint);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  box-shadow: var(--glass-tint-rim), 0 1px 2px rgba(0, 0, 0, 0.08), 0 8px 22px rgba(18, 100, 206, 0.28);
+}
+.btn-pill:hover { background: rgba(18, 100, 206, 0.96); }
+
+/* where it is touched, the glass lights up */
+:is(.project-filters, .paddlenav-arrow, #back-to-top, .cert-expand-btn,
+    .exp-lightbox-close, .cert-lightbox-close, .btn-pill)::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(circle 56px at var(--lx, 50%) var(--ly, 0%),
+    rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0) 100%);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  :is(.project-filters, .paddlenav-arrow, #back-to-top, .cert-expand-btn,
+      .exp-lightbox-close, .cert-lightbox-close, .btn-pill):hover::before { opacity: 0.5; }
+}
+:is(.project-filters, .paddlenav-arrow, #back-to-top, .cert-expand-btn,
+    .exp-lightbox-close, .cert-lightbox-close, .btn-pill):active::before {
+  opacity: 1;
+  transition-duration: 0.08s;
+}
+.btn-pill::before { mix-blend-mode: soft-light; }
+
+/* ── Filters: one glass capsule, a tinted lens that flows to the choice ── */
+.project-filters {
+  position: relative;
+  flex-wrap: nowrap;
+  width: max-content;
+  margin: 0 auto 1.5rem;
+  padding: 4px;
+  gap: 2px;
+  border-radius: var(--r-capsule);
+}
+.project-filters .filter-btn {
+  position: relative;
+  z-index: 1;
+  padding: 10px 22px;
+  background: transparent;
+  transition: color 0.25s ease, transform 0.3s var(--ease-swift);
+}
+.project-filters .filter-btn:hover {
+  background: transparent;
+  color: var(--color-link);
+  transform: none;
+}
+.project-filters .filter-btn.active,
+.project-filters .filter-btn.active:hover { background: transparent; color: #fff; }
+/* without the script there is no lens, so the chip carries the state itself */
+.project-filters:not(.has-lens) .filter-btn.active { background: var(--color-link); }
+
+.filter-lens {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  right: auto;
+  z-index: 0;
+  border-radius: var(--r-capsule);
+  background: var(--glass-tint);
+  box-shadow: var(--glass-tint-rim), 0 4px 14px rgba(18, 100, 206, 0.3);
+  pointer-events: none;
+  /* the leading edge leaves first and the trailing edge follows, so the
+     lens stretches like a drop on the way and settles into the chip */
+  transition-property: left, right;
+  transition-duration: 0.42s;
+  transition-timing-function: cubic-bezier(0.3, 0.8, 0.25, 1);
+}
+
+/* ── The modal sheet: a glass slab over a dimmed page ── */
+/* the scrim only dims; blurring there would leave the sheet nothing to refract */
+.exp-lightbox {
+  background: rgba(0, 0, 0, 0.3);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.exp-lightbox .exp-lightbox-inner {
+  /* frosted enough to read paragraphs on: the page shows as light, not as text */
+  background: rgba(255, 255, 255, 0.9);
+  /* brightness lifts the dimmed page back to white under the sheet, so
+     the light-grey chips inside keep their edge */
+  -webkit-backdrop-filter: blur(40px) saturate(180%) brightness(1.3);
+  backdrop-filter: blur(40px) saturate(180%) brightness(1.3);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.95),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.6),
+    0 32px 80px rgba(0, 0, 0, 0.22);
+}
+
+/* ── The business card: a slab of glass held over the accent light ── */
+.biz-scene {
+  position: relative;
+  isolation: isolate;
+}
+.biz-scene::before,
+.biz-scene::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  border-radius: 50%;
+  aspect-ratio: 1;
+  pointer-events: none;
+}
+.biz-scene::before {
+  width: 52%;
+  left: -2%;
+  top: -14%;
+  background: radial-gradient(circle, rgba(18, 100, 206, 0.42), rgba(18, 100, 206, 0) 68%);
+  animation: glass-drift-a 16s ease-in-out infinite alternate;
+}
+.biz-scene::after {
+  width: 46%;
+  right: -4%;
+  bottom: -18%;
+  background: radial-gradient(circle, rgba(90, 167, 255, 0.5), rgba(90, 167, 255, 0) 68%);
+  animation: glass-drift-b 19s ease-in-out infinite alternate;
+}
+@keyframes glass-drift-a { to { transform: translate(14%, 10%); } }
+@keyframes glass-drift-b { to { transform: translate(-12%, -8%); } }
+
+.biz-card {
+  /* flat: a backdrop filter needs a flat surface to sample through */
+  transform-style: flat;
+  background: rgba(255, 255, 255, 0.5);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  backdrop-filter: blur(22px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.95),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.6),
+    inset 0 0 28px rgba(255, 255, 255, 0.4),
+    0 30px 60px rgba(29, 29, 31, 0.12),
+    0 4px 12px rgba(29, 29, 31, 0.06);
+}
+/* the glare follows the pointer across the glass */
+.biz-card::before {
+  background: radial-gradient(circle 70% at var(--lx, 18%) var(--ly, 0%),
+    rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 70%);
+}
+
+/* ── Motion, transparency and contrast preferences ── */
+@media (prefers-reduced-motion: reduce) {
+  .filter-lens { transition: none !important; }
+  .biz-scene::before,
+  .biz-scene::after { animation: none; }
+}
+
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  .project-filters,
+  .paddlenav-arrow,
+  .paddlenav-arrow:hover,
+  .paddlenav-arrow:active,
+  #back-to-top,
+  .cert-expand-btn,
+  .cert-expand-btn:hover,
+  .exp-lightbox-close,
+  .exp-lightbox-close:hover,
+  .exp-lightbox .exp-lightbox-inner,
+  .biz-card {
+    background: #fbfbfd;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .cert-lightbox-close,
+  .cert-lightbox-close:hover {
+    background: #3a3a3c;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .btn-pill,
+  .btn-pill:hover,
+  .filter-lens {
+    background: var(--color-link);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .biz-scene::before,
+  .biz-scene::after { display: none; }
+}
+@media (prefers-contrast: more) {
+  .project-filters,
+  .paddlenav-arrow,
+  #back-to-top,
+  .cert-expand-btn,
+  .exp-lightbox-close,
+  .biz-card { box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.45); }
+}
+
+/* browsers without backdrop-filter get the solid version of each surface */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .project-filters,
+  .paddlenav-arrow,
+  #back-to-top,
+  .cert-expand-btn,
+  .exp-lightbox-close,
+  .exp-lightbox .exp-lightbox-inner,
+  .biz-card { background: #fbfbfd; }
+}
+
+/*--------------------------------------------------------------
+# Liquid Glass — the whole page
+  Glass reads as glass only when there is light behind it, so the page
+  gets a ground: a cool near-white lit by soft pools of the accent blue,
+  fixed to the viewport so every surface slides across the light as you
+  scroll. Every card, chip and panel becomes a pane of that glass.
+
+  Content panes are translucent rather than backdrop-filtered: what sits
+  behind them is already a soft gradient, which a blur would leave
+  unchanged — the same look without dozens of filtered layers to repaint
+  on every scroll frame. The floating controls above keep the real
+  filter, because they pass over text and images.
+--------------------------------------------------------------*/
+:root {
+  --glass-ground: #f2f5fa;
+  --glass-pane: rgba(255, 255, 255, 0.62);
+  --glass-pane-hover: rgba(255, 255, 255, 0.74);
+  --glass-pane-rim:
+    inset 0 1px 1px rgba(255, 255, 255, 0.95),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.4),
+    inset 0 0 28px rgba(255, 255, 255, 0.45);
+  --glass-pane-edge: rgba(255, 255, 255, 0.8);
+  --glass-pane-lift: 0 1px 2px rgba(17, 40, 80, 0.04), 0 14px 36px rgba(17, 40, 80, 0.07);
+  --glass-chip: rgba(255, 255, 255, 0.55);
+  --glass-chip-rim:
+    inset 0 1px 0.5px rgba(255, 255, 255, 0.95),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.7),
+    0 0 0 0.5px rgba(17, 40, 80, 0.06),
+    0 1px 3px rgba(17, 40, 80, 0.06);
+}
+
+/* ── The ground and its light ── */
+html { background: var(--glass-ground); }
+body { background: transparent; }
+body::before {
+  content: '';
+  position: fixed;
+  inset: -10%;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(38vmax 38vmax at 10% 14%, rgba(18, 100, 206, 0.13), rgba(18, 100, 206, 0) 70%),
+    radial-gradient(42vmax 42vmax at 92% 38%, rgba(90, 167, 255, 0.18), rgba(90, 167, 255, 0) 70%),
+    radial-gradient(46vmax 36vmax at 28% 96%, rgba(90, 167, 255, 0.14), rgba(90, 167, 255, 0) 70%),
+    radial-gradient(30vmax 30vmax at 70% 82%, rgba(18, 100, 206, 0.08), rgba(18, 100, 206, 0) 70%);
+  animation: glass-ground-drift 40s ease-in-out infinite alternate;
+  will-change: transform;
+}
+@keyframes glass-ground-drift {
+  to { transform: translate3d(-3%, 2%, 0) scale(1.04); }
+}
+
+/* sections stop painting white over the light */
+#hero, #resume, #experience, #skill, #portfolio, #certificates, #services, #contact {
+  background: transparent;
+}
+
+/* ── Panes: every card on the page ── */
+#resume .data-box,
+#experience .data-box,
+#skill .rf-cards-scroller-item,
+#portfolio .rf-cards-scroller-item,
+#certificates .cert-card,
+.svc-card,
+.faq {
+  background: var(--glass-pane);
+  border: 1px solid var(--glass-pane-edge);
+  box-shadow: var(--glass-pane-rim), var(--glass-pane-lift);
+}
+/* the carousels clip their overflow, so their panes keep the rim and drop the cast shadow */
+#skill .rf-cards-scroller-item,
+#portfolio .rf-cards-scroller-item { box-shadow: var(--glass-pane-rim); }
+
+@media (hover: hover) and (pointer: fine) {
+  #resume .data-box:hover,
+  #experience .data-box:hover,
+  #certificates .cert-card:hover,
+  .svc-card:hover { background: var(--glass-pane-hover); }
+}
+
+.svc-card { transition: background 0.3s ease; }
+
+/* the FAQ list sits on one pane */
+.faq {
+  border-radius: var(--r-card);
+  padding: 32px 40px 16px;
+}
+.faq h3 { margin-bottom: 8px; }
+.faq details:last-of-type { border-bottom: 0; }
+.faq details { border-bottom-color: rgba(17, 40, 80, 0.08); }
+@media (max-width: 768px) {
+  .faq { padding: 24px 20px 8px; }
+}
+
+/* ── Chips: small panes of clear glass ── */
+.exp-card-highlights .hl,
+.exp-duration,
+.exp-card-stack span,
+.exp-badge-chip,
+.exp-filter-chip,
+.hero-net-label,
+#experience .data-box[data-exp]:hover .exp-card-stack span,
+#experience .data-box[data-exp]:hover .exp-badge-chip {
+  background: var(--glass-chip);
+  border-color: transparent;
+  box-shadow: var(--glass-chip-rim);
+}
+.exp-filter-chip:hover { background: rgba(255, 255, 255, 0.8); }
+.exp-filter-chip.active {
+  background: var(--glass-tint);
+  box-shadow: var(--glass-tint-rim), 0 2px 8px rgba(18, 100, 206, 0.25);
+}
+
+/* tinted chips keep their hue, as tinted glass */
+.exp-card-highlights .hl-blue,
+.project-tag,
+.info-icon,
+.exp-card-btn {
+  background: rgba(18, 100, 206, 0.1);
+  box-shadow:
+    inset 0 1px 0.5px rgba(255, 255, 255, 0.85),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.5),
+    0 0 0 0.5px rgba(18, 100, 206, 0.1);
+}
+#experience .data-box[data-exp]:hover .exp-card-btn { background: rgba(18, 100, 206, 0.17); }
+.exp-status-active {
+  /* a deeper green: systemGreen on its own tint is 1.8:1 */
+  color: #1d7a33;
+  background: rgba(48, 209, 88, 0.12);
+  box-shadow: inset 0 1px 0.5px rgba(255, 255, 255, 0.85), inset 0 0 0 0.5px rgba(255, 255, 255, 0.5);
+}
+
+/* ── Footer: a frosted shelf at the foot of the page ── */
+#footer {
+  background: rgba(255, 255, 255, 0.5);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 -1px 0 rgba(17, 40, 80, 0.05);
+}
+#footer .border-top { border-top-color: rgba(17, 40, 80, 0.08) !important; }
+
+/* ── Preferences ── */
+@media (prefers-reduced-motion: reduce) {
+  body::before { animation: none; }
+}
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  html { background: #fff; }
+  body::before { display: none; }
+  #resume .data-box,
+  #experience .data-box,
+  #skill .rf-cards-scroller-item,
+  #portfolio .rf-cards-scroller-item,
+  #certificates .cert-card,
+  .svc-card,
+  .faq,
+  #footer { background: #fff; }
+  .exp-card-highlights .hl,
+  .exp-duration,
+  .exp-card-stack span,
+  .exp-badge-chip,
+  .exp-filter-chip,
+  .hero-net-label { background: #f5f5f7; }
+}
+@media (prefers-contrast: more) {
+  #resume .data-box,
+  #experience .data-box,
+  #skill .rf-cards-scroller-item,
+  #portfolio .rf-cards-scroller-item,
+  #certificates .cert-card,
+  .svc-card,
+  .faq { border-color: rgba(0, 0, 0, 0.45); box-shadow: none; }
 }
