@@ -555,3 +555,38 @@ test('type follows the reader\'s own text-size setting, layout and all', async (
   }
   await page.close();
 });
+
+test('liquid glass: the lens flows to the chosen filter, and glass stays off the content', async () => {
+  const { page } = await ctx.openPage();
+  const lensOver = async (sel) => page.$eval(sel, (btn) => {
+    const lens = btn.parentElement.querySelector('.filter-lens').getBoundingClientRect();
+    const b = btn.getBoundingClientRect();
+    return Math.abs(lens.left - b.left) < 1.5 && Math.abs(lens.right - b.right) < 1.5;
+  });
+  assert.ok(await lensOver('#skill .filter-btn.active'), 'lens starts under the active chip');
+  await page.$eval('#skill .filter-btn[data-filter="ai"]', (el) => el.click());
+  await page.waitForTimeout(700);
+  assert.ok(await lensOver('#skill .filter-btn[data-filter="ai"]'), 'lens did not settle on the chosen chip');
+
+  // glass is the floating layer only: controls are frosted, content cards are not
+  const frosted = await page.evaluate(() => {
+    const bf = (sel) => getComputedStyle(document.querySelector(sel)).backdropFilter;
+    return { capsule: bf('#skill .project-filters'), arrow: bf('.paddlenav-arrow'),
+      card: bf('#skill .rf-cards-scroller-item'), svc: bf('.svc-card') };
+  });
+  assert.notEqual(frosted.capsule, 'none');
+  assert.notEqual(frosted.arrow, 'none');
+  assert.equal(frosted.card, 'none', 'content cards must stay solid');
+  assert.equal(frosted.svc, 'none', 'content cards must stay solid');
+  await page.close();
+});
+
+test('liquid glass turns solid when the reader asks for less transparency', async () => {
+  const { page } = await ctx.openPage();
+  const cdp = await page.context().newCDPSession(page);
+  await cdp.send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-transparency', value: 'reduce' }] });
+  const surfaces = await page.evaluate(() => ['#skill .project-filters', '.paddlenav-arrow', '#back-to-top', '#biz-card', '.btn-pill']
+    .map((sel) => [sel, getComputedStyle(document.querySelector(sel)).backdropFilter]));
+  for (const [sel, bf] of surfaces) assert.equal(bf, 'none', `${sel} still frosted under reduced transparency`);
+  await page.close();
+});
