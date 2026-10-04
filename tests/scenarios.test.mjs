@@ -556,7 +556,7 @@ test('type follows the reader\'s own text-size setting, layout and all', async (
   await page.close();
 });
 
-test('liquid glass: the lens flows to the chosen filter, and glass stays off the content', async () => {
+test('liquid glass: the lens flows to the chosen filter, and every surface is glass', async () => {
   const { page } = await ctx.openPage();
   const lensOver = async (sel) => page.$eval(sel, (btn) => {
     const lens = btn.parentElement.querySelector('.filter-lens').getBoundingClientRect();
@@ -568,16 +568,26 @@ test('liquid glass: the lens flows to the chosen filter, and glass stays off the
   await page.waitForTimeout(700);
   assert.ok(await lensOver('#skill .filter-btn[data-filter="ai"]'), 'lens did not settle on the chosen chip');
 
-  // glass is the floating layer only: controls are frosted, content cards are not
-  const frosted = await page.evaluate(() => {
-    const bf = (sel) => getComputedStyle(document.querySelector(sel)).backdropFilter;
-    return { capsule: bf('#skill .project-filters'), arrow: bf('.paddlenav-arrow'),
-      card: bf('#skill .rf-cards-scroller-item'), svc: bf('.svc-card') };
+  // the floating controls carry a real backdrop filter; every content pane is
+  // translucent glass over the lit ground
+  const glass = await page.evaluate(() => {
+    const cs = (sel) => getComputedStyle(document.querySelector(sel));
+    const alpha = (sel) => { const m = cs(sel).backgroundColor.match(/[\d.]+/g).map(Number); return m.length > 3 ? m[3] : 1; };
+    return {
+      capsule: cs('#skill .project-filters').backdropFilter,
+      arrow: cs('.paddlenav-arrow').backdropFilter,
+      panes: ['#resume .data-box', '#experience .data-box', '#skill .rf-cards-scroller-item',
+        '#portfolio .rf-cards-scroller-item', '#certificates .cert-card', '.svc-card', '.faq']
+        .map((sel) => [sel, alpha(sel)]),
+      ground: getComputedStyle(document.body, '::before').backgroundImage,
+      section: cs('#skill').backgroundColor,
+    };
   });
-  assert.notEqual(frosted.capsule, 'none');
-  assert.notEqual(frosted.arrow, 'none');
-  assert.equal(frosted.card, 'none', 'content cards must stay solid');
-  assert.equal(frosted.svc, 'none', 'content cards must stay solid');
+  assert.notEqual(glass.capsule, 'none');
+  assert.notEqual(glass.arrow, 'none');
+  for (const [sel, a] of glass.panes) assert.ok(a > 0.3 && a < 0.9, `${sel} is not a pane of glass (alpha ${a})`);
+  assert.match(glass.ground, /radial-gradient/, 'the ground has no light for the glass to show');
+  assert.equal(glass.section, 'rgba(0, 0, 0, 0)', 'sections must not paint over the light');
   await page.close();
 });
 
@@ -588,5 +598,11 @@ test('liquid glass turns solid when the reader asks for less transparency', asyn
   const surfaces = await page.evaluate(() => ['#skill .project-filters', '.paddlenav-arrow', '#back-to-top', '#biz-card', '.btn-pill']
     .map((sel) => [sel, getComputedStyle(document.querySelector(sel)).backdropFilter]));
   for (const [sel, bf] of surfaces) assert.equal(bf, 'none', `${sel} still frosted under reduced transparency`);
+  const solid = await page.evaluate(() => ({
+    pane: getComputedStyle(document.querySelector('#experience .data-box')).backgroundColor,
+    ground: getComputedStyle(document.body, '::before').display,
+  }));
+  assert.equal(solid.pane, 'rgb(255, 255, 255)', 'panes must turn solid');
+  assert.equal(solid.ground, 'none', 'the light behind the glass must go');
   await page.close();
 });
