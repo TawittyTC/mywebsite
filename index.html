@@ -1354,10 +1354,10 @@
   </style>
 
   <!-- Full CSS loaded async: no render blocking (bootstrap merged in) -->
-  <link rel="preload" href="assets/css/style.min.css?v=2.30.0" as="style"
+  <link rel="preload" href="assets/css/style.min.css?v=2.31.0" as="style"
     onload="this.onload=null;this.rel='stylesheet'">
   <noscript>
-    <link href="assets/css/style.min.css?v=2.30.0" rel="stylesheet">
+    <link href="assets/css/style.min.css?v=2.31.0" rel="stylesheet">
   </noscript>
 
 
@@ -1611,7 +1611,7 @@
   </script>
 
   <!-- Preload deferred JS to start downloading before parser reaches script tags -->
-  <link rel="preload" href="assets/js/main.min.js?v=2.30.0" as="script">
+  <link rel="preload" href="assets/js/main.min.js?v=2.31.0" as="script">
 
   <script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="233b92be-5a2d-492b-b093-9c3ed14c9063"
     type="text/javascript" async></script>
@@ -1645,7 +1645,7 @@
           <p class="hero-eyebrow">Software Engineer · Bangkok</p>
           <h1 class="hero-name"><span class="hero-name-line">Tanapol</span> <span
               class="hero-name-line">Chamnanhan</span></h1>
-          <p class="hero-role">I'm a <span class="typed"
+          <p class="hero-role">I'm <span class="typed-article">a</span> <span class="typed"
               data-typed-items="Full-Stack Developer, AI Engineer, Software Engineer"></span>
           </p>
         </div>
@@ -2073,11 +2073,13 @@
           </div>
         </div>
 
-        <div class="project-filters">
-          <button class="filter-btn active" data-filter="all">All</button>
-          <button class="filter-btn" data-filter="web">Web</button>
-          <button class="filter-btn" data-filter="ai">AI</button>
-          <button class="filter-btn" data-filter="eng">Engineering</button>
+        <div class="project-filters-wrap">
+          <div class="project-filters">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="web">Web</button>
+            <button class="filter-btn" data-filter="ai">AI</button>
+            <button class="filter-btn" data-filter="eng">Engineering</button>
+          </div>
         </div>
 
         <div class="rf-cards-scroller">
@@ -2449,27 +2451,102 @@
         </div>
 
         <div class="svc-grid">
-          <article class="svc-card">
-            <h3>รับทำเว็บไซต์</h3>
-            <p>Corporate Website, Landing Page, E-Commerce และ Web Application — Responsive ทุกอุปกรณ์ ส่งงานตรงเวลา</p>
+          <article class="svc-card svc-card-wide">
+            <div class="svc-icon" aria-hidden="true">
+              <svg viewBox="0 0 170 170" fill="none">
+                <g stroke="#1264CE" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M88 118H36a12 12 0 0 1-12-12V44a12 12 0 0 1 12-12h86a12 12 0 0 1 12 12v16" />
+                  <path d="M24 54h110M40 76h34M40 94h22" />
+                  <rect x="102" y="72" width="46" height="72" rx="11" />
+                  <path d="M119 84h12" />
+                </g>
+                <circle cx="38" cy="43" r="3.5" fill="#1264CE" />
+                <circle cx="49" cy="43" r="3.5" fill="#1264CE" />
+                <circle cx="60" cy="43" r="3.5" fill="#1264CE" />
+                <circle cx="125" cy="131" r="3.5" fill="#1264CE" />
+              </svg>
+            </div>
+            <div class="svc-body">
+              <h3>รับทำเว็บไซต์</h3>
+              <p>Corporate Website, Landing Page, <span class="svc-nw">E-Commerce</span> และ Web Application — Responsive ทุกอุปกรณ์ ส่งงานตรงเวลา</p>
+            </div>
           </article>
           <article class="svc-card">
-            <h3>รับทำระบบ CRM</h3>
-            <p>CRM แบบ Custom สำหรับองค์กร — Sales Pipeline, Lead Management, Call Center CRM และ Reporting Dashboard</p>
+            <div class="svc-icon" aria-hidden="true">
+              <svg viewBox="0 0 170 170" fill="none">
+                <g stroke="#1264CE" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="22" y="34" width="126" height="102" rx="16" />
+                  <circle cx="62" cy="72" r="14" />
+                  <path d="M38 114c2-13 11-20 24-20s22 7 24 20" />
+                  <path d="M104 66h26M104 85h26M104 104h14" />
+                </g>
+              </svg>
+            </div>
+            <div class="svc-body">
+              <h3>รับทำระบบ CRM</h3>
+              <p>CRM แบบ Custom สำหรับองค์กร — Sales Pipeline, Lead Management, Call Center CRM และ Reporting Dashboard</p>
+            </div>
           </article>
           <article class="svc-card">
-            <h3>รับทำระบบ POS</h3>
-            <p>ระบบจุดขายครบวงจร — สต็อกสินค้า รายงานยอดขาย และเชื่อมต่อ Payment Gateway ตามความต้องการ</p>
+            <div class="svc-icon" aria-hidden="true">
+              <svg viewBox="0 0 170 170" fill="none">
+                <g stroke="#1264CE" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M60 36V22h50v14M72 30h26" />
+                  <rect x="36" y="36" width="98" height="112" rx="18" />
+                  <rect x="52" y="52" width="66" height="30" rx="7" />
+                </g>
+                <g fill="#1264CE">
+                  <circle cx="63" cy="102" r="5" /><circle cx="85" cy="102" r="5" /><circle cx="107" cy="102" r="5" />
+                  <circle cx="63" cy="125" r="5" /><circle cx="85" cy="125" r="5" /><circle cx="107" cy="125" r="5" />
+                </g>
+              </svg>
+            </div>
+            <div class="svc-body">
+              <h3>รับทำระบบ POS</h3>
+              <p>ระบบจุดขายครบวงจร — สต็อกสินค้า รายงานยอดขาย และเชื่อมต่อ Payment Gateway ตามความต้องการ</p>
+            </div>
           </article>
-          <article class="svc-card">
-            <h3>รับพัฒนา AI Agent</h3>
-            <p>Agentic AI แบบ Multi-Agent, LLM Integration (GPT, Gemini, Claude), Voice AI (ASR / TTS / Speech-to-Speech), AI Chatbot และ AI IVR</p>
+          <article class="svc-card svc-card-wide">
+            <div class="svc-icon" aria-hidden="true">
+              <svg viewBox="0 0 170 170" fill="none">
+                <g stroke="#1264CE" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M76 30c4 27 14 37 41 41-27 4-37 14-41 41-4-27-14-37-41-41 27-4 37-14 41-41z" />
+                  <path d="M124 98c2 11 6 15 17 17-11 2-15 6-17 17-2-11-6-15-17-17 11-2 15-6 17-17z" />
+                  <path d="M38 126v12M52 120v24M66 128v8" />
+                </g>
+                <circle cx="132" cy="40" r="5" fill="#1264CE" />
+              </svg>
+            </div>
+            <div class="svc-body">
+              <h3>รับพัฒนา AI Agent</h3>
+              <p>Agentic AI แบบ Multi-Agent, LLM Integration (GPT, Gemini, Claude), Voice AI (ASR / TTS / <span class="svc-nw">Speech-to-Speech</span>), AI Chatbot และ AI IVR</p>
+            </div>
           </article>
+          <div class="svc-more">
+            <p class="svc-more-label">และงานอื่นๆ</p>
+            <ul class="svc-chips">
+              <li>ERP</li>
+              <li>Back-Office</li>
+              <li>Dashboard</li>
+              <li>Booking System</li>
+              <li>LINE Bot</li>
+              <li>Telegram Bot</li>
+              <li>Asterisk PBX / Call Center</li>
+              <li>AWS &amp; Docker</li>
+            </ul>
+          </div>
         </div>
-        <p class="svc-more">และงานอื่นๆ — ERP, Back-Office, Dashboard, Booking System, LINE Bot, Telegram Bot, Asterisk PBX / Call Center, AWS &amp; Docker</p>
 
-        <div class="faq">
-          <h3>คำถามที่พบบ่อย</h3>
+        <div class="faq-layout">
+          <div class="faq-intro">
+            <h3>คำถามที่พบบ่อย</h3>
+            <p>คำตอบสั้นๆ เรื่องบริการ ค่าใช้จ่าย และการร่วมงาน — ถ้ายังไม่เจอสิ่งที่อยากรู้ ทักมาคุยกันได้เลย ปรึกษาฟรี</p>
+            <div class="faq-actions">
+              <a class="btn-pill" href="mailto:tanapol.ch@rmutsvmail.com">ติดต่อสอบถาม</a>
+              <a class="faq-call" href="tel:+66962437210">+66 962 437 210</a>
+            </div>
+          </div>
+          <div class="faq">
             <details>
               <summary>ธนพล ชำนาญหาญ คือใคร?</summary>
               <p>ธนพล ชำนาญหาญ (Tanapol Chamnanhan) คือ Full-Stack Developer และ Software Engineer จากกรุงเทพมหานคร มีประสบการณ์กว่า 2 ปีในการพัฒนาระบบ CRM, เว็บแอปพลิเคชัน และระบบ AI สำหรับองค์กรชั้นนำในไทยกว่า 27 แห่ง</p>
@@ -2490,7 +2567,7 @@
               <summary>ธนพล ชำนาญหาญ กำลังหางานอยู่ไหม?</summary>
               <p>ใช่ครับ ธนพล ชำนาญหาญ เปิดรับโอกาสงานใหม่ ทั้งตำแหน่ง Software Engineer, Full-Stack Developer, Web Developer และ Programmer ในกรุงเทพหรือรูปแบบ Remote ติดต่อ HR ได้ที่ tanapol.ch@rmutsvmail.com หรือ LinkedIn: linkedin.com/in/tanapol-chamnanhan/</p>
             </details>
-            <details>
+            <details lang="en">
               <summary>How to hire Tanapol Chamnanhan (ธนพล ชำนาญหาญ) as Software Engineer or Web Developer?</summary>
               <p>Contact Tanapol Chamnanhan via email tanapol.ch@rmutsvmail.com or LinkedIn linkedin.com/in/tanapol-chamnanhan/. Bangkok-based Full-Stack Developer open to full-time, contract, and freelance opportunities in Software Engineering, Web Development, CRM/POS system development.</p>
             </details>
@@ -2502,14 +2579,15 @@
               <summary>ธนพล ชำนาญหาญ รับพัฒนา AI Agent และระบบ AI สำหรับธุรกิจไหม?</summary>
               <p>รับครับ ธนพล ชำนาญหาญ รับพัฒนา AI Agent และระบบ AI สำหรับธุรกิจครบวงจร — Agentic AI (Multi-Agent Orchestration, Sub-Agents), LLM Integration (GPT, Gemini, Claude), Voice AI (ASR, TTS, Speech-to-Speech แบบ Realtime), AI Chatbot และ AI IVR สำหรับ Contact Center ติดต่อ tanapol.ch@rmutsvmail.com</p>
             </details>
-            <details>
+            <details lang="en">
               <summary>Does Tanapol Chamnanhan build AI agents and voice AI systems?</summary>
               <p>Yes. Tanapol Chamnanhan designs and builds agentic AI systems (orchestrator + sub-agent architectures, multi-agent orchestration), LLM integrations (GPT, Gemini, Claude), and voice AI pipelines (ASR, TTS, realtime speech-to-speech) for business automation and contact centers. Based in Bangkok, Thailand — contact tanapol.ch@rmutsvmail.com</p>
             </details>
-            <details>
+            <details lang="en">
               <summary>What technologies does Tanapol Chamnanhan use for CRM and POS development?</summary>
               <p>Tanapol Chamnanhan builds CRM and POS systems using PHP, Python, JavaScript, MySQL, React, RESTful APIs, and integrations with LINE Messaging API, Telegram Bot, Payment Gateways, and Asterisk PBX for call center functionality. Based in Bangkok, Thailand.</p>
             </details>
+          </div>
         </div>
       </div>
     </section><!-- End Services & FAQ -->
@@ -2630,7 +2708,7 @@
   </button>
 
   <!-- Main JS -->
-  <script defer src="assets/js/main.min.js?v=2.30.0"></script>
+  <script defer src="assets/js/main.min.js?v=2.31.0"></script>
   <!-- Service Worker: cache assets for repeat visits -->
   <script>if ('serviceWorker' in navigator) { var _sw = function () { navigator.serviceWorker.register('sw.js') }; 'requestIdleCallback' in window ? requestIdleCallback(_sw) : window.addEventListener('load', _sw) }</script>
 

@@ -591,18 +591,34 @@ test('liquid glass: the lens flows to the chosen filter, and every surface is gl
   await page.close();
 });
 
-test('liquid glass turns solid when the reader asks for less transparency', async () => {
+test('liquid glass turns frostier, not gone, when the reader asks for less transparency', async () => {
   const { page } = await ctx.openPage();
   const cdp = await page.context().newCDPSession(page);
   await cdp.send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-transparency', value: 'reduce' }] });
+  // some panes ease their background, so let the change settle before reading it
+  await page.waitForTimeout(600);
   const surfaces = await page.evaluate(() => ['#skill .project-filters', '.paddlenav-arrow', '#back-to-top', '#biz-card', '.btn-pill']
     .map((sel) => [sel, getComputedStyle(document.querySelector(sel)).backdropFilter]));
-  for (const [sel, bf] of surfaces) assert.equal(bf, 'none', `${sel} still frosted under reduced transparency`);
-  const solid = await page.evaluate(() => ({
-    pane: getComputedStyle(document.querySelector('#experience .data-box')).backgroundColor,
-    ground: getComputedStyle(document.body, '::before').display,
-  }));
-  assert.equal(solid.pane, 'rgb(255, 255, 255)', 'panes must turn solid');
-  assert.equal(solid.ground, 'none', 'the light behind the glass must go');
+  for (const [sel, bf] of surfaces) assert.equal(bf, 'none', `${sel} still samples the backdrop under reduced transparency`);
+  const frost = await page.evaluate(() => {
+    const cs = (sel) => getComputedStyle(document.querySelector(sel));
+    const rgba = (c) => { const m = c.match(/[\d.]+/g).map(Number); return { rgb: m.slice(0, 3), a: m.length > 3 ? m[3] : 1 }; };
+    const ground = getComputedStyle(document.body, '::before');
+    return {
+      panes: ['#resume .data-box', '#experience .data-box', '#skill .rf-cards-scroller-item', '#portfolio .rf-cards-scroller-item',
+        '#certificates .cert-card', '.svc-card', '.faq']
+        .map((sel) => [sel, rgba(cs(sel).backgroundColor).a, rgba(cs(sel).borderTopColor).rgb]),
+      groundDisplay: ground.display,
+      groundImage: ground.backgroundImage,
+      html: cs('html').backgroundColor,
+    };
+  });
+  for (const [sel, a, edge] of frost.panes) {
+    assert.ok(a >= 0.85, `${sel} must turn frostier (alpha ${a})`);
+    assert.ok(Math.min(...edge) < 200, `${sel} keeps a white edge on a white pane, so it disappears`);
+  }
+  assert.notEqual(frost.groundDisplay, 'none', 'the ground keeps its light: frostier, not gone');
+  assert.match(frost.groundImage, /radial-gradient/);
+  assert.notEqual(frost.html, 'rgb(255, 255, 255)', 'a white ground leaves white panes nothing to stand on');
   await page.close();
 });

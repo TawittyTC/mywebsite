@@ -104,9 +104,12 @@
   const typedEl = select(".typed");
   if (typedEl) {
     const items = typedEl.getAttribute("data-typed-items").split(",").map(s => s.trim());
+    const art = typedEl.parentNode.querySelector(".typed-article");
     let i = 0, j = 0, deleting = false;
     function typeTick() {
       const cur = items[i];
+      // "a Full-Stack Developer", "an AI Engineer": the article changes only once the old role is erased
+      if (art && j === 0 && !deleting) art.textContent = /^[aeiou]/i.test(cur) ? "an" : "a";
       typedEl.textContent = cur.slice(0, j);
       if (!deleting) {
         j++;
@@ -1636,7 +1639,8 @@ document.addEventListener('DOMContentLoaded', function () {
  */
 (function () {
   var GLASS = '.project-filters, .paddlenav-arrow, #back-to-top, .cert-expand-btn, ' +
-    '.exp-lightbox-close, .cert-lightbox-close, .btn-pill, .biz-card';
+    '.exp-lightbox-close, .cert-lightbox-close, .btn-pill, .biz-card, ' +
+    '#experience .data-box[data-exp], #resume .data-box';
   function light(e) {
     var el = e.target && e.target.closest && e.target.closest(GLASS);
     if (!el) return;
