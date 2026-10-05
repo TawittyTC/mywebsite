@@ -204,3 +204,20 @@ test('hero rotates three roles, strongest first', async () => {
   assert.ok(items.length <= 3, `${items.length} roles — most visitors scroll on after one or two`);
   await page.close();
 });
+
+test('the hero name never loses letters, on 4K screens or with a larger reader font', async () => {
+  for (const [width, font] of [[2560, 16], [1665, 20], [2560, 24], [390, 24]]) {
+    const { page } = await ctx.openPage({ viewport: { width, height: 900 } });
+    const cdp = await page.context().newCDPSession(page);
+    await cdp.send('Page.setFontSizes', { fontSizes: { standard: font, fixed: 13 } });
+    await page.reload({ waitUntil: 'load' });
+    await page.evaluate(() => document.fonts.ready);
+    // the gradient ink is painted only inside each line's own box, so the box must hold every glyph
+    const lines = await page.$$eval('.hero-name-line', (els) => els.map((el) => {
+      const r = document.createRange(); r.selectNodeContents(el);
+      return { text: r.getBoundingClientRect().width, box: el.getBoundingClientRect().width };
+    }));
+    for (const l of lines) assert.ok(l.text <= l.box + 1, `${width}px / ${font}px font: name ${l.text}px in a ${l.box}px box`);
+    await page.close();
+  }
+});

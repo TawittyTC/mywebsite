@@ -1913,87 +1913,6 @@ a.info-item:hover .info-value { color: var(--color-link); }
 #footer .border-top { border-top-color: rgba(0, 0, 0, 0.07) !important; }
 
 /*--------------------------------------------------------------
-# Services & FAQ
---------------------------------------------------------------*/
-.svc-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 20px;
-}
-.svc-card {
-  background: var(--color-fill);
-  border-radius: var(--r-card-sm);
-  padding: 28px;
-}
-.svc-card h3 {
-  font-size: 1.2941rem;
-  font-weight: 600;
-  line-height: 1.3;
-  margin: 0 0 10px;
-}
-.svc-card p {
-  font-size: 0.9412rem;
-  line-height: 1.65;
-  color: var(--color-text-secondary);
-  margin: 0;
-}
-.svc-more {
-  font-size: 0.9412rem;
-  line-height: 1.65;
-  color: var(--color-text-secondary);
-  margin: 24px 0 0;
-}
-.faq {
-  max-width: 760px;
-  margin: 88px auto 0;
-}
-.faq h3 {
-  font-size: 1.7647rem;
-  text-align: center;
-  margin: 0 0 24px;
-}
-.faq details { border-bottom: 1px solid rgba(0, 0, 0, 0.07); }
-.faq summary {
-  position: relative;
-  list-style: none;
-  cursor: pointer;
-  padding: 18px 36px 18px 0;
-  font-size: 1.0588rem;
-  font-weight: 600;
-  line-height: 1.45;
-}
-.faq summary::-webkit-details-marker { display: none; }
-/* the chevron turns with the row, so the state reads without the colour */
-.faq summary::after {
-  content: '';
-  position: absolute;
-  right: 6px;
-  top: 50%;
-  width: 9px;
-  height: 9px;
-  border-right: 2px solid var(--color-link);
-  border-bottom: 2px solid var(--color-link);
-  transform: translateY(-70%) rotate(45deg);
-  transition: transform 0.2s var(--ease-swift);
-}
-.faq details[open] summary::after { transform: translateY(-30%) rotate(-135deg); }
-.faq summary:focus-visible {
-  outline: 2px solid var(--color-link);
-  outline-offset: 2px;
-  border-radius: var(--r-min);
-}
-.faq details p {
-  font-size: 0.9412rem;
-  line-height: 1.7;
-  color: var(--color-text-secondary);
-  margin: 0 0 20px;
-  padding-right: 36px;
-}
-@media (prefers-reduced-motion: reduce) {
-  .faq summary::after { transition: none; }
-}
-
-/*--------------------------------------------------------------
 # Touch targets
   Every control answers a 44×44 finger (Apple HIG) while the mark keeps
   its size: a centred hit-slop where there is room around it, and 44-pitch
@@ -2395,19 +2314,6 @@ body::before {
   .svc-card:hover { background: var(--glass-pane-hover); }
 }
 
-.svc-card { transition: background 0.3s ease; }
-
-/* the FAQ list sits on one pane */
-.faq {
-  border-radius: var(--r-card);
-  padding: 32px 40px 16px;
-}
-.faq h3 { margin-bottom: 8px; }
-.faq details:last-of-type { border-bottom: 0; }
-.faq details { border-bottom-color: rgba(17, 40, 80, 0.08); }
-@media (max-width: 768px) {
-  .faq { padding: 24px 20px 8px; }
-}
 
 /* ── Chips: small panes of clear glass ── */
 .exp-card-highlights .hl,
@@ -2546,4 +2452,1258 @@ body::before {
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }
+}
+
+/*--------------------------------------------------------------
+# Liquid Glass — lower half: specular rims, carousels, frames, footer slab, contact
+--------------------------------------------------------------*/
+:root {
+  --glass-refract:
+    inset 0 -14px 24px -14px rgba(18, 100, 206, 0.12),
+    inset 0 0 22px rgba(90, 167, 255, 0.08);
+  --glass-cast: 0 1px 2px rgba(17, 40, 80, 0.05), 0 12px 28px rgba(17, 40, 80, 0.08);
+  --glass-hairline: 0 0 0 0.5px rgba(17, 40, 80, 0.08);
+  --glass-sheen: linear-gradient(180deg, rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0) 30%);
+  --glass-spec: linear-gradient(150deg, #fff 0%, rgba(255, 255, 255, 0.4) 25%, rgba(255, 255, 255, 0) 45%,
+    rgba(255, 255, 255, 0) 60%, rgba(255, 255, 255, 0.55) 85%, #fff 100%);
+}
+#skill .rf-cards-scroller-item,
+#portfolio .rf-cards-scroller-item,
+#certificates .cert-card {
+  position: relative;
+  border-color: transparent;
+  background-image: var(--glass-sheen);
+  box-shadow: var(--glass-pane-rim), var(--glass-refract), var(--glass-hairline), var(--glass-cast);
+}
+#skill .rf-cards-scroller-item::after,
+#portfolio .rf-cards-scroller-item::after,
+#certificates .cert-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: var(--glass-spec);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+}
+/* the existing hover rule uses the background shorthand; keep the sheen when it brightens */
+@media (hover: hover) and (pointer: fine) {
+  #certificates .cert-card:hover { background-image: var(--glass-sheen); }
+}
+
+/* clip, not hidden: no scroll container, and a classic scrollbar's 17px inside 100vw never scrolls the page */
+#skill, #portfolio { overflow-x: clip; }
+.rf-cards-scroller-overflow {
+  margin-inline: calc(50% - 50vw);
+  padding-inline: calc(50vw - 50%);
+  scroll-padding-inline: calc(50vw - 50%);
+}
+/* room inside the clip for each pane's cast shadow */
+@media (min-width: 1024px) {
+  .rf-cards-scroller-overflow { padding-block: 30px 58px; margin-bottom: -28px; }
+}
+@media (max-width: 768px) {
+  .rf-cards-scroller-overflow { padding-block: 8px 40px; margin-bottom: -32px; }
+}
+
+#portfolio .project-img {
+  width: auto;
+  margin: 8px 8px 0;
+  border-radius: calc(var(--r-card) - 8px);   /* concentric: 28 − 8 */
+  box-shadow: 0 0 0 0.5px rgba(17, 40, 80, 0.14), 0 6px 18px rgba(17, 40, 80, 0.10);
+  isolation: isolate;
+}
+#portfolio .project-img img { border-radius: inherit; }
+/* the cover glass: a sheen from the top-left and a hairline inner rim */
+#portfolio .project-img::after {
+  border-radius: inherit;
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.38) 0%, rgba(255, 255, 255, 0.08) 28%, rgba(255, 255, 255, 0) 45%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45);
+}
+
+#skill .rf-cards-scroller-item { min-height: 0; }
+#skill .rf-cards-scroller-item .skill-icon {
+  width: 148px;
+  height: 148px;
+  padding: 12px;
+  margin: 0 0 30px;
+  border-radius: 40px;
+  background: radial-gradient(120% 100% at 30% 0%, rgba(90, 167, 255, 0.22), rgba(18, 100, 206, 0.07));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.6),
+    inset 0 -10px 18px -10px rgba(18, 100, 206, 0.18),
+    0 10px 24px rgba(18, 100, 206, 0.14);
+}
+@media (max-width: 768px) {
+  #skill .rf-cards-scroller-item .skill-icon { width: 116px; height: 116px; padding: 10px; border-radius: 32px; margin: 4px 0 22px; }
+}
+
+#footer {
+  background: transparent;
+  box-shadow: none;
+  padding-top: 0;
+  /* the back-to-top button parks below the slab, not on its corner */
+  padding-bottom: max(88px, calc(66px + env(safe-area-inset-bottom)));
+}
+#footer > .container {
+  position: relative;
+  margin-top: 0 !important;   /* .my-3 is !important in the Bootstrap subset */
+  padding: 36px 28px 20px;
+  border-radius: var(--r-card);
+  background-color: var(--glass-pane);
+  background-image: var(--glass-sheen);
+  box-shadow: var(--glass-pane-rim), var(--glass-refract), var(--glass-hairline), var(--glass-cast);
+}
+#footer .text-body-secondary { font-size: 0.8235rem; }
+.social-links-footer { gap: 10px; }
+.social-links-footer a {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--glass-chip);
+  box-shadow: var(--glass-chip-rim);
+}
+.social-links-footer a:hover { background: rgba(255, 255, 255, 0.7); }
+.social-links-footer .social-icon { width: 20px; height: 20px; }
+@media (pointer: coarse) {
+  .social-links-footer { gap: 10px; margin: 16px 0 0; }
+}
+@media (max-width: 768px) {
+  #footer > .container { width: auto; margin-inline: 12px; padding: 24px 0 12px; }
+}
+
+.cta-pill {
+  min-height: 52px;
+  padding: 0 32px;
+  font-size: 1rem;
+  margin-bottom: 48px;
+}
+/* the light behind the card is wider and softer, so it reads as light, not as two spots */
+.biz-scene::before {
+  width: 70%;
+  left: -12%;
+  top: -30%;
+  background: radial-gradient(circle, rgba(18, 100, 206, 0.30), rgba(18, 100, 206, 0) 66%);
+}
+.biz-scene::after {
+  width: 66%;
+  right: -14%;
+  bottom: -34%;
+  background: radial-gradient(circle, rgba(90, 167, 255, 0.40), rgba(90, 167, 255, 0) 66%);
+}
+.biz-card {
+  -webkit-backdrop-filter: blur(18px) saturate(180%) brightness(1.05);
+  backdrop-filter: blur(18px) saturate(180%) brightness(1.05);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 1px 0 0 rgba(255, 255, 255, 0.5),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -16px 28px -16px rgba(18, 100, 206, 0.14),
+    var(--glass-hairline),
+    0 30px 60px rgba(29, 29, 31, 0.12),
+    0 4px 12px rgba(29, 29, 31, 0.06);
+}
+/* must precede the reduced-transparency block, which sets .biz-card backdrop-filter: none */
+
+.cert-lightbox {
+  background: rgba(12, 18, 30, 0.62);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
+  backdrop-filter: blur(24px) saturate(140%);
+}
+.cert-lightbox img {
+  max-width: min(92vw, 1100px);
+  max-height: 86vh;
+  padding: 10px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.2),
+    0 30px 80px rgba(0, 0, 0, 0.45);
+}
+
+#certificates .cert-img { padding: 16px; }
+#certificates .cert-img img {
+  border-radius: 4px;
+  /* drop-shadow, not box-shadow: it follows the paper, not the letterboxed img box */
+  filter: drop-shadow(0 1px 1px rgba(17, 40, 80, 0.10)) drop-shadow(0 6px 12px rgba(17, 40, 80, 0.12));
+}
+.cert-expand-btn { width: 32px; height: 32px; bottom: 14px; right: 14px; color: var(--color-link); }
+@media (max-width: 767px) {
+  #certificates .cert-img { padding: 10px; }
+  .cert-expand-btn { width: 28px; height: 28px; bottom: 10px; right: 10px; }
+}
+
+@media (max-width: 430px) {
+  #portfolio .project-filters .filter-btn {
+    padding: 10px 12px;
+    min-width: 44px;
+    justify-content: center;
+    font-size: 0.8824rem;
+  }
+}
+
+
+/*--------------------------------------------------------------
+# Liquid Glass — upper half: hero light, rims, stats well, grouped controls, sheet
+--------------------------------------------------------------*/
+/* hero: the light reaches the first screen */
+#hero::before { background: transparent; }
+/* the copy keeps a calm, bright zone: the light pools around it, not under the words */
+#hero .hero-copy::before {
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.35) 35%, rgba(255, 255, 255, 0) 65%);
+}
+#hero .hero-eyebrow {
+  display: inline-block;
+  padding: 7px 14px;
+  border-radius: var(--r-capsule);
+  background: var(--glass-chip);
+  box-shadow: var(--glass-chip-rim);
+}
+/* six tiny floating labels over a moving canvas: the one place content earns the real lens */
+.hero-net-label {
+  padding: 3px 8px;
+  background: rgba(255, 255, 255, 0.5);
+  -webkit-backdrop-filter: blur(6px) saturate(170%);
+  backdrop-filter: blur(6px) saturate(170%);
+}
+/* the scroll hint is a floating bead of glass (display untouched: phones keep it hidden) */
+.hero-scroll-hint {
+  width: 44px;
+  height: 44px;
+  padding: 11px;
+  border-radius: 50%;
+  opacity: 1;
+  color: var(--color-text-secondary);
+  background: var(--glass-fill);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  box-shadow: var(--glass-rim), var(--glass-lift);
+}
+.hero-scroll-hint svg { display: block; }
+@media (prefers-reduced-transparency: reduce) {
+  .hero-net-label,
+  .hero-scroll-hint { -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .hero-scroll-hint { background: rgba(255, 255, 255, 0.92); }
+  #hero .hero-eyebrow { background: rgba(255, 255, 255, 0.9); }
+}
+
+/* more light behind the glass (wide screens; phones keep today's pools, where text sits directly on the ground) */
+@media (min-width: 768px) and (prefers-contrast: no-preference) {
+  html { background: #eef2f9; }
+  body::before {
+    background:
+      radial-gradient(38vmax 38vmax at 10% 14%, rgba(18, 100, 206, 0.2), rgba(18, 100, 206, 0) 70%),
+      radial-gradient(42vmax 42vmax at 92% 38%, rgba(90, 167, 255, 0.28), rgba(90, 167, 255, 0) 70%),
+      radial-gradient(46vmax 36vmax at 28% 96%, rgba(90, 167, 255, 0.22), rgba(90, 167, 255, 0) 70%),
+      radial-gradient(30vmax 30vmax at 70% 82%, rgba(18, 100, 206, 0.12), rgba(18, 100, 206, 0) 70%);
+  }
+}
+/* panes: a specular rim that catches light top-left and lower-right, and flares where the pointer is */
+@property --rim-a { syntax: '<number>'; inherits: false; initial-value: 0; }
+#resume .data-box,
+#experience .data-box { position: relative; isolation: isolate; }
+#resume .data-box::after,
+#experience .data-box:not([data-exp])::after,
+#experience .data-box[data-exp]::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  z-index: 0;
+  border-radius: inherit;
+  padding: 2px;
+  pointer-events: none;
+  opacity: 1;
+  box-shadow: none;
+  background:
+    radial-gradient(circle 200px at var(--lx, 30%) var(--ly, 0%),
+      rgba(255, 255, 255, var(--rim-a)), rgba(255, 255, 255, 0) 100%),
+    linear-gradient(135deg,
+      rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.35) 22%,
+      rgba(255, 255, 255, 0) 45%, rgba(255, 255, 255, 0) 60%,
+      rgba(255, 255, 255, 0.5) 85%, rgba(255, 255, 255, 0.95) 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  transition: --rim-a 0.35s ease;
+}
+/* the experience cards clip their overflow, so their rim sits just inside */
+#experience .data-box[data-exp]::before { inset: 0; }
+@media (prefers-reduced-motion: reduce) {
+  #resume .data-box::after,
+  #experience .data-box[data-exp]::before { transition: none; }
+}
+
+/* depends on the rim block in the 'specular rim' finding (::after on #resume cards, ::before on experience cards) */
+#experience .data-box[data-exp]::after,
+#resume .data-box::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  transform: none;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(circle 240px at var(--lx, 30%) var(--ly, 0%),
+    rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0) 75%);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  #experience .data-box[data-exp]:hover::after,
+  #resume .data-box:hover::before { opacity: 1; transform: none; }
+  #experience .data-box[data-exp]:hover::before,
+  #resume .data-box:hover::after { --rim-a: 1; }
+  /* the lift shadow the old ::before carried now lives on the card */
+  #experience .data-box[data-exp]:hover {
+    box-shadow: var(--glass-pane-rim), 0 1px 2px rgba(17, 40, 80, 0.05), 0 24px 56px rgba(17, 40, 80, 0.13);
+  }
+}
+/* the touch rule in style.css slides the old sweep away on sticky :hover; keep the light in place */
+@media (hover: none), (pointer: coarse) {
+  #experience .data-box[data-exp]:hover::after { transform: none; }
+}
+#experience .data-box[data-exp]:active::after { opacity: 1; transition-duration: 0.08s; }
+#experience .data-box[data-exp]:active::before { --rim-a: 1; transition-duration: 0.08s; }
+#experience .data-box[data-exp] {
+  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease,
+    opacity 0.2s ease, transform 0.3s var(--ease-swift), box-shadow 0.3s var(--ease-swift);
+}
+
+@media (max-width: 576px) {
+  #resume .data-box,
+  #experience .data-box { padding: 28px 22px; margin: 32px auto; }
+  #experience .data-box[data-exp] { padding-bottom: 84px; }
+  .data-box.profile-featured { padding: 22px; }
+  /* the logo leads on a phone, so the role title gets the full line */
+  #experience .data-box[data-exp] > .d-flex:first-child { flex-direction: column-reverse; gap: 6px !important; }
+  #experience .data-box[data-exp] .company-logo { margin-top: 0; }
+}
+
+.exp-card-stats {
+  margin: 22px 0 6px;
+  padding: 16px 4px 14px;
+  border: 0;
+  border-radius: var(--r-card-sm);
+  background: rgba(255, 255, 255, 0.3);
+  box-shadow:
+    inset 0 1px 2px rgba(17, 40, 80, 0.07),
+    inset 0 0 0 0.5px rgba(17, 40, 80, 0.07),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.95);
+}
+.exp-stat-item { position: relative; border-right: 0; }
+.exp-stat-item + .exp-stat-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 10%;
+  bottom: 10%;
+  width: 1px;
+  background: linear-gradient(rgba(17, 40, 80, 0), rgba(17, 40, 80, 0.12), rgba(17, 40, 80, 0));
+  box-shadow: 1px 0 0 rgba(255, 255, 255, 0.85);
+}
+/* the plus rides at cap height, as a superscript, instead of a dot on the baseline */
+.stat-sup { align-self: flex-start; margin-top: 0.12em; font-size: 0.9412rem; }
+@media (prefers-reduced-transparency: reduce) {
+  .exp-card-stats { background: rgba(255, 255, 255, 0.6); }
+}
+
+.exp-card-cta {
+  bottom: 18px;
+  right: 18px;
+  padding: 4px 4px 4px 18px;
+  gap: 10px;
+  border-radius: var(--r-capsule);
+  background: var(--glass-chip);
+  box-shadow: var(--glass-chip-rim), 0 6px 16px rgba(17, 40, 80, 0.06);
+}
+.exp-card-btn { width: 36px; height: 36px; }
+.exp-card-btn svg { transition: fill 0.2s ease; }
+#experience .data-box[data-exp]:hover .exp-card-cta-label { opacity: 1; }
+#experience .data-box[data-exp]:hover .exp-card-btn {
+  background: var(--glass-tint);
+  box-shadow: var(--glass-tint-rim), 0 3px 10px rgba(18, 100, 206, 0.3);
+  transform: none;
+}
+#experience .data-box[data-exp]:hover .exp-card-btn svg { fill: #fff; }
+@media (prefers-reduced-transparency: reduce) {
+  .exp-card-cta { background: rgba(255, 255, 255, 0.9); }
+}
+
+.profile-featured .social-links {
+  display: inline-flex;
+  gap: 2px;
+  padding: 4px;
+  margin: 18px 0 0;
+  border-radius: var(--r-capsule);
+  background: var(--glass-chip);
+  box-shadow: var(--glass-chip-rim);
+}
+.profile-featured .social-links a { width: 40px; height: 40px; border-radius: 50%; }
+@media (hover: hover) and (pointer: fine) {
+  .profile-featured .social-links a:hover {
+    background: rgba(255, 255, 255, 0.75);
+    box-shadow: inset 0 1px 0 #fff, 0 1px 3px rgba(17, 40, 80, 0.1);
+  }
+}
+@media (pointer: coarse) {
+  .profile-featured .social-links { gap: 0; margin: 18px 0 0; }
+  .profile-featured .social-links a { width: 44px; height: 44px; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .profile-featured .social-links { background: rgba(255, 255, 255, 0.9); }
+}
+
+/* the sheet renders ~#f5f5f7, the same grey the chips were: give them the glass rim */
+.exp-modal-tech span {
+  background: rgba(255, 255, 255, 0.62);
+  box-shadow: var(--glass-chip-rim);
+}
+.exp-client-section {
+  background: rgba(255, 255, 255, 0.5);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.7),
+    0 0 0 0.5px rgba(17, 40, 80, 0.06),
+    0 2px 8px rgba(17, 40, 80, 0.05);
+}
+.exp-client-section:hover { background: rgba(255, 255, 255, 0.68); }
+.exp-modal-period,
+.exp-client-section-header .exp-client-tag {
+  background: rgba(18, 100, 206, 0.1);
+  box-shadow: inset 0 1px 0.5px rgba(255, 255, 255, 0.85), inset 0 0 0 0.5px rgba(255, 255, 255, 0.5), 0 0 0 0.5px rgba(18, 100, 206, 0.1);
+}
+.exp-modal-header { border-bottom-color: rgba(17, 40, 80, 0.08); }
+.exp-modal-company-logo {
+  border-color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 0 0.5px rgba(17, 40, 80, 0.08), 0 4px 12px rgba(17, 40, 80, 0.08);
+}
+@media (prefers-reduced-transparency: reduce) {
+  .exp-modal-tech span,
+  .exp-client-section { background: #fff; }
+}
+
+.exp-lightbox-inner::before {
+  content: '';
+  display: block;
+  position: sticky;
+  top: -36px;
+  z-index: 5;
+  height: 44px;
+  margin: -36px -40px -8px;
+  pointer-events: none;
+  background: linear-gradient(to bottom, rgba(246, 247, 250, 0.96) 30%, rgba(246, 247, 250, 0));
+}
+@media (max-width: 768px) {
+  .exp-lightbox-inner::before { top: -26px; margin: -26px -20px -8px; height: 34px; }
+}
+@media (max-width: 600px) {
+  .exp-lightbox-inner::before { top: -24px; margin: -24px -18px -8px; height: 32px; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .exp-lightbox-inner::before { background: linear-gradient(to bottom, rgba(251, 251, 253, 0.98) 30%, rgba(251, 251, 253, 0)); }
+}
+
+.exp-card-highlights .hl-blue {
+  background: linear-gradient(rgba(18, 100, 206, 0.09), rgba(18, 100, 206, 0.09)), rgba(255, 255, 255, 0.6);
+}
+.exp-status-active {
+  background: linear-gradient(rgba(48, 209, 88, 0.14), rgba(48, 209, 88, 0.14)), rgba(255, 255, 255, 0.65);
+}
+.exp-stat-label,
+.exp-duration { color: var(--color-text-secondary); }
+
+.exp-lightbox-close:focus-visible,
+.cert-lightbox-close:focus-visible,
+.cert-expand-btn:focus-visible,
+#back-to-top:focus-visible { border-radius: 50%; }
+
+#hero .hero-role .typed-article { color: inherit; letter-spacing: inherit; }
+
+.info-icon {
+  background:
+    radial-gradient(120% 90% at 30% 10%, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0) 55%),
+    rgba(18, 100, 206, 0.12);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -1px 1px rgba(18, 100, 206, 0.14),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.6),
+    0 1px 2px rgba(17, 40, 80, 0.06),
+    0 4px 12px rgba(18, 100, 206, 0.12);
+}
+.profile-featured-img { position: relative; border-radius: var(--r-min); }
+.profile-featured-img img {
+  display: block;
+  box-shadow: 0 1px 2px rgba(17, 40, 80, 0.08), 0 14px 32px rgba(17, 40, 80, 0.16);
+}
+.profile-featured-img::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 38%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+}
+.exp-role::before {
+  background: radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.95) 0 1px, rgba(255, 255, 255, 0) 2.5px), #c3cad3;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.7), 0 1px 3px rgba(17, 40, 80, 0.18);
+}
+.exp-role:first-child::before {
+  background: radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.9) 0 1px, rgba(255, 255, 255, 0) 2.5px), #1264CE;
+  box-shadow: 0 0 0 3px rgba(18, 100, 206, 0.15), 0 1px 4px rgba(18, 100, 206, 0.4);
+}
+
+
+/*--------------------------------------------------------------
+# AA margin on the clear glass
+--------------------------------------------------------------*/
+/* AA margin for small accent/grey text that sits on the clear (30%) glass:
+   the light pools behind can pull the backdrop down to ~4.3:1 */
+.exp-card-highlights .hl-blue,
+.project-tag { color: #0f58b8; }
+.exp-stat-label,
+.exp-duration { color: var(--color-text-secondary); }
+.biz-card .biz-logo,
+.biz-card .biz-contacts,
+.biz-card .biz-contacts a { color: #545458; }
+#footer .fw-light { color: var(--color-text-secondary); }
+
+/*--------------------------------------------------------------
+# Liquid Glass — frosted (reduced transparency)
+  "Frostier, not gone." The reader asked to see less *through* the
+  glass, not for the glass to disappear. The ground keeps its light,
+  every pane keeps its edge, rim and depth; only the fill thickens to
+  near-opaque and nothing samples the backdrop (no backdrop-filter).
+--------------------------------------------------------------*/
+@media (prefers-reduced-transparency: reduce) {
+  :root {
+    --glass-ground: #f2f5fa;
+    /* floating controls */
+    --glass-fill: rgba(255, 255, 255, 0.96);
+    --glass-rim:
+      inset 0 1px 0 #fff,
+      inset 0 -1px 0 rgba(17, 40, 80, 0.05);
+    --glass-lift:
+      0 0 0 0.5px rgba(17, 40, 80, 0.18),
+      0 2px 6px rgba(17, 40, 80, 0.08),
+      0 10px 28px rgba(17, 40, 80, 0.12);
+    /* content panes */
+    --glass-pane: rgba(255, 255, 255, 0.88);
+    --glass-pane-hover: rgba(255, 255, 255, 0.96);
+    --glass-pane-edge: rgba(17, 40, 80, 0.1);
+    --glass-pane-rim:
+      inset 0 1px 0 #fff,
+      inset 0 -1px 0 rgba(17, 40, 80, 0.04);
+    --glass-pane-lift: 0 1px 2px rgba(17, 40, 80, 0.06), 0 14px 36px rgba(17, 40, 80, 0.09);
+    /* chips: a cool frost on the white pane, drawn by a hairline */
+    --glass-chip: rgba(17, 40, 80, 0.045);
+    --glass-chip-rim:
+      inset 0 1px 0 rgba(255, 255, 255, 0.9),
+      0 0 0 0.5px rgba(17, 40, 80, 0.14);
+  }
+
+  /* the ground keeps its light — it is what the glass is lit by */
+  html { background: var(--glass-ground); }
+  body::before { display: block; }
+  .biz-scene::before,
+  .biz-scene::after { display: block; }
+
+  /* panes: near-opaque frost, a hairline edge, a lit top rim, real depth */
+  #resume .data-box,
+  #experience .data-box,
+  #skill .rf-cards-scroller-item,
+  #portfolio .rf-cards-scroller-item,
+  #certificates .cert-card,
+  .svc-card,
+  .faq {
+    background: var(--glass-pane);
+    border-color: var(--glass-pane-edge);
+    box-shadow: var(--glass-pane-rim), var(--glass-pane-lift);
+  }
+  /* the carousels clip at 10px, so their depth stays inside that */
+  #skill .rf-cards-scroller-item,
+  #portfolio .rf-cards-scroller-item {
+    box-shadow: var(--glass-pane-rim), 0 1px 2px rgba(17, 40, 80, 0.05), 0 4px 8px rgba(17, 40, 80, 0.05);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    #resume .data-box:hover,
+    #experience .data-box:hover,
+    #certificates .cert-card:hover,
+    .svc-card:hover { background: var(--glass-pane-hover); }
+  }
+
+  /* floating controls: frosted, still lifted, nothing behind them sampled */
+  .project-filters,
+  .paddlenav-arrow,
+  .paddlenav-arrow:hover,
+  .paddlenav-arrow:active,
+  #back-to-top,
+  .cert-expand-btn,
+  .cert-expand-btn:hover,
+  .exp-lightbox-close,
+  .exp-lightbox-close:hover {
+    background: var(--glass-fill);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    box-shadow: var(--glass-rim), var(--glass-lift);
+  }
+
+  /* chips: frost + hairline; tinted chips keep their hue */
+  .exp-card-highlights .hl,
+  .exp-duration,
+  .exp-card-stack span,
+  .exp-badge-chip,
+  .exp-filter-chip,
+  .hero-net-label {
+    background: var(--glass-chip);
+    box-shadow: var(--glass-chip-rim);
+  }
+  .hero-net-label { background: #f6f8fb; }
+  .exp-card-highlights .hl-blue,
+  .project-tag,
+  .info-icon,
+  .exp-card-btn {
+    background: rgba(18, 100, 206, 0.08);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85), 0 0 0 0.5px rgba(18, 100, 206, 0.24);
+  }
+  .exp-filter-chip.active {
+    background: var(--color-link);
+    box-shadow: var(--glass-tint-rim), 0 2px 8px rgba(18, 100, 206, 0.25);
+  }
+
+  /* the slab held over the accent light: frosted, the light shows as colour */
+  .biz-card {
+    background: rgba(255, 255, 255, 0.8);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    border-color: rgba(255, 255, 255, 0.9);
+    box-shadow:
+      inset 0 1px 0 #fff,
+      0 0 0 0.5px rgba(17, 40, 80, 0.12),
+      0 30px 60px rgba(29, 29, 31, 0.12),
+      0 4px 12px rgba(29, 29, 31, 0.06);
+  }
+
+  /* the sheet holds paragraphs: opaque, so nothing ghosts through the
+     text, and still a slab of glass — lit rim, hairline, deep shadow */
+  .exp-lightbox { background: rgba(10, 20, 40, 0.42); }
+  .exp-lightbox .exp-lightbox-inner {
+    background: #fff;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    box-shadow: inset 0 1px 0 #fff, 0 0 0 0.5px rgba(17, 40, 80, 0.12), 0 32px 80px rgba(0, 0, 0, 0.25);
+  }
+
+  /* the footer shelf: frost over the ground, a lit top edge */
+  #footer {
+    background: rgba(255, 255, 255, 0.62);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    box-shadow: inset 0 1px 0 #fff, 0 -1px 0 rgba(17, 40, 80, 0.08);
+  }
+}
+
+/*--------------------------------------------------------------
+# Liquid Glass — increased contrast
+  Same material, every edge drawn: panes and controls get a border
+  that reaches 3:1 against both the pane and the ground, chips get a
+  ring, secondary text darkens. Depth stays; only the haze goes.
+--------------------------------------------------------------*/
+@media (prefers-contrast: more) {
+  :root {
+    --glass-ground: #f2f5fa;
+    --glass-pane: rgba(255, 255, 255, 0.97);
+    --glass-pane-hover: #fff;
+    --glass-hc-edge: rgba(17, 40, 80, 0.62);
+    --color-text-secondary: #48484a;
+  }
+  html { background: var(--glass-ground); }
+  body::before { display: block; opacity: 0.6; }
+
+  #resume .data-box,
+  #experience .data-box,
+  #skill .rf-cards-scroller-item,
+  #portfolio .rf-cards-scroller-item,
+  #certificates .cert-card,
+  .svc-card,
+  .faq {
+    background: var(--glass-pane);
+    border-color: var(--glass-hc-edge);
+    box-shadow: inset 0 1px 0 #fff, 0 8px 24px rgba(17, 40, 80, 0.08);
+  }
+  #skill .rf-cards-scroller-item,
+  #portfolio .rf-cards-scroller-item { box-shadow: inset 0 1px 0 #fff; }
+
+  .project-filters,
+  .paddlenav-arrow,
+  .paddlenav-arrow:hover,
+  .paddlenav-arrow:active,
+  #back-to-top,
+  .cert-expand-btn,
+  .cert-expand-btn:hover,
+  .exp-lightbox-close,
+  .exp-lightbox-close:hover,
+  .biz-card,
+  .exp-lightbox .exp-lightbox-inner {
+    background: #fff;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    box-shadow: 0 0 0 1px var(--glass-hc-edge), 0 6px 18px rgba(17, 40, 80, 0.12);
+  }
+
+  .exp-card-highlights .hl,
+  .exp-duration,
+  .exp-card-stack span,
+  .exp-badge-chip,
+  .exp-filter-chip,
+  .hero-net-label {
+    background: #f2f4f8;
+    box-shadow: 0 0 0 1px rgba(17, 40, 80, 0.42);
+  }
+  .exp-card-highlights .hl-blue,
+  .project-tag,
+  .info-icon,
+  .exp-card-btn {
+    background: #e8f0fa;
+    box-shadow: 0 0 0 1px rgba(18, 100, 206, 0.6);
+  }
+  .exp-filter-chip.active { background: var(--color-link); box-shadow: none; }
+
+  .btn-pill,
+  .filter-lens { box-shadow: 0 0 0 1px #0b4796, 0 4px 14px rgba(18, 100, 206, 0.3); }
+
+  .faq details { border-bottom-color: rgba(17, 40, 80, 0.3); }
+  .exp-card-stats,
+  .exp-stat-item { border-color: rgba(17, 40, 80, 0.3); }
+  #footer {
+    background: #fff;
+    box-shadow: 0 -1px 0 var(--glass-hc-edge);
+  }
+  #footer .border-top { border-top-color: rgba(17, 40, 80, 0.35) !important; }
+}
+
+/*--------------------------------------------------------------
+# Services & FAQ — Liquid Glass bento
+--------------------------------------------------------------*/
+/*--------------------------------------------------------------
+# Services — a bento of glass over its own pool of light
+  Four services as panes of clear glass, each icon held in a lens (a
+  bead of thicker glass that gathers the light under it), the smaller
+  jobs as chips inside the grid, then the FAQ in two columns on the
+  same width. The section brings its own light so the panes have
+  something to show. Under reduced transparency the panes turn
+  frosted-solid but the light, lenses and rims stay: frostier, not gone.
+  Self-contained: supersedes the older "Services & FAQ" rules.
+--------------------------------------------------------------*/
+#services {
+  /* secondary text sits on tinted glass here, not white: one step deeper
+     keeps it above 4.5:1 wherever the light pools under it */
+  --svc-text-2: #56565b;
+  --svc-pad: 32px;
+  --svc-lens: 64px;
+  --svc-sheen: linear-gradient(150deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 40%);
+  /* a clip, not a scroll container, so the FAQ heading can stick */
+  overflow: clip;
+  letter-spacing: 0;
+}
+
+/* ── The light the panes sit in; each pool fades out inside its box ── */
+.svc-grid,
+.faq-layout {
+  position: relative;
+  isolation: isolate;
+}
+.svc-grid::before,
+.faq-layout::before {
+  content: '';
+  position: absolute;
+  inset: -150px -120px;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(26% 34% at 26% 38%, #5aa7ff57, #5aa7ff1f 55%, #5aa7ff00),
+    radial-gradient(24% 34% at 74% 62%, #1264ce38, #1264ce14 55%, #1264ce00);
+}
+.faq-layout::before { opacity: 0.7; }
+
+/* ── Bento: wide, narrow / narrow, wide / the chips across ── */
+.svc-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+.svc-card-wide { grid-column: span 2; }
+.svc-more { grid-column: 1 / -1; }
+
+/* ── Panes ── */
+#services .svc-card,
+#services .svc-more,
+#services .faq {
+  border-radius: var(--r-card);
+  border: 1px solid var(--glass-pane-edge);
+  background-color: var(--glass-pane);
+  background-image: var(--svc-sheen);
+  box-shadow: var(--glass-pane-rim), var(--glass-pane-lift);
+}
+/* light gathers under each lens */
+#services .svc-card {
+  --svc-at: calc(var(--svc-pad) + var(--svc-lens) / 2);
+  background-image: var(--svc-sheen),
+    radial-gradient(circle calc(var(--svc-lens) * 1.7) at var(--svc-at) var(--svc-at), #5aa7ff33, #5aa7ff00);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: var(--svc-pad);
+  transition: background-color 0.3s;
+}
+@media (hover: hover) and (pointer: fine) {
+  #services .svc-card:hover { background-color: var(--glass-pane-hover); }
+}
+.svc-card h3 {
+  font-size: 1.4118rem;
+  font-weight: 600;
+  line-height: 1.4;
+  margin: 0 0 8px;
+}
+.svc-card p {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--svc-text-2);
+  margin: 0;
+  text-wrap: pretty;
+}
+/* hyphenated names stay whole */
+.svc-nw { white-space: nowrap; }
+
+/* the lens: thicker glass, its own rim, lit from above */
+.svc-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: var(--svc-lens);
+  height: var(--svc-lens);
+  border-radius: calc(var(--svc-lens) * 0.31);
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.5) 55%, rgba(214, 231, 252, 0.7));
+  box-shadow: var(--glass-chip-rim), 0 10px 24px rgba(18, 100, 206, 0.16);
+}
+.svc-icon svg {
+  width: 69%;
+  height: 69%;
+}
+
+/* ── The smaller jobs: chips of clear glass ── */
+#services .svc-more {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 14px 28px;
+  margin: 0;
+  padding: 22px var(--svc-pad);
+  color: var(--color-text);
+}
+.svc-more-label {
+  margin: 0;
+  font-size: 1.0588rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+.svc-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.svc-chips li {
+  padding: 7px 16px;
+  border-radius: var(--r-capsule);
+  font-size: 0.8824rem;
+  font-weight: 500;
+  line-height: 1.45;
+  background: rgba(255, 255, 255, 0.5);
+  box-shadow: var(--glass-chip-rim);
+}
+
+/* ── FAQ: heading and a way to ask on the left, the answers on one pane ── */
+.faq-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 8fr);
+  gap: 64px;
+  align-items: start;
+  margin-top: 120px;
+}
+.faq-intro {
+  position: sticky;
+  top: 64px;
+  padding-top: 20px;
+}
+.faq-intro h3 {
+  font-size: 2.1176rem;
+  font-weight: 700;
+  line-height: 1.3;
+  margin: 0 0 14px;
+}
+.faq-intro p {
+  max-width: 26em;
+  font-size: 1.0588rem;
+  line-height: 1.7;
+  color: var(--svc-text-2);
+  margin: 0 0 28px;
+}
+.faq-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.faq-actions .btn-pill { padding: 0 26px; }
+/* the second action: the same capsule in clear glass */
+.faq-call {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 22px;
+  border-radius: var(--r-capsule);
+  font-size: 0.8824rem;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.62);
+  box-shadow: var(--glass-chip-rim), 0 4px 14px rgba(17, 40, 80, 0.06);
+}
+.faq-call:hover { background: rgba(255, 255, 255, 0.85); }
+.faq-call:active { transform: scale(0.97); }
+
+#services .faq {
+  max-width: none;
+  margin: 0;
+  padding: 10px;
+}
+.faq details {
+  position: relative;
+  border: 0;
+  border-radius: 20px;
+  padding: 0 22px;
+  transition: background-color 0.3s;
+}
+/* hairlines between rows, inset to the text, gone around the open one */
+.faq details + details::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 22px;
+  right: 22px;
+  height: 1px;
+  background: rgba(17, 40, 80, 0.08);
+}
+.faq details[open]::before,
+.faq details[open] + details::before { opacity: 0; }
+/* the open answer rises as its own lens of glass */
+.faq details[open] {
+  background: rgba(255, 255, 255, 0.55);
+  box-shadow: var(--glass-chip-rim), 0 8px 22px rgba(17, 40, 80, 0.07);
+}
+.faq summary {
+  position: relative;
+  min-height: 44px;
+  padding: 20px 52px 20px 0;
+  list-style: none;
+  cursor: pointer;
+  font-size: 1.0588rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary:focus-visible {
+  outline: 2px solid var(--color-link);
+  outline-offset: 2px;
+  border-radius: var(--r-min);
+}
+/* the chevron rides in a bead of glass that turns tinted when open */
+.faq summary::before,
+.faq summary::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+}
+.faq summary::before {
+  right: -4px;
+  width: 32px;
+  height: 32px;
+  margin-top: -16px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  box-shadow: var(--glass-chip-rim);
+  transition: background-color 0.2s;
+}
+.faq summary::after {
+  right: 8px;
+  width: 8px;
+  height: 8px;
+  margin-top: -6px;
+  border: solid var(--color-link);
+  border-width: 0 1.8px 1.8px 0;
+  transform: rotate(45deg);
+  transition: transform 0.35s var(--ease-swift);
+}
+.faq summary:hover::before { background-color: rgba(255, 255, 255, 0.9); }
+.faq details[open] summary::before {
+  background: var(--glass-tint);
+  box-shadow: var(--glass-tint-rim), 0 4px 12px rgba(18, 100, 206, 0.3);
+}
+.faq details[open] summary::after {
+  border-color: #fff;
+  transform: translateY(4px) rotate(-135deg);
+}
+.faq details p {
+  margin: 0;
+  /* padding, not margin: a margin would collapse out of the clipped answer box */
+  padding: 0 52px 22px 0;
+  font-size: 1rem;
+  line-height: 1.75;
+  color: var(--svc-text-2);
+}
+/* where the browser can animate to auto, the answer unfolds instead of jumping */
+@supports selector(::details-content) {
+  .faq { interpolate-size: allow-keywords; }
+  .faq details::details-content {
+    block-size: 0;
+    overflow: clip;
+    transition: block-size 0.4s var(--ease-swift), content-visibility 0.4s allow-discrete;
+  }
+  .faq details[open]::details-content { block-size: auto; }
+}
+
+/* ── Desktop: icon up top, the words settle to the foot of each pane ── */
+@media (min-width: 992px) {
+  .svc-body { margin-top: auto; }
+  #services .svc-card-wide {
+    --svc-lens: 124px;
+    background-image: var(--svc-sheen),
+      radial-gradient(circle 190px at calc(100% - var(--svc-at)) var(--svc-at), #5aa7ff42, #5aa7ff00);
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 40px;
+  }
+  .svc-card-wide .svc-icon {
+    order: 1;
+    align-self: flex-start;
+  }
+  /* the wide panes lead, like the feature tiles of a bento */
+  .svc-card-wide .svc-body { max-width: 32rem; }
+  .svc-card-wide h3 { font-size: 1.7647rem; line-height: 1.3; margin-bottom: 10px; }
+  .svc-card-wide p { font-size: 1.0588rem; }
+}
+
+/* ── Tablet: two by two, the FAQ stacks ── */
+@media (max-width: 991px) {
+  .svc-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .svc-card-wide { grid-column: auto; }
+  .faq-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 36px;
+    margin-top: 96px;
+  }
+  .faq-intro { position: static; padding-top: 0; }
+}
+
+/* ── Phone: one column, each lens beside its title ── */
+@media (max-width: 767px) {
+  #services {
+    --svc-pad: 22px;
+    --svc-lens: 52px;
+  }
+  .svc-grid { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  #services .svc-card {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 14px 16px;
+  }
+  .svc-body { display: contents; }
+  .svc-card h3 { margin: 0; font-size: 1.2353rem; }
+  .svc-card p { grid-column: 1 / -1; }
+  #services .svc-more {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    padding: 20px var(--svc-pad) 22px;
+  }
+  .svc-chips { gap: 8px; }
+  .faq-layout { margin-top: 80px; gap: 28px; }
+  .faq-intro h3 { font-size: 1.7647rem; }
+  #services .faq { padding: 6px; }
+  .faq details { padding: 0 16px; }
+  .faq details + details::before { left: 16px; right: 16px; }
+  .faq summary { padding: 16px 44px 16px 0; font-size: 1rem; }
+  .faq summary::before { right: -6px; }
+  .faq summary::after { right: 6px; }
+  .faq details p { padding: 0 0 20px; font-size: 0.9412rem; }
+}
+
+/* ── Preferences ── */
+@media (prefers-reduced-motion: reduce) {
+  .faq details,
+  .faq summary::before,
+  .faq summary::after,
+  .faq details::details-content { transition: none; }
+}
+/* less transparency: frosted-solid panes; the light, lenses and rims stay */
+@media (prefers-reduced-transparency: reduce) {
+  #services { --svc-sheen: linear-gradient(160deg, #fff 30%, #f4f8fe); }
+  #services .svc-card,
+  #services .svc-card:hover,
+  #services .svc-more,
+  #services .faq {
+    background-color: #fff;
+    border-color: rgba(17, 40, 80, 0.09);
+    box-shadow: inset 0 1px 0 #fff, 0 1px 2px rgba(17, 40, 80, 0.05), 0 14px 36px rgba(17, 40, 80, 0.08);
+  }
+  .svc-icon { background: linear-gradient(160deg, #fff, #e6effb); }
+  .svc-chips li,
+  .faq summary::before,
+  .faq summary:hover::before { background: #f1f5fb; }
+  .faq-call,
+  .faq-call:hover {
+    background: #fff;
+    box-shadow: 0 0 0 1px rgba(17, 40, 80, 0.12), 0 4px 14px rgba(17, 40, 80, 0.06);
+  }
+  .faq details[open] { background: #f3f7fd; }
+  .faq details[open] summary::before { background: var(--color-link); }
+}
+/* more contrast: solid white, a firm outline on every surface, deeper text */
+@media (prefers-contrast: more) {
+  #services { --svc-text-2: #3a3a3c; }
+  #services .svc-card,
+  #services .svc-card:hover,
+  #services .svc-more,
+  #services .faq {
+    background: #fff;
+    border-color: rgba(0, 0, 0, 0.45);
+    box-shadow: none;
+  }
+  .svc-grid::before,
+  .faq-layout::before { content: none; }
+  .svc-icon,
+  .svc-chips li,
+  .faq-call,
+  .faq summary::before {
+    background: #fff;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.45);
+  }
+  .faq details + details::before { background: rgba(0, 0, 0, 0.3); }
+  .faq details[open] { background: #fff; box-shadow: none; }
+}
+
+
+/*--------------------------------------------------------------
+# Frosted and high-contrast addenda for the pieces added above
+--------------------------------------------------------------*/
+@media (prefers-reduced-transparency: reduce) {
+  /* the footer is now a slab on the ground, not a painted band */
+  #footer { background: transparent; box-shadow: none; }
+  .cert-lightbox { background: rgba(12, 18, 30, 0.92); -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .cert-lightbox img { background: #2c2c2e; }
+}
+@media (prefers-contrast: more) {
+  #footer { background: transparent; box-shadow: none; }
+  #footer > .container,
+  #hero .hero-eyebrow,
+  .profile-featured .social-links,
+  .exp-card-cta,
+  .exp-card-stats,
+  .hero-scroll-hint {
+    background: #fff;
+    box-shadow: 0 0 0 1px rgba(17, 40, 80, 0.62);
+  }
+  #skill .rf-cards-scroller-item::after,
+  #portfolio .rf-cards-scroller-item::after,
+  #certificates .cert-card::after,
+  #resume .data-box::after,
+  #experience .data-box:not([data-exp])::after,
+  #experience .data-box[data-exp]::before { display: none; }
+}
+
+/* ── Hero name: the gradient ink has to cover every glyph ──
+   background-clip:text paints only inside the line's own box, so a
+   name wider than the 620px copy column lost its last letters (2K/4K
+   screens, or a larger default font). The line now sizes to its word. */
+.hero-name-line { width: fit-content; }
+@media (max-width: 992px) {
+  .hero-name-line { margin-inline: auto; }
+}
+
+/* the expand bead sits over busy certificate artwork: clear glass let the
+   colours through the "+" (1.6:1 at worst), so this one is frosted thick */
+.cert-expand-btn,
+.cert-expand-btn:hover {
+  background: rgba(255, 255, 255, 0.9);
+  -webkit-backdrop-filter: blur(10px) saturate(160%);
+  backdrop-filter: blur(10px) saturate(160%);
+}
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  .cert-expand-btn,
+  .cert-expand-btn:hover { background: #fff; -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
+
+/*--------------------------------------------------------------
+# Nothing clips: text that grows with the reader's font size or a 2K/4K screen
+--------------------------------------------------------------*/
+@media (max-width: 768px) {
+  /* chips give back side padding before the row has to scroll */
+  .project-filters .filter-btn { padding-inline: clamp(10px, 3.5vw, 22px); min-width: 44px; }
+}
+
+#skill .rf-cards-scroller-item { container-type: inline-size; }
+#skill .rf-cards-scroller-item .title {
+  font-size: min(1.7647rem, 13.5cqi);
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+.info-grid { display: flex; flex-wrap: wrap; gap: 26px 32px; }
+.info-item { flex: 1 1 13rem; min-width: 0; }
+.info-item[href^="tel:"], .info-item[href^="mailto:"] { flex: 1 0 auto; max-width: 100%; }
+.info-item[href^="tel:"] .info-value { white-space: nowrap; }
+.info-value, .info-sub { overflow-wrap: anywhere; }
+@media (max-width: 768px) {
+  .info-grid { flex-direction: column; }
+  .info-item { flex: none; }
+}
+
+.skip-link { top: 0; transform: translateY(calc(-100% - 8px)); transition: transform 0.2s ease-out; }
+.skip-link:focus { top: 0; transform: translateY(16px); }
+@media (prefers-reduced-motion: reduce) { .skip-link { transition: none; } }
+
+#portfolio .rf-cards-scroller-item { container-type: inline-size; }
+#portfolio .rf-cards-scroller-item h3 { font-size: min(1.7647rem, 15cqi); overflow-wrap: break-word; hyphens: auto; }
+
+.biz-contacts a { min-width: 0; overflow-wrap: anywhere; }
+
+/* ── Carousel paddles sit under the track, right-aligned to the column ──
+   Now that the track runs to the window edge, arrows floating over it
+   landed on the next card's title. Below the track (as Apple's store
+   carousels do) they never cover content. */
+@media (min-width: 769px) {
+  .paddlenav {
+    position: static;
+    transform: none;
+    width: auto;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 20px 0 0;
+  }
+  .paddlenav-arrow {
+    top: auto;
+    transform: none;
+  }
+  .paddlenav-arrow:active { transform: scale(0.94); }
+}
+@media (min-width: 769px) and (hover: hover) and (pointer: fine) {
+  .paddlenav-arrow:not(:disabled):hover { transform: scale(1.1); }
 }
