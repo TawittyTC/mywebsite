@@ -3707,3 +3707,37 @@ body::before {
 @media (min-width: 769px) and (hover: hover) and (pointer: fine) {
   .paddlenav-arrow:not(:disabled):hover { transform: scale(1.1); }
 }
+
+/* ── Skill cards: proportion, not stretch ──
+   A carousel row takes the height of its tallest card ("Voice &
+   Conversational AI": three title lines, five of description), so on a
+   phone every other card was a 260×417 column with up to 111px of empty
+   glass at the bottom. Wider cards, a smaller mark and phone-sized
+   titles bring the tallest down; on phones, where one card is seen at a
+   time, the content sits in the middle so what is left is shared top and
+   bottom instead of pooling under the text. */
+#skill .rf-cards-scroller-item { width: 400px; padding: 44px 40px; }
+#skill .rf-cards-scroller-item .skill-icon {
+  width: 128px;
+  height: 128px;
+  padding: 10px;
+  border-radius: 36px;
+  margin: 0 0 24px;
+}
+@media (max-width: 768px) {
+  #skill .rf-cards-scroller-item {
+    width: min(340px, 86vw);
+    padding: 26px 20px;
+    justify-content: center;
+    /* a tighter gap keeps the next card peeking in: the only swipe cue on a phone */
+    margin-right: 16px;
+  }
+  #skill .rf-cards-scroller-item .skill-icon {
+    width: 88px;
+    height: 88px;
+    padding: 8px;
+    border-radius: 25px;
+    margin: 0 0 16px;
+  }
+  #skill .rf-cards-scroller-item .title { font-size: min(1.4118rem, 11cqi); margin-bottom: 8px; }
+}
