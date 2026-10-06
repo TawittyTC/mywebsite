@@ -92,8 +92,6 @@ test('asset size budgets hold', () => {
     assert.ok(kb <= max, `${p} is ${kb.toFixed(0)}KB (budget ${max}KB)`);
   };
   budget('assets/js/main.min.js', 45);
-  // the Apple redesign replaced the stacked glass layers with one stylesheet:
-  // ~45KB including Bootstrap's grid; the budget keeps it from creeping back
   budget('assets/css/style.min.css', 60);
   for (const f of readdirSync(join(ROOT, 'assets/img/certificate'))) {
     budget(`assets/img/certificate/${f}`, 80);
