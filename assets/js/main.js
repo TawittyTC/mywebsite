@@ -239,9 +239,11 @@ function anchorOrigin(surface, source) {
     }
   });
 
-  function openLightbox(src, alt, source) {
+  function openLightbox(src, alt, source, label) {
     lbImg.src = src;
     lbImg.alt = alt;
+    // one viewer serves certificates and project screenshots alike
+    lightbox.setAttribute("aria-label", label || "Certificate preview");
     lightbox.classList.add("open");
     lightbox.style.display = "flex";
     document.body.style.overflow = "hidden";
@@ -477,6 +479,18 @@ document.addEventListener('DOMContentLoaded', function () {
       card.querySelectorAll('.js-count[data-count]').forEach(countUp);
     });
   }
+});
+
+// Project cards open their screenshot whole, the way an apple.com card's
+// "+" opens its story. The whole card is the target; the "+" is its label.
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll("#portfolio .rf-cards-scroller-item").forEach(function (card) {
+    var img = card.querySelector(".project-img img");
+    if (!img) return;
+    card.addEventListener("click", function () {
+      window._certLightboxOpen(img.currentSrc || img.src, img.alt, card.querySelector(".project-img"), "Project screenshot");
+    });
+  });
 });
 
 // Certificate grid: the DOM is built immediately so the page has its
@@ -1647,15 +1661,12 @@ document.addEventListener('DOMContentLoaded', function () {
 })();
 
 /**
- * Liquid Glass light — the material brightens where the pointer or the
- * finger is. CSS draws the light; this only tells it where to stand.
+ * The business card's glare follows the pointer or the finger.
+ * CSS draws the light; this only tells it where to stand.
  */
 (function () {
-  var GLASS = '.project-filters, .paddlenav-arrow, #back-to-top, .cert-expand-btn, ' +
-    '.exp-lightbox-close, .cert-lightbox-close, .btn-pill, .biz-card, ' +
-    '#experience .data-box[data-exp], #resume .data-box';
   function light(e) {
-    var el = e.target && e.target.closest && e.target.closest(GLASS);
+    var el = e.target && e.target.closest && e.target.closest('.biz-card');
     if (!el) return;
     var r = el.getBoundingClientRect();
     el.style.setProperty('--lx', (e.clientX - r.left) + 'px');
@@ -1663,4 +1674,26 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   document.addEventListener('pointermove', light, { passive: true });
   document.addEventListener('pointerdown', light, { passive: true });
+})();
+
+/**
+ * Local nav — its links glide to their section instead of jumping, so the
+ * reader keeps a sense of where on the page they went. Focus follows, for
+ * keyboard and screen-reader users.
+ */
+(function () {
+  var nav = document.querySelector('.localnav');
+  if (!nav) return;
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  nav.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var target = document.getElementById(a.getAttribute('href').slice(1));
+    if (!target) return;
+    e.preventDefault();
+    if (target.id === 'hero') window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+    else target.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+    if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
+    target.focus({ preventScroll: true });
+  });
 })();

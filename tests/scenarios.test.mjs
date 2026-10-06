@@ -347,39 +347,33 @@ test('violent jump-scrolling then landing anywhere leaves nothing half-faded', a
   await page.close();
 });
 
-test('every section carries its themed wave and the waves actually animate', async () => {
+test('every section opens the apple.com way: an eyebrow over one large, left-aligned headline', async () => {
   const { page } = await ctx.openPage();
-  // one wave per section: resume, experience, skill, portfolio, certificates, services
-  // (the closing CTA deliberately has none)
-  const homes = await page.$$eval('.section-wave', (els) =>
-    els.map((el) => el.closest('section')?.id || ''));
-  assert.deepEqual(homes, ['resume', 'experience', 'skill', 'portfolio', 'certificates', 'services'],
-    'expected exactly one wave in each content section, in page order');
-  // each themed part is animated (computed style, not just class names)
-  const anims = await page.evaluate(() => {
-    const name = (sel) => getComputedStyle(document.querySelector(sel)).animationName;
+  const heads = await page.$$eval('.section-title', (els) => els.map((el) => {
+    const h2 = el.querySelector('h2');
+    const p = el.querySelector('p');
     return {
-      flow: name('#resume .wave-flow'),
-      dot: name('#experience .wave-dot'),
-      bar: name('#skill .wave-bar'),
-      signal: name('#portfolio .wave-signal'),
-      ribbon: name('#certificates .wave-ribbon'),
-      servicesRibbon: name('#services .wave-ribbon'),
+      section: el.closest('section')?.id || '',
+      eyebrow: parseFloat(getComputedStyle(h2).fontSize),
+      headline: parseFloat(getComputedStyle(p).fontSize),
+      weight: Number(getComputedStyle(p).fontWeight),
+      align: getComputedStyle(el).textAlign,
+      left: Math.round(p.getBoundingClientRect().left),
     };
-  });
-  for (const [part, anim] of Object.entries(anims)) {
-    assert.notEqual(anim, 'none', `${part} wave is not animated`);
+  }));
+  assert.deepEqual(heads.map((h) => h.section),
+    ['resume', 'experience', 'skill', 'portfolio', 'certificates', 'services'],
+    'expected one headline in each content section, in page order');
+  for (const h of heads) {
+    assert.ok(h.headline >= h.eyebrow * 1.8,
+      `${h.section}: the headline (${h.headline}px) should dwarf its eyebrow (${h.eyebrow}px)`);
+    assert.ok(h.weight >= 600, `${h.section}: headline weight ${h.weight}`);
+    assert.equal(h.align, 'left', `${h.section}: headlines sit left, as on apple.com`);
   }
-  // solid strokes only — dashed lines were rejected as visually noisy
-  const dashed = await page.$$eval('.section-wave path', (els) =>
-    els.filter((el) => getComputedStyle(el).strokeDasharray !== 'none').length);
-  assert.equal(dashed, 0, `${dashed} wave paths still use dashed strokes`);
-  // the Experience spark exists for the SMIL journey animation
-  assert.ok(await page.$('#experience .wave-spark'), 'experience spark missing');
-  // decorative only: hidden from assistive tech and never intercepts input
-  const decorative = await page.$$eval('.section-wave', (els) =>
-    els.every((el) => el.getAttribute('aria-hidden') === 'true'));
-  assert.ok(decorative, 'waves must be aria-hidden');
+  // every headline starts on the one content column
+  assert.equal(new Set(heads.map((h) => h.left)).size, 1, `headline columns differ: ${heads.map((h) => h.left)}`);
+  // the decorative waves are gone for good
+  assert.equal(await page.locator('.section-wave').count(), 0, 'section waves should be removed');
   await page.close();
 });
 
@@ -556,69 +550,110 @@ test('type follows the reader\'s own text-size setting, layout and all', async (
   await page.close();
 });
 
-test('liquid glass: the lens flows to the chosen filter, and every surface is glass', async () => {
+test('apple design: the segmented lens follows the choice, white cards sit on the grey page, glass only floats', async () => {
   const { page } = await ctx.openPage();
   const lensOver = async (sel) => page.$eval(sel, (btn) => {
     const lens = btn.parentElement.querySelector('.filter-lens').getBoundingClientRect();
     const b = btn.getBoundingClientRect();
     return Math.abs(lens.left - b.left) < 1.5 && Math.abs(lens.right - b.right) < 1.5;
   });
-  assert.ok(await lensOver('#skill .filter-btn.active'), 'lens starts under the active chip');
+  assert.ok(await lensOver('#skill .filter-btn.active'), 'lens starts under the active segment');
   await page.$eval('#skill .filter-btn[data-filter="ai"]', (el) => el.click());
   await page.waitForTimeout(700);
-  assert.ok(await lensOver('#skill .filter-btn[data-filter="ai"]'), 'lens did not settle on the chosen chip');
+  assert.ok(await lensOver('#skill .filter-btn[data-filter="ai"]'), 'lens did not settle on the chosen segment');
 
-  // the floating controls carry a real backdrop filter; every content pane is
-  // translucent glass over the lit ground
-  const glass = await page.evaluate(() => {
+  const look = await page.evaluate(() => {
     const cs = (sel) => getComputedStyle(document.querySelector(sel));
-    const alpha = (sel) => { const m = cs(sel).backgroundColor.match(/[\d.]+/g).map(Number); return m.length > 3 ? m[3] : 1; };
+    const cards = ['#resume .profile-featured', '#resume .contact-strip .info-item', '#experience .data-box[data-exp]',
+      '#skill .rf-cards-scroller-item', '#portfolio .rf-cards-scroller-item', '#certificates .cert-card', '.svc-card', '.faq'];
     return {
-      capsule: cs('#skill .project-filters').backdropFilter,
-      arrow: cs('.paddlenav-arrow').backdropFilter,
-      panes: ['#resume .data-box', '#experience .data-box', '#skill .rf-cards-scroller-item',
-        '#portfolio .rf-cards-scroller-item', '#certificates .cert-card', '.svc-card', '.faq']
-        .map((sel) => [sel, alpha(sel)]),
-      ground: getComputedStyle(document.body, '::before').backgroundImage,
+      page: cs('body').backgroundColor,
       section: cs('#skill').backgroundColor,
+      cards: cards.map((sel) => [sel, cs(sel).backgroundColor, cs(sel).backdropFilter]),
+      nav: cs('.localnav-bar').backdropFilter,
+      toTop: cs('#back-to-top').backdropFilter,
+      lens: cs('.filter-lens').backgroundColor,
+      ground: getComputedStyle(document.body, '::before').content,
     };
   });
-  assert.notEqual(glass.capsule, 'none');
-  assert.notEqual(glass.arrow, 'none');
-  for (const [sel, a] of glass.panes) assert.ok(a >= 0.15 && a < 0.9, `${sel} is not a pane of glass (alpha ${a})`);
-  assert.match(glass.ground, /radial-gradient/, 'the ground has no light for the glass to show');
-  assert.equal(glass.section, 'rgba(0, 0, 0, 0)', 'sections must not paint over the light');
+  assert.equal(look.page, 'rgb(245, 245, 247)', "the page is Apple's light grey");
+  assert.equal(look.section, 'rgba(0, 0, 0, 0)', 'sections do not paint their own bands');
+  for (const [sel, bg, bf] of look.cards) {
+    assert.equal(bg, 'rgb(255, 255, 255)', `${sel} should be a solid white card`);
+    assert.equal(bf, 'none', `${sel}: content cards never blur what is behind them`);
+  }
+  assert.notEqual(look.nav, 'none', 'the local nav floats as glass');
+  assert.notEqual(look.toTop, 'none', 'back-to-top floats as glass');
+  assert.equal(look.lens, 'rgb(255, 255, 255)', 'the segmented control lens is white, as in iOS');
+  assert.ok(['none', 'normal'].includes(look.ground), 'no drifting light behind the page');
   await page.close();
 });
 
-test('liquid glass turns frostier, not gone, when the reader asks for less transparency', async () => {
+test('less transparency: the floating glass turns solid and the white cards still stand on the grey page', async () => {
   const { page } = await ctx.openPage();
   const cdp = await page.context().newCDPSession(page);
   await cdp.send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-transparency', value: 'reduce' }] });
-  // some panes ease their background, so let the change settle before reading it
-  await page.waitForTimeout(600);
-  const surfaces = await page.evaluate(() => ['#skill .project-filters', '.paddlenav-arrow', '#back-to-top', '#biz-card', '.btn-pill']
-    .map((sel) => [sel, getComputedStyle(document.querySelector(sel)).backdropFilter]));
-  for (const [sel, bf] of surfaces) assert.equal(bf, 'none', `${sel} still samples the backdrop under reduced transparency`);
-  const frost = await page.evaluate(() => {
+  await page.waitForTimeout(400);
+  const r = await page.evaluate(() => {
     const cs = (sel) => getComputedStyle(document.querySelector(sel));
-    const rgba = (c) => { const m = c.match(/[\d.]+/g).map(Number); return { rgb: m.slice(0, 3), a: m.length > 3 ? m[3] : 1 }; };
-    const ground = getComputedStyle(document.body, '::before');
     return {
-      panes: ['#resume .data-box', '#experience .data-box', '#skill .rf-cards-scroller-item', '#portfolio .rf-cards-scroller-item',
-        '#certificates .cert-card', '.svc-card', '.faq']
-        .map((sel) => [sel, rgba(cs(sel).backgroundColor).a, rgba(cs(sel).borderTopColor).rgb]),
-      groundDisplay: ground.display,
-      groundImage: ground.backgroundImage,
-      html: cs('html').backgroundColor,
+      floating: ['.localnav-bar', '#back-to-top'].map((sel) => [sel, cs(sel).backdropFilter, cs(sel).backgroundColor]),
+      page: cs('body').backgroundColor,
+      cards: ['#skill .rf-cards-scroller-item', '#portfolio .rf-cards-scroller-item', '.svc-card', '.faq']
+        .map((sel) => cs(sel).backgroundColor),
     };
   });
-  for (const [sel, a, edge] of frost.panes) {
-    assert.ok(a >= 0.85, `${sel} must turn frostier (alpha ${a})`);
-    assert.ok(Math.min(...edge) < 200, `${sel} keeps a white edge on a white pane, so it disappears`);
+  for (const [sel, bf, bg] of r.floating) {
+    assert.equal(bf, 'none', `${sel} still samples the backdrop under reduced transparency`);
+    assert.equal(bg, 'rgb(255, 255, 255)', `${sel} should turn solid white`);
   }
-  assert.notEqual(frost.groundDisplay, 'none', 'the ground keeps its light: frostier, not gone');
-  assert.match(frost.groundImage, /radial-gradient/);
-  assert.notEqual(frost.html, 'rgb(255, 255, 255)', 'a white ground leaves white panes nothing to stand on');
+  for (const bg of r.cards) assert.notEqual(bg, r.page, 'a card the colour of the page would vanish');
+  await page.close();
+});
+
+test('the local nav stays pinned and takes the reader to Projects, Contact and back to the top', async () => {
+  const { page } = await ctx.openPage({ reducedMotion: 'reduce' });
+  const navTop = () => page.$eval('.localnav-bar', (el) => Math.round(el.getBoundingClientRect().top));
+  const pinned = await navTop();
+  await page.evaluate(() => window.scrollTo(0, 3000));
+  assert.equal(await navTop(), pinned, 'the local nav scrolled away');
+  // anchors land just below the nav, never under it
+  const landed = (id) => page.waitForFunction((s) => {
+    const nav = document.querySelector('.localnav-bar').getBoundingClientRect().bottom;
+    const top = document.getElementById(s).getBoundingClientRect().top;
+    return top >= nav && top - nav < 24;
+  }, id, { timeout: 4000 });
+  await page.click('.localnav-cta');
+  await landed('contact');
+  assert.equal(await page.evaluate(() => document.activeElement.id), 'contact', 'focus should follow to the section');
+  await page.click('.localnav-link');
+  await landed('portfolio');
+  await page.click('.localnav-title');
+  await page.waitForFunction(() => window.scrollY === 0, null, { timeout: 4000 });
+  await page.close();
+});
+
+test('a project card opens its screenshot whole, and no screenshot ever bleeds past its card', async () => {
+  const { page } = await ctx.openPage();
+  await page.$eval('#portfolio', (el) => el.scrollIntoView());
+  await page.waitForTimeout(800);
+  const fit = await page.$$eval('#portfolio .rf-cards-scroller-item', (cards) => cards.map((c) => {
+    const card = c.getBoundingClientRect();
+    const img = c.querySelector('.project-img img').getBoundingClientRect();
+    return img.left >= card.left && img.right <= card.right && img.top >= card.top && img.bottom <= card.bottom;
+  }));
+  assert.ok(fit.every(Boolean), `a screenshot bleeds past its card: ${fit}`);
+  // headlines are never hyphenated mid-word
+  const hyphens = await page.$$eval('#portfolio .project-caption h3', (els) => els.map((e) => getComputedStyle(e).hyphens));
+  assert.ok(hyphens.every((h) => h !== 'auto'), 'project headlines must not hyphenate');
+
+  const second = '#portfolio .rf-cards-scroller-item:nth-child(2)';
+  const expected = await page.$eval(`${second} .project-img img`, (img) => img.currentSrc || img.src);
+  await page.click(`${second} .card-plus`);
+  await page.waitForSelector('.cert-lightbox.open');
+  assert.equal(await page.$eval('.cert-lightbox img', (img) => img.src), expected, 'the viewer shows a different screenshot');
+  assert.equal(await page.$eval('.cert-lightbox', (el) => el.getAttribute('aria-label')), 'Project screenshot');
+  await page.keyboard.press('Escape');
+  await page.waitForFunction(() => !document.querySelector('.cert-lightbox.open'));
   await page.close();
 });
