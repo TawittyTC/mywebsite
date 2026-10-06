@@ -834,6 +834,8 @@ a.info-item:hover .info-value { color: var(--color-link); }
 }
 .paddlenav-arrow {
   position: relative;
+  /* above the floating back-to-top: where the two meet, the row's own control wins */
+  z-index: 901;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1643,7 +1645,8 @@ summary,
 @media (pointer: coarse) {
   /* small print grows to a 44px pitch where links stack */
   .footer-links li { margin: 0; }
-  .footer-contact-link { padding: 0.8235rem 0; }
+  /* 15px a side, not 14: rem rounding left the row at 43.97px */
+  .footer-contact-link { padding: 0.8824rem 0; }
   .social-links-footer a { width: 44px; height: 44px; }
   .social-links-footer .social-icon { width: 20px; height: 20px; }
 }
@@ -1732,6 +1735,8 @@ summary,
   .company-logo--lg { height: 56px; max-width: 130px; }
 
   .rf-cards-scroller-overflow { gap: 0.8235rem; }
+  /* the back-to-top button owns the bottom-right corner of a phone */
+  .paddlenav { justify-content: center; }
   #skill .rf-cards-scroller-item { width: min(17.6471rem, 80vw); padding: 1.6471rem 1.4118rem 1.8824rem; }
   #skill .rf-cards-scroller-item .skill-icon { width: 3.5294rem; height: 3.5294rem; margin-bottom: 1.1765rem; }
   #skill .rf-cards-scroller-item .title { font-size: 1.2353rem; line-height: 1.19048; }
