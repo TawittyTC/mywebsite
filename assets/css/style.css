@@ -2067,16 +2067,16 @@ a.info-item:hover .info-value { color: var(--color-link); }
   flex-direction: column;
   align-items: flex-start;
   gap: 0;
-  padding: 2rem;
+  padding: 1.4118rem 1.6471rem;
   border: 1px solid rgba(0, 0, 0, .07);
   border-radius: var(--r-card);
   background: #fff;
   color: var(--color-text);
 }
 .contact-strip .info-icon {
-  width: 2.1176rem;
-  height: 2.1176rem;
-  margin: 0 0 1.1765rem;
+  width: 1.6471rem;
+  height: 1.6471rem;
+  margin: 0 0 0.7059rem;
   border-radius: 0;
   background: none;
 }
@@ -2101,7 +2101,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
 }
 @media (max-width: 734px) {
   .contact-strip .info-grid { gap: 14px; }
-  .contact-strip .info-item { padding: 1.4118rem; }
+  .contact-strip .info-item { padding: 1.1765rem 1.4118rem; }
 }
 
 /* social marks: the accent glyph in a grey well */
