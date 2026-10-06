@@ -3741,3 +3741,66 @@ body::before {
   }
   #skill .rf-cards-scroller-item .title { font-size: min(1.4118rem, 11cqi); margin-bottom: 8px; }
 }
+
+/*--------------------------------------------------------------
+# The ground, lighter and alive
+  A paler ground and softer pools, split across two layers that drift
+  on their own slow paths (34s and 46s, out of step), so the light
+  behind the glass is always moving a little and never repeats the
+  same way. Transform-only, so the compositor does all of it.
+--------------------------------------------------------------*/
+:root { --glass-ground: #f6f8fc; }
+html { background: var(--glass-ground); }
+body::before,
+body::after {
+  content: '';
+  position: fixed;
+  inset: -14%;
+  z-index: -1;
+  pointer-events: none;
+  will-change: transform;
+}
+body::before {
+  background:
+    radial-gradient(38vmax 38vmax at 12% 16%, rgba(18, 100, 206, 0.09), rgba(18, 100, 206, 0) 70%),
+    radial-gradient(44vmax 36vmax at 30% 92%, rgba(90, 167, 255, 0.11), rgba(90, 167, 255, 0) 70%);
+  animation: ground-drift-a 34s ease-in-out infinite alternate;
+}
+body::after {
+  background:
+    radial-gradient(42vmax 42vmax at 88% 36%, rgba(90, 167, 255, 0.13), rgba(90, 167, 255, 0) 70%),
+    radial-gradient(30vmax 30vmax at 68% 84%, rgba(18, 100, 206, 0.06), rgba(18, 100, 206, 0) 70%);
+  animation: ground-drift-b 46s ease-in-out infinite alternate;
+}
+@media (min-width: 768px) and (prefers-contrast: no-preference) {
+  html { background: var(--glass-ground); }
+  body::before {
+    background:
+      radial-gradient(38vmax 38vmax at 12% 16%, rgba(18, 100, 206, 0.12), rgba(18, 100, 206, 0) 70%),
+      radial-gradient(44vmax 36vmax at 30% 92%, rgba(90, 167, 255, 0.14), rgba(90, 167, 255, 0) 70%);
+  }
+  body::after {
+    background:
+      radial-gradient(42vmax 42vmax at 88% 36%, rgba(90, 167, 255, 0.17), rgba(90, 167, 255, 0) 70%),
+      radial-gradient(30vmax 30vmax at 68% 84%, rgba(18, 100, 206, 0.08), rgba(18, 100, 206, 0) 70%);
+  }
+}
+@keyframes ground-drift-a {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to   { transform: translate3d(7%, 5%, 0) scale(1.08); }
+}
+@keyframes ground-drift-b {
+  from { transform: translate3d(0, 0, 0) scale(1.04); }
+  to   { transform: translate3d(-8%, -4%, 0) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  body::before,
+  body::after { animation: none; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  body::before,
+  body::after { display: block; }
+}
+@media (prefers-contrast: more) {
+  body::after { opacity: 0.6; }
+}
