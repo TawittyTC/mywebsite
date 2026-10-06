@@ -221,3 +221,16 @@ test('the hero name never loses letters, on 4K screens or with a larger reader f
     await page.close();
   }
 });
+
+test('desktop → phone resize re-lays the constellation for the phone composition', async () => {
+  const { page } = await ctx.openPage({ viewport: { width: 1440, height: 900 } });
+  await page.waitForTimeout(1500);
+  await page.setViewportSize({ width: 330, height: 720 });
+  await page.waitForTimeout(2500);
+  // desktop parks the graph right of the copy; stretched onto a phone it
+  // crowded into the right edge — the labels must spread across the width
+  const xs = await page.$$eval('.hero-net-label', (els) => els.map((l) => l.getBoundingClientRect().left + 8));
+  const mean = xs.reduce((a, b) => a + b, 0) / xs.length;
+  assert.ok(mean > 330 * 0.3 && mean < 330 * 0.7, `labels centred at x=${Math.round(mean)} of 330: the graph is lopsided`);
+  await page.close();
+});
