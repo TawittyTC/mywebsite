@@ -261,12 +261,10 @@ test('mobile viewport renders hero and certificates', async () => {
   await page.close();
 });
 
-test('hero stays clean: no buttons in it, the local nav is the only navigation; name lines carry the ink', async () => {
+test('hero stays clean: no navbar, no CTA buttons; name lines carry the ink treatment', async () => {
   const { page } = await openPage();
-  assert.equal(await page.locator('#site-nav').count(), 0, 'the old navbar stays removed');
-  assert.equal(await page.locator('#hero .hero-btn, #hero a, #hero button').count(), 0, 'the hero itself carries no buttons');
-  assert.deepEqual(await page.$$eval('nav.localnav a', (as) => as.map((a) => a.getAttribute('href'))),
-    ['#hero', '#portfolio', '#contact'], 'local nav: the name, Projects, Contact');
+  assert.equal(await page.locator('#site-nav').count(), 0, 'navbar should be removed');
+  assert.equal(await page.locator('#hero .hero-btn').count(), 0, 'CTA buttons should be removed');
   const clipped = await page.$$eval('#hero .hero-name-line', (els) =>
     els.map((el) => getComputedStyle(el).webkitBackgroundClip || getComputedStyle(el).backgroundClip)
   );

@@ -104,12 +104,9 @@
   const typedEl = select(".typed");
   if (typedEl) {
     const items = typedEl.getAttribute("data-typed-items").split(",").map(s => s.trim());
-    const art = typedEl.parentNode.querySelector(".typed-article");
     let i = 0, j = 0, deleting = false;
     function typeTick() {
       const cur = items[i];
-      // "a Full-Stack Developer", "an AI Engineer": the article changes only once the old role is erased
-      if (art && j === 0 && !deleting) art.textContent = /^[aeiou]/i.test(cur) ? "an" : "a";
       typedEl.textContent = cur.slice(0, j);
       if (!deleting) {
         j++;
@@ -239,11 +236,9 @@ function anchorOrigin(surface, source) {
     }
   });
 
-  function openLightbox(src, alt, source, label) {
+  function openLightbox(src, alt, source) {
     lbImg.src = src;
     lbImg.alt = alt;
-    // one viewer serves certificates and project screenshots alike
-    lightbox.setAttribute("aria-label", label || "Certificate preview");
     lightbox.classList.add("open");
     lightbox.style.display = "flex";
     document.body.style.overflow = "hidden";
@@ -481,18 +476,6 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 });
 
-// Project cards open their screenshot whole, the way an apple.com card's
-// "+" opens its story. The whole card is the target; the "+" is its label.
-document.addEventListener("DOMContentLoaded", function () {
-  document.querySelectorAll("#portfolio .rf-cards-scroller-item").forEach(function (card) {
-    var img = card.querySelector(".project-img img");
-    if (!img) return;
-    card.addEventListener("click", function () {
-      window._certLightboxOpen(img.currentSrc || img.src, img.alt, card.querySelector(".project-img"), "Project screenshot");
-    });
-  });
-});
-
 // Certificate grid: the DOM is built immediately so the page has its
 // final length from the start (deferring it made the page grow ~4000px
 // mid-scroll — the scrollbar jumped). Only the IMAGES stay lazy.
@@ -709,42 +692,10 @@ document.addEventListener('DOMContentLoaded', function () {
     var scroller = root.querySelector('[data-card-scroller]');
     if (!btns.length || !items.length) return;
 
-    // Liquid Glass lens: a tinted drop that flows to the chosen chip
-    var lens = document.createElement('span');
-    lens.className = 'filter-lens';
-    lens.setAttribute('aria-hidden', 'true');
-    group.insertBefore(lens, group.firstChild);
-    group.classList.add('has-lens');
-    var lastLeft = null;
-    function placeLens(animate) {
-      var a = group.querySelector('.filter-btn.active');
-      if (!a) return;
-      var left = a.offsetLeft;
-      var right = group.clientWidth - (a.offsetLeft + a.offsetWidth);
-      if (animate && lastLeft !== null) {
-        // the edge in the direction of travel leaves first; the other follows
-        lens.style.transitionDelay = left > lastLeft ? '0.07s, 0s' : '0s, 0.07s';
-      } else {
-        lens.style.transition = 'none';
-      }
-      lens.style.left = left + 'px';
-      lens.style.right = right + 'px';
-      if (!animate || lastLeft === null) {
-        void lens.offsetWidth; // commit the jump before transitions return
-        lens.style.transition = '';
-      }
-      lastLeft = left;
-    }
-    placeLens(false);
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { placeLens(false); });
-    window.addEventListener('load', function () { placeLens(false); });
-    window.addEventListener('resize', function () { placeLens(false); });
-
     btns.forEach(function (btn) {
       btn.addEventListener('click', function () {
         btns.forEach(function (b) { b.classList.remove('active'); });
         btn.classList.add('active');
-        placeLens(true);
         var filter = btn.getAttribute('data-filter');
         items.forEach(function (item) {
           // data-tech may hold several space-separated categories
@@ -1658,42 +1609,4 @@ document.addEventListener('DOMContentLoaded', function () {
     else if (!vis) { run = false; }
   }, { threshold: 0.1 });
   io.observe(scene);
-})();
-
-/**
- * The business card's glare follows the pointer or the finger.
- * CSS draws the light; this only tells it where to stand.
- */
-(function () {
-  function light(e) {
-    var el = e.target && e.target.closest && e.target.closest('.biz-card');
-    if (!el) return;
-    var r = el.getBoundingClientRect();
-    el.style.setProperty('--lx', (e.clientX - r.left) + 'px');
-    el.style.setProperty('--ly', (e.clientY - r.top) + 'px');
-  }
-  document.addEventListener('pointermove', light, { passive: true });
-  document.addEventListener('pointerdown', light, { passive: true });
-})();
-
-/**
- * Local nav — its links glide to their section instead of jumping, so the
- * reader keeps a sense of where on the page they went. Focus follows, for
- * keyboard and screen-reader users.
- */
-(function () {
-  var nav = document.querySelector('.localnav');
-  if (!nav) return;
-  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  nav.addEventListener('click', function (e) {
-    var a = e.target.closest && e.target.closest('a[href^="#"]');
-    if (!a) return;
-    var target = document.getElementById(a.getAttribute('href').slice(1));
-    if (!target) return;
-    e.preventDefault();
-    if (target.id === 'hero') window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
-    else target.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
-    if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
-    target.focus({ preventScroll: true });
-  });
 })();

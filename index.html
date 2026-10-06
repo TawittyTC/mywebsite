@@ -57,6 +57,9 @@
   <link rel="preconnect" href="https://logo.clearbit.com">
   <link rel="dns-prefetch" href="https://logo.clearbit.com">
 
+  <!-- Preload critical hero background image -->
+  <link rel="preload" href="assets/img/hero-bg.webp" as="image" type="image/webp" fetchpriority="high">
+
   <!-- Self-hosted fonts — no external DNS lookup -->
   <link rel="preload" href="assets/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/notosansthai-thai.woff2" as="font" type="font/woff2" crossorigin>
@@ -106,7 +109,7 @@
       font-weight: 400;
       line-height: 1.5;
       color: #1d1d1f;
-      background-color: #f5f5f7
+      background-color: #fff
     }
 
     .container {
@@ -186,8 +189,7 @@
       color: #1d1d1f;
       font-size: 1rem;
       font-weight: 400;
-      letter-spacing: -.022em;
-      background: #f5f5f7
+      letter-spacing: -.022em
     }
 
     a {
@@ -203,16 +205,38 @@
       background-size: cover;
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      background: #fff
+      justify-content: center
+    }
+
+    #hero:before {
+      content: "";
+      background: rgba(255, 255, 255, 0.8);
+      position: absolute;
+      bottom: 0;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: -2
+    }
+
+    #hero .fallback-background {
+      background: url('assets/img/hero-bg.webp') no-repeat center center;
+      background-size: cover;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -3;
+      filter: blur(5px)
     }
 
     #hero h1 {
       margin: 0;
       font-size: clamp(2.1176rem, 9vw, 7.5294rem);
-      font-weight: 600;
+      font-weight: 700;
       line-height: 1.05;
-      letter-spacing: -.015em;
+      letter-spacing: -4px;
       color: #1d1d1f
     }
 
@@ -230,6 +254,12 @@
     @media(max-width:992px) {
       #hero {
         text-align: center
+      }
+    }
+
+    @media(max-width:735px) {
+      #hero h1 {
+        letter-spacing: -2px
       }
     }
 
@@ -347,7 +377,29 @@
     #experience .data-box[data-exp] {
       cursor: pointer;
       position: relative;
-      will-change: transform
+      will-change: transform;
+      transition: transform .3s cubic-bezier(.25, .46, .45, .94);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, .07)
+    }
+
+    #experience .data-box[data-exp]::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 28px;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, .13);
+      opacity: 0;
+      transition: opacity .3s ease;
+      pointer-events: none;
+      z-index: 0
+    }
+
+    #experience .data-box[data-exp]:hover {
+      transform: translateY(-3px)
+    }
+
+    #experience .data-box[data-exp]:hover::before {
+      opacity: 1
     }
 
     /* Logo stays right: prevent text div from overflowing flex container */
@@ -381,25 +433,27 @@
     }
 
     .exp-card-btn {
-      width: 36px;
-      height: 36px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
-      background: rgba(29, 29, 31, .9);
+      background: rgba(18, 100, 206, .1);
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background .2s;
-      flex-shrink: 0
+      transition: background .2s, transform .2s;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(255, 255, 255, 0.18);
     }
 
     #experience .data-box[data-exp]:hover .exp-card-btn {
-      background: #000
+      background: rgba(18, 100, 206, .18);
+      transform: scale(1.1)
     }
 
     .exp-card-btn svg {
-      width: 36px;
-      height: 36px;
-      fill: #fff
+      width: 20px;
+      height: 20px;
+      fill: #1264CE
     }
 
     @keyframes card-btn-hint {
@@ -445,8 +499,24 @@
       background: rgba(18, 100, 206, .08)
     }
 
+    /* Card shimmer on hover */
     #experience .data-box[data-exp] {
       overflow: hidden
+    }
+
+    #experience .data-box[data-exp]::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, .22) 50%, transparent 70%);
+      transform: translateX(-160%);
+      transition: transform .75s ease;
+      pointer-events: none;
+      border-radius: 28px
+    }
+
+    #experience .data-box[data-exp]:hover::after {
+      transform: translateX(160%)
     }
 
     /* Active/Current position pulse dot */
@@ -456,8 +526,8 @@
       gap: 5px;
       font-size: 0.6471rem;
       font-weight: 600;
-      color: #1d7a33;
-      background: rgba(48, 209, 88, .12);
+      color: #30d158;
+      background: rgba(48, 209, 88, .1);
       border-radius: 980px;
       padding: 3px 10px;
       margin-right: 6px;
@@ -818,7 +888,9 @@
       display: flex;
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, .42);
+      background: rgba(0, 0, 0, .25);
+      backdrop-filter: blur(20px) saturate(1.8);
+      -webkit-backdrop-filter: blur(20px) saturate(1.8);
       z-index: 9999;
       align-items: center;
       justify-content: center;
@@ -837,7 +909,7 @@
     }
 
     .exp-lightbox-inner {
-      background: #fff;
+      background: rgba(255, 255, 255, .97);
       border-radius: 28px;
       max-width: 740px;
       width: 100%;
@@ -894,11 +966,11 @@
       top: 0;
       float: right;
       z-index: 10;
-      background: #e8e8ed;
+      background: rgba(232, 232, 237, .9);
       border: none;
       border-radius: 50%;
-      width: 36px;
-      height: 36px;
+      width: 40px;
+      height: 40px;
       font-size: 1rem;
       cursor: pointer;
       display: flex;
@@ -910,7 +982,8 @@
     }
 
     .exp-lightbox-close:hover {
-      background: #dcdce1
+      background: #d8d8df;
+      transform: scale(1.12)
     }
 
     /* ── Apple HIG: Modal Header ── */
@@ -1281,10 +1354,10 @@
   </style>
 
   <!-- Full CSS loaded async: no render blocking (bootstrap merged in) -->
-  <link rel="preload" href="assets/css/style.min.css?v=2.37.0" as="style"
+  <link rel="preload" href="assets/css/style.min.css?v=2.38.0" as="style"
     onload="this.onload=null;this.rel='stylesheet'">
   <noscript>
-    <link href="assets/css/style.min.css?v=2.37.0" rel="stylesheet">
+    <link href="assets/css/style.min.css?v=2.38.0" rel="stylesheet">
   </noscript>
 
 
@@ -1538,7 +1611,7 @@
   </script>
 
   <!-- Preload deferred JS to start downloading before parser reaches script tags -->
-  <link rel="preload" href="assets/js/main.min.js?v=2.37.0" as="script">
+  <link rel="preload" href="assets/js/main.min.js?v=2.38.0" as="script">
 
   <script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="233b92be-5a2d-492b-b093-9c3ed14c9063"
     type="text/javascript" async></script>
@@ -1559,19 +1632,6 @@
   <a class="skip-link" href="#main-content">Skip to content</a>
   <div class="loader" aria-hidden="true"></div>
 
-  <!-- Local nav: the floating capsule apple.com pins to the top of a product page -->
-  <nav class="localnav" aria-label="Quick links">
-    <div class="container">
-      <div class="localnav-bar">
-        <a class="localnav-title" href="#hero">Tanapol Chamnanhan</a>
-        <div class="localnav-actions">
-          <a class="localnav-link" href="#portfolio">Projects</a>
-          <a class="localnav-cta" href="#contact">Contact</a>
-        </div>
-      </div>
-    </div>
-  </nav>
-
   <main id="main-content">
 
     <!-- ======= Hero Section ======= -->
@@ -1585,7 +1645,7 @@
           <p class="hero-eyebrow">Software Engineer · Bangkok</p>
           <h1 class="hero-name"><span class="hero-name-line">Tanapol</span> <span
               class="hero-name-line">Chamnanhan</span></h1>
-          <p class="hero-role">I'm <span class="typed-article">a</span> <span class="typed"
+          <p class="hero-role">I'm a <span class="typed"
               data-typed-items="Full-Stack Developer, AI Engineer, Software Engineer"></span>
           </p>
         </div>
@@ -1606,12 +1666,29 @@
         <div class="section-title">
           <h2>Resume</h2>
           <p>Background and education.</p>
+          <div class="section-wave section-wave-fade" aria-hidden="true">
+            <svg viewBox="0 0 220 24" fill="none">
+              <defs>
+                <linearGradient id="wg-resume" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0" stop-color="#5AA7FF" />
+                  <stop offset=".5" stop-color="#1264CE" />
+                  <stop offset="1" stop-color="#5AA7FF" />
+                </linearGradient>
+              </defs>
+              <path class="wave-flow wave-flow-echo"
+                d="M-56 15 Q -42 9, -28 15 T 0 15 T 28 15 T 56 15 T 84 15 T 112 15 T 140 15 T 168 15 T 196 15 T 224 15 T 252 15 T 280 15"
+                stroke="#5AA7FF" stroke-opacity=".3" stroke-width="2" stroke-linecap="round" />
+              <path class="wave-flow"
+                d="M-56 10 Q -42 3, -28 10 T 0 10 T 28 10 T 56 10 T 84 10 T 112 10 T 140 10 T 168 10 T 196 10 T 224 10 T 252 10 T 280 10"
+                stroke="url(#wg-resume)" stroke-width="2.4" stroke-linecap="round" />
+            </svg>
+          </div>
         </div>
 
         <div class="row">
           <div class="col-lg-12">
 
-            <h3 class="resume-title">Profile</h3>
+            <h3 class="resume-title mt-5">Profile</h3>
 
             <!-- Featured Profile Card -->
             <div class="row">
@@ -1712,7 +1789,7 @@
               </div>
             </div>
 
-            <h3 class="resume-title">Education</h3>
+            <h3 class="resume-title mt-5">Education</h3>
 
             <div class="row">
               <div class="col-md-12">
@@ -1733,7 +1810,7 @@
               </div>
             </div>
 
-            <h3 class="resume-title">Achievement</h3>
+            <h3 class="resume-title mt-5">Achievement</h3>
             <div class="row">
               <div class="col-md-12">
                 <div class="data-box">
@@ -1767,6 +1844,25 @@
         <div class="section-title">
           <h2>Experience</h2>
           <p>Where I've built and grown.</p>
+          <div class="section-wave" aria-hidden="true">
+            <svg viewBox="0 0 220 24" fill="none">
+              <defs>
+                <linearGradient id="wg-exp" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0" stop-color="#5AA7FF" />
+                  <stop offset="1" stop-color="#1264CE" />
+                </linearGradient>
+              </defs>
+              <path class="wave-journey" d="M6 18 C 34 18, 44 6, 72 6 S 108 18, 136 18 S 186 6, 214 6"
+                stroke="url(#wg-exp)" stroke-opacity=".4" stroke-width="2" stroke-linecap="round" />
+              <circle class="wave-dot" cx="72" cy="6" r="3.2" fill="currentColor" />
+              <circle class="wave-dot wave-dot-2" cx="136" cy="18" r="3.2" fill="currentColor" />
+              <circle class="wave-dot wave-dot-3" cx="214" cy="6" r="3.2" fill="currentColor" />
+              <circle class="wave-spark" r="3" fill="#1264CE">
+                <animateMotion dur="4.2s" repeatCount="indefinite" calcMode="spline" keyTimes="0;1"
+                  keySplines=".45 0 .55 1" path="M6 18 C 34 18, 44 6, 72 6 S 108 18, 136 18 S 186 6, 214 6" />
+              </circle>
+            </svg>
+          </div>
         </div>
 
         <div class="row">
@@ -1776,7 +1872,7 @@
                 <div class="data-box" data-exp="protollcall">
                   <div class="d-flex justify-content-between align-items-start gap-3">
                     <div>
-                      <h3 class="h2">Full Stack Developer</h3>
+                      <h3 class="mt-3 h2">Full Stack Developer</h3>
                       <div class="fw-light mb-1">at Protollcall Advance Service</div>
                       <div class="fw-light profile-bio-small ">June 2024 - Present </div>
                       <div><span class="exp-status-active">Active </span><span class="exp-duration" id="protollcall-duration">2 yr 10 months</span></div>
@@ -1837,7 +1933,7 @@
                 <div class="data-box" data-exp="scg">
                   <div class="d-flex justify-content-between align-items-start gap-3">
                     <div>
-                      <h3 class="h2">Full Stack Developer Intern</h3>
+                      <h3 class="mt-3 h2">Full Stack Developer Intern</h3>
                       <div class="fw-light mb-1">at The Siam Cement Group</div>
                       <div class="fw-light profile-bio-small">April 2023 - March 2024</div>
                       <div><span class="exp-duration">1 year &middot; 2 internships</span></div>
@@ -1903,7 +1999,7 @@
                 <div class="data-box" data-exp="advice">
                   <div class="d-flex justify-content-between align-items-start gap-3">
                     <div>
-                      <h3 class="h2">Computer Technician Intern</h3>
+                      <h3 class="mt-3 h2">Computer Technician Intern</h3>
                       <div class="fw-light mb-1">at Advice IT Infinite Co., Ltd.</div>
                       <div class="fw-light profile-bio-small">September 2019 - December 2019</div>
                       <div><span class="exp-duration">4 months</span></div>
@@ -1965,15 +2061,23 @@
         <div class="section-title">
           <h2>Skills</h2>
           <p>The technologies and tools I bring to every project.</p>
+          <div class="section-wave section-wave-eq" aria-hidden="true">
+            <svg viewBox="0 0 220 24" fill="none">
+              <rect class="wave-bar" x="76" y="4" width="5" height="16" rx="2.5" fill="currentColor" />
+              <rect class="wave-bar wave-bar-2" x="88" y="4" width="5" height="16" rx="2.5" fill="currentColor" />
+              <rect class="wave-bar wave-bar-3" x="100" y="4" width="5" height="16" rx="2.5" fill="currentColor" />
+              <rect class="wave-bar wave-bar-4" x="112" y="4" width="5" height="16" rx="2.5" fill="currentColor" />
+              <rect class="wave-bar wave-bar-5" x="124" y="4" width="5" height="16" rx="2.5" fill="currentColor" />
+              <rect class="wave-bar wave-bar-6" x="136" y="4" width="5" height="16" rx="2.5" fill="currentColor" />
+            </svg>
+          </div>
         </div>
 
-        <div class="project-filters-wrap">
-          <div class="project-filters">
-            <button class="filter-btn active" data-filter="all">All</button>
-            <button class="filter-btn" data-filter="web">Web</button>
-            <button class="filter-btn" data-filter="ai">AI</button>
-            <button class="filter-btn" data-filter="eng">Engineering</button>
-          </div>
+        <div class="project-filters">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="web">Web</button>
+          <button class="filter-btn" data-filter="ai">AI</button>
+          <button class="filter-btn" data-filter="eng">Engineering</button>
         </div>
 
         <div class="rf-cards-scroller">
@@ -2163,11 +2267,28 @@
     </section>
 
 
-    <section id="portfolio" class="portfolio" aria-labelledby="portfolio-title">
-      <div class="container" data-aos="fade-up">
+    <section id="portfolio" class="portfolio section-bg mb-5" aria-labelledby="portfolio-title">
+      <div class="container mb-5" data-aos="fade-up">
         <div class="section-title" id="portfolio-title">
           <h2>My Projects</h2>
           <p>Selected work I'm proud of.</p>
+          <div class="section-wave section-wave-fade" aria-hidden="true">
+            <svg viewBox="0 0 220 24" fill="none">
+              <defs>
+                <linearGradient id="wg-proj" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0" stop-color="#1264CE" />
+                  <stop offset=".5" stop-color="#5AA7FF" />
+                  <stop offset="1" stop-color="#1264CE" />
+                </linearGradient>
+              </defs>
+              <path class="wave-signal-echo"
+                d="M-56 13 Q -42 19, -28 13 T 0 13 T 28 13 T 56 13 T 84 13 T 112 13 T 140 13 T 168 13 T 196 13 T 224 13 T 252 13 T 280 13"
+                stroke="#5AA7FF" stroke-opacity=".28" stroke-width="2" stroke-linecap="round" />
+              <path class="wave-signal"
+                d="M-28 11 Q -21 3, -14 11 T 0 11 T 14 11 T 28 11 T 42 11 T 56 11 T 70 11 T 84 11 T 98 11 T 112 11 T 126 11 T 140 11 T 154 11 T 168 11 T 182 11 T 196 11 T 210 11 T 224 11 T 238 11 T 252 11"
+                stroke="url(#wg-proj)" stroke-width="2.2" stroke-linecap="round" />
+            </svg>
+          </div>
         </div>
 
         <!-- Project Filters -->
@@ -2192,13 +2313,8 @@
                   loading="lazy" decoding="async" width="1916" height="809" />
               </div>
               <span class="project-tag">IoT / AWS</span>
-              <div class="project-caption">
-                <h3 class="h4" id="project1-title">Real Time Pulse & Temperature Monitoring</h3>
-                <p class="fw-light">ThingsBoard, AWS, Sensors</p>
-              </div>
-              <button type="button" class="card-plus" aria-label="View screenshot: Real Time Pulse & Temperature Monitoring">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
-              </button>
+              <h3 class="h4" id="project1-title">Real Time Pulse & Temperature Monitoring</h3>
+              <p class="fw-light">ThingsBoard, AWS, Sensors</p>
             </div>
 
             <!-- Project 2 -->
@@ -2209,13 +2325,8 @@
                   decoding="async" width="1888" height="721" />
               </div>
               <span class="project-tag">PHP / MySQL</span>
-              <div class="project-caption">
-                <h3 class="h4" id="project2-title">Student's Project Management System</h3>
-                <p class="fw-light">PHP, HTML, CSS, MySQL</p>
-              </div>
-              <button type="button" class="card-plus" aria-label="View screenshot: Student's Project Management System">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
-              </button>
+              <h3 class="h4" id="project2-title">Student's Project Management System</h3>
+              <p class="fw-light">PHP, HTML, CSS, MySQL</p>
             </div>
 
             <!-- Project 3 -->
@@ -2226,13 +2337,8 @@
                   decoding="async" width="1354" height="678" />
               </div>
               <span class="project-tag">Python / Flask</span>
-              <div class="project-caption">
-                <h3 class="h4" id="project3-title">Covid-19 Spread Analysis Website</h3>
-                <p class="fw-light">Flask, HTML, CSS, Python libraries</p>
-              </div>
-              <button type="button" class="card-plus" aria-label="View screenshot: Covid-19 Spread Analysis Website">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
-              </button>
+              <h3 class="h4" id="project3-title">Covid-19 Spread Analysis Website</h3>
+              <p class="fw-light">Flask, HTML, CSS, Python libraries</p>
             </div>
 
             <!-- Project 4 -->
@@ -2243,13 +2349,8 @@
                   decoding="async" width="980" height="476" />
               </div>
               <span class="project-tag">Java</span>
-              <div class="project-caption">
-                <h3 class="h4" id="project4-title">Classroom Booking Record System</h3>
-                <p class="fw-light">Java, NetBeans</p>
-              </div>
-              <button type="button" class="card-plus" aria-label="View screenshot: Classroom Booking Record System">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
-              </button>
+              <h3 class="h4" id="project4-title">Classroom Booking Record System</h3>
+              <p class="fw-light">Java, NetBeans</p>
             </div>
           </div>
 
@@ -2285,12 +2386,31 @@
 
 
 
-    <!-- ======= Certificates Section ======= -->
-    <section id="certificates" class="certificates">
+    <!-- ======= Services Section ======= -->
+    <section id="certificates" class="certificates bg-light">
       <div class="container">
         <div class="section-title">
           <h2>Certificates</h2>
           <p>Credentials that speak for themselves.</p>
+          <div class="section-wave section-wave-fade" aria-hidden="true">
+            <svg viewBox="0 0 220 24" fill="none">
+              <defs>
+                <linearGradient id="wg-cert" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0" stop-color="#5AA7FF" />
+                  <stop offset=".5" stop-color="#1264CE" />
+                  <stop offset="1" stop-color="#5AA7FF" />
+                </linearGradient>
+              </defs>
+              <g class="wave-ribbon">
+                <path d="M-58 8 Q -44 2, -30 8 T -2 8 T 26 8 T 54 8 T 82 8 T 110 8 T 138 8 T 166 8 T 194 8 T 222 8 T 250 8 T 278 8"
+                  stroke="url(#wg-cert)" stroke-width="2.4" stroke-linecap="round" />
+              </g>
+              <g class="wave-ribbon wave-ribbon-2">
+                <path d="M-58 16 Q -44 22, -30 16 T -2 16 T 26 16 T 54 16 T 82 16 T 110 16 T 138 16 T 166 16 T 194 16 T 222 16 T 250 16 T 278 16"
+                  stroke="#5AA7FF" stroke-width="2" stroke-linecap="round" opacity=".4" />
+              </g>
+            </svg>
+          </div>
         </div>
 
         <!-- Content for larger screens -->
@@ -2307,105 +2427,49 @@
         <div class="section-title">
           <h2>บริการ</h2>
           <p>ธนพล ชำนาญหาญ — รับทำเว็บไซต์ ระบบ CRM / POS และ AI Agent สำหรับธุรกิจ</p>
+          <div class="section-wave section-wave-fade" aria-hidden="true">
+            <svg viewBox="0 0 220 24" fill="none">
+              <defs>
+                <linearGradient id="wg-svc" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0" stop-color="#5AA7FF" />
+                  <stop offset=".5" stop-color="#1264CE" />
+                  <stop offset="1" stop-color="#5AA7FF" />
+                </linearGradient>
+              </defs>
+              <g class="wave-ribbon">
+                <path d="M-58 8 Q -44 2, -30 8 T -2 8 T 26 8 T 54 8 T 82 8 T 110 8 T 138 8 T 166 8 T 194 8 T 222 8 T 250 8 T 278 8"
+                  stroke="url(#wg-svc)" stroke-width="2.4" stroke-linecap="round" />
+              </g>
+              <g class="wave-ribbon wave-ribbon-2">
+                <path d="M-58 16 Q -44 22, -30 16 T -2 16 T 26 16 T 54 16 T 82 16 T 110 16 T 138 16 T 166 16 T 194 16 T 222 16 T 250 16 T 278 16"
+                  stroke="#5AA7FF" stroke-width="2" stroke-linecap="round" opacity=".4" />
+              </g>
+            </svg>
+          </div>
         </div>
 
         <div class="svc-grid">
-          <article class="svc-card svc-card-wide">
-            <div class="svc-icon" aria-hidden="true">
-              <svg viewBox="0 0 170 170" fill="none">
-                <g stroke="#1264CE" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M88 118H36a12 12 0 0 1-12-12V44a12 12 0 0 1 12-12h86a12 12 0 0 1 12 12v16" />
-                  <path d="M24 54h110M40 76h34M40 94h22" />
-                  <rect x="102" y="72" width="46" height="72" rx="11" />
-                  <path d="M119 84h12" />
-                </g>
-                <circle cx="38" cy="43" r="3.5" fill="#1264CE" />
-                <circle cx="49" cy="43" r="3.5" fill="#1264CE" />
-                <circle cx="60" cy="43" r="3.5" fill="#1264CE" />
-                <circle cx="125" cy="131" r="3.5" fill="#1264CE" />
-              </svg>
-            </div>
-            <div class="svc-body">
-              <h3>รับทำเว็บไซต์</h3>
-              <p>Corporate Website, Landing Page, <span class="svc-nw">E-Commerce</span> และ Web Application — Responsive ทุกอุปกรณ์ ส่งงานตรงเวลา</p>
-            </div>
+          <article class="svc-card">
+            <h3>รับทำเว็บไซต์</h3>
+            <p>Corporate Website, Landing Page, E-Commerce และ Web Application — Responsive ทุกอุปกรณ์ ส่งงานตรงเวลา</p>
           </article>
           <article class="svc-card">
-            <div class="svc-icon" aria-hidden="true">
-              <svg viewBox="0 0 170 170" fill="none">
-                <g stroke="#1264CE" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="22" y="34" width="126" height="102" rx="16" />
-                  <circle cx="62" cy="72" r="14" />
-                  <path d="M38 114c2-13 11-20 24-20s22 7 24 20" />
-                  <path d="M104 66h26M104 85h26M104 104h14" />
-                </g>
-              </svg>
-            </div>
-            <div class="svc-body">
-              <h3>รับทำระบบ CRM</h3>
-              <p>CRM แบบ Custom สำหรับองค์กร — Sales Pipeline, Lead Management, Call Center CRM และ Reporting Dashboard</p>
-            </div>
+            <h3>รับทำระบบ CRM</h3>
+            <p>CRM แบบ Custom สำหรับองค์กร — Sales Pipeline, Lead Management, Call Center CRM และ Reporting Dashboard</p>
           </article>
           <article class="svc-card">
-            <div class="svc-icon" aria-hidden="true">
-              <svg viewBox="0 0 170 170" fill="none">
-                <g stroke="#1264CE" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M60 36V22h50v14M72 30h26" />
-                  <rect x="36" y="36" width="98" height="112" rx="18" />
-                  <rect x="52" y="52" width="66" height="30" rx="7" />
-                </g>
-                <g fill="#1264CE">
-                  <circle cx="63" cy="102" r="5" /><circle cx="85" cy="102" r="5" /><circle cx="107" cy="102" r="5" />
-                  <circle cx="63" cy="125" r="5" /><circle cx="85" cy="125" r="5" /><circle cx="107" cy="125" r="5" />
-                </g>
-              </svg>
-            </div>
-            <div class="svc-body">
-              <h3>รับทำระบบ POS</h3>
-              <p>ระบบจุดขายครบวงจร — สต็อกสินค้า รายงานยอดขาย และเชื่อมต่อ Payment Gateway ตามความต้องการ</p>
-            </div>
+            <h3>รับทำระบบ POS</h3>
+            <p>ระบบจุดขายครบวงจร — สต็อกสินค้า รายงานยอดขาย และเชื่อมต่อ Payment Gateway ตามความต้องการ</p>
           </article>
-          <article class="svc-card svc-card-wide">
-            <div class="svc-icon" aria-hidden="true">
-              <svg viewBox="0 0 170 170" fill="none">
-                <g stroke="#1264CE" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M76 30c4 27 14 37 41 41-27 4-37 14-41 41-4-27-14-37-41-41 27-4 37-14 41-41z" />
-                  <path d="M124 98c2 11 6 15 17 17-11 2-15 6-17 17-2-11-6-15-17-17 11-2 15-6 17-17z" />
-                  <path d="M38 126v12M52 120v24M66 128v8" />
-                </g>
-                <circle cx="132" cy="40" r="5" fill="#1264CE" />
-              </svg>
-            </div>
-            <div class="svc-body">
-              <h3>รับพัฒนา AI Agent</h3>
-              <p>Agentic AI แบบ Multi-Agent, LLM Integration (GPT, Gemini, Claude), Voice AI (ASR / TTS / <span class="svc-nw">Speech-to-Speech</span>), AI Chatbot และ AI IVR</p>
-            </div>
+          <article class="svc-card">
+            <h3>รับพัฒนา AI Agent</h3>
+            <p>Agentic AI แบบ Multi-Agent, LLM Integration (GPT, Gemini, Claude), Voice AI (ASR / TTS / Speech-to-Speech), AI Chatbot และ AI IVR</p>
           </article>
-          <div class="svc-more">
-            <p class="svc-more-label">และงานอื่นๆ</p>
-            <ul class="svc-chips">
-              <li>ERP</li>
-              <li>Back-Office</li>
-              <li>Dashboard</li>
-              <li>Booking System</li>
-              <li>LINE Bot</li>
-              <li>Telegram Bot</li>
-              <li>Asterisk PBX / Call Center</li>
-              <li>AWS &amp; Docker</li>
-            </ul>
-          </div>
         </div>
+        <p class="svc-more">และงานอื่นๆ — ERP, Back-Office, Dashboard, Booking System, LINE Bot, Telegram Bot, Asterisk PBX / Call Center, AWS &amp; Docker</p>
 
-        <div class="faq-layout">
-          <div class="faq-intro">
-            <h3>คำถามที่พบบ่อย</h3>
-            <p>คำตอบสั้นๆ เรื่องบริการ ค่าใช้จ่าย และการร่วมงาน — ถ้ายังไม่เจอสิ่งที่อยากรู้ ทักมาคุยกันได้เลย ปรึกษาฟรี</p>
-            <div class="faq-actions">
-              <a class="btn-pill" href="mailto:tanapol.ch@rmutsvmail.com">ติดต่อสอบถาม</a>
-              <a class="faq-call" href="tel:+66962437210">+66 962 437 210</a>
-            </div>
-          </div>
-          <div class="faq">
+        <div class="faq">
+          <h3>คำถามที่พบบ่อย</h3>
             <details>
               <summary>ธนพล ชำนาญหาญ คือใคร?</summary>
               <p>ธนพล ชำนาญหาญ (Tanapol Chamnanhan) คือ Full-Stack Developer และ Software Engineer จากกรุงเทพมหานคร มีประสบการณ์กว่า 2 ปีในการพัฒนาระบบ CRM, เว็บแอปพลิเคชัน และระบบ AI สำหรับองค์กรชั้นนำในไทยกว่า 27 แห่ง</p>
@@ -2426,7 +2490,7 @@
               <summary>ธนพล ชำนาญหาญ กำลังหางานอยู่ไหม?</summary>
               <p>ใช่ครับ ธนพล ชำนาญหาญ เปิดรับโอกาสงานใหม่ ทั้งตำแหน่ง Software Engineer, Full-Stack Developer, Web Developer และ Programmer ในกรุงเทพหรือรูปแบบ Remote ติดต่อ HR ได้ที่ tanapol.ch@rmutsvmail.com หรือ LinkedIn: linkedin.com/in/tanapol-chamnanhan/</p>
             </details>
-            <details lang="en">
+            <details>
               <summary>How to hire Tanapol Chamnanhan (ธนพล ชำนาญหาญ) as Software Engineer or Web Developer?</summary>
               <p>Contact Tanapol Chamnanhan via email tanapol.ch@rmutsvmail.com or LinkedIn linkedin.com/in/tanapol-chamnanhan/. Bangkok-based Full-Stack Developer open to full-time, contract, and freelance opportunities in Software Engineering, Web Development, CRM/POS system development.</p>
             </details>
@@ -2438,15 +2502,14 @@
               <summary>ธนพล ชำนาญหาญ รับพัฒนา AI Agent และระบบ AI สำหรับธุรกิจไหม?</summary>
               <p>รับครับ ธนพล ชำนาญหาญ รับพัฒนา AI Agent และระบบ AI สำหรับธุรกิจครบวงจร — Agentic AI (Multi-Agent Orchestration, Sub-Agents), LLM Integration (GPT, Gemini, Claude), Voice AI (ASR, TTS, Speech-to-Speech แบบ Realtime), AI Chatbot และ AI IVR สำหรับ Contact Center ติดต่อ tanapol.ch@rmutsvmail.com</p>
             </details>
-            <details lang="en">
+            <details>
               <summary>Does Tanapol Chamnanhan build AI agents and voice AI systems?</summary>
               <p>Yes. Tanapol Chamnanhan designs and builds agentic AI systems (orchestrator + sub-agent architectures, multi-agent orchestration), LLM integrations (GPT, Gemini, Claude), and voice AI pipelines (ASR, TTS, realtime speech-to-speech) for business automation and contact centers. Based in Bangkok, Thailand — contact tanapol.ch@rmutsvmail.com</p>
             </details>
-            <details lang="en">
+            <details>
               <summary>What technologies does Tanapol Chamnanhan use for CRM and POS development?</summary>
               <p>Tanapol Chamnanhan builds CRM and POS systems using PHP, Python, JavaScript, MySQL, React, RESTful APIs, and integrations with LINE Messaging API, Telegram Bot, Payment Gateways, and Asterisk PBX for call center functionality. Based in Bangkok, Thailand.</p>
             </details>
-          </div>
         </div>
       </div>
     </section><!-- End Services & FAQ -->
@@ -2455,7 +2518,7 @@
     <section id="contact" class="closing-cta">
       <div class="container">
         <div class="cta-inner">
-          <h2 class="cta-headline">Let's build<br><span class="cta-ink">what's next.</span></h2>
+          <h2 class="cta-headline">Let's build<br>what's next.</h2>
           <p class="cta-sub">Open to full-time roles and freelance projects — web apps, CRM &amp; POS systems, and AI
             voice agents.</p>
           <a class="btn-pill cta-pill" href="mailto:tanapol.ch@rmutsvmail.com">Get in touch</a>
@@ -2493,19 +2556,29 @@
 
   <!-- ======= Footer ======= -->
   <footer id="footer">
-    <div class="container">
-      <div class="footer-top">
-        <div class="footer-col">
-          <p class="footer-heading">Tanapol Chamnanhan</p>
-          <p class="footer-text">Full-Stack Developer &amp; Software Engineer based in Bangkok, Thailand.</p>
-        </div>
-        <div class="footer-col">
-          <p class="footer-heading">Contact</p>
-          <ul class="footer-links">
-            <li><a href="mailto:tanapol.ch@rmutsvmail.com" class="footer-contact-link">tanapol.ch@rmutsvmail.com</a></li>
-            <li><a href="tel:+66962437210" class="footer-contact-link">+66 962 437 210</a></li>
-          </ul>
-          <div class="social-links-footer">
+    <div class="container fw-light my-3 text-start">
+      <div class="container">
+
+        <div class="row ">
+          <div class="col-12 col-md-4 mt-3">
+            <div style="font-size: 1rem;font-weight:600;color:#1d1d1f;margin-bottom:8px;letter-spacing:-0.2px;">Tanapol
+              Chamnanhan</div>
+            <div class="fw-light" style="font-size: 0.8235rem;color:#6e6e73;line-height:1.6;">Full-Stack Developer &amp;
+              Software Engineer based in Bangkok, Thailand.</div>
+          </div>
+
+          <div class="col-0 col-md-4">
+          </div>
+
+          <div class="col-12 col-md-4 mt-3">
+            <div style="font-size: 1rem;font-weight:600;color:#1d1d1f;margin-bottom:8px;letter-spacing:-0.2px;">Contact
+            </div>
+            <div class="fw-light" style="font-size: 0.8235rem;color:#6e6e73;"><a href="mailto:tanapol.ch@rmutsvmail.com"
+                class="text-decoration-none footer-contact-link" style="color:#1264CE;">tanapol.ch@rmutsvmail.com</a></div>
+            <div class="fw-light" style="font-size: 0.8235rem;color:#6e6e73;"><a href="tel:+66962437210"
+                class="text-decoration-none footer-contact-link" style="color:#1264CE;">+66 962 437 210</a></div>
+
+            <div class="social-links-footer">
               <a href="https://github.com/TawittyTC" class="github" aria-label="Tanapol on GitHub"><svg
                   class="social-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                   <path
@@ -2530,13 +2603,22 @@
                     d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z" />
                 </svg></a>
             </div>
+          </div>
+
+
         </div>
       </div>
-      <div class="footer-legal">
-        <p>Copyright &copy; <span id="current-year">2024</span> <a href="https://tawittytc.github.io/mywebsite"
-            class="footer-copy-link">Tanapol Chamnanhan</a>. Built and maintained by hand.</p>
+      <div class="container border-top mt-4">
+        <div class="d-lg-flex justify-content-between align-items-center text-center text-lg-start mt-2">
+          <!-- copyright text -->
+          <div class="text-body-secondary text-primary-hover">Copyright &copy; <span id="current-year">2024</span>
+            <a href="https://tawittytc.github.io/mywebsite" class="text-body-secondary footer-copy-link">Tanapol Chamnanhan</a>. Built and
+            maintained by hand.
+          </div>
+        </div>
       </div>
     </div>
+
   </footer><!-- End Footer -->
 
   <!-- Back to top -->
@@ -2548,7 +2630,7 @@
   </button>
 
   <!-- Main JS -->
-  <script defer src="assets/js/main.min.js?v=2.37.0"></script>
+  <script defer src="assets/js/main.min.js?v=2.38.0"></script>
   <!-- Service Worker: cache assets for repeat visits -->
   <script>if ('serviceWorker' in navigator) { var _sw = function () { navigator.serviceWorker.register('sw.js') }; 'requestIdleCallback' in window ? requestIdleCallback(_sw) : window.addEventListener('load', _sw) }</script>
 
