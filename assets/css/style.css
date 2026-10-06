@@ -3745,7 +3745,7 @@ body::before {
 /*--------------------------------------------------------------
 # The ground, lighter and alive
   A paler ground and softer pools, split across two layers that drift
-  on their own slow paths (34s and 46s, out of step), so the light
+  on their own slow paths (22s and 28s, out of step), so the light
   behind the glass is always moving a little and never repeats the
   same way. Transform-only, so the compositor does all of it.
 --------------------------------------------------------------*/
@@ -3764,13 +3764,13 @@ body::before {
   background:
     radial-gradient(38vmax 38vmax at 12% 16%, rgba(18, 100, 206, 0.09), rgba(18, 100, 206, 0) 70%),
     radial-gradient(44vmax 36vmax at 30% 92%, rgba(90, 167, 255, 0.11), rgba(90, 167, 255, 0) 70%);
-  animation: ground-drift-a 34s ease-in-out infinite alternate;
+  animation: ground-drift-a 22s ease-in-out infinite alternate;
 }
 body::after {
   background:
     radial-gradient(42vmax 42vmax at 88% 36%, rgba(90, 167, 255, 0.13), rgba(90, 167, 255, 0) 70%),
     radial-gradient(30vmax 30vmax at 68% 84%, rgba(18, 100, 206, 0.06), rgba(18, 100, 206, 0) 70%);
-  animation: ground-drift-b 46s ease-in-out infinite alternate;
+  animation: ground-drift-b 28s ease-in-out infinite alternate;
 }
 @media (min-width: 768px) and (prefers-contrast: no-preference) {
   html { background: var(--glass-ground); }
@@ -3787,11 +3787,11 @@ body::after {
 }
 @keyframes ground-drift-a {
   from { transform: translate3d(0, 0, 0) scale(1); }
-  to   { transform: translate3d(7%, 5%, 0) scale(1.08); }
+  to   { transform: translate3d(14%, 9%, 0) scale(1.12); }
 }
 @keyframes ground-drift-b {
   from { transform: translate3d(0, 0, 0) scale(1.04); }
-  to   { transform: translate3d(-8%, -4%, 0) scale(1); }
+  to   { transform: translate3d(-15%, -8%, 0) scale(1); }
 }
 @media (prefers-reduced-motion: reduce) {
   body::before,

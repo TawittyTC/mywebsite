@@ -1026,6 +1026,9 @@ document.addEventListener('DOMContentLoaded', function () {
   // cluster breathe with it. Layout dims only re-adopt on a real width
   // change (rotation / window resize) or a drastic height change.
   var layoutW = 0, layoutH = 0;
+  // which composition the graph was laid out for: desktop keeps it to the
+  // right of the copy, phones put it in the band below
+  var layoutMobile = null;
   // eased state for the node-lit name ink
   var nameEl = hero.querySelector('.hero-name');
   var inkX = 62, inkR = 24, inkG = 119, inkB = 242;
@@ -1260,7 +1263,17 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!nodes.length) {
       layoutW = W;
       layoutH = H;
+      layoutMobile = isMobile();
       makeNodes();
+    } else if (isMobile() !== layoutMobile) {
+      // crossed between the desktop and phone compositions: stretching the
+      // old layout left a desktop graph crowded into the right of a phone,
+      // so lay it out afresh and let it burst into its new place
+      layoutW = W;
+      layoutH = H;
+      layoutMobile = isMobile();
+      makeNodes();
+      replayQueued = true;
     } else if (Math.abs(W - layoutW) > 1 || Math.abs(H - layoutH) > layoutH * 0.25) {
       // real layout change (rotation, desktop window resize) — re-anchor;
       // toolbar-sized height churn is deliberately ignored
