@@ -2123,26 +2123,205 @@ a.info-item:hover .info-value { color: var(--color-link); }
 }
 
 /*--------------------------------------------------------------
-# Project cards: wider, sized to the screen
-  Only the width changes here; the picture and the words keep the
-  heights they had before. A phone shows one card with the next one
-  peeking in; tablets and desktops get a wider card.
+# Project cards, measured from apple.com
+  Taken from the "Why Apple is the best place to shop iPhone" cards on a
+  440pt iPhone (screenshot at 3x): a 258 x 389 card (2:3), 28px corners,
+  24px inside, 22px between cards, the first card on the content edge
+  and the row running off the screen. Type on the card: a 14px semibold
+  eyebrow, a 21px semibold headline on 25px lines, 14px body on 18px
+  lines; the picture sits at the foot and a 36px round button 19px in
+  from the corner. iPad and Mac keep the same build on Apple's larger
+  steps: 17 / 24 / 17 at 735-1068px, 17 / 28 / 17 and a 400 x 500 card
+  from 1069px. SF Pro on Apple devices (the system font), Inter elsewhere.
 --------------------------------------------------------------*/
+#portfolio { background: #F5F5F7; overflow-x: clip; }
+#portfolio .rf-cards-scroller-overflow {
+  /* full bleed: the row reaches the window edge, its first card on the column */
+  margin-inline: calc(50% - 50vw);
+  padding-inline: calc(50vw - 50%);
+  scroll-padding-inline: calc(50vw - 50%);
+}
 #portfolio .rf-cards-scroller-item {
-  width: 460px;
-  margin-right: 24px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 400px;
+  min-height: 500px;
+  margin-right: 20px;
+  padding: 30px 30px 78px;
+  border: 0;
+  border-radius: 28px;
+  background: #fff;
+  overflow: visible;
+  cursor: zoom-in;
+  transition: transform .45s cubic-bezier(.32, .72, 0, 1), box-shadow .45s cubic-bezier(.32, .72, 0, 1);
 }
-@media (min-width: 769px) and (max-width: 1199px) {
-  #portfolio .rf-cards-scroller-item { width: 400px; }
+#portfolio .rf-cards-scroller-item:last-child { margin-right: 0; }
+@media (hover: hover) and (pointer: fine) {
+  #portfolio .rf-cards-scroller-item:hover {
+    transform: scale(1.01);
+    box-shadow: 2px 4px 16px rgba(0, 0, 0, .16);
+  }
 }
-@media (max-width: 768px) {
-  #portfolio .rf-cards-scroller-item { width: min(340px, 86vw); margin-right: 14px; }
-  /* the wider card would stretch a 4:3 picture taller; hold the old height */
-  #portfolio .project-img { aspect-ratio: auto; height: 180px; }
+/* eyebrow: Apple sets it as plain semibold text, not a pill */
+#portfolio .project-tag {
+  order: 1;
+  align-self: flex-start;
+  margin: 0 0 8px;
+  padding: 0;
+  border-radius: 0;
+  background: none;
+  color: #1D1D1F;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.23536;
+  letter-spacing: -0.022em;
+}
+#portfolio .rf-cards-scroller-item h3 {
+  order: 2;
+  margin: 0 0 12px;
+  padding: 0;
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.14286;
+  letter-spacing: .007em;
+  color: #1D1D1F;
+}
+#portfolio .rf-cards-scroller-item p.fw-light {
+  order: 2;
+  margin: 0;
+  padding: 0;
+  font-size: 17px;
+  font-weight: 400 !important;
+  line-height: 1.47059;
+  letter-spacing: -0.022em;
+  color: #1D1D1F;
+}
+/* the picture: whole, at the foot of the card, never cut by its edge */
+#portfolio .project-img {
+  order: 3;
+  width: 100%;
+  height: auto;
+  margin-top: auto;
+  padding-top: 24px;
+  aspect-ratio: auto;
+  border-radius: 0;
+  overflow: visible;
+}
+#portfolio .project-img::after { display: none; }
+#portfolio .project-img img,
+#portfolio .rf-cards-scroller-item img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  border-radius: 10px;
+  box-shadow: 0 0 0 .5px rgba(0, 0, 0, .08), 0 8px 24px rgba(0, 0, 0, .14);
+}
+/* the round button in the corner */
+.card-plus {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(210, 210, 215, .64);
+  color: rgba(0, 0, 0, .56);
+  transition: background .2s ease, color .2s ease;
+}
+.card-plus svg { width: 36px; height: 36px; fill: currentColor; }
+.card-plus::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 44px;
+  height: 44px;
+  transform: translate(-50%, -50%);
+}
+#portfolio .rf-cards-scroller-item:hover .card-plus { background: rgba(223, 223, 227, .9); color: rgba(0, 0, 0, .64); }
+
+/* iPad and small laptops: Apple's medium step */
+@media (max-width: 1068px) {
+  #portfolio .rf-cards-scroller-item { width: 344px; min-height: 460px; padding: 28px 28px 76px; }
+  #portfolio .rf-cards-scroller-item h3 { font-size: 24px; line-height: 1.16667; letter-spacing: .009em; }
+}
+/* iPhone: the measured card */
+@media (max-width: 734px) {
+  #portfolio .rf-cards-scroller-item {
+    width: clamp(240px, 58.6vw, 300px);
+    min-height: 0;
+    aspect-ratio: 258 / 389;
+    margin-right: 22px;
+    padding: 24px 24px 74px;
+    transform: none;
+  }
+  #portfolio .project-tag { font-size: 14px; line-height: 1.28577; letter-spacing: -0.016em; }
+  #portfolio .rf-cards-scroller-item h3 { font-size: 21px; line-height: 1.19048; letter-spacing: .011em; }
+  #portfolio .rf-cards-scroller-item p.fw-light { font-size: 14px; line-height: 1.28577; letter-spacing: -0.016em; }
+  #portfolio .project-img { padding-top: 18px; }
+  .card-plus { right: 19px; bottom: 19px; }
 }
 @media (min-width: 2000px) {
-  #portfolio .rf-cards-scroller-item { width: 520px; }
+  #portfolio .rf-cards-scroller-item { width: 452px; min-height: 565px; }
 }
 @media (min-width: 3000px) and (min-height: 1700px) {
-  #portfolio .rf-cards-scroller-item { width: 667px; }
+  #portfolio .rf-cards-scroller-item { width: 580px; min-height: 725px; }
+}
+
+/*--------------------------------------------------------------
+# Carousel paddles, the apple.com way: grey 36px circles under the row,
+  right-aligned to the column, on every screen size; a disabled one dims
+--------------------------------------------------------------*/
+.rf-cards-scroller .paddlenav {
+  position: static;
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  width: auto;
+  padding: 0;
+  margin-top: 28px;
+  transform: none;
+}
+.rf-cards-scroller .paddlenav-arrow {
+  position: relative;
+  z-index: 901;               /* above the floating back-to-top where they meet */
+  top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  min-width: 0;
+  min-height: 0;
+  transform: none;
+}
+.rf-cards-scroller .paddlenav-arrow span:not(.visuallyhidden) { display: flex; }
+.rf-cards-scroller .paddlenav-arrow svg { width: 36px; height: 36px; fill: currentColor; }
+.rf-cards-scroller .paddlenav-arrow::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 44px;
+  height: 44px;
+  transform: translate(-50%, -50%);
+}
+.rf-cards-scroller .paddlenav-arrow:disabled,
+.rf-cards-scroller .paddlenav-arrow.disabled {
+  visibility: visible !important;
+  opacity: .42 !important;
+  pointer-events: auto !important;
+}
+.rf-cards-scroller .paddlenav-arrow:not(:disabled):active { transform: scale(.94); }
+@media (hover: hover) and (pointer: fine) {
+  .rf-cards-scroller .paddlenav-arrow:not(:disabled):hover { transform: scale(1.06); }
+}
+@media (max-width: 768px) {
+  .rf-cards-scroller .paddlenav { display: flex; margin-top: 24px; }
 }
