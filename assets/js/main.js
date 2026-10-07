@@ -236,9 +236,11 @@ function anchorOrigin(surface, source) {
     }
   });
 
-  function openLightbox(src, alt, source) {
+  function openLightbox(src, alt, source, label) {
     lbImg.src = src;
     lbImg.alt = alt;
+    // one viewer serves certificates and project screenshots alike
+    lightbox.setAttribute("aria-label", label || "Certificate preview");
     lightbox.classList.add("open");
     lightbox.style.display = "flex";
     document.body.style.overflow = "hidden";
@@ -474,6 +476,18 @@ document.addEventListener('DOMContentLoaded', function () {
       card.querySelectorAll('.js-count[data-count]').forEach(countUp);
     });
   }
+});
+
+// Project cards open their screenshot whole, the way an apple.com card's
+// corner button opens its story. The whole card is the target.
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll("#portfolio .rf-cards-scroller-item").forEach(function (card) {
+    var img = card.querySelector(".project-img img");
+    if (!img) return;
+    card.addEventListener("click", function () {
+      window._certLightboxOpen(img.currentSrc || img.src, img.alt, card.querySelector(".project-img"), "Project screenshot");
+    });
+  });
 });
 
 // Certificate grid: the DOM is built immediately so the page has its
