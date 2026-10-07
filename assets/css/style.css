@@ -2123,42 +2123,47 @@ a.info-item:hover .info-value { color: var(--color-link); }
 }
 
 /*--------------------------------------------------------------
-# Project cards, measured from apple.com
-  Taken from the "Why Apple is the best place to shop iPhone" cards on a
-  440pt iPhone (screenshot at 3x): a 258 x 389 card (2:3), 28px corners,
-  24px inside, 22px between cards, the first card on the content edge
-  and the row running off the screen. Type on the card: a 14px semibold
-  eyebrow, a 21px semibold headline on 25px lines, 14px body on 18px
-  lines; the picture sits at the foot and a 36px round button 19px in
-  from the corner. iPad and Mac keep the same build on Apple's larger
-  steps: 17 / 24 / 17 at 735-1068px, 17 / 28 / 17 and a 400 x 500 card
-  from 1069px. SF Pro on Apple devices (the system font), Inter elsewhere.
+# Project and skill cards, measured from apple.com
+  Built on Apple's "Why Apple is the best place to shop iPhone" cards
+  (measured on a 440pt iPhone: 258 x 389, 2:3, 28px corners, 24px inside,
+  22px apart, 14/21/14 type), then set about 10% larger with more air, as
+  asked: 282 x 425 on that iPhone, 28px inside and 26px apart; 376 x 500 on
+  iPad widths; 440 x 550 from 1069px. Both rows share the build: white
+  cards on a grey band, the row running to the window edge. Project cards
+  close with the screenshot and a round "+"; skill cards open with their
+  mark, as Apple's values cards do. SF Pro on Apple devices, Inter elsewhere.
 --------------------------------------------------------------*/
-#portfolio { background: #F5F5F7; overflow-x: clip; }
-#portfolio .rf-cards-scroller-overflow {
+#portfolio, #skill { background: #F5F5F7; overflow-x: clip; }
+#portfolio .rf-cards-scroller-overflow,
+#skill .rf-cards-scroller-overflow {
   /* full bleed: the row reaches the window edge, its first card on the column */
   margin-inline: calc(50% - 50vw);
   padding-inline: calc(50vw - 50%);
   scroll-padding-inline: calc(50vw - 50%);
 }
-#portfolio .rf-cards-scroller-item {
+#portfolio .rf-cards-scroller-item,
+#skill .rf-cards-scroller-item {
   position: relative;
   display: flex;
   flex-direction: column;
-  width: 400px;
-  min-height: 500px;
-  margin-right: 20px;
-  padding: 30px 30px 78px;
+  align-items: stretch;
+  width: 440px;
+  min-height: 550px;
+  margin-right: 28px;
+  padding: 36px;
   border: 0;
   border-radius: 28px;
   background: #fff;
+  text-align: left;
   overflow: visible;
-  cursor: zoom-in;
   transition: transform .45s cubic-bezier(.32, .72, 0, 1), box-shadow .45s cubic-bezier(.32, .72, 0, 1);
 }
-#portfolio .rf-cards-scroller-item:last-child { margin-right: 0; }
+#portfolio .rf-cards-scroller-item { padding-bottom: 88px; cursor: zoom-in; }
+#portfolio .rf-cards-scroller-item:last-child,
+#skill .rf-cards-scroller-item:last-child { margin-right: 0; }
 @media (hover: hover) and (pointer: fine) {
-  #portfolio .rf-cards-scroller-item:hover {
+  #portfolio .rf-cards-scroller-item:hover,
+  #skill .rf-cards-scroller-item:hover {
     transform: scale(1.01);
     box-shadow: 2px 4px 16px rgba(0, 0, 0, .16);
   }
@@ -2167,7 +2172,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
 #portfolio .project-tag {
   order: 1;
   align-self: flex-start;
-  margin: 0 0 8px;
+  margin: 0 0 10px;
   padding: 0;
   border-radius: 0;
   background: none;
@@ -2177,9 +2182,10 @@ a.info-item:hover .info-value { color: var(--color-link); }
   line-height: 1.23536;
   letter-spacing: -0.022em;
 }
-#portfolio .rf-cards-scroller-item h3 {
+#portfolio .rf-cards-scroller-item h3,
+#skill .rf-cards-scroller-item .title {
   order: 2;
-  margin: 0 0 12px;
+  margin: 0 0 14px;
   padding: 0;
   font-size: 28px;
   font-weight: 600;
@@ -2187,7 +2193,8 @@ a.info-item:hover .info-value { color: var(--color-link); }
   letter-spacing: .007em;
   color: #1D1D1F;
 }
-#portfolio .rf-cards-scroller-item p.fw-light {
+#portfolio .rf-cards-scroller-item p.fw-light,
+#skill .rf-cards-scroller-item .skill-desc {
   order: 2;
   margin: 0;
   padding: 0;
@@ -2197,13 +2204,21 @@ a.info-item:hover .info-value { color: var(--color-link); }
   letter-spacing: -0.022em;
   color: #1D1D1F;
 }
+/* the skill's mark, top left, as on Apple's values cards */
+#skill .rf-cards-scroller-item .skill-icon {
+  display: block;
+  flex-shrink: 0;
+  width: 88px;
+  height: 88px;
+  margin: -8px 0 28px -10px;   /* the drawing keeps its own margin inside the box */
+}
 /* the picture: whole, at the foot of the card, never cut by its edge */
 #portfolio .project-img {
   order: 3;
   width: 100%;
   height: auto;
   margin-top: auto;
-  padding-top: 24px;
+  padding-top: 32px;
   aspect-ratio: auto;
   border-radius: 0;
   overflow: visible;
@@ -2221,8 +2236,8 @@ a.info-item:hover .info-value { color: var(--color-link); }
 /* the round button in the corner */
 .card-plus {
   position: absolute;
-  right: 20px;
-  bottom: 20px;
+  right: 22px;
+  bottom: 22px;
   z-index: 2;
   display: flex;
   align-items: center;
@@ -2248,30 +2263,41 @@ a.info-item:hover .info-value { color: var(--color-link); }
 
 /* iPad and small laptops: Apple's medium step */
 @media (max-width: 1068px) {
-  #portfolio .rf-cards-scroller-item { width: 344px; min-height: 460px; padding: 28px 28px 76px; }
-  #portfolio .rf-cards-scroller-item h3 { font-size: 24px; line-height: 1.16667; letter-spacing: .009em; }
+  #portfolio .rf-cards-scroller-item,
+  #skill .rf-cards-scroller-item { width: 376px; min-height: 500px; padding: 32px; margin-right: 26px; }
+  #portfolio .rf-cards-scroller-item { padding-bottom: 84px; }
+  #portfolio .rf-cards-scroller-item h3,
+  #skill .rf-cards-scroller-item .title { font-size: 24px; line-height: 1.16667; letter-spacing: .009em; }
+  #skill .rf-cards-scroller-item .skill-icon { width: 80px; height: 80px; margin-bottom: 24px; }
 }
-/* iPhone: the measured card */
+/* iPhone: the measured card, about 10% larger */
 @media (max-width: 734px) {
-  #portfolio .rf-cards-scroller-item {
-    width: clamp(240px, 58.6vw, 300px);
+  #portfolio .rf-cards-scroller-item,
+  #skill .rf-cards-scroller-item {
+    width: clamp(260px, 64vw, 320px);
     min-height: 0;
     aspect-ratio: 258 / 389;
-    margin-right: 22px;
-    padding: 24px 24px 74px;
+    margin-right: 26px;
+    padding: 28px;
     transform: none;
   }
+  #portfolio .rf-cards-scroller-item { padding-bottom: 80px; }
   #portfolio .project-tag { font-size: 14px; line-height: 1.28577; letter-spacing: -0.016em; }
-  #portfolio .rf-cards-scroller-item h3 { font-size: 21px; line-height: 1.19048; letter-spacing: .011em; }
-  #portfolio .rf-cards-scroller-item p.fw-light { font-size: 14px; line-height: 1.28577; letter-spacing: -0.016em; }
-  #portfolio .project-img { padding-top: 18px; }
-  .card-plus { right: 19px; bottom: 19px; }
+  #portfolio .rf-cards-scroller-item h3,
+  #skill .rf-cards-scroller-item .title { font-size: 21px; line-height: 1.19048; letter-spacing: .011em; margin-bottom: 12px; }
+  #portfolio .rf-cards-scroller-item p.fw-light,
+  #skill .rf-cards-scroller-item .skill-desc { font-size: 14px; line-height: 1.42859; letter-spacing: -0.016em; }
+  #skill .rf-cards-scroller-item .skill-icon { width: 72px; height: 72px; margin: -6px 0 20px -8px; }
+  #portfolio .project-img { padding-top: 24px; }
+  .card-plus { right: 21px; bottom: 21px; }
 }
 @media (min-width: 2000px) {
-  #portfolio .rf-cards-scroller-item { width: 452px; min-height: 565px; }
+  #portfolio .rf-cards-scroller-item,
+  #skill .rf-cards-scroller-item { width: 497px; min-height: 622px; }
 }
 @media (min-width: 3000px) and (min-height: 1700px) {
-  #portfolio .rf-cards-scroller-item { width: 580px; min-height: 725px; }
+  #portfolio .rf-cards-scroller-item,
+  #skill .rf-cards-scroller-item { width: 638px; min-height: 798px; }
 }
 
 /*--------------------------------------------------------------
@@ -2285,7 +2311,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
   gap: 16px;
   width: auto;
   padding: 0;
-  margin-top: 28px;
+  margin-top: 36px;
   transform: none;
 }
 .rf-cards-scroller .paddlenav-arrow {
