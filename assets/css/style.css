@@ -2351,3 +2351,57 @@ a.info-item:hover .info-value { color: var(--color-link); }
 @media (max-width: 768px) {
   .rf-cards-scroller .paddlenav { display: flex; margin-top: 24px; }
 }
+
+/*--------------------------------------------------------------
+# Skill cards, filled: the mark on a soft tile, a category eyebrow,
+  and the tools the skill is made of at the foot of the card — the place
+  a project card keeps its screenshot, so the two rows read as one set
+--------------------------------------------------------------*/
+#skill .rf-cards-scroller-item .skill-icon {
+  width: 72px;
+  height: 72px;
+  margin: 0 0 24px;
+  padding: 8px;
+  border-radius: 20px;
+  background: rgba(18, 100, 206, .08);
+}
+#skill .skill-tag {
+  order: 2;
+  margin: 0 0 8px;
+  color: var(--color-link);
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.23536;
+  letter-spacing: -0.022em;
+}
+#skill .skill-tools {
+  order: 3;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: auto 0 0;
+  padding: 24px 0 0;
+  list-style: none;
+}
+#skill .skill-tools li {
+  padding: 6px 14px;
+  border-radius: 980px;
+  background: #F5F5F7;
+  color: #1D1D1F;
+  font-size: 14px;
+  line-height: 1.42859;
+  letter-spacing: -0.016em;
+  white-space: nowrap;
+}
+@media (max-width: 1068px) {
+  #skill .rf-cards-scroller-item .skill-icon { width: 64px; height: 64px; border-radius: 18px; }
+}
+@media (max-width: 734px) {
+  #skill .rf-cards-scroller-item .skill-icon { width: 56px; height: 56px; padding: 6px; margin: 0 0 20px; border-radius: 16px; }
+  #skill .skill-tag { font-size: 14px; line-height: 1.28577; letter-spacing: -0.016em; }
+  #skill .skill-tools { gap: 6px; padding-top: 20px; }
+  #skill .skill-tools li { padding: 5px 12px; font-size: 12px; line-height: 1.33337; letter-spacing: -0.01em; }
+}
+@media (prefers-contrast: more) {
+  #skill .skill-tools li { box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .35); }
+}
