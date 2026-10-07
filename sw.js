@@ -1,10 +1,10 @@
-const CACHE = 'v133';
+const CACHE = 'v134';
 const PRECACHE = [
-  'assets/css/style.min.css?v=2.43.0',
+  'assets/css/style.min.css?v=2.44.0',
   'assets/fonts/inter-latin.woff2',
   'assets/fonts/notosansthai-thai.woff2',
   'assets/fonts/notosansthai-latin.woff2',
-  'assets/js/main.min.js?v=2.43.0',
+  'assets/js/main.min.js?v=2.44.0',
 ];
 
 self.addEventListener('install', e => {

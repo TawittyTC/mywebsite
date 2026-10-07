@@ -2407,23 +2407,42 @@ a.info-item:hover .info-value { color: var(--color-link); }
 }
 
 /*--------------------------------------------------------------
-# Skill cards: a picture above the category, the way an apple.com card
-  shows its product. 3D illustrations from Microsoft's Fluent Emoji
-  (MIT licence), 256px WebP, about 4KB each.
+# Skill cards: the mark on a quiet stage. The skill's own drawing, large
+  and in the theme blue, on a pale blue tile with a soft light and a faint
+  dot grid — a picture for each card that stays calm on the eye.
 --------------------------------------------------------------*/
-#skill .skill-art {
+#skill .rf-cards-scroller-item .skill-icon {
   order: 1;
-  display: block;
-  width: 112px;
-  height: 112px;
-  margin: -6px 0 22px -6px;     /* the renders carry a little air of their own */
-  object-fit: contain;
-  -webkit-filter: drop-shadow(0 10px 16px rgba(0, 0, 0, .12));
-  filter: drop-shadow(0 10px 16px rgba(0, 0, 0, .12));
+  width: auto;
+  height: auto;
+  aspect-ratio: 16 / 10;
+  margin: -16px -16px 24px;      /* the stage reaches 20px from the card edge */
+  padding: 13% 0;
+  border-radius: 18px;
+  background:
+    radial-gradient(120% 90% at 18% 0%, rgba(255, 255, 255, .9), rgba(255, 255, 255, 0) 60%),
+    radial-gradient(circle at 1px 1px, rgba(18, 100, 206, .10) 1px, transparent 1.5px) 0 0 / 14px 14px,
+    linear-gradient(135deg, #F4F8FE 0%, #E4EEFB 100%);
+  box-shadow: inset 0 0 0 1px rgba(18, 100, 206, .06);
+}
+#skill .rf-cards-scroller-item[data-tech="ai"] .skill-icon {
+  background:
+    radial-gradient(120% 90% at 18% 0%, rgba(255, 255, 255, .9), rgba(255, 255, 255, 0) 60%),
+    radial-gradient(circle at 1px 1px, rgba(18, 100, 206, .10) 1px, transparent 1.5px) 0 0 / 14px 14px,
+    linear-gradient(135deg, #F3F5FE 0%, #E3E8FA 100%);
+}
+#skill .rf-cards-scroller-item[data-tech="eng"] .skill-icon {
+  background:
+    radial-gradient(120% 90% at 18% 0%, rgba(255, 255, 255, .9), rgba(255, 255, 255, 0) 60%),
+    radial-gradient(circle at 1px 1px, rgba(18, 100, 206, .10) 1px, transparent 1.5px) 0 0 / 14px 14px,
+    linear-gradient(135deg, #F3F8FD 0%, #E5EFF8 100%);
 }
 @media (max-width: 1068px) {
-  #skill .skill-art { width: 100px; height: 100px; }
+  #skill .rf-cards-scroller-item .skill-icon { width: auto; height: auto; margin: -12px -12px 22px; }
 }
 @media (max-width: 734px) {
-  #skill .skill-art { width: 88px; height: 88px; margin: -4px 0 18px -4px; }
+  #skill .rf-cards-scroller-item .skill-icon { width: auto; height: auto; margin: -8px -8px 20px; padding: 12% 0; border-radius: 16px; }
+}
+@media (prefers-contrast: more) {
+  #skill .rf-cards-scroller-item .skill-icon { box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .35); }
 }
