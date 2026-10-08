@@ -2375,9 +2375,8 @@ a.info-item:hover .info-value { color: var(--color-link); }
   (one column on phones), built to the skill and project cards'
   measurements: 28px corners, no border, 36 / 32 / 28px inside,
   28 / 24 / 21px headlines over 17 / 17 / 14px copy. Each card opens
-  with its service's line drawing on the same pale stage the skill
-  cards use. The rest of the work closes the grid as a fifth,
-  full-width card of grey chips. The questions sit in one white card:
+  with its service's line drawing on the card's own white. The rest
+  of the work closes the grid as a fifth, full-width card of grey chips. The questions sit in one white card:
   hairline dividers between rows, a blue "+" on the right that turns
   to "x" while a row is open, and answers in secondary grey.
 --------------------------------------------------------------*/
@@ -2399,25 +2398,13 @@ a.info-item:hover .info-value { color: var(--color-link); }
   color: #1D1D1F;
   text-align: left;
 }
-/* the stage: the skill cards' pale tile, reaching 20px from the card edge */
+/* the drawing's own space at the top of the card, on the card's white */
 #services .svc-icon {
   display: flex;
   align-items: center;
   justify-content: center;
   aspect-ratio: 3 / 1;
   margin: -16px -16px 28px;
-  border-radius: 18px;
-  background:
-    radial-gradient(120% 90% at 18% 0%, rgba(255, 255, 255, .9), rgba(255, 255, 255, 0) 60%),
-    radial-gradient(circle at 1px 1px, rgba(18, 100, 206, .10) 1px, transparent 1.5px) 0 0 / 14px 14px,
-    linear-gradient(135deg, #F4F8FE 0%, #E4EEFB 100%);
-  box-shadow: inset 0 0 0 1px rgba(18, 100, 206, .06);
-}
-#services .svc-card[data-svc="ai"] .svc-icon {
-  background:
-    radial-gradient(120% 90% at 18% 0%, rgba(255, 255, 255, .9), rgba(255, 255, 255, 0) 60%),
-    radial-gradient(circle at 1px 1px, rgba(18, 100, 206, .10) 1px, transparent 1.5px) 0 0 / 14px 14px,
-    linear-gradient(135deg, #F3F5FE 0%, #E3E8FA 100%);
 }
 /* the drawing fills about 60% of the stage's height at every step */
 #services .svc-icon svg {
@@ -2601,7 +2588,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
 @media (max-width: 734px) {
   #services .svc-grid { grid-template-columns: minmax(0, 1fr); gap: 20px; }
   #services .svc-card { padding: 28px; }
-  #services .svc-icon { aspect-ratio: 8 / 3; margin: -8px -8px 20px; border-radius: 16px; }
+  #services .svc-icon { aspect-ratio: 8 / 3; margin: -8px -8px 20px; }
   #services .svc-icon svg { width: 22.5%; }
   #services .svc-card h3 { margin-bottom: 12px; font-size: 21px; line-height: 1.19048; letter-spacing: .011em; }
   #services .svc-card p { font-size: 14px; line-height: 1.42859; letter-spacing: -0.016em; }
@@ -2620,7 +2607,6 @@ a.info-item:hover .info-value { color: var(--color-link); }
   #services .faq summary::after { transition: none; }
 }
 @media (prefers-contrast: more) {
-  #services .svc-icon,
   #services .svc-chips li { box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .35); }
   #services .faq details + details { border-top-color: rgba(0, 0, 0, .35); }
   #services .faq details > p { color: #1D1D1F; }
