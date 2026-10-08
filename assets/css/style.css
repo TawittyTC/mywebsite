@@ -2284,7 +2284,6 @@ a.info-item:hover .info-value { color: var(--color-link); }
   margin: 0 0 24px;
   padding: 8px;
   border-radius: 20px;
-  background: rgba(18, 100, 206, .08);
 }
 #skill .skill-tag {
   order: 2;
@@ -2328,44 +2327,22 @@ a.info-item:hover .info-value { color: var(--color-link); }
 }
 
 /*--------------------------------------------------------------
-# Skill cards: the mark on a quiet stage. The skill's own drawing, large
-  and in the theme blue, on a pale blue tile with a soft light and a faint
-  dot grid — a picture for each card that stays calm on the eye.
+# Skill cards: the mark at the top. The skill's own drawing, large and
+  in the theme blue, centred in its own space on the card's white.
 --------------------------------------------------------------*/
 #skill .rf-cards-scroller-item .skill-icon {
   order: 1;
   width: auto;
   height: auto;
   aspect-ratio: 16 / 10;
-  margin: -16px -16px 24px;      /* the stage reaches 20px from the card edge */
-  padding: 13% 0;
-  border-radius: 18px;
-  background:
-    radial-gradient(120% 90% at 18% 0%, rgba(255, 255, 255, .9), rgba(255, 255, 255, 0) 60%),
-    radial-gradient(circle at 1px 1px, rgba(18, 100, 206, .10) 1px, transparent 1.5px) 0 0 / 14px 14px,
-    linear-gradient(135deg, #F4F8FE 0%, #E4EEFB 100%);
-  box-shadow: inset 0 0 0 1px rgba(18, 100, 206, .06);
-}
-#skill .rf-cards-scroller-item[data-tech="ai"] .skill-icon {
-  background:
-    radial-gradient(120% 90% at 18% 0%, rgba(255, 255, 255, .9), rgba(255, 255, 255, 0) 60%),
-    radial-gradient(circle at 1px 1px, rgba(18, 100, 206, .10) 1px, transparent 1.5px) 0 0 / 14px 14px,
-    linear-gradient(135deg, #F3F5FE 0%, #E3E8FA 100%);
-}
-#skill .rf-cards-scroller-item[data-tech="eng"] .skill-icon {
-  background:
-    radial-gradient(120% 90% at 18% 0%, rgba(255, 255, 255, .9), rgba(255, 255, 255, 0) 60%),
-    radial-gradient(circle at 1px 1px, rgba(18, 100, 206, .10) 1px, transparent 1.5px) 0 0 / 14px 14px,
-    linear-gradient(135deg, #F3F8FD 0%, #E5EFF8 100%);
+  margin: -16px -16px 24px;      /* the space reaches 20px from the card edge */
+  padding: 9.5% 0;
 }
 @media (max-width: 1068px) {
   #skill .rf-cards-scroller-item .skill-icon { width: auto; height: auto; margin: -12px -12px 22px; }
 }
 @media (max-width: 734px) {
-  #skill .rf-cards-scroller-item .skill-icon { width: auto; height: auto; margin: -8px -8px 20px; padding: 12% 0; border-radius: 16px; }
-}
-@media (prefers-contrast: more) {
-  #skill .rf-cards-scroller-item .skill-icon { box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .35); }
+  #skill .rf-cards-scroller-item .skill-icon { width: auto; height: auto; margin: -8px -8px 20px; padding: 8% 0; }
 }
 
 /*--------------------------------------------------------------
@@ -2406,10 +2383,10 @@ a.info-item:hover .info-value { color: var(--color-link); }
   aspect-ratio: 3 / 1;
   margin: -16px -16px 28px;
 }
-/* the drawing fills about 60% of the stage's height at every step */
+/* the drawing fills about 72% of its space's height at every step */
 #services .svc-icon svg {
   display: block;
-  width: 20%;
+  width: 24%;
   height: auto;
   aspect-ratio: 1;
 }
@@ -2570,7 +2547,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
   #services .svc-grid { gap: 26px; }
   #services .svc-card { padding: 32px; }
   #services .svc-icon { aspect-ratio: 5 / 2; margin: -12px -12px 24px; }
-  #services .svc-icon svg { width: 24%; }
+  #services .svc-icon svg { width: 29%; }
   #services .svc-card h3 { font-size: 24px; line-height: 1.16667; letter-spacing: .009em; }
   #services .svc-more { padding-top: 28px; padding-bottom: 28px; }
   #services .faq { margin-top: 100px; }
@@ -2589,7 +2566,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
   #services .svc-grid { grid-template-columns: minmax(0, 1fr); gap: 20px; }
   #services .svc-card { padding: 28px; }
   #services .svc-icon { aspect-ratio: 8 / 3; margin: -8px -8px 20px; }
-  #services .svc-icon svg { width: 22.5%; }
+  #services .svc-icon svg { width: 27%; }
   #services .svc-card h3 { margin-bottom: 12px; font-size: 21px; line-height: 1.19048; letter-spacing: .011em; }
   #services .svc-card p { font-size: 14px; line-height: 1.42859; letter-spacing: -0.016em; }
   #services .svc-more { gap: 12px; padding-top: 24px; padding-bottom: 24px; }
