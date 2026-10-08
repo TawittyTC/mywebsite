@@ -579,15 +579,73 @@ function createCardScroller(scroller, options) {
     nextBtn.classList.toggle('disabled', left >= max - 1);
   }
 
-  if (prevBtn) {
-    prevBtn.addEventListener('click', function () {
-      scroller.scrollBy({ left: -step, behavior: 'smooth' });
+  // Paging, the way apple.com's gallery paddles move: a whole page of
+  // cards at a time, landing with the next card exactly on the column
+  // edge, on an eased glide we draw ourselves. Native smooth scrolling was
+  // uneven across browsers (Safari jumps an overflow:hidden row outright)
+  // and a fixed 400px step left the row resting mid-card.
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var glide = null;
+
+  function stops() {
+    // where the row must rest for each visible card to sit on the column edge
+    var items = Array.prototype.filter.call(scroller.children, function (el) {
+      return el.offsetParent !== null;
     });
+    if (!items.length) return null;
+    var first = items[0].offsetLeft;
+    return items.map(function (el) { return el.offsetLeft - first; });
+  }
+
+  function pageTarget(dir) {
+    var max = scroller.scrollWidth - scroller.clientWidth;
+    var s = stops();
+    if (!s || s.length < 2) return Math.max(0, Math.min(max, scroller.scrollLeft + dir * step));
+    // aim from where an unfinished glide is heading, so quick taps add up
+    var at = glide ? glide.to : scroller.scrollLeft;
+    var pitch = s[1] - s[0];
+    var column = scroller.clientWidth - (parseFloat(getComputedStyle(scroller).paddingLeft) || 0);
+    var perPage = Math.max(1, Math.floor((column + 1) / pitch));
+    var current = 0;
+    for (var i = 0; i < s.length; i++) if (s[i] <= at + 2) current = i;
+    var next = Math.max(0, Math.min(s.length - 1, current + dir * perPage));
+    // stepping back from a resting point between stops lands on the stop just passed
+    if (dir < 0 && at > s[current] + 2) next = Math.max(0, current - perPage + 1);
+    return Math.max(0, Math.min(max, s[next]));
+  }
+
+  function glideTo(to) {
+    if (glide) cancelAnimationFrame(glide.raf);
+    var from = scroller.scrollLeft;
+    var dist = to - from;
+    if (Math.abs(dist) < 1) { glide = null; return; }
+    if (reduceMotion) { glide = null; scroller.scrollLeft = to; return; }
+    // a longer trip takes a little longer, as a thrown object would
+    var dur = Math.min(900, 520 + Math.abs(dist) * 0.18);
+    var t0 = performance.now();
+    var g = glide = { to: to, raf: 0 };
+    function frame(now) {
+      if (glide !== g) return; // cancelled or replaced by a newer glide
+      var p = Math.min(1, (now - t0) / dur);
+      // ease-in-out: leaves gently, travels, settles without a bump
+      var e = p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+      scroller.scrollLeft = from + dist * e;
+      if (p < 1) g.raf = requestAnimationFrame(frame);
+      else { glide = null; update(); }
+    }
+    g.raf = requestAnimationFrame(frame);
+  }
+
+  // a finger on the row takes over from any glide in progress
+  scroller.addEventListener('touchstart', function () {
+    if (glide) { cancelAnimationFrame(glide.raf); glide = null; }
+  }, { passive: true });
+
+  if (prevBtn) {
+    prevBtn.addEventListener('click', function () { glideTo(pageTarget(-1)); });
   }
   if (nextBtn) {
-    nextBtn.addEventListener('click', function () {
-      scroller.scrollBy({ left: step, behavior: 'smooth' });
-    });
+    nextBtn.addEventListener('click', function () { glideTo(pageTarget(1)); });
   }
   scroller.addEventListener('scroll', update, { passive: true });
   window.addEventListener('load', update); // re-sync once images have sized the row
@@ -671,6 +729,7 @@ function createCardScroller(scroller, options) {
     update: update,
     // jump back to the start and re-sync the arrows (e.g. after filtering)
     reset: function () {
+      if (glide) { cancelAnimationFrame(glide.raf); glide = null; }
       scroller.scrollLeft = 0;
       setTimeout(update, 100);
     }
