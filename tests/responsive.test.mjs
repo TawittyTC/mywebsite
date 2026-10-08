@@ -234,3 +234,30 @@ test('desktop → phone resize re-lays the constellation for the phone compositi
   assert.ok(mean > 330 * 0.3 && mean < 330 * 0.7, `labels centred at x=${Math.round(mean)} of 330: the graph is lopsided`);
   await page.close();
 });
+
+test('no card spills its words past its own edge, on any phone or desktop', async () => {
+  // a fixed 2:3 card once let a long skill's tool chips hang below it on phones
+  for (const width of [320, 390, 440, 768, 1440]) {
+    const { page } = await ctx.openPage({
+      viewport: { width, height: 900 }, isMobile: width < 800, hasTouch: width < 800, reducedMotion: 'reduce',
+    });
+    await page.evaluate(() => document.fonts.ready);
+    const spills = await page.evaluate(() => {
+      const out = [];
+      for (const card of document.querySelectorAll('#skill .rf-cards-scroller-item, #portfolio .rf-cards-scroller-item')) {
+        const r = card.getBoundingClientRect();
+        for (const el of card.querySelectorAll(':scope > *')) {
+          const e = el.getBoundingClientRect();
+          if (!e.width || !e.height) continue;
+          if (e.bottom > r.bottom + 0.5 || e.right > r.right + 0.5) {
+            out.push(`${(card.querySelector('h3') || {}).textContent}: ${el.className.baseVal ?? el.className}`);
+            break;
+          }
+        }
+      }
+      return out;
+    });
+    assert.deepEqual(spills, [], `${width}px: content past the card edge`);
+    await page.close();
+  }
+});
