@@ -2275,7 +2275,9 @@ a.info-item:hover .info-value { color: var(--color-link); }
   #portfolio .rf-cards-scroller-item,
   #skill .rf-cards-scroller-item {
     width: clamp(260px, 64vw, 320px);
-    min-height: 0;
+    /* 2:3 is the shape, not a cage: min-height auto lets a card with more
+       words grow past it instead of spilling them over its edge */
+    min-height: auto;
     aspect-ratio: 258 / 389;
     margin-right: 26px;
     padding: 28px;
