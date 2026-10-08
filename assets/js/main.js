@@ -1683,3 +1683,19 @@ document.addEventListener('DOMContentLoaded', function () {
   }, { threshold: 0.1 });
   io.observe(scene);
 })();
+
+/**
+ * BizCard glass light — the glare stands where the pointer or the finger
+ * is. CSS draws the light; this only tells it where to stand.
+ */
+(function () {
+  var card = document.getElementById('biz-card');
+  if (!card) return;
+  function light(e) {
+    var r = card.getBoundingClientRect();
+    card.style.setProperty('--lx', (e.clientX - r.left) + 'px');
+    card.style.setProperty('--ly', (e.clientY - r.top) + 'px');
+  }
+  card.addEventListener('pointermove', light, { passive: true });
+  card.addEventListener('pointerdown', light, { passive: true });
+})();

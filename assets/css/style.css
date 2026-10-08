@@ -2591,3 +2591,120 @@ a.info-item:hover .info-value { color: var(--color-link); }
 @media (forced-colors: active) {
   #services .faq summary::after { forced-color-adjust: none; background-color: CanvasText; }
 }
+
+/*--------------------------------------------------------------
+# Business card: Liquid Glass, as it was before the apple.com rebuild.
+  A clear slab held over two soft pools of the accent light that drift
+  slowly behind it: the backdrop frosts and brightens what shows
+  through, a white rim lights the top edge, a faint blue light gathers
+  along the foot, and a glare stands where the pointer or finger is.
+  Asking for less transparency gives a frostier slab, more contrast a
+  solid white one with a drawn edge, and browsers without backdrop
+  filters the frosty one.
+--------------------------------------------------------------*/
+.biz-scene {
+  position: relative;
+  isolation: isolate;
+}
+.biz-scene::before,
+.biz-scene::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  border-radius: 50%;
+  aspect-ratio: 1;
+  pointer-events: none;
+}
+.biz-scene::before {
+  width: 70%;
+  left: -12%;
+  top: -30%;
+  background: radial-gradient(circle, rgba(18, 100, 206, .30), rgba(18, 100, 206, 0) 66%);
+  animation: biz-drift-a 16s ease-in-out infinite alternate;
+}
+.biz-scene::after {
+  width: 66%;
+  right: -14%;
+  bottom: -34%;
+  background: radial-gradient(circle, rgba(90, 167, 255, .40), rgba(90, 167, 255, 0) 66%);
+  animation: biz-drift-b 19s ease-in-out infinite alternate;
+}
+@keyframes biz-drift-a { to { transform: translate(14%, 10%); } }
+@keyframes biz-drift-b { to { transform: translate(-12%, -8%); } }
+
+.biz-card {
+  transform-style: flat;          /* a backdrop filter samples through a flat surface */
+  background: rgba(255, 255, 255, .2);
+  -webkit-backdrop-filter: blur(18px) saturate(180%) brightness(1.05);
+  backdrop-filter: blur(18px) saturate(180%) brightness(1.05);
+  border: 1px solid rgba(255, 255, 255, .75);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .95),
+    inset 1px 0 0 rgba(255, 255, 255, .5),
+    inset 0 -1px 0 rgba(255, 255, 255, .35),
+    inset 0 -16px 28px -16px rgba(18, 100, 206, .14),
+    0 0 0 .5px rgba(17, 40, 80, .08),
+    0 30px 60px rgba(29, 29, 31, .12),
+    0 4px 12px rgba(29, 29, 31, .06);
+}
+/* the glare, in place of the titanium grain: only while the card is
+   pointed at or touched, so the resting slab shows its light pools; behind
+   the type, so it lights the glass without washing out the words */
+.biz-card::before {
+  z-index: -1;
+  background: radial-gradient(circle 260px at var(--lx, 50%) var(--ly, 50%),
+    rgba(255, 255, 255, .55), rgba(255, 255, 255, 0) 70%);
+  opacity: 0;
+  transition: opacity .35s ease;
+}
+.biz-card:hover::before { opacity: 1; }
+/* the scene paints after the content around it, so the pill is lifted
+   to stay above the light that reaches up behind it */
+.cta-pill {
+  position: relative;
+  z-index: 1;
+}
+/* small grey type keeps AA contrast with the blue light behind the glass */
+.biz-card .biz-logo,
+.biz-card .biz-role,
+.biz-card .biz-contacts a { color: #545458; }
+.biz-card .biz-contacts a:hover { color: var(--color-link); }
+
+@media (prefers-reduced-motion: reduce) {
+  .biz-scene::before,
+  .biz-scene::after { animation: none; }
+  .biz-card::before { transition: none; }
+}
+/* frostier, not gone: the light still shows through as colour */
+@media (prefers-reduced-transparency: reduce) {
+  .biz-card {
+    background: rgba(255, 255, 255, .8);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    border-color: rgba(255, 255, 255, .9);
+    box-shadow:
+      inset 0 1px 0 #fff,
+      0 0 0 .5px rgba(17, 40, 80, .12),
+      0 30px 60px rgba(29, 29, 31, .12),
+      0 4px 12px rgba(29, 29, 31, .06);
+  }
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .biz-card { background: rgba(255, 255, 255, .8); }
+}
+@media (prefers-contrast: more) {
+  .biz-scene::before,
+  .biz-scene::after { display: none; }
+  .biz-card {
+    background: #fff;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, .45), 0 6px 18px rgba(17, 40, 80, .12);
+  }
+}
+@media (forced-colors: active) {
+  .biz-scene::before,
+  .biz-scene::after,
+  .biz-card::before { display: none; }
+  .biz-card { border-color: CanvasText; }
+}
