@@ -1913,87 +1913,6 @@ a.info-item:hover .info-value { color: var(--color-link); }
 #footer .border-top { border-top-color: rgba(0, 0, 0, 0.07) !important; }
 
 /*--------------------------------------------------------------
-# Services & FAQ
---------------------------------------------------------------*/
-.svc-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 20px;
-}
-.svc-card {
-  background: var(--color-fill);
-  border-radius: var(--r-card-sm);
-  padding: 28px;
-}
-.svc-card h3 {
-  font-size: 1.2941rem;
-  font-weight: 600;
-  line-height: 1.3;
-  margin: 0 0 10px;
-}
-.svc-card p {
-  font-size: 0.9412rem;
-  line-height: 1.65;
-  color: var(--color-text-secondary);
-  margin: 0;
-}
-.svc-more {
-  font-size: 0.9412rem;
-  line-height: 1.65;
-  color: var(--color-text-secondary);
-  margin: 24px 0 0;
-}
-.faq {
-  max-width: 760px;
-  margin: 88px auto 0;
-}
-.faq h3 {
-  font-size: 1.7647rem;
-  text-align: center;
-  margin: 0 0 24px;
-}
-.faq details { border-bottom: 1px solid rgba(0, 0, 0, 0.07); }
-.faq summary {
-  position: relative;
-  list-style: none;
-  cursor: pointer;
-  padding: 18px 36px 18px 0;
-  font-size: 1.0588rem;
-  font-weight: 600;
-  line-height: 1.45;
-}
-.faq summary::-webkit-details-marker { display: none; }
-/* the chevron turns with the row, so the state reads without the colour */
-.faq summary::after {
-  content: '';
-  position: absolute;
-  right: 6px;
-  top: 50%;
-  width: 9px;
-  height: 9px;
-  border-right: 2px solid var(--color-link);
-  border-bottom: 2px solid var(--color-link);
-  transform: translateY(-70%) rotate(45deg);
-  transition: transform 0.2s var(--ease-swift);
-}
-.faq details[open] summary::after { transform: translateY(-30%) rotate(-135deg); }
-.faq summary:focus-visible {
-  outline: 2px solid var(--color-link);
-  outline-offset: 2px;
-  border-radius: var(--r-min);
-}
-.faq details p {
-  font-size: 0.9412rem;
-  line-height: 1.7;
-  color: var(--color-text-secondary);
-  margin: 0 0 20px;
-  padding-right: 36px;
-}
-@media (prefers-reduced-motion: reduce) {
-  .faq summary::after { transition: none; }
-}
-
-/*--------------------------------------------------------------
 # Touch targets
   Every control answers a 44×44 finger (Apple HIG) while the mark keeps
   its size: a centred hit-slop where there is room around it, and 44-pitch
@@ -2447,4 +2366,265 @@ a.info-item:hover .info-value { color: var(--color-link); }
 }
 @media (prefers-contrast: more) {
   #skill .rf-cards-scroller-item .skill-icon { box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .35); }
+}
+
+/*--------------------------------------------------------------
+# Services & FAQ, the apple.com way: values cards and an
+  AppleCare-style FAQ. Everything here is scoped to #services.
+  The four services are white cards on the grey band, two by two
+  (one column on phones), built to the skill and project cards'
+  measurements: 28px corners, no border, 36 / 32 / 28px inside,
+  28 / 24 / 21px headlines over 17 / 17 / 14px copy. Each card opens
+  with its service's line drawing on the same pale stage the skill
+  cards use. The rest of the work closes the grid as a fifth,
+  full-width card of grey chips. The questions sit in one white card:
+  hairline dividers between rows, a blue "+" on the right that turns
+  to "x" while a row is open, and answers in secondary grey.
+--------------------------------------------------------------*/
+#services { background: #F5F5F7; }
+
+#services .svc-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 28px;
+}
+#services .svc-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 36px;
+  border: 0;
+  border-radius: 28px;
+  background: #fff;
+  color: #1D1D1F;
+  text-align: left;
+}
+/* the stage: the skill cards' pale tile, reaching 20px from the card edge */
+#services .svc-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 3 / 1;
+  margin: -16px -16px 28px;
+  border-radius: 18px;
+  background:
+    radial-gradient(120% 90% at 18% 0%, rgba(255, 255, 255, .9), rgba(255, 255, 255, 0) 60%),
+    radial-gradient(circle at 1px 1px, rgba(18, 100, 206, .10) 1px, transparent 1.5px) 0 0 / 14px 14px,
+    linear-gradient(135deg, #F4F8FE 0%, #E4EEFB 100%);
+  box-shadow: inset 0 0 0 1px rgba(18, 100, 206, .06);
+}
+#services .svc-card[data-svc="ai"] .svc-icon {
+  background:
+    radial-gradient(120% 90% at 18% 0%, rgba(255, 255, 255, .9), rgba(255, 255, 255, 0) 60%),
+    radial-gradient(circle at 1px 1px, rgba(18, 100, 206, .10) 1px, transparent 1.5px) 0 0 / 14px 14px,
+    linear-gradient(135deg, #F3F5FE 0%, #E3E8FA 100%);
+}
+/* the drawing fills about 60% of the stage's height at every step */
+#services .svc-icon svg {
+  display: block;
+  width: 20%;
+  height: auto;
+  aspect-ratio: 1;
+}
+#services .svc-card h3 {
+  margin: 0 0 14px;
+  padding: 0;
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.14286;
+  letter-spacing: .007em;
+  color: #1D1D1F;
+}
+#services .svc-card p {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1.47059;
+  letter-spacing: -0.022em;
+  color: #1D1D1F;
+  text-wrap: pretty;
+}
+/* a hyphenated name stays whole on its line */
+#services .svc-nw { white-space: nowrap; }
+
+/* the rest of the work: a fifth card, the full width of the grid, its
+   label a quiet line beside the chips (above them on smaller screens) */
+#services .svc-more {
+  grid-column: 1 / -1;
+  flex-direction: row;
+  align-items: baseline;
+  gap: 24px;
+  padding-top: 28px;
+  padding-bottom: 28px;
+}
+#services .svc-card.svc-more h3 {
+  flex: none;
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.47059;
+  letter-spacing: -0.022em;
+}
+/* the chips run as a line of text so balancing can even out the rows
+   and no chip is left alone on the last one */
+#services .svc-chips {
+  min-width: 0;
+  margin: 0 -10px -10px 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0;                 /* no stray spaces between chips */
+  text-wrap: balance;
+}
+#services .svc-chips li {
+  display: inline-block;
+  margin: 0 10px 10px 0;
+  padding: 6px 14px;
+  border-radius: 980px;
+  background: #F5F5F7;
+  color: #1D1D1F;
+  font-size: 14px;
+  line-height: 1.42859;
+  letter-spacing: -0.016em;
+  white-space: nowrap;
+}
+
+/* FAQ: one white card of rows */
+#services .faq {
+  max-width: 880px;
+  margin: 120px auto 0;
+}
+#services .faq h3 {
+  margin: 0 0 40px;
+  text-align: center;
+  font-size: 40px;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: 0;
+  color: #1D1D1F;
+}
+#services .faq-list {
+  --faq-pull: -10px;           /* the answer tucks up under its question */
+  padding: 8px 36px;
+  border-radius: 28px;
+  background: #fff;
+}
+#services .faq details { border: 0; }
+#services .faq details + details { border-top: 1px solid #E8E8ED; }
+/* the whole row is the control; it reaches 12px past the text on each
+   side so the focus ring has room to breathe */
+#services .faq summary {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  min-height: 44px;
+  margin: 0 -12px;
+  padding: 24px 12px;
+  border-radius: 14px;
+  list-style: none;
+  cursor: pointer;
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.36842;
+  letter-spacing: 0;
+  color: #1D1D1F;
+  text-wrap: pretty;
+  -webkit-tap-highlight-color: transparent;
+}
+#services .faq summary::-webkit-details-marker { display: none; }
+#services .faq summary::marker { content: ''; }
+/* "+" in the theme blue, centred on the question's first line; turned
+   45 degrees it reads as "x" */
+#services .faq summary::after {
+  content: '';
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin-top: 5px;              /* (26px line - 16px) / 2 */
+  background-color: var(--color-link);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 1.5v13M1.5 8h13' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 1.5v13M1.5 8h13' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  transition: transform .4s var(--ease-swift);
+}
+#services .faq details[open] > summary::after { transform: rotate(45deg); }
+#services .faq summary:focus-visible {
+  outline: 2px solid var(--color-link);
+  outline-offset: 0;
+  border-radius: 14px;
+}
+#services .faq details > p {
+  margin: var(--faq-pull) 0 0;
+  padding: 0 56px 26px 0;
+  font-size: 17px;
+  line-height: 1.47059;
+  letter-spacing: -0.022em;
+  color: #6E6E73;
+  overflow-wrap: break-word;
+  text-wrap: pretty;
+}
+/* the answer unfolds where the browser can animate to a natural height;
+   the tuck moves onto the clipped box so it eases shut with it */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (interpolate-size: allow-keywords) {
+    #services .faq-list { interpolate-size: allow-keywords; }
+    #services .faq details > p { margin-top: 0; }
+    #services .faq details::details-content {
+      height: 0;
+      margin-top: 0;
+      overflow: clip;
+      transition: height .4s cubic-bezier(.32, .72, 0, 1), margin-top .4s cubic-bezier(.32, .72, 0, 1),
+        content-visibility .4s allow-discrete;
+    }
+    #services .faq details[open]::details-content { height: auto; margin-top: var(--faq-pull); }
+  }
+}
+
+/* iPad and small laptops: Apple's medium step */
+@media (max-width: 1068px) {
+  #services .svc-grid { gap: 26px; }
+  #services .svc-card { padding: 32px; }
+  #services .svc-icon { aspect-ratio: 5 / 2; margin: -12px -12px 24px; }
+  #services .svc-icon svg { width: 24%; }
+  #services .svc-card h3 { font-size: 24px; line-height: 1.16667; letter-spacing: .009em; }
+  #services .svc-more { padding-top: 28px; padding-bottom: 28px; }
+  #services .faq { margin-top: 100px; }
+  #services .faq h3 { margin-bottom: 32px; font-size: 32px; line-height: 1.125; }
+  #services .faq-list { --faq-pull: -8px; padding: 4px 32px; }
+  #services .faq summary { padding: 22px 12px; font-size: 17px; line-height: 1.47059; }
+  #services .faq summary::after { margin-top: 4.5px; }
+  #services .faq details > p { padding-bottom: 24px; }
+}
+/* below the iPad's width the label sits above its chips */
+@media (max-width: 767px) {
+  #services .svc-more { flex-direction: column; align-items: stretch; gap: 14px; }
+}
+/* iPhone: one column, the measured 14 / 21 / 14 type */
+@media (max-width: 734px) {
+  #services .svc-grid { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  #services .svc-card { padding: 28px; }
+  #services .svc-icon { aspect-ratio: 8 / 3; margin: -8px -8px 20px; border-radius: 16px; }
+  #services .svc-icon svg { width: 22.5%; }
+  #services .svc-card h3 { margin-bottom: 12px; font-size: 21px; line-height: 1.19048; letter-spacing: .011em; }
+  #services .svc-card p { font-size: 14px; line-height: 1.42859; letter-spacing: -0.016em; }
+  #services .svc-more { gap: 12px; padding-top: 24px; padding-bottom: 24px; }
+  #services .svc-card.svc-more h3 { margin: 0; font-size: 15px; line-height: 1.33337; letter-spacing: -0.016em; }
+  #services .svc-chips { margin: 0 -6px -6px 0; }
+  #services .svc-chips li { margin: 0 6px 6px 0; padding: 5px 12px; font-size: 12px; line-height: 1.33337; letter-spacing: -0.01em; }
+  #services .faq { margin-top: 80px; }
+  #services .faq h3 { margin-bottom: 28px; font-size: 28px; line-height: 1.14286; }
+  #services .faq-list { --faq-pull: -6px; padding: 4px 20px; }
+  #services .faq summary { gap: 14px; padding: 18px 12px; font-size: 16px; line-height: 1.5; }
+  #services .faq summary::after { width: 14px; height: 14px; margin-top: 5px; }
+  #services .faq details > p { padding: 0 0 22px; font-size: 15px; line-height: 1.53334; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #services .faq summary::after { transition: none; }
+}
+@media (prefers-contrast: more) {
+  #services .svc-icon,
+  #services .svc-chips li { box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .35); }
+  #services .faq details + details { border-top-color: rgba(0, 0, 0, .35); }
+  #services .faq details > p { color: #1D1D1F; }
+}
+@media (forced-colors: active) {
+  #services .faq summary::after { forced-color-adjust: none; background-color: CanvasText; }
 }
