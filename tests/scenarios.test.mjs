@@ -18,7 +18,7 @@ test('full user journey produces zero console errors and zero failed requests', 
     await page.evaluate((s) => document.getElementById(s).scrollIntoView(), id);
     await settle(page);
   }
-  // exercise every project filter
+  // exercise every filter chip
   const filters = await page.$$eval('.filter-btn', (b) => b.length);
   for (let i = 0; i < filters; i++) {
     await page.$$eval('.filter-btn', (btns, idx) => btns[idx].click(), i);
@@ -98,32 +98,35 @@ test('paddle arrows disable at the ends and re-enable after moving', async () =>
   await page.close();
 });
 
-test('filter cycle leaves every project card visible, settled, and the row rewound', async () => {
+test('filter cycle leaves every skill card visible, settled, and the row rewound', async () => {
   const { page } = await ctx.openPage();
-  await page.$eval('#portfolio .section-title', (el) => el.scrollIntoView());
+  await page.$eval('#skill .section-title', (el) => el.scrollIntoView());
   await settle(page, 700);
   // scroll the row, then run through every filter and land back on All
-  await page.evaluate(() => { document.getElementById('scroller').scrollLeft = 500; });
-  const nBtns = await page.$$eval('#portfolio .filter-btn', (b) => b.length);
+  await page.evaluate(() => { document.getElementById('skill-scroller').scrollLeft = 500; });
+  const nBtns = await page.$$eval('#skill .filter-btn', (b) => b.length);
   for (let i = 1; i < nBtns; i++) {
-    await page.$$eval('#portfolio .filter-btn', (btns, idx) => btns[idx].click(), i);
+    await page.$$eval('#skill .filter-btn', (btns, idx) => btns[idx].click(), i);
     await settle(page, 250);
-    const rewound = await page.evaluate(() => document.getElementById('scroller').scrollLeft);
+    const rewound = await page.evaluate(() => document.getElementById('skill-scroller').scrollLeft);
     assert.ok(rewound <= 1, `filter did not rewind the scroller (at ${rewound}px)`);
   }
-  await page.$eval('#portfolio .filter-btn[data-filter="all"]', (el) => el.click());
+  await page.$eval('#skill .filter-btn[data-filter="all"]', (el) => el.click());
   await settle(page, 600);
   const state = await page.evaluate(() => {
-    const items = [...document.querySelectorAll('#portfolio .rf-cards-scroller-item')];
+    const items = [...document.querySelectorAll('#skill .rf-cards-scroller-item')];
     return {
       hidden: items.filter((i) => i.style.display === 'none').length,
       dim: items.filter((i) => getComputedStyle(i).opacity !== '1').length,
-      prevDisabled: document.querySelector('#portfolio [data-scroller-prev]').disabled,
+      prevDisabled: document.querySelector('#skill [data-scroller-prev]').disabled,
+      pressed: [...document.querySelectorAll('#skill .filter-btn')].map((b) => b.getAttribute('aria-pressed')),
     };
   });
   assert.equal(state.hidden, 0, `${state.hidden} cards still hidden after All`);
   assert.equal(state.dim, 0, `${state.dim} cards stuck semi-transparent after filtering`);
   assert.equal(state.prevDisabled, true, 'prev arrow should be disabled after rewind');
+  assert.deepEqual(state.pressed, ['true', ...Array(state.pressed.length - 1).fill('false')],
+    'only All should be marked selected');
   await page.close();
 });
 
@@ -456,7 +459,10 @@ test('the SCG timeline pulse rides the connector from the oldest entry to the ne
   const low = seen.reduce((a, b) => (a.y > b.y ? a : b));
   const high = seen.reduce((a, b) => (a.y < b.y ? a : b));
   assert.ok(low.rgb[0] > 150, `pulse should leave the older node grey, got rgb(${low.rgb})`);
-  assert.deepEqual(high.rgb.slice(0, 3), [18, 100, 206],
+  // sampled every 300ms, the top frame can land a hair before the last
+  // keyframe: within 3 of link blue on every channel is arriving as it
+  const blue = [18, 100, 206];
+  assert.ok(high.rgb.slice(0, 3).every((c, i) => Math.abs(c - blue[i]) <= 3),
     `pulse should arrive as link blue, got rgb(${high.rgb})`);
   await page.close();
 });
@@ -493,7 +499,8 @@ test('a sheet grows from the card that opened it and never jumps back when re-gr
     `growth origin ${first.y} sits outside the sheet (0..${first.h})`);
 
   await page.keyboard.press('Escape');
-  await page.waitForFunction(() => !document.querySelector('.exp-lightbox.open'));
+  // closing also takes the sheet's history entry back off; scroll once it has
+  await page.waitForFunction(() => !document.querySelector('.exp-lightbox.open') && history.state === null);
   await page.evaluate(() => window.scrollBy(0, 140));
   await settle(page, 250);
   await page.$eval(card, (el) => el.click());

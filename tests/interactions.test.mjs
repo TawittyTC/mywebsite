@@ -35,30 +35,62 @@ test('experience modal: opens from a card, filters by client, closes with Escape
   await page.close();
 });
 
-test('project filters hide non-matching cards and All restores them', async () => {
+test('client work leads My Projects, and every card shows without a filter row', async () => {
   const { page } = await ctx.openPage();
-  await page.evaluate(() => document.getElementById('portfolio').scrollIntoView());
-  await page.waitForSelector('#portfolio .filter-btn[data-filter]:not([data-filter="all"])');
-  const result = await page.evaluate(() => {
-    const btn = document.querySelector('#portfolio .filter-btn[data-filter]:not([data-filter="all"])');
-    btn.click();
+  const state = await page.evaluate(() => {
     const items = [...document.querySelectorAll('#portfolio .rf-cards-scroller-item')];
-    const wrong = items.filter(
-      (i) => i.style.display !== 'none' && i.getAttribute('data-tech') !== btn.dataset.filter
-    ).length;
-    const shown = items.filter((i) => i.style.display !== 'none').length;
-    // filtering projects must NEVER touch the skills scroller
-    const skillsHidden = [...document.querySelectorAll('#skill .rf-cards-scroller-item')]
-      .filter((i) => i.style.display === 'none').length;
-    document.querySelector('#portfolio .filter-btn[data-filter="all"]').click();
-    const restored = items.filter((i) => i.style.display !== 'none').length;
-    return { filter: btn.dataset.filter, wrong, shown, skillsHidden, restored, total: items.length };
+    return {
+      filters: document.querySelectorAll('#portfolio .filter-btn').length,
+      hidden: items.filter((i) => getComputedStyle(i).display === 'none').length,
+      firstIsWork: items[0].classList.contains('work-card'),
+      total: items.length,
+    };
   });
-  assert.equal(result.wrong, 0, `cards not matching '${result.filter}' stayed visible`);
-  assert.ok(result.shown >= 1, 'filter hid everything');
-  assert.equal(result.skillsHidden, 0,
-    `project filter hid ${result.skillsHidden} skill cards — selector leaked outside #portfolio`);
-  assert.equal(result.restored, result.total, "'All' did not restore every card");
+  assert.equal(state.filters, 0, 'a filter row for a handful of projects only hides work');
+  assert.equal(state.hidden, 0, 'a project card is hidden');
+  assert.ok(state.firstIsWork, 'real client work should come before the student projects');
+  await page.close();
+});
+
+test('a client-work card opens its story in the experience sheet, on that client', async () => {
+  const { page } = await ctx.openPage();
+  const want = await page.$eval('#portfolio .work-card[data-client]', (c) => c.dataset.client);
+  await page.$eval('#portfolio .work-card[data-client]', (c) => { c.scrollIntoView({ block: 'center' }); c.click(); });
+  await page.waitForSelector('.exp-lightbox.open');
+  const sheet = await page.evaluate(() => {
+    const inner = document.querySelector('.exp-lightbox-inner');
+    const active = inner.querySelector('.exp-filter-chip.active');
+    const shown = [...inner.querySelectorAll('.exp-client-section')].filter((s) => s.style.display !== 'none');
+    return { active: active && active.dataset.filter, pressed: active && active.getAttribute('aria-pressed'),
+      shown: [...new Set(shown.map((s) => s.dataset.client))] };
+  });
+  assert.equal(sheet.active, want, 'the sheet did not open on the card\'s client');
+  assert.equal(sheet.pressed, 'true', 'the chosen client chip does not say it is selected');
+  assert.deepEqual(sheet.shown, [want], 'other clients are still listed');
+  await page.keyboard.press('Escape');
+  await page.waitForFunction(() => !document.querySelector('.exp-lightbox.open'));
+  await page.close();
+});
+
+test('Back closes an open sheet or picture instead of leaving the site', async () => {
+  const { page } = await ctx.openPage();
+  const site = page.url();
+  await page.goto(ctx.srv.url + '/robots.txt');
+  await page.goto(site, { waitUntil: 'load' });
+  await page.waitForFunction(() => !document.querySelector('.loader'), null, { timeout: 8000 });
+  // certificate viewer: Back closes it and stays on the page
+  await page.$eval('#images-list .cert-card', (c) => c.click());
+  await page.waitForSelector('.cert-lightbox.open');
+  await page.goBack();
+  await page.waitForFunction(() => !document.querySelector('.cert-lightbox.open'));
+  assert.equal(page.url(), site, 'Back left the site with the certificate open');
+  // experience sheet closed by its X leaves no stray history entry: Back now leaves
+  await page.$eval('#experience .data-box[data-exp]', (c) => c.click());
+  await page.waitForSelector('.exp-lightbox.open');
+  await page.click('.exp-lightbox-close');
+  await page.waitForFunction(() => !document.querySelector('.exp-lightbox.open') && history.state === null);
+  await page.goBack();
+  await page.waitForURL(/robots\.txt$/);
   await page.close();
 });
 

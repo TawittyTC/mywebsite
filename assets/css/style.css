@@ -68,6 +68,18 @@ a:hover {
 }
 
 
+/* The page is ready to read once this stylesheet applies, so the loader
+   fades now instead of waiting for analytics and the cookie banner. A new
+   animation name, so it starts fresh here rather than retiming the inline
+   3s fallback */
+.loader {
+  animation: loader-gone .25s ease forwards;
+  pointer-events: none;
+}
+@keyframes loader-gone {
+  to { opacity: 0; visibility: hidden; }
+}
+
 /*--------------------------------------------------------------
 # Hero Section
 --------------------------------------------------------------*/
@@ -717,9 +729,7 @@ button {
 #portfolio .rf-cards-scroller-item:hover {
   transform: translateY(-8px);
 }
-#skill .rf-cards-scroller-item:hover {
-  transform: translateY(-6px);
-}
+
 
 /* Project tag pill */
 .project-tag {
@@ -785,8 +795,7 @@ button {
 
 /* Mobile: whole-card tap feedback */
 @media (max-width: 768px) {
-  #portfolio .rf-cards-scroller-item:active,
-  #skill .rf-cards-scroller-item:active {
+  #portfolio .rf-cards-scroller-item:active {
     transform: scale(0.97);
   }
   #experience .data-box[data-exp]:active {
@@ -2010,7 +2019,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
   font-size: 1.1176rem;
   font-weight: 600;
   line-height: 1.26316;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 .contact-strip .info-item[href^="tel:"] .info-value { white-space: nowrap; }
 .contact-strip .info-sub {
@@ -2081,8 +2090,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
 #portfolio .rf-cards-scroller-item:last-child,
 #skill .rf-cards-scroller-item:last-child { margin-right: 0; }
 @media (hover: hover) and (pointer: fine) {
-  #portfolio .rf-cards-scroller-item:hover,
-  #skill .rf-cards-scroller-item:hover {
+  #portfolio .rf-cards-scroller-item:hover {
     transform: scale(1.01);
     box-shadow: 2px 4px 16px rgba(0, 0, 0, .16);
   }
@@ -2708,3 +2716,244 @@ a.info-item:hover .info-value { color: var(--color-link); }
   .biz-card::before { display: none; }
   .biz-card { border-color: CanvasText; }
 }
+
+/*--------------------------------------------------------------
+# Usability fixes from the UX audit (v2.47). Each rule says which
+  visitor it is for; nothing here changes the look on a normal desktop.
+--------------------------------------------------------------*/
+
+/* Phone held sideways, or a laptop zoomed to 200%: the 220px section
+   padding pushed the name below a 390px-tall screen. Let the hero be as
+   tall as its words need (never shorter than the screen) and drop the
+   padding there. */
+@media (orientation: landscape) and (max-height: 500px) {
+  #hero { padding: 0; height: auto; min-height: 100svh; }
+  #hero .hero-grid { padding-top: 40px; padding-bottom: 40px; }
+}
+
+/* Skills filter on phones: all four chips fit from 360px up (narrower
+   phones scroll the row); tablets keep the full-size chips */
+@media (max-width: 768px) {
+  #skill .project-filters {
+    width: max-content;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+@media (max-width: 480px) {
+  #skill .project-filters { gap: 6px; }
+  #skill .filter-btn { min-width: 58px; justify-content: center; padding-left: 16px; padding-right: 16px; }
+}
+
+/* Recruiters never opened "Read more", so the client names were never
+   seen: six of them sit under the current job's numbers */
+.exp-clients-line {
+  margin: 20px 0 0;
+  font-size: 0.8235rem;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+}
+.exp-clients-more { color: var(--color-link); white-space: nowrap; }
+@media (max-width: 768px) {
+  .exp-clients-line { font-size: 0.7647rem; }
+}
+
+/* Client work at the front of My Projects: the project card's build with
+   the line drawing on top (as the skill and service cards have it) and
+   the tools at the foot where a screenshot would be. The card opens its
+   story in the experience sheet. */
+#portfolio .work-card { cursor: pointer; }
+#portfolio .work-icon {
+  order: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 3 / 1;
+  margin: -16px -16px 24px;
+}
+#portfolio .work-icon svg {
+  display: block;
+  width: 24%;
+  height: auto;
+  aspect-ratio: 1;
+}
+#portfolio .work-tools {
+  order: 3;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: auto 0 0;
+  padding: 24px 0 0;
+  list-style: none;
+}
+#portfolio .work-tools li {
+  padding: 6px 14px;
+  border-radius: 980px;
+  background: #F5F5F7;
+  color: #1D1D1F;
+  font-size: 14px;
+  line-height: 1.42859;
+  letter-spacing: -0.016em;
+  white-space: nowrap;
+}
+@media (max-width: 1068px) {
+  #portfolio .work-icon { aspect-ratio: 7 / 2; margin: -12px -12px 22px; }
+}
+@media (max-width: 734px) {
+  #portfolio .work-icon { aspect-ratio: 7 / 2; margin: -8px -8px 20px; }
+  #portfolio .work-icon svg { width: 27%; }
+  #portfolio .work-tools { gap: 6px; padding-top: 20px; }
+  #portfolio .work-tools li { padding: 5px 12px; font-size: 12px; line-height: 1.33337; letter-spacing: -0.01em; }
+}
+/* on a phone the words and tools fill the card; the drawing would make
+   every card in the row taller than the measured 2:3 shape */
+@media (max-width: 480px) {
+  #portfolio .work-icon { display: none; }
+}
+@media (prefers-contrast: more) {
+  #portfolio .work-tools li { box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .35); }
+}
+
+/* The current job's sheet on a phone: the client chips stay at the top
+   while you read, clear of the close button, and each client folds to
+   its name until it is opened */
+@media (max-width: 734px) {
+  /* the sheet keeps 26px (24px under 600px) of padding above its content;
+     the stuck row covers it so nothing shows through above the chips,
+     which sit level with the close button */
+  .exp-clients-folded .exp-client-filter {
+    position: sticky;
+    top: -26px;
+    z-index: 5;
+    margin-top: 12px;
+    padding-top: 28px;
+    padding-bottom: 10px;
+    margin-right: 46px;
+    padding-right: 18px;
+    background: rgba(255, 255, 255, .97);
+    box-shadow: 64px 0 0 rgba(255, 255, 255, .97), 64px 1px 0 #E8E8ED, 0 1px 0 #E8E8ED;
+  }
+  @media (max-width: 600px) {
+    .exp-clients-folded .exp-client-filter { top: -24px; padding-top: 26px; }
+  }
+  .exp-clients-folded .exp-client-section-header {
+    position: relative;
+    margin-bottom: 0;
+    padding-right: 26px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .exp-clients-folded .exp-client-section-header::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    width: 14px;
+    height: 14px;
+    margin-top: -7px;
+    background-color: var(--color-link);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 1.5v13M1.5 8h13' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") center / contain no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 1.5v13M1.5 8h13' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") center / contain no-repeat;
+    transition: transform .3s var(--ease-swift);
+  }
+  .exp-clients-folded .exp-client-section.is-open .exp-client-section-header { margin-bottom: 16px; }
+  .exp-clients-folded .exp-client-section.is-open .exp-client-section-header::after { transform: rotate(45deg); }
+  .exp-clients-folded .exp-client-section:not(.is-open) > :not(.exp-client-section-header) { display: none; }
+  .exp-client-toggle {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    letter-spacing: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+  .exp-client-toggle:focus-visible { outline: 2px solid var(--color-link); outline-offset: 3px; border-radius: 4px; }
+  /* a focused client header is never left hidden under the stuck chip row */
+  .exp-lightbox-inner:has(.exp-clients-folded) { scroll-padding-top: 84px; }
+}
+@media (forced-colors: active) {
+  .exp-clients-folded .exp-client-section-header::after { forced-color-adjust: none; background-color: CanvasText; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .exp-clients-folded .exp-client-section-header::after { transition: none; }
+}
+
+/* Screenshot viewer: the project's name under the picture, and on a
+   portrait phone a wide screenshot shown tall enough to read, panned
+   sideways (it used to shrink to a strip 19–37% of its size) */
+.cert-lightbox { flex-direction: column; }
+.cert-lightbox-frame {
+  display: flex;
+  justify-content: center;
+  max-width: 100%;
+}
+.cert-lightbox-caption {
+  max-width: min(92vw, 640px);
+  text-wrap: balance;
+  margin: 16px auto 0;
+  padding: 0 16px;
+  color: rgba(255, 255, 255, .88);
+  font-size: 15px;
+  line-height: 1.4;
+  text-align: center;
+}
+.cert-lightbox-caption[hidden] { display: none; }
+.cert-lightbox:has(.cert-lightbox-caption:not([hidden])) img { max-height: 82vh; }
+.cert-lightbox.lb-pan .cert-lightbox-frame {
+  width: 100%;
+  justify-content: flex-start;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.cert-lightbox.lb-pan .cert-lightbox-frame::-webkit-scrollbar { display: none; }
+.cert-lightbox.lb-pan img {
+  flex: none;
+  width: auto;
+  height: 58svh;
+  max-width: none;
+  max-height: none;
+  margin: 0 16px;
+}
+
+/* back-to-top clears the iPhone home indicator */
+#back-to-top { bottom: calc(22px + env(safe-area-inset-bottom, 0px)); }
+
+/* Small phones: a one-word stat label ("Customizations") is wider than a
+   third of the card, so each cell takes at least its label's width */
+@media (max-width: 400px) {
+  .exp-stat-item { flex: 1 1 0; min-width: min-content; padding: 0 4px; }
+}
+@media (max-width: 359px) {
+  .exp-stat-label { font-size: 0.5882rem; }
+  .exp-stat-item { padding: 0 2px; }
+}
+
+/* links inside FAQ answers are told apart by more than their colour */
+#services .faq details > p a {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+/* High contrast: every filter chip keeps an outline and the chosen one is filled */
+@media (forced-colors: active) {
+  .filter-btn,
+  .exp-filter-chip { border: 1px solid ButtonText; }
+  .filter-btn[aria-pressed="true"],
+  .exp-filter-chip[aria-pressed="true"] {
+    forced-color-adjust: none;
+    background: Highlight;
+    color: HighlightText;
+    border-color: Highlight;
+  }
+}
+
+/* back-to-top hides while you scroll down on a phone, but a keyboard or
+   switch user who reaches it always sees it */
+#back-to-top:focus-visible { opacity: 1; transform: none; pointer-events: auto; }

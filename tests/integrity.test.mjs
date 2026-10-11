@@ -106,3 +106,14 @@ test('main.min.js ships clean (no console.log, no unsupported syntax)', () => {
   assert.doesNotMatch(min, /\?\.(?![0-9])/, 'optional chaining breaks older Safari');
   assert.doesNotMatch(min, /\w\?\?\w/, 'nullish coalescing breaks older Safari');
 });
+
+test('the page publishes the city, not a home street address', () => {
+  assert.doesNotMatch(html, /"streetAddress"/, 'street address in structured data');
+  assert.doesNotMatch(html, /45\/411/, 'house number on the page');
+});
+
+test('the CV link points at a PDF that exists', () => {
+  const cv = html.match(/href="(assets\/cv\/[^"]+\.pdf)"/);
+  assert.ok(cv, 'no CV download link');
+  assert.ok(existsSync(join(ROOT, cv[1])), `${cv[1]} missing`);
+});

@@ -175,7 +175,9 @@ test('on a phone every control answers a 44px finger (Apple HIG)', async () => {
     const controls = [...document.querySelectorAll('a, button, summary, [role="button"]')].filter((e) => {
       const r = e.getBoundingClientRect();
       // carousel cards are whole-card targets; the skip link lives off-screen until focused
-      return r.width > 0 && r.height > 0 && !e.closest('[data-card-scroller]')
+      // links inside a closed FAQ answer are not on screen until it opens
+      const folded = e.closest('details:not([open])') && !e.matches('summary');
+      return r.width > 0 && r.height > 0 && !e.closest('[data-card-scroller]') && !folded
         && !e.classList.contains('skip-link') && getComputedStyle(e).visibility !== 'hidden';
     });
     const out = [];
@@ -260,4 +262,37 @@ test('no card spills its words past its own edge, on any phone or desktop', asyn
     assert.deepEqual(spills, [], `${width}px: content past the card edge`);
     await page.close();
   }
+});
+
+test('the Skills filter chips all fit on a 360px phone', async () => {
+  const { page } = await ctx.openPage({ viewport: { width: 360, height: 780 }, isMobile: true, hasTouch: true });
+  const chips = await page.$$eval('#skill .filter-btn', (els) => els.map((e) => {
+    const r = e.getBoundingClientRect();
+    return { label: e.textContent.trim(), left: r.left, right: r.right };
+  }));
+  const cut = chips.filter((c) => c.left < 0 || c.right > 360);
+  assert.deepEqual(cut, [], 'a filter chip runs off the screen');
+  await page.close();
+});
+
+test('a phone held sideways shows the name and role on the first screen', async () => {
+  for (const [width, height] of [[844, 390], [932, 430]]) {
+    const { page } = await ctx.openPage({ viewport: { width, height }, isMobile: true, hasTouch: true });
+    const role = await page.$eval('#hero .hero-role', (el) => el.getBoundingClientRect().bottom);
+    assert.ok(role <= height, `${width}x${height}: the role line ends at ${Math.round(role)}px, below the screen`);
+    await page.close();
+  }
+});
+
+test('without JavaScript the loading cover still lifts', async () => {
+  const page = await ctx.browser.newPage({ viewport: { width: 390, height: 844 }, javaScriptEnabled: false });
+  await page.goto(ctx.srv.url + '/index.html', { waitUntil: 'load' });
+  // waitForFunction polls with page script, which is off here: poll from the test
+  let state = '';
+  for (let i = 0; i < 40 && state !== 'hidden'; i++) {
+    await page.waitForTimeout(100);
+    state = await page.evaluate(() => getComputedStyle(document.querySelector('.loader')).visibility);
+  }
+  assert.equal(state, 'hidden', 'the loading cover never lifted without JavaScript');
+  await page.close();
 });
