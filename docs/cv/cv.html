@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Tanapol Chamnanhan — CV</title>
+<style>
+  @font-face { font-family: 'Inter'; src: url('../../assets/fonts/inter-latin.woff2') format('woff2'); font-weight: 100 900; }
+  @page { size: A4; margin: 0; }
+  :root { --ink: #1D1D1F; --grey: #545458; --line: #E5E5EA; --blue: #1264CE; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: #fff; }
+  body { font-family: 'Inter', -apple-system, 'Helvetica Neue', Arial, sans-serif; color: var(--ink);
+         font-size: 9pt; line-height: 1.38; padding: 12mm 14mm 10mm; }
+  a { color: var(--blue); text-decoration: none; }
+  header { display: flex; justify-content: space-between; align-items: flex-end; gap: 12mm;
+           padding-bottom: 4mm; border-bottom: 1px solid var(--line); }
+  h1 { margin: 0; font-size: 22pt; font-weight: 700; letter-spacing: -0.02em; line-height: 1.05; }
+  .role { margin: 2mm 0 0; font-size: 11pt; color: var(--blue); font-weight: 500; }
+  .contact { text-align: right; font-size: 8.8pt; color: var(--grey); line-height: 1.6; white-space: nowrap; }
+  h2 { margin: 4.4mm 0 1.8mm; font-size: 8.4pt; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--blue); }
+  p { margin: 0; }
+  .summary { margin-top: 3.6mm; color: var(--ink); }
+  .job { margin-bottom: 2.6mm; }
+  .job-head { display: flex; justify-content: space-between; gap: 6mm; }
+  .job-title { font-weight: 600; }
+  .job-title span { font-weight: 400; color: var(--grey); }
+  .when { color: var(--grey); white-space: nowrap; }
+  ul { margin: 1.2mm 0 0; padding-left: 4.2mm; }
+  li { margin: 0 0 .5mm; }
+  li::marker { color: var(--blue); }
+  .clients { margin-top: 1.2mm; color: var(--grey); }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 0 9mm; }
+  .skills { display: grid; grid-template-columns: 27mm 1fr; gap: 1.1mm 3mm; }
+  .skills dt { font-weight: 600; }
+  .skills dd { margin: 0; color: var(--grey); }
+  .muted { color: var(--grey); }
+  footer { margin-top: 4mm; padding-top: 2.5mm; border-top: 1px solid var(--line); font-size: 8pt; color: var(--grey); }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Tanapol Chamnanhan</h1>
+    <p class="role">Full-Stack Developer · AI Engineer</p>
+  </div>
+  <div class="contact">
+    Bangkok, Thailand<br>
+    <a href="mailto:tanapol.ch@rmutsvmail.com">tanapol.ch@rmutsvmail.com</a> · <a href="tel:+66962437210">+66 962 437 210</a><br>
+    <a href="https://www.linkedin.com/in/tanapol-chamnanhan/">linkedin.com/in/tanapol-chamnanhan</a> · <a href="https://github.com/TawittyTC">github.com/TawittyTC</a><br>
+    <a href="https://tawittytc.github.io/mywebsite/">tawittytc.github.io/mywebsite</a>
+  </div>
+</header>
+
+<p class="summary">Full-stack developer and computer engineer who has shipped custom CRM systems for 27 companies across
+Thailand, solo from requirements to production, with hands-on experience in AI engineering: LLM integration, voice AI
+(ASR, TTS, speech-to-speech) and agentic AI systems for business automation.</p>
+
+<h2>Experience</h2>
+<div class="job">
+  <div class="job-head"><div class="job-title">Full Stack Developer <span>· Protollcall Advance Service Co., Ltd.</span></div><div class="when">June 2024 – Present</div></div>
+  <ul>
+    <li>Architected and shipped tailor-made enterprise CRM systems for 27 clients in healthcare, finance, insurance and
+      <span style="white-space:nowrap">e-commerce</span>, as the sole full-stack developer across the complete SDLC.</li>
+    <li>Integrated Asterisk PBX telephony (AGI, AMI, Dialplan), AI-powered IVR (TTS/ASR/LLM), predictive dialers,
+      real-time analytics dashboards and multi-channel APIs (LINE, Telegram, webhooks).</li>
+    <li>Delivered and maintained 60+ customization tickets, from UI/UX enhancements to backend logic and database optimization.</li>
+    <li>Hardened security per OWASP guidelines (XSS fixes, HSTS, session security, password policy) and built audit logging for compliance.</li>
+    <li>Researched and prototyped agentic AI: an orchestrator coordinating sub-agents, LLM voice pipelines (ASR → LLM → TTS) and real-time speech-to-speech.</li>
+  </ul>
+  <p class="clients">Clients include Bangkok Hospital Chiang Mai, Kasikorn Carabao, Thai VietJet Air, Isuzu Thailand, Rabbit Card and Inchcape Thailand.</p>
+</div>
+<div class="job">
+  <div class="job-head"><div class="job-title">Full Stack Developer Intern <span>· The Siam Cement Group (SCG)</span></div><div class="when">April 2023 – March 2024</div></div>
+  <ul>
+    <li>Two internships, 6 internal platforms delivered end-to-end; built REST APIs (Laravel) and Bootstrap/JavaScript front ends with MVC, validation, CSRF protection and authentication.</li>
+    <li>Dec 2023 – Mar 2024: 4 production apps for the Center of Excellence &amp; Data Driven department: a reservation system,
+      document reference tracker, area-based job dispatch platform and an event e-commerce store with inventory.</li>
+    <li>Apr – Jul 2023: a software license request and approval workflow, and a company-wide IT asset tracking platform with full lifecycle management, used group-wide by 2,000+ people.</li>
+  </ul>
+</div>
+<div class="job">
+  <div class="job-head"><div class="job-title">Computer Technician Intern <span>· Advice IT Infinite Co., Ltd.</span></div><div class="when">September – December 2019</div></div>
+  <ul>
+    <li>Front-line hardware diagnostics, repair and technical support, servicing 5+ devices and 10+ customers daily.</li>
+  </ul>
+</div>
+
+<div class="two">
+  <div>
+    <h2>Education</h2>
+    <p><b>Bachelor's degree, Computer Engineering</b></p>
+    <p class="muted">Rajamangala University of Technology Srivijaya · June 2020 – April 2024 · GPAX 3.64</p>
+    <p style="margin-top:2mm"><b>Vocational Certificate, Information Technology</b></p>
+    <p class="muted">Songkhla Technical College · May 2017 – March 2019 · GPAX 3.84</p>
+  </div>
+  <div>
+    <h2>Achievements</h2>
+    <p><b>Professional Qualification, Software &amp; Applications System Tester, Level 4</b></p>
+    <p class="muted">Thailand Professional Qualification Institute (TPQI)</p>
+    <p style="margin-top:2mm"><b>Published research (TCI-1)</b></p>
+    <p class="muted">“Measuring of Words Similarity for Question Answering System for Diabetes”. Journal of Applied
+      Informatics and Technology, Vol. 5 No. 2, July–December 2023.</p>
+  </div>
+</div>
+
+<h2>Skills</h2>
+<dl class="skills">
+  <dt>Web</dt><dd>PHP, Python, JavaScript, React, Flask, Laravel, REST API, HTML5 / CSS3, Bootstrap, UX/UI</dd>
+  <dt>AI</dt><dd>LLM integration (GPT, Gemini, Claude), multi-agent orchestration, ASR, TTS, speech-to-speech, AI IVR, chatbots</dd>
+  <dt>Telephony</dt><dd>Asterisk PBX (AGI, AMI, Dialplan), predictive dialers, call analytics</dd>
+  <dt>Data</dt><dd>MySQL, MSSQL, query tuning, ORM</dd>
+  <dt>DevOps</dt><dd>Docker, Git, CI, AWS, Linux, Zabbix</dd>
+  <dt>Security</dt><dd>OWASP, XSS, CSRF, SSL/TLS, HSTS</dd>
+</dl>
+
+<footer>Portfolio, projects and certificates: <a href="https://tawittytc.github.io/mywebsite/">tawittytc.github.io/mywebsite</a></footer>
+</body>
+</html>

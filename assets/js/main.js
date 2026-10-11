@@ -80,9 +80,10 @@
   });
 
   /**
-   * Preloader — removed on load, but no later than 2s from navigation start
+   * Preloader — the stylesheet fades it as soon as it applies (style.css);
+   * this only takes the element away once it has faded, or on load, and
+   * no later than 2s from navigation start
    */
-  // let preloader = select("#preloader");
   let preloader = select(".loader");
   if (preloader) {
     let done = false;
@@ -93,6 +94,9 @@
       preloader.style.opacity = '0';
       setTimeout(() => { if (preloader.parentNode) preloader.remove(); }, 260);
     };
+    preloader.addEventListener("animationend", (e) => {
+      if (e.target === preloader && /^loader-(out|gone)$/.test(e.animationName)) hideLoader();
+    });
     window.addEventListener("load", hideLoader);
     // Failsafe: never block the page for more than 2s from navigation start
     setTimeout(hideLoader, Math.max(0, 2000 - performance.now()));
@@ -198,6 +202,54 @@ function anchorOrigin(surface, source) {
   surface.style.transformOrigin = x + 'px ' + y + 'px';
 }
 
+/**
+ * Back closes the open sheet or picture instead of leaving the site. Each
+ * overlay that opens adds one history entry for the same URL; Back takes
+ * it off and closes the overlay on top. Closing by X, Escape or the
+ * backdrop takes the entry back off too, so history is left as it was.
+ */
+var overlayHistory = (function () {
+  var stack = [];        // close functions of the open overlays, top last
+  var unwinding = false; // the next popstate is our own history.go()
+  var pending = 0, timer = null;
+  // An entry whose overlay is no longer on screen (left by a reload, or
+  // reached with Forward) is stepped off, so Back is never a dead press
+  function stale(depth) {
+    if (depth <= stack.length) return false;
+    unwinding = true;
+    history.go(stack.length - depth);
+    return true;
+  }
+  window.addEventListener('popstate', function (e) {
+    if (unwinding) { unwinding = false; return; }
+    var depth = (e.state && e.state.overlay) || 0;
+    if (stale(depth)) return;
+    while (stack.length > depth) stack.pop()();
+  });
+  if (history.state && history.state.overlay) stale(history.state.overlay);
+  return {
+    opened: function (close) {
+      stack.push(close);
+      try { history.pushState({ overlay: stack.length }, ''); } catch (e) { stack.pop(); }
+    },
+    closed: function (close) {
+      var i = stack.lastIndexOf(close);
+      if (i < 0) return; // Back already took its entry off
+      stack.splice(i, 1);
+      pending++;
+      // Escape can close two layers in one keypress: one go() for both
+      if (timer) return;
+      timer = setTimeout(function () {
+        var n = pending;
+        timer = null;
+        pending = 0;
+        unwinding = true;
+        history.go(-n);
+      }, 0);
+    }
+  };
+})();
+
 // Cert lightbox
 (function () {
   const lightbox = document.createElement("div");
@@ -206,11 +258,18 @@ function anchorOrigin(surface, source) {
   lightbox.setAttribute("aria-modal", "true");
   lightbox.setAttribute("aria-label", "Certificate preview");
   const lbImg = document.createElement("img");
+  // the frame lets a wide screenshot be panned on a narrow phone
+  const frame = document.createElement("div");
+  frame.className = "cert-lightbox-frame";
+  frame.appendChild(lbImg);
+  const caption = document.createElement("p");
+  caption.className = "cert-lightbox-caption";
   const closeBtn = document.createElement("button");
   closeBtn.className = "cert-lightbox-close";
   closeBtn.setAttribute("aria-label", "Close");
   closeBtn.innerHTML = "&#x2715;";
-  lightbox.appendChild(lbImg);
+  lightbox.appendChild(frame);
+  lightbox.appendChild(caption);
   lightbox.appendChild(closeBtn);
   document.body.appendChild(lightbox);
 
@@ -236,9 +295,30 @@ function anchorOrigin(surface, source) {
     }
   });
 
-  function openLightbox(src, alt, source, label) {
+  function openLightbox(src, alt, source, label, title) {
+    if (!lightbox.classList.contains("open")) overlayHistory.opened(closeLightbox);
     lbImg.src = src;
     lbImg.alt = alt;
+    caption.textContent = title || "";
+    caption.hidden = !title;
+    // A wide screenshot on a portrait phone would shrink to a strip too
+    // small to read: show it tall enough to read and let it pan sideways
+    var w = parseFloat(source && source.querySelector && source.querySelector("img") ?
+      source.querySelector("img").getAttribute("width") : 0);
+    var h = parseFloat(source && source.querySelector && source.querySelector("img") ?
+      source.querySelector("img").getAttribute("height") : 0);
+    var pan = !!(w && h && w / h > 1.4 && window.innerWidth < 768 && window.innerHeight > window.innerWidth &&
+      window.matchMedia("(pointer: coarse)").matches);
+    lightbox.classList.toggle("lb-pan", pan);
+    if (pan) {
+      frame.tabIndex = 0;
+      frame.setAttribute("aria-label", "Screenshot, scroll sideways");
+    } else {
+      frame.removeAttribute("tabindex");
+      frame.removeAttribute("aria-label");
+    }
+    if (pan) caption.textContent = (title ? title + " · " : "") + "Swipe to see the whole screen";
+    if (pan) caption.hidden = false;
     // one viewer serves certificates and project screenshots alike
     lightbox.setAttribute("aria-label", label || "Certificate preview");
     lightbox.classList.add("open");
@@ -246,6 +326,7 @@ function anchorOrigin(surface, source) {
     document.body.style.overflow = "hidden";
     lastFocus = document.activeElement;
     anchorOrigin(lbImg, source);
+    frame.scrollLeft = 0;
     if (reduce) motion.jump(1); else motion.to(1);
     closeBtn.focus();
   }
@@ -259,17 +340,19 @@ function anchorOrigin(surface, source) {
     if (reduce) motion.jump(0); else motion.to(0);
     if (lastFocus && typeof lastFocus.focus === "function") lastFocus.focus();
     lastFocus = null;
+    overlayHistory.closed(closeLightbox);
   }
   closeBtn.addEventListener("click", closeLightbox);
   lightbox.addEventListener("click", function (e) {
-    if (e.target === lightbox) closeLightbox();
+    if (e.target === lightbox || e.target === caption ||
+        (e.target === frame && !lightbox.classList.contains("lb-pan"))) closeLightbox();
   });
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape") closeLightbox();
-    // the close button is the dialog's only focusable control — keep Tab on it
+    // Tab stays inside: the close button, and the screenshot when it pans
     if (e.key === "Tab" && lightbox.classList.contains("open")) {
       e.preventDefault();
-      closeBtn.focus();
+      (lightbox.classList.contains("lb-pan") && document.activeElement === closeBtn ? frame : closeBtn).focus();
     }
   });
 
@@ -326,6 +409,7 @@ function anchorOrigin(surface, source) {
     // catching up, so the page is scrollable again immediately
     if (!document.querySelector('.cert-lightbox.open')) document.body.style.overflow = '';
     if (reduce) motion.jump(0); else motion.to(0);
+    overlayHistory.closed(closeExp);
   }
   closeBtn.addEventListener('click', function(e) {
     e.stopPropagation();
@@ -360,7 +444,8 @@ function anchorOrigin(surface, source) {
     }
   });
 
-  window._expLightboxOpen = function (html, source) {
+  window._expLightboxOpen = function (html, source, client) {
+    if (!lightbox.classList.contains('open')) overlayHistory.opened(closeExp);
     while (inner.children.length > 1) inner.removeChild(inner.lastChild);
     const content = document.createElement('div');
     content.innerHTML = html;
@@ -388,28 +473,80 @@ function anchorOrigin(surface, source) {
     var chips = inner.querySelectorAll('.exp-filter-chip');
     var sections = inner.querySelectorAll('.exp-client-section');
     if (chips.length && sections.length) {
-      chips.forEach(function (chip) {
-        chip.addEventListener('click', function () {
-          var filter = chip.dataset.filter;
-          chips.forEach(function (c) { c.classList.remove('active'); });
-          chip.classList.add('active');
-          sections.forEach(function (s) {
-            s.style.display = (filter === 'all' || s.dataset.client === filter) ? '' : 'none';
+      var phone = window.matchMedia('(max-width: 734px)').matches;
+      var clientsBlock = chips[0].closest('.exp-modal-section');
+      var heads = [];
+      // On a phone the client list is the proof, so it follows the role
+      // overview straight away, each client folded to its name until opened
+      if (phone && clientsBlock) {
+        var overview = inner.querySelector('.exp-modal-overview');
+        var overviewBlock = overview && overview.closest('.exp-modal-section');
+        if (overviewBlock && overviewBlock.nextElementSibling !== clientsBlock) overviewBlock.after(clientsBlock);
+        clientsBlock.classList.add('exp-clients-folded');
+        sections.forEach(function (sec) {
+          var head = sec.querySelector('.exp-client-section-header');
+          var h3 = head && head.querySelector('h3');
+          if (!h3) return;
+          // a real button inside the heading (the accordion pattern), so the
+          // client names stay headings for screen readers; the whole row taps
+          var btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'exp-client-toggle';
+          btn.setAttribute('aria-expanded', 'false');
+          while (h3.firstChild) btn.appendChild(h3.firstChild);
+          h3.appendChild(btn);
+          heads.push(head);
+          head.addEventListener('click', function () {
+            btn.setAttribute('aria-expanded', String(sec.classList.toggle('is-open')));
           });
         });
-      });
-      // Hint animation: bounce non-"All" chips after modal opens
-      setTimeout(function () {
-        var delay = 0;
-        chips.forEach(function (chip) {
-          if (chip.dataset.filter === 'all') return;
-          setTimeout(function () {
-            chip.classList.add('hint');
-            chip.addEventListener('animationend', function () { chip.classList.remove('hint'); }, { once: true });
-          }, delay);
-          delay += 70;
+      }
+      var choose = function (chip) {
+        var filter = chip.dataset.filter;
+        chips.forEach(function (c) {
+          c.classList.toggle('active', c === chip);
+          c.setAttribute('aria-pressed', String(c === chip));
         });
-      }, 450);
+        sections.forEach(function (sec) {
+          var show = filter === 'all' || sec.dataset.client === filter;
+          sec.style.display = show ? '' : 'none';
+          // one client chosen: its story shows open
+          if (phone && show && filter !== 'all') {
+            sec.classList.add('is-open');
+            var toggle = sec.querySelector('.exp-client-toggle');
+            if (toggle) toggle.setAttribute('aria-expanded', 'true');
+          }
+        });
+        // chosen from the stuck row further down: bring the story up under it
+        if (phone && clientsBlock && inner.scrollTop > clientsBlock.offsetTop - 8) {
+          inner.scrollTop = clientsBlock.offsetTop - 8;
+        }
+      };
+      chips.forEach(function (chip) {
+        chip.setAttribute('aria-pressed', String(chip.classList.contains('active')));
+        chip.addEventListener('click', function () { choose(chip); });
+      });
+      var preset = client && inner.querySelector('.exp-filter-chip[data-filter="' + client + '"]');
+      if (preset && clientsBlock) {
+        // opened from a client-work card: straight to that client
+        choose(preset);
+        inner.scrollTop = Math.max(0, clientsBlock.offsetTop - 8);
+        var row = preset.parentNode;
+        row.scrollLeft = preset.offsetLeft - row.offsetLeft - 18;
+      } else {
+        // Hint animation: bounce non-"All" chips after modal opens
+        setTimeout(function () {
+          var delay = 0;
+          chips.forEach(function (chip) {
+            if (chip.dataset.filter === 'all') return;
+            setTimeout(function () {
+              chip.classList.add('hint');
+              chip.addEventListener('animationend', function () { chip.classList.remove('hint'); }, { once: true });
+            }, delay);
+            delay += 70;
+          });
+        }, 450);
+      }
     }
   };
 })();
@@ -425,12 +562,16 @@ document.addEventListener('DOMContentLoaded', function () {
     // Update stat number + data-count for count-up
     var statSpan = document.querySelector('[data-exp="protollcall"] .exp-stat-clients');
     if (statSpan) { statSpan.dataset.count = clientCount; statSpan.textContent = clientCount; }
-    // Update highlight badge
-    var badge = document.querySelector('[data-exp="protollcall"] .exp-client-count-badge');
-    if (badge) badge.textContent = clientCount + ' Clients';
-    // Update paragraph text
-    var para = document.querySelector('[data-exp="protollcall"] .js-client-count-text');
-    if (para) para.textContent = clientCount;
+    // Update the count wherever it is written: the card and its sheet
+    document.querySelectorAll('[data-exp="protollcall"] .js-client-count-text').forEach(function (el) {
+      el.textContent = clientCount;
+    });
+    protollcallTmpl.content.querySelectorAll('.js-client-count-text').forEach(function (el) {
+      el.textContent = clientCount;
+    });
+    // "+ N more" after the six clients named on the card
+    var more = document.querySelector('[data-exp="protollcall"] .js-client-more');
+    if (more) more.textContent = Math.max(0, clientCount - 6);
   }
 
   document.querySelectorAll('#experience .data-box[data-exp]').forEach(function (card) {
@@ -482,10 +623,20 @@ document.addEventListener('DOMContentLoaded', function () {
 // corner button opens its story. The whole card is the target.
 document.addEventListener("DOMContentLoaded", function () {
   document.querySelectorAll("#portfolio .rf-cards-scroller-item").forEach(function (card) {
+    // client-work cards open their story in the experience sheet, on that client
+    if (card.dataset.openExp) {
+      card.addEventListener("click", function () {
+        var tmpl = document.getElementById("exp-" + card.dataset.openExp);
+        if (tmpl) window._expLightboxOpen(tmpl.innerHTML, card, card.dataset.client);
+      });
+      return;
+    }
     var img = card.querySelector(".project-img img");
     if (!img) return;
+    var title = card.querySelector("h3");
     card.addEventListener("click", function () {
-      window._certLightboxOpen(img.currentSrc || img.src, img.alt, card.querySelector(".project-img"), "Project screenshot");
+      window._certLightboxOpen(img.currentSrc || img.src, img.alt, card.querySelector(".project-img"), "Project screenshot",
+        title ? title.textContent : "");
     });
   });
 });
@@ -765,10 +916,13 @@ document.addEventListener('DOMContentLoaded', function () {
     var scroller = root.querySelector('[data-card-scroller]');
     if (!btns.length || !items.length) return;
 
+    // the selected chip is said, not only shown in colour
+    btns.forEach(function (b) { b.setAttribute('aria-pressed', String(b.classList.contains('active'))); });
     btns.forEach(function (btn) {
       btn.addEventListener('click', function () {
-        btns.forEach(function (b) { b.classList.remove('active'); });
+        btns.forEach(function (b) { b.classList.remove('active'); b.setAttribute('aria-pressed', 'false'); });
         btn.classList.add('active');
+        btn.setAttribute('aria-pressed', 'true');
         var filter = btn.getAttribute('data-filter');
         items.forEach(function (item) {
           // data-tech may hold several space-separated categories
@@ -1002,10 +1156,22 @@ document.addEventListener('DOMContentLoaded', function () {
   if (!toTop) return;
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  // On a touch screen the button floats over what people tap (certificates,
+  // FAQ rows), so there it shows only while they scroll back up
+  var touch = window.matchMedia && window.matchMedia('(hover: none)').matches;
+  var lastY = window.scrollY || 0, upFrom = null;
   var ticking = false;
   function update() {
     ticking = false;
-    toTop.classList.toggle('visible', (window.scrollY || 0) > window.innerHeight * 0.9);
+    var y = window.scrollY || 0;
+    var show = y > window.innerHeight * 0.9;
+    if (touch) {
+      if (y < lastY - 2) { if (upFrom === null) upFrom = lastY; }
+      else if (y > lastY + 2) upFrom = null;
+      show = show && upFrom !== null && upFrom - y > 30;
+    }
+    lastY = y;
+    toTop.classList.toggle('visible', show);
   }
   function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
   window.addEventListener('scroll', onScroll, { passive: true });
@@ -1076,7 +1242,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // trembles harder and harder, then detonates outward — every node
   // overshoots to its home (Duolingo-inspired burst). ──
   var SHAKE_END = 0.5, EXPLODE_DUR = 0.5, INTRO_END = SHAKE_END + EXPLODE_DUR;
-  var introCluster = null, boomPlayed = false;
+  var introCluster = null;
   // Intro plays in its own clock (time - introT0) so it can REPLAY:
   // iOS restores tabs from the back-forward cache without reloading,
   // which used to mean no intro at all on "reopening" the site.
@@ -1091,40 +1257,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     return isMobile() ? { x: W * 0.5, y: H * 0.34 } : { x: W * 0.24, y: H * 0.46 };
   }
-  // Cheerful synthesized pop (Duolingo-flavored: soft thump + three
-  // bright rising notes). No audio asset. Browsers block autoplay
-  // audio before the first user gesture — in that case we skip
-  // silently rather than error.
-  function playBoom() {
-    try {
-      var AC = window.AudioContext || window.webkitAudioContext;
-      if (!AC) return;
-      var ac = new AC();
-      if (ac.state !== 'running') { ac.close(); return; }
-      var t = ac.currentTime;
-      var o1 = ac.createOscillator(), g1 = ac.createGain();
-      o1.type = 'sine';
-      o1.frequency.setValueAtTime(220, t);
-      o1.frequency.exponentialRampToValueAtTime(70, t + 0.18);
-      g1.gain.setValueAtTime(0.16, t);
-      g1.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
-      o1.connect(g1); g1.connect(ac.destination);
-      o1.start(t); o1.stop(t + 0.24);
-      [1046.5, 1318.5, 1568].forEach(function (fq, k) { // C6 E6 G6
-        var o = ac.createOscillator(), g = ac.createGain();
-        o.type = 'triangle';
-        o.frequency.value = fq;
-        var ts = t + 0.02 + k * 0.055;
-        g.gain.setValueAtTime(0.0001, ts);
-        g.gain.exponentialRampToValueAtTime(0.1, ts + 0.015);
-        g.gain.exponentialRampToValueAtTime(0.001, ts + 0.16);
-        o.connect(g); g.connect(ac.destination);
-        o.start(ts); o.stop(ts + 0.18);
-      });
-      setTimeout(function () { ac.close(); }, 800);
-    } catch (e) { /* no sound is fine */ }
-  }
-
   function bounds() {
     var bw = layoutW || W, bh = layoutH || H;
     // Mobile: the graph SURROUNDS the copy (full canvas) — the keep-out
@@ -1412,11 +1544,8 @@ document.addEventListener('DOMContentLoaded', function () {
       n.f = (koBlend < 1 ? (1 - koBlend) + koBlend * fk : fk) * n.iv;
     }
 
-    // detonation moment: pop sound + expanding shockwave ring
-    if (!reduce && !boomPlayed && it >= SHAKE_END) {
-      boomPlayed = true;
-      playBoom();
-    }
+    // detonation moment: an expanding shockwave ring (silent: the page
+    // never makes a sound the visitor did not ask for)
     if (!reduce && introCluster && it >= SHAKE_END && it < SHAKE_END + 0.7) {
       var rp = (it - SHAKE_END) / 0.7;
       ctx.strokeStyle = rgba(WARM1, (1 - rp) * 0.35);
@@ -1585,7 +1714,8 @@ document.addEventListener('DOMContentLoaded', function () {
     // otherwise the cluster/shake plays hidden behind the overlay and
     // visitors only catch the tail of the explosion.
     if (!curtainUp) {
-      if (document.querySelector('.loader')) { t0 = ts; }
+      var curtain = document.querySelector('.loader');
+      if (curtain && parseFloat(getComputedStyle(curtain).opacity) > 0.5) { t0 = ts; }
       else { curtainUp = true; }
     }
     // iOS batches resize events until scroll momentum ends; catch the
@@ -1599,7 +1729,6 @@ document.addEventListener('DOMContentLoaded', function () {
     if (replayQueued) { // bfcache reopen: restart the intro on this clock
       replayQueued = false;
       introT0 = lastDrawT;
-      boomPlayed = false;
       introCluster = null;
     }
     drawFrame(lastDrawT);
