@@ -89,7 +89,7 @@ a:hover {
   height: 100vh;
   min-height: -webkit-fill-available;
   overflow: hidden;
-  background: #fcfcfd;
+  background: #fff;
 }
 @supports (min-height: 100svh) {
   #hero { height: 100svh; min-height: 100svh; }
@@ -819,10 +819,8 @@ button {
 # Apple Colors + Typography
 --------------------------------------------------------------*/
 
-/* 60/30/10 — white canvas AND white cards everywhere. The 30% neutral
-   gray lives in the details instead of section tints: hairline card
-   borders, chip and stat fills, dividers, secondary text, and the
-   footer. Blue stays the lone 10% accent. */
+/* Base band colours; the one surface system (v2.48, near the end of
+   this file) sets the alternation. Blue stays the lone 10% accent. */
 #resume, #skill, #portfolio { background: #fff; }
 #certificates.bg-light { background-color: #F5F5F7 !important; }
 
@@ -1240,7 +1238,7 @@ button {
 }
 .cta-sub {
   font-size: 1.1176rem;
-  color: var(--color-text-secondary);
+  color: #636366;   /* AA over the blue glow on the grey band */
   line-height: 1.65;
   max-width: 560px;
   margin: 0 auto 40px;
@@ -1976,8 +1974,8 @@ a.info-item:hover .info-value { color: var(--color-link); }
   (measured on a 440pt iPhone: 258 x 389, 2:3, 28px corners, 24px inside,
   22px apart, 14/21/14 type), then set about 10% larger with more air, as
   asked: 282 x 425 on that iPhone, 28px inside and 26px apart; 376 x 500 on
-  iPad widths; 440 x 550 from 1069px. Both rows share the build: white
-  cards on a grey band, the row running to the window edge. Project cards
+  iPad widths; 440 x 550 from 1069px. Both rows share the build: grey
+  cards on a white band, the row running to the window edge. Project cards
   close with the screenshot and a round "+"; skill cards open with their
   mark, as Apple's values cards do. SF Pro on Apple devices, Inter elsewhere.
 --------------------------------------------------------------*/
@@ -2256,7 +2254,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
 
 /*--------------------------------------------------------------
 # Skill cards: the mark at the top. The skill's own drawing, large and
-  in the theme blue, centred in its own space on the card's white.
+  in the theme blue, centred in its own space on the card's grey.
 --------------------------------------------------------------*/
 #skill .rf-cards-scroller-item .skill-icon {
   order: 1;
@@ -2276,12 +2274,12 @@ a.info-item:hover .info-value { color: var(--color-link); }
 /*--------------------------------------------------------------
 # Services & FAQ, the apple.com way: values cards and an
   AppleCare-style FAQ. Everything here is scoped to #services.
-  The four services are white cards on the grey band, two by two
+  The four services are grey cards on the white band, two by two
   (one column on phones), built to the skill and project cards'
   measurements: 28px corners, no border, 36 / 32 / 28px inside,
   28 / 24 / 21px headlines over 17 / 17 / 14px copy. Each card opens
-  with its service's line drawing on the card's own white. The rest
-  of the work closes the grid as a fifth, full-width card of grey chips. The questions sit in one white card:
+  with its service's line drawing on the card's own grey. The rest
+  of the work closes the grid as a fifth, full-width card of white chips. The questions sit in one grey card:
   hairline dividers between rows, a blue "+" on the right that turns
   to "x" while a row is open, and answers in secondary grey.
 --------------------------------------------------------------*/
@@ -2303,7 +2301,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
   color: #1D1D1F;
   text-align: left;
 }
-/* the drawing's own space at the top of the card, on the card's white */
+/* the drawing's own space at the top of the card, on the card's grey */
 #services .svc-icon {
   display: flex;
   align-items: center;
@@ -2890,7 +2888,8 @@ a.info-item:hover .info-value { color: var(--color-link); }
 
 /* Resume on the white band: grey cards, white chips, no hairline */
 #resume .data-box { background: #F5F5F7; }
-#resume .hl:not(.hl-blue) { background: #fff; }
+#resume .hl { background: #fff; }
+#resume .hl-blue { background: #ECF3FB; }   /* the 8% blue tint, solid */
 #resume .data-box,
 #resume .contact-strip .info-item { border: 0; }
 /* the strip only wraps the three tiles; painted grey it would fuse them */
@@ -2911,8 +2910,9 @@ a.info-item:hover .info-value { color: var(--color-link); }
 .exp-card-cta { right: 22px; bottom: 22px; gap: 0; }
 .exp-card-cta-label { display: none; }   /* the button keeps its "Read more: …" name */
 .exp-card-btn { width: 36px; height: 36px; background: var(--sk-paddlenav-background); box-shadow: none; }
-.exp-card-btn svg { width: 36px; height: 36px; fill: rgba(0, 0, 0, .56); }
-#experience .data-box[data-exp]:hover .exp-card-btn { background: var(--sk-paddlenav-background-hover); transform: none; }
+.exp-card-btn svg { width: 36px; height: 36px; fill: rgba(0, 0, 0, .56); transition: fill .2s ease; }
+#experience .data-box[data-exp]:hover .exp-card-btn { background: rgba(223, 223, 227, .9); transform: none; }
+#experience .data-box[data-exp]:hover .exp-card-btn svg { fill: rgba(0, 0, 0, .64); }
 .exp-card-btn.hint-loop { animation: none; }
 @media (prefers-reduced-motion: reduce) {
   #experience .data-box[data-exp]:hover { transform: none; }
@@ -2931,14 +2931,14 @@ a.info-item:hover .info-value { color: var(--color-link); }
 #certificates .cert-img { padding: 28px; }
 #certificates .cert-img img {
   border-radius: 2px;
-  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .06)) drop-shadow(0 6px 16px rgba(0, 0, 0, .10));
+  filter: drop-shadow(0 0 1px rgba(0, 0, 0, .14)) drop-shadow(0 6px 16px rgba(0, 0, 0, .10));
 }
 #certificates .cert-expand-btn {
   right: 14px;
   bottom: 14px;
   width: 36px;
   height: 36px;
-  background: var(--sk-paddlenav-background);
+  background: #E2E2E5;   /* the paddle fill made solid: the certificate corner never shows through */
   color: rgba(0, 0, 0, .56);
   font-size: 0;   /* the "+" text gives way to the Projects plus glyph */
   box-shadow: none;
@@ -2951,7 +2951,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
   -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'%3E%3Cpath d='m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z'/%3E%3C/svg%3E") center / 36px no-repeat;
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'%3E%3Cpath d='m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z'/%3E%3C/svg%3E") center / 36px no-repeat;
 }
-#certificates .cert-expand-btn:hover { transform: none; background: var(--sk-paddlenav-background-hover); color: rgba(0, 0, 0, .72); }
+#certificates .cert-expand-btn:hover { transform: none; background: #E2E2E5; color: rgba(0, 0, 0, .72); }
 @media (min-width: 768px) { #certificates .images-list { gap: 24px; } }
 @media (max-width: 767px) {
   #certificates .images-list { gap: 12px; }
