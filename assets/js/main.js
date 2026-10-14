@@ -558,6 +558,10 @@ var overlayHistory = (function () {
           });
         }, 450);
       }
+    } else if (client) {
+      // a sheet without client chips (SCG): open it on that project
+      var sec = inner.querySelector('.exp-client-section[data-client="' + client + '"]');
+      if (sec) inner.scrollTop = Math.max(0, sec.offsetTop - 8);
     }
   };
 })();

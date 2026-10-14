@@ -1502,6 +1502,7 @@ h1, h2, h3, h4, h5, h6 { color: var(--color-text); }
   transition: top 0.2s ease-out;
 }
 .skip-link:focus { top: 16px; color: #fff; }
+.skip-link:not(:focus) { clip-path: inset(50%); }
 
 /* ── Focus States: Visible for all interactive elements (Apple HIG Accessibility) ── */
 :focus-visible {
@@ -1986,6 +1987,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
   margin-inline: calc(50% - 50vw);
   padding-inline: calc(50vw - 50%);
   scroll-padding-inline: calc(50vw - 50%);
+  overflow-x: auto; /* a trackpad or finger moves the row on every screen, the paddles still page it */
 }
 #portfolio .rf-cards-scroller-item,
 #skill .rf-cards-scroller-item {
@@ -2048,6 +2050,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
   line-height: 1.47059;
   letter-spacing: -0.022em;
   color: #1D1D1F;
+  text-wrap: pretty; /* no lone last word */
 }
 /* the skill's mark, top left, as on Apple's values cards */
 #skill .rf-cards-scroller-item .skill-icon {
