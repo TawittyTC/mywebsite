@@ -92,7 +92,9 @@ test('asset size budgets hold', () => {
     assert.ok(kb <= max, `${p} is ${kb.toFixed(0)}KB (budget ${max}KB)`);
   };
   budget('assets/js/main.min.js', 45);
-  budget('assets/css/style.min.css', 60);
+  // 66KB minified (~13KB gzipped) after the v2.47 usability fixes and the
+  // v2.48 surface system; dead rules are swept before raising it again
+  budget('assets/css/style.min.css', 66);
   for (const f of readdirSync(join(ROOT, 'assets/img/certificate'))) {
     budget(`assets/img/certificate/${f}`, 80);
   }

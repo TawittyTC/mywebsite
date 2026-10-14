@@ -204,28 +204,13 @@ section {
 }
 
 /* Margin utility classes */
-.mt-0  { margin-top: 0; }
-.mt-1  { margin-top: 0.25rem; }
 .mt-2  { margin-top: 0.5rem; }
 .mt-3  { margin-top: 0.75rem; }
 .mt-4  { margin-top: 1rem; }
 .mt-5  { margin-top: 1.25rem; }
-.mt-6  { margin-top: 1.5rem; }
-.mt-8  { margin-top: 2rem; }
-.mt-10 { margin-top: 2.5rem; }
-.mt-12 { margin-top: 3rem; }
-.mt-16 { margin-top: 4rem; }
-.mt-20 { margin-top: 5rem; }
-.mt-24 { margin-top: 6rem; }
-.mt-32 { margin-top: 8rem; }
-.mt-auto { margin-top: auto; }
 
 .mb-1  { margin-bottom: 0.25rem; }
-.mb-2  { margin-bottom: 0.5rem; }
-.mb-3  { margin-bottom: 0.75rem; }
-.mb-4  { margin-bottom: 1rem; }
 .mb-5  { margin-bottom: 1.25rem; }
-.mb-6  { margin-bottom: 1.5rem; }
 
 .data-box {
   border-radius: var(--r-card);
@@ -1339,31 +1324,6 @@ button {
 }
 .biz-contacts a:hover { color: var(--color-link); }
 
-.cta-mail {
-  display: inline-flex;
-  align-items: center;
-  min-height: 50px;
-  padding: 12px 30px;
-  border-radius: var(--r-capsule);
-  background: var(--color-text);
-  color: #fff;
-  font-size: 0.9412rem;
-  font-weight: 500;
-  transition: transform 0.3s var(--ease-swift), box-shadow 0.3s var(--ease-swift), background 0.3s ease;
-}
-.cta-mail:hover {
-  color: #fff;
-  background: #000;
-  transform: translateY(-2px);
-  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.18);
-}
-.cta-tel {
-  font-size: 0.9412rem;
-  font-weight: 500;
-  color: var(--color-text-secondary);
-  padding: 12px 6px;
-}
-.cta-tel:hover { color: var(--color-text); }
 @media (max-width: 735px) {
   .closing-cta { padding: 128px 0; }
   .cta-sub { font-size: 1rem; margin-bottom: 32px; }
@@ -1424,13 +1384,6 @@ a.info-item:hover .info-value {
   color: var(--color-link);
 }
 
-.info-sub {
-  /* desktop: same reading size as .profile-bio */
-  font-size: 1rem;
-  color: var(--color-text-secondary);
-  line-height: 1.7;
-  margin-top: 2px;
-}
 
 @media (max-width: 768px) {
   .info-grid {
@@ -1442,9 +1395,6 @@ a.info-item:hover .info-value {
     font-size: 0.8235rem;
   }
 
-  .info-sub {
-    font-size: 0.7647rem;
-  }
 
   /* phones keep the compact reading sizes — desktop-only bumps above
      (.profile-bio/.profile-bio-small are overridden next to their base
@@ -1593,27 +1543,6 @@ select:focus-visible {
 .footer-contact-link { display: inline-block; padding: 5px 0; }
 .biz-contacts a { display: inline-block; padding: 4px 0; }
 .social-links-footer .social-icon { width: 24px; height: 24px; }
-.section-icon {
-  width: 32px;
-  height: 32px;
-  display: block;
-  color: var(--color-text);
-}
-.footer-social {
-  display: flex;
-  gap: 4px;
-  align-items: center;
-}
-.footer-social a {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  color: var(--color-text);
-  transition: color 0.3s ease-in-out;
-}
-.footer-social a:hover { color: var(--color-link); }
 
 /* ── Mobile: iOS input zoom fix (font-size ≥ 16px prevents auto-zoom) ── */
 @media (max-width: 768px) {
@@ -1783,7 +1712,6 @@ select:focus-visible {
   .rf-cards-scroller-item p.fw-light { font-size: 1rem; }
   .project-tag { font-size: 0.8824rem; }
   .info-value { font-size: 1.0588rem; }
-  .info-sub { font-size: 1.0588rem; }
 }
 /* 2K tier — 1.13× */
 @media (min-width: 2000px) {
@@ -2022,11 +1950,6 @@ a.info-item:hover .info-value { color: var(--color-link); }
   overflow-wrap: break-word;
 }
 .contact-strip .info-item[href^="tel:"] .info-value { white-space: nowrap; }
-.contact-strip .info-sub {
-  margin-top: 0.4706rem;
-  font-size: 0.8235rem;
-  line-height: 1.42859;
-}
 @media (max-width: 734px) {
   .contact-strip .info-grid { gap: 14px; }
   .contact-strip .info-item { padding: 1.1765rem 1.4118rem; }
@@ -2957,3 +2880,147 @@ a.info-item:hover .info-value { color: var(--color-link); }
 /* back-to-top hides while you scroll down on a phone, but a keyboard or
    switch user who reaches it always sees it */
 #back-to-top:focus-visible { opacity: 1; transform: none; pointer-events: auto; }
+
+/*--------------------------------------------------------------
+# One surface system, the apple.com way (v2.48). The page now
+  alternates white and #F5F5F7 bands, and a card is always the other
+  colour of its band with no hairline: the colour change is the edge.
+  hero white · RESUME grey · Experience white · Skills + Projects grey ·
+  Certificates white · Services grey · Contact white · footer grey.
+  Reading text is Regular in #1D1D1F; spacing is one ladder of
+  36 / 32 / 28px inside cards and one 28px gutter between them.
+--------------------------------------------------------------*/
+
+/* Resume on the grey band: white cards, no hairline */
+#resume { background: #F5F5F7; }
+#resume .data-box,
+#resume .contact-strip .info-item { border: 0; }
+/* the strip only wraps the three tiles; painted white it would fuse them */
+#resume .data-box.contact-strip { background: none; }
+/* cards that are not links stay still under the pointer */
+#resume .data-box:hover { transform: none; }
+
+/* Experience: #F5F5F7 tiles on the white band, no hairline, no resting
+   shadow; the approved Projects corner "+" is the one control */
+#experience .data-box[data-exp] { background: #F5F5F7; border: 0; box-shadow: none; }
+#experience .data-box[data-exp] .hl,
+#experience .data-box[data-exp] .exp-duration { background: #fff; }
+#experience .data-box[data-exp]::after { display: none; }   /* the shimmer sweep */
+@media (hover: hover) and (pointer: fine) {
+  #experience .data-box[data-exp] { transition: transform .3s cubic-bezier(0, 0, .5, 1); }
+  #experience .data-box[data-exp]:hover { transform: scale(1.01); }
+  #experience .data-box[data-exp]::before { box-shadow: 2px 4px 16px rgba(0, 0, 0, .16); }
+}
+.exp-card-cta { right: 22px; bottom: 22px; gap: 0; }
+.exp-card-cta-label { display: none; }   /* the button keeps its "Read more: …" name */
+.exp-card-btn { width: 36px; height: 36px; background: #fff; box-shadow: none; }
+.exp-card-btn svg { width: 36px; height: 36px; fill: rgba(0, 0, 0, .56); }
+#experience .data-box[data-exp]:hover .exp-card-btn { background: #fff; transform: none; }
+.exp-card-btn.hint-loop { animation: none; }
+@media (prefers-reduced-motion: reduce) {
+  #experience .data-box[data-exp]:hover { transform: none; }
+}
+
+/* Certificates: each document on a #F5F5F7 tile like a product shot, a
+   soft shadow that hugs the paper, and the Projects-size round "+" */
+#certificates .cert-card {
+  background: #F5F5F7;
+  border: 0;
+  border-radius: 18px;
+  transition: transform .3s cubic-bezier(0, 0, .5, 1);
+}
+#certificates .cert-card:hover { transform: scale3d(1.01, 1.01, 1.01); }
+#certificates .cert-card:hover .cert-img img { transform: none; }
+#certificates .cert-img { padding: 28px; }
+#certificates .cert-img img {
+  border-radius: 2px;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .06)) drop-shadow(0 6px 16px rgba(0, 0, 0, .10));
+}
+#certificates .cert-expand-btn {
+  right: 14px;
+  bottom: 14px;
+  width: 36px;
+  height: 36px;
+  background: #fff;
+  color: rgba(0, 0, 0, .56);
+  font-size: 0;   /* the "+" text gives way to the Projects plus glyph */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .10);
+}
+#certificates .cert-expand-btn::before {
+  content: '';
+  width: 36px;
+  height: 36px;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'%3E%3Cpath d='m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z'/%3E%3C/svg%3E") center / 36px no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'%3E%3Cpath d='m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z'/%3E%3C/svg%3E") center / 36px no-repeat;
+}
+#certificates .cert-expand-btn:hover { transform: none; background: #fff; color: rgba(0, 0, 0, .72); }
+@media (min-width: 768px) { #certificates .images-list { gap: 24px; } }
+@media (max-width: 767px) {
+  #certificates .images-list { gap: 12px; }
+  #certificates .cert-img { padding: 16px; }
+  #certificates .cert-expand-btn { right: 8px; bottom: 8px; width: 30px; height: 30px; }
+  #certificates .cert-expand-btn::before { width: 30px; height: 30px; -webkit-mask-size: 30px; mask-size: 30px; }
+}
+
+/* Reading text in Regular (never Light), at Apple's leading; the
+   sentences that tell the story in #1D1D1F, meta lines stay grey */
+.fw-light { font-weight: 400 !important; }
+.profile-bio,
+p.profile-bio-small,
+#experience .data-box[data-exp] .fw-light,
+.exp-role-period { line-height: 1.47059; }
+@media (max-width: 768px) {
+  .profile-bio,
+  p.profile-bio-small,
+  #experience .data-box[data-exp] .fw-light,
+  .exp-role-period { line-height: 1.42859; }
+}
+.profile-bio,
+#experience .data-box[data-exp] > .profile-bio-small.mt-3,
+#experience .exp-role > p.profile-bio-small { color: #1D1D1F; }
+@media (min-width: 769px) {
+  #experience .data-box[data-exp] > .profile-bio-small.mt-3,
+  #experience .exp-role > p.profile-bio-small { font-size: 1rem; letter-spacing: -0.022em; }
+}
+
+/* One spacing ladder, from the approved cards: 36 / 32 / 28px inside,
+   one 28px gutter (20px on phones) between cards, a sub-heading closer to
+   its own card than to the one above, and Projects sharing the Skills
+   band without doubling its padding */
+#resume .data-box:not(.contact-strip),
+#experience .data-box[data-exp] { padding: 36px; }
+#experience .data-box[data-exp] { padding-bottom: 88px; }
+#experience .data-box { margin: 0 auto 28px; }
+#resume .data-box { margin: 0 auto; }
+#resume .contact-strip { margin-top: 28px; }
+#resume .resume-title { margin: 72px 0 24px; }
+#resume .resume-title:first-child { margin-top: 0; }
+#portfolio.portfolio { padding-top: 0; margin-bottom: 0 !important; }
+@media (max-width: 1068px) {
+  #resume .data-box:not(.contact-strip),
+  #experience .data-box[data-exp] { padding: 32px; }
+  #experience .data-box[data-exp] { padding-bottom: 84px; }
+}
+@media (max-width: 734px) {
+  #resume .data-box:not(.contact-strip),
+  #experience .data-box[data-exp] { padding: 28px; }
+  #experience .data-box[data-exp] { padding-bottom: 80px; }
+  #experience .data-box { margin-bottom: 20px; }
+  #resume .contact-strip { margin-top: 20px; }
+  #resume .resume-title { margin: 56px 0 20px; }
+}
+
+/* High contrast and forced colours: borderless cards get their edge back */
+@media (prefers-contrast: more) {
+  #resume .data-box:not(.contact-strip),
+  #resume .contact-strip .info-item,
+  #experience .data-box[data-exp],
+  #certificates .cert-card { box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .35); }
+}
+@media (forced-colors: active) {
+  #resume .data-box:not(.contact-strip),
+  #resume .contact-strip .info-item,
+  #experience .data-box[data-exp],
+  #certificates .cert-card { border: 1px solid CanvasText; }
+}
