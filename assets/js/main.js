@@ -395,7 +395,8 @@ var overlayHistory = (function () {
     response: 0.34,
     damping: 1,
     onFrame: function (p) {
-      lightbox.style.visibility = p > 0.002 ? 'visible' : 'hidden';
+      // an open sheet stays visible from its first frame, so focus can land in it
+      lightbox.style.visibility = (p > 0.002 || lightbox.classList.contains('open')) ? 'visible' : 'hidden';
       lightbox.style.opacity = Math.min(1, p * 1.25);
       inner.style.opacity = Math.min(1, p * 1.4);
       inner.style.transform = 'translateY(' + ((1 - p) * 8).toFixed(2) + 'px) scale('
@@ -558,6 +559,10 @@ var overlayHistory = (function () {
           });
         }, 450);
       }
+    } else if (client) {
+      // a sheet without client chips (SCG): open it on that project
+      var sec = inner.querySelector('.exp-client-section[data-client="' + client + '"]');
+      if (sec) inner.scrollTop = Math.max(0, sec.offsetTop - 8);
     }
   };
 })();
@@ -810,6 +815,19 @@ function createCardScroller(scroller, options) {
     nextBtn.addEventListener('click', function () { glideTo(pageTarget(1)); });
   }
   scroller.addEventListener('scroll', update, { passive: true });
+  // Tab into a card: bring the whole card onto the column, not just its "+"
+  scroller.addEventListener('focusin', function (e) {
+    var it = e.target.closest('.rf-cards-scroller-item');
+    if (!it || !e.target.matches(':focus-visible')) return;
+    requestAnimationFrame(function () {
+      var pad = parseFloat(getComputedStyle(scroller).paddingLeft) || 0;
+      var r = it.getBoundingClientRect(), box = scroller.getBoundingClientRect();
+      if (r.left < box.left + pad - 1 || r.right > box.right - pad + 1) {
+        scroller.scrollLeft = it.offsetLeft - scroller.firstElementChild.offsetLeft;
+      }
+      it.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    });
+  });
   window.addEventListener('load', update); // re-sync once images have sized the row
   update();
   setTimeout(update, 500);
@@ -817,7 +835,7 @@ function createCardScroller(scroller, options) {
   // Mobile: nudge the row left-and-back every few seconds to hint that
   // it scrolls horizontally; pause while (and shortly after) the user
   // interacts, and fire the first hint when the row enters the viewport.
-  if (window.innerWidth <= 1024) {
+  if (window.innerWidth <= 1024 && !reduceMotion) {
     var hintDistance = 80;
     var duration = 250;
     var userScrolling = false;
@@ -874,6 +892,8 @@ function createCardScroller(scroller, options) {
 
     scroller.addEventListener('touchstart', onUserScroll, { passive: true });
     scroller.addEventListener('scroll', onUserScroll, { passive: true });
+    // a keyboard user moving through the row stops the hint at once
+    scroller.addEventListener('focusin', function () { isAnimating = false; onUserScroll(); });
 
     var hintStarted = false;
     var hintObs = new IntersectionObserver(function (entries) {

@@ -920,6 +920,10 @@
     }
 
     /* reduced motion still needs a visible end state if scripting is off */
+    @media (prefers-reduced-motion: reduce) {
+      .exp-lightbox, .exp-lightbox * { transition-property: none !important }
+    }
+
     .exp-lightbox.open .exp-lightbox-inner {
       transform: scale(1);
       opacity: 1
@@ -1348,10 +1352,10 @@
   </style>
 
   <!-- Full CSS loaded async: no render blocking (bootstrap merged in) -->
-  <link rel="preload" href="assets/css/style.min.css?v=2.50.0" as="style"
+  <link rel="preload" href="assets/css/style.min.css?v=2.51.0" as="style"
     onload="this.onload=null;this.rel='stylesheet'">
   <noscript>
-    <link href="assets/css/style.min.css?v=2.50.0" rel="stylesheet">
+    <link href="assets/css/style.min.css?v=2.51.0" rel="stylesheet">
   </noscript>
 
 
@@ -1627,7 +1631,7 @@
   </script>
 
   <!-- Preload deferred JS to start downloading before parser reaches script tags -->
-  <link rel="preload" href="assets/js/main.min.js?v=2.50.0" as="script">
+  <link rel="preload" href="assets/js/main.min.js?v=2.51.0" as="script">
 
   <script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="233b92be-5a2d-492b-b093-9c3ed14c9063"
     type="text/javascript" async></script>
@@ -2314,7 +2318,7 @@
       <div class="container mb-5" data-aos="fade-up">
         <div class="section-title" id="portfolio-title">
           <h2>My Projects</h2>
-          <p>Selected work I'm proud of.</p>
+          <p>Every project, highlights first.</p>
           <div class="section-wave section-wave-fade" aria-hidden="true">
             <svg viewBox="0 0 220 24" fill="none">
               <defs>
@@ -2336,9 +2340,9 @@
 
         <!-- Project Scroller Wrapper -->
         <div class="rf-cards-scroller">
-          <div class="rf-cards-scroller-overflow" id="scroller" data-card-scroller>
-            <!-- Client work first: each card opens its story in the experience sheet -->
-            <div class="rf-cards-scroller-item work-card" role="region" aria-labelledby="work1-title"
+          <a class="skip-link" href="#certificates">Skip past projects</a>
+          <div class="rf-cards-scroller-overflow" id="scroller" data-card-scroller role="list" aria-label="Projects, highlights first">
+            <div class="rf-cards-scroller-item work-card" role="listitem"
               data-open-exp="protollcall" data-client="bkk-hosp">
               <div class="work-icon" aria-hidden="true">
                 <svg viewBox="0 0 170 170" fill="none">
@@ -2359,7 +2363,7 @@
               </button>
             </div>
 
-            <div class="rf-cards-scroller-item work-card" role="region" aria-labelledby="work2-title"
+            <div class="rf-cards-scroller-item work-card" role="listitem"
               data-open-exp="protollcall" data-client="kasikorn">
               <div class="work-icon" aria-hidden="true">
                 <svg viewBox="0 0 170 170" fill="none">
@@ -2378,8 +2382,60 @@
               </button>
             </div>
 
-            <div class="rf-cards-scroller-item work-card" role="region" aria-labelledby="work3-title"
-              data-open-exp="scg">
+            <div class="rf-cards-scroller-item work-card" role="listitem" data-open-exp="protollcall" data-client="vietjet">
+              <div class="work-icon" aria-hidden="true">
+                <svg viewBox="0 0 170 170" fill="none"><g stroke="#1264CE" stroke-width="5"><circle cx="55" cy="38" r="11" /><circle cx="85" cy="38" r="11" /><circle cx="115" cy="38" r="11" /><circle cx="55" cy="70" r="11" /><circle cx="85" cy="70" r="11" /><circle cx="115" cy="70" r="11" /><circle cx="55" cy="102" r="11" /><circle cx="85" cy="102" r="11" /><circle cx="115" cy="102" r="11" /><circle cx="85" cy="134" r="11" /></g></svg>
+              </div>
+              <span class="project-tag">Client work · Airline</span>
+              <h3 class="h4">Multilingual IVR, Thai VietJet Air</h3>
+              <p class="fw-light">Thai and English IVR with live flight status, baggage and refund policy, spoken by TTS.</p>
+              <ul class="work-tools" aria-label="Built with"><li>Asterisk PBX</li><li>AGI/ARI</li><li>DTMF</li><li>TTS</li></ul>
+              <button type="button" class="card-plus" aria-label="Read more: Multilingual IVR, Thai VietJet Air">
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+              </button>
+            </div>
+
+            <div class="rf-cards-scroller-item work-card" role="listitem" data-open-exp="protollcall" data-client="general">
+              <div class="work-icon" aria-hidden="true">
+                <svg viewBox="0 0 170 170" fill="none"><g stroke="#1264CE" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"> <path d="M76 30c4 27 14 37 41 41-27 4-37 14-41 41-4-27-14-37-41-41 27-4 37-14 41-41z" /> <path d="M124 98c2 11 6 15 17 17-11 2-15 6-17 17-2-11-6-15-17-17 11-2 15-6 17-17z" /> <path d="M38 126v12M52 120v24M66 128v8" /> </g> <circle cx="132" cy="40" r="5" fill="#1264CE" /></svg>
+              </div>
+              <span class="project-tag">R&amp;D · Voice AI</span>
+              <h3 class="h4">Voice AI pipeline for contact centers</h3>
+              <p class="fw-light">Prototyped Thai and English call handling, ASR to LLM to TTS, and benchmarked ASR engines.</p>
+              <ul class="work-tools" aria-label="Built with"><li>ASR</li><li>GPT</li><li>Gemini</li><li>TTS</li></ul>
+              <button type="button" class="card-plus" aria-label="Read more: Voice AI pipeline for contact centers">
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+              </button>
+            </div>
+
+            <div class="rf-cards-scroller-item work-card" role="listitem" data-open-exp="protollcall" data-client="rabbitcard">
+              <div class="work-icon" aria-hidden="true">
+                <svg viewBox="0 0 170 170" fill="none"><g stroke="#1264CE" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><rect x="22" y="40" width="126" height="90" rx="14" /><rect x="40" y="60" width="30" height="24" rx="6" /><path d="M40 110h34M86 110h18" /><path d="M112 62a14 14 0 0 1 0 22M123 55a25 25 0 0 1 0 36" /></g></svg>
+              </div>
+              <span class="project-tag">Client work · Fintech</span>
+              <h3 class="h4">Customer service IVR, Rabbit Card</h3>
+              <p class="fw-light">IVR for balance, transaction history and card activation, linked live to the backend API.</p>
+              <ul class="work-tools" aria-label="Built with"><li>IVR</li><li>DTMF</li><li>Backend API</li></ul>
+              <button type="button" class="card-plus" aria-label="Read more: Customer service IVR, Rabbit Card">
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+              </button>
+            </div>
+
+            <div class="rf-cards-scroller-item work-card" role="listitem" data-open-exp="protollcall" data-client="general">
+              <div class="work-icon" aria-hidden="true">
+                <svg viewBox="0 0 170 170" fill="none"><circle cx="85" cy="50" r="22" stroke="#1264CE" stroke-width="5" /> <circle cx="85" cy="50" r="8" fill="#1264CE" /> <circle cx="38" cy="120" r="16" stroke="#1264CE" stroke-width="5" /> <circle cx="85" cy="128" r="16" stroke="#1264CE" stroke-width="5" /> <circle cx="132" cy="120" r="16" stroke="#1264CE" stroke-width="5" /> <path d="M73 68 45 106M85 72v40M97 68l28 38" stroke="#1264CE" stroke-width="5" stroke-linecap="round" /> <path d="M107 28l4-9 4 9 9 4-9 4-4 9-4-9-9-4 9-4z" fill="#1264CE" /></svg>
+              </div>
+              <span class="project-tag">R&amp;D · Agentic AI</span>
+              <h3 class="h4">Agentic AI for business workflows</h3>
+              <p class="fw-light">Orchestrator and <span class="nw">sub-agents</span> with tool calling, for lead qualification and <span class="nw">after-call</span> work.</p>
+              <ul class="work-tools" aria-label="Built with"><li>Orchestrator</li><li>Sub-agents</li><li>Tool calling</li></ul>
+              <button type="button" class="card-plus" aria-label="Read more: Agentic AI for business workflows">
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+              </button>
+            </div>
+
+            <div class="rf-cards-scroller-item work-card" role="listitem"
+              data-open-exp="scg" data-client="scg-license">
               <div class="work-icon" aria-hidden="true">
                 <svg viewBox="0 0 170 170" fill="none">
                   <ellipse cx="85" cy="42" rx="48" ry="16" stroke="#1264CE" stroke-width="5" />
@@ -2391,15 +2447,378 @@
               </div>
               <span class="project-tag">SCG · Enterprise</span>
               <h3 class="h4" id="work3-title">License and asset platforms, SCG</h3>
-              <p class="fw-light">Approval workflows and IT asset tracking, used group-wide by 2,000+ people.</p>
+              <p class="fw-light">Approval workflows and IT asset tracking, used <span class="nw">group-wide</span> by 2,000+ people.</p>
               <ul class="work-tools" aria-label="Built with"><li>Laravel</li><li>MSSQL</li><li>Bootstrap</li><li>REST API</li></ul>
               <button type="button" class="card-plus" aria-label="Read more: License and asset platforms, SCG">
                 <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
               </button>
             </div>
 
-            <!-- Project 1 -->
-            <div class="rf-cards-scroller-item" role="region" aria-labelledby="project1-title" data-tech="iot">
+            <div class="rf-cards-scroller-item work-card" role="listitem" data-open-exp="protollcall" data-client="inchcape">
+              <div class="work-icon" aria-hidden="true">
+                <svg viewBox="0 0 170 170" fill="none"><rect x="28" y="32" width="114" height="106" rx="14" stroke="#1264CE" stroke-width="5" /> <rect x="44" y="52" width="26" height="66" rx="7" stroke="#1264CE" stroke-width="5" /> <rect x="72" y="52" width="26" height="44" rx="7" stroke="#1264CE" stroke-width="5" /> <rect x="100" y="52" width="26" height="56" rx="7" stroke="#1264CE" stroke-width="5" /></svg>
+              </div>
+              <span class="project-tag">Client work · Automotive</span>
+              <h3 class="h4">Vehicle sales CRM, Inchcape Thailand</h3>
+              <p class="fw-light">The full buyer journey from lead and test drive to purchase and <span class="nw">after-sales</span>, with LINE&nbsp;OA.</p>
+              <ul class="work-tools" aria-label="Built with"><li>PHP</li><li>MySQL</li><li>Asterisk PBX</li><li>LINE OA</li></ul>
+              <button type="button" class="card-plus" aria-label="Read more: Vehicle sales CRM, Inchcape Thailand">
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+              </button>
+            </div>
+
+            <div class="rf-cards-scroller-item work-card" role="listitem" data-open-exp="protollcall" data-client="isv">
+              <div class="work-icon" aria-hidden="true">
+                <svg viewBox="0 0 170 170" fill="none"><g stroke="#1264CE" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"> <rect x="22" y="34" width="126" height="102" rx="16" /> <circle cx="62" cy="72" r="14" /> <path d="M38 114c2-13 11-20 24-20s22 7 24 20" /> <path d="M104 66h26M104 85h26M104 104h14" /> </g></svg>
+              </div>
+              <span class="project-tag">Client work · Insurance</span>
+              <h3 class="h4">Insurance sales CRM, Insurverse</h3>
+              <p class="fw-light">Sales pipeline, policy tracking and appointments, with CTI <span class="nw">screen-pop</span> on the softphone.</p>
+              <ul class="work-tools" aria-label="Built with"><li>PHP</li><li>MySQL</li><li>Asterisk PBX</li><li>CTI</li></ul>
+              <button type="button" class="card-plus" aria-label="Read more: Insurance sales CRM, Insurverse">
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+              </button>
+            </div>
+
+            <div class="rf-cards-scroller-item work-card" role="listitem" data-open-exp="protollcall" data-client="genie">
+              <div class="work-icon" aria-hidden="true">
+                <svg viewBox="0 0 170 170" fill="none"><rect x="28" y="32" width="114" height="106" rx="14" stroke="#1264CE" stroke-width="5" /> <path d="M28 62h114" stroke="#1264CE" stroke-width="5" /> <circle cx="43" cy="47" r="3.5" fill="#1264CE" /> <circle cx="56" cy="47" r="3.5" fill="#1264CE" /> <circle cx="69" cy="47" r="3.5" fill="#1264CE" /> <path d="M68 85 52 100l16 15M102 85l16 15-16 15M92 81l-14 38" stroke="#1264CE" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+              </div>
+              <span class="project-tag">Client work · CTI</span>
+              <h3 class="h4">Softphone CTI APIs, Genie Properties</h3>
+              <p class="fw-light">Click to call from their CRM, plus APIs for call history, live agent status and recordings.</p>
+              <ul class="work-tools" aria-label="Built with"><li>Asterisk AMI</li><li>Asterisk CDR</li><li>Phonerlite</li><li>queuelog</li></ul>
+              <button type="button" class="card-plus" aria-label="Read more: Softphone CTI APIs, Genie Properties">
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+              </button>
+            </div>
+
+            <div class="rf-cards-scroller-item work-card" role="listitem" data-open-exp="protollcall" data-client="happy">
+              <div class="work-icon" aria-hidden="true">
+                <svg viewBox="0 0 170 170" fill="none"><g stroke="#1264CE" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"> <path d="M60 36V22h50v14M72 30h26" /> <rect x="36" y="36" width="98" height="112" rx="18" /> <rect x="52" y="52" width="66" height="30" rx="7" /> </g> <g fill="#1264CE"> <circle cx="63" cy="102" r="5" /><circle cx="85" cy="102" r="5" /><circle cx="107" cy="102" r="5" /> <circle cx="63" cy="125" r="5" /><circle cx="85" cy="125" r="5" /><circle cx="107" cy="125" r="5" /> </g></svg>
+              </div>
+              <span class="project-tag">Client work · TV shopping</span>
+              <h3 class="h4">TV shopping CRM, Happy Products</h3>
+              <p class="fw-light">Airtime, orders and telesales in one CRM, with live warehouse stock and product lock rules.</p>
+              <ul class="work-tools" aria-label="Built with"><li>PHP</li><li>MySQL</li><li>Asterisk PBX</li><li>Warehouse API</li></ul>
+              <button type="button" class="card-plus" aria-label="Read more: TV shopping CRM, Happy Products">
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+              </button>
+            </div>
+
+            <div class="rf-cards-scroller-item work-card" role="listitem" data-open-exp="protollcall" data-client="netbay">
+              <div class="work-icon" aria-hidden="true">
+                <svg viewBox="0 0 170 170" fill="none"><path d="M85 28 134 46v38c0 30-21 48-49 58-28-10-49-28-49-58V46l49-18z" stroke="#1264CE" stroke-width="5" stroke-linejoin="round" /> <rect x="67" y="80" width="36" height="28" rx="7" stroke="#1264CE" stroke-width="5" /> <path d="M76 80v-9a9 9 0 0 1 18 0v9" stroke="#1264CE" stroke-width="5" stroke-linecap="round" /></svg>
+              </div>
+              <span class="project-tag">Client work · IT services</span>
+              <h3 class="h4">Service ticket CRM, Netbay</h3>
+              <p class="fw-light">Tickets with SLA escalation, abandoned call callbacks, six reports and security hardening.</p>
+              <ul class="work-tools" aria-label="Built with"><li>PHP</li><li>MySQL</li><li>Asterisk PBX</li><li>OWASP</li></ul>
+              <button type="button" class="card-plus" aria-label="Read more: Service ticket CRM, Netbay">
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+              </button>
+            </div>
+
+            <div class="rf-cards-scroller-item work-card" role="listitem" data-open-exp="research">
+              <div class="work-icon" aria-hidden="true">
+                <svg viewBox="0 0 170 170" fill="none"><g stroke="#1264CE" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M98 24H54a12 12 0 0 0-12 12v98a12 12 0 0 0 12 12h62a12 12 0 0 0 12-12V54z" /><path d="M98 24v30h30" /><path d="M60 84h50M60 104h50M60 124h28" /></g></svg>
+              </div>
+              <span class="project-tag">Research · Healthcare</span>
+              <h3 class="h4">Diabetes question answering research</h3>
+              <p class="fw-light">Published paper on measuring word similarity for a diabetes question answering system.</p>
+              <ul class="work-tools" aria-label="Published"><li>TCI-1</li><li>Vol. 5 No. 2</li><li>2023</li></ul>
+              <button type="button" class="card-plus" aria-label="Read more: Diabetes question answering research">
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+              </button>
+            </div>
+
+            <div class="rf-cards-scroller-item work-card" role="listitem" data-open-exp="scg" data-client="scg-booking">
+              <div class="work-icon" aria-hidden="true">
+                <svg viewBox="0 0 170 170" fill="none"><g stroke="#1264CE" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><rect x="24" y="38" width="122" height="106" rx="16" /><path d="M24 72h122M58 26v24M112 26v24" /><path d="M66 108l13 13 26-26" /></g></svg>
+              </div>
+              <span class="project-tag">SCG · Enterprise</span>
+              <h3 class="h4">Internal reservation system, SCG</h3>
+              <p class="fw-light">Meeting rooms, vehicles and equipment, with calendar views, conflict checks and approvals.</p>
+              <ul class="work-tools" aria-label="Built with"><li>Laravel</li><li>MSSQL</li><li>Bootstrap</li><li>REST API</li></ul>
+              <button type="button" class="card-plus" aria-label="Read more: Internal reservation system, SCG">
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+              </button>
+            </div>
+
+            <div class="rf-cards-scroller-item work-card" role="listitem" data-open-exp="protollcall" data-client="isuzu">
+              <div class="work-icon" aria-hidden="true">
+                <svg viewBox="0 0 170 170" fill="none"><g stroke="#1264CE" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><rect x="24" y="32" width="122" height="106" rx="14" /><path d="M44 114l26-30 20 16 36-42" /></g><circle cx="126" cy="58" r="6" fill="#1264CE" /></svg>
+              </div>
+              <span class="project-tag">Client work · Analytics</span>
+              <h3 class="h4">Call analytics reports, Isuzu Thailand</h3>
+              <p class="fw-light">Thai labels for answered and unanswered calls, and readable queue names for supervisors.</p>
+              <ul class="work-tools" aria-label="Built with"><li>PHP</li><li>MySQL</li><li>Asterisk PBX</li></ul>
+              <button type="button" class="card-plus" aria-label="Read more: Call analytics reports, Isuzu Thailand">
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+              </button>
+            </div>
+
+            <div class="rf-cards-scroller-item work-card" role="listitem" data-open-exp="scg" data-client="scg-jobsouth">
+              <div class="work-icon" aria-hidden="true">
+                <svg viewBox="0 0 170 170" fill="none"><rect x="28" y="32" width="114" height="106" rx="14" stroke="#1264CE" stroke-width="5" /> <rect x="44" y="52" width="26" height="66" rx="7" stroke="#1264CE" stroke-width="5" /> <rect x="72" y="52" width="26" height="44" rx="7" stroke="#1264CE" stroke-width="5" /> <rect x="100" y="52" width="26" height="56" rx="7" stroke="#1264CE" stroke-width="5" /></svg>
+              </div>
+              <span class="project-tag">SCG · Enterprise</span>
+              <h3 class="h4">Job dispatch platform, SCG</h3>
+              <p class="fw-light">Create, assign and close field jobs in the southern region, with workload reports.</p>
+              <ul class="work-tools" aria-label="Built with"><li>Laravel</li><li>MSSQL</li><li>Bootstrap</li><li>REST API</li></ul>
+              <button type="button" class="card-plus" aria-label="Read more: Job dispatch platform, SCG">
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+              </button>
+            </div>
+
+            <div class="rf-cards-scroller-item work-card" role="listitem" data-open-exp="protollcall" data-client="artelia">
+              <div class="work-icon" aria-hidden="true">
+                <svg viewBox="0 0 170 170" fill="none"><g stroke="#1264CE" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M29 120a56 56 0 0 1 112 0" /><path d="M52 87l-7-7M85 72V62M118 87l7-7" /><path d="M85 120l22-30" /><path d="M36 142h98" /></g><circle cx="85" cy="120" r="8" fill="#1264CE" /></svg>
+              </div>
+              <span class="project-tag">Client work · Operations</span>
+              <h3 class="h4">Operations dashboard, Artelia Cornerstone</h3>
+              <p class="fw-light">Live queue and SLA dashboard with LINE and email alerts, KPI targets and historical reports.</p>
+              <ul class="work-tools" aria-label="Built with"><li>PHP</li><li>MySQL</li><li>Asterisk PBX</li><li>LINE</li></ul>
+              <button type="button" class="card-plus" aria-label="Read more: Operations dashboard, Artelia Cornerstone">
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+              </button>
+            </div>
+
+            <div class="rf-cards-scroller-item work-card" role="listitem" data-open-exp="scg" data-client="scg-familyday">
+              <div class="work-icon" aria-hidden="true">
+                <svg viewBox="0 0 170 170" fill="none"><g stroke="#1264CE" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"> <path d="M88 118H36a12 12 0 0 1-12-12V44a12 12 0 0 1 12-12h86a12 12 0 0 1 12 12v16" /> <path d="M24 54h110M40 76h34M40 94h22" /> <rect x="102" y="72" width="46" height="72" rx="11" /> <path d="M119 84h12" /> </g> <circle cx="38" cy="43" r="3.5" fill="#1264CE" /> <circle cx="49" cy="43" r="3.5" fill="#1264CE" /> <circle cx="60" cy="43" r="3.5" fill="#1264CE" /> <circle cx="125" cy="131" r="3.5" fill="#1264CE" /></svg>
+              </div>
+              <span class="project-tag">SCG · Enterprise</span>
+              <h3 class="h4">Family Day event shop, SCG</h3>
+              <p class="fw-light">Online shop for SCG's annual Family Day, with stock, cart, orders and payment confirmation.</p>
+              <ul class="work-tools" aria-label="Built with"><li>Laravel</li><li>MSSQL</li><li>Bootstrap</li><li>REST API</li></ul>
+              <button type="button" class="card-plus" aria-label="Read more: Family Day event shop, SCG">
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+              </button>
+            </div>
+
+            <div class="rf-cards-scroller-item work-card" role="listitem" data-open-exp="protollcall" data-client="livplus">
+              <div class="work-icon" aria-hidden="true">
+                <svg viewBox="0 0 170 170" fill="none"><g stroke="#1264CE" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><rect x="24" y="32" width="122" height="106" rx="14" /><path d="M44 114l26-30 20 16 36-42" /></g><circle cx="126" cy="58" r="6" fill="#1264CE" /></svg>
+              </div>
+              <span class="project-tag">Client work · Reporting</span>
+              <h3 class="h4">Scheduled call reports, LivPlus</h3>
+              <p class="fw-light">Daily and weekly KPI reports emailed as PDF and Excel, over millions of CDR records.</p>
+              <ul class="work-tools" aria-label="Built with"><li>PHP</li><li>MySQL</li><li>Asterisk CDR</li><li>queuelog</li></ul>
+              <button type="button" class="card-plus" aria-label="Read more: Scheduled call reports, LivPlus">
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+              </button>
+            </div>
+
+            <div class="rf-cards-scroller-item work-card" role="listitem" data-open-exp="scg" data-client="scg-refnumber">
+              <div class="work-icon" aria-hidden="true">
+                <svg viewBox="0 0 170 170" fill="none"><g stroke="#1264CE" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M98 24H54a12 12 0 0 0-12 12v98a12 12 0 0 0 12 12h62a12 12 0 0 0 12-12V54z" /><path d="M98 24v30h30" /><path d="M60 84h50M60 104h50M60 124h28" /></g></svg>
+              </div>
+              <span class="project-tag">SCG · Enterprise</span>
+              <h3 class="h4">Document reference tracker, SCG</h3>
+              <p class="fw-light">Reference codes for documents across SCG business units, with search and audit history.</p>
+              <ul class="work-tools" aria-label="Built with"><li>Laravel</li><li>MSSQL</li><li>Bootstrap</li><li>REST API</li></ul>
+              <button type="button" class="card-plus" aria-label="Read more: Document reference tracker, SCG">
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+              </button>
+            </div>
+
+            <div class="rf-cards-scroller-item work-card" role="listitem" data-open-exp="protollcall" data-client="digiserve">
+              <div class="work-icon" aria-hidden="true">
+                <svg viewBox="0 0 170 170" fill="none"><path d="M85 28 28 56l57 28 57-28-57-28z" stroke="#1264CE" stroke-width="5" stroke-linejoin="round" /> <path d="M28 85l57 28 57-28" stroke="#1264CE" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" /> <path d="M28 113l57 29 57-29" stroke="#1264CE" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+              </div>
+              <span class="project-tag">Client work · Analytics</span>
+              <h3 class="h4">Customer analytics, Digiserve</h3>
+              <p class="fw-light">One view of calls, LINE and email, with <span class="nw">drill-down</span>, period comparison and exports.</p>
+              <ul class="work-tools" aria-label="Built with"><li>PHP</li><li>MySQL</li><li>Asterisk CDR</li><li>LINE</li></ul>
+              <button type="button" class="card-plus" aria-label="Read more: Customer analytics, Digiserve">
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+              </button>
+            </div>
+
+            <div class="rf-cards-scroller-item work-card" role="listitem" data-open-exp="protollcall" data-client="oto">
+              <div class="work-icon" aria-hidden="true">
+                <svg viewBox="0 0 170 170" fill="none"><rect x="28" y="32" width="114" height="106" rx="14" stroke="#1264CE" stroke-width="5" /> <rect x="44" y="52" width="26" height="66" rx="7" stroke="#1264CE" stroke-width="5" /> <rect x="72" y="52" width="26" height="44" rx="7" stroke="#1264CE" stroke-width="5" /> <rect x="100" y="52" width="26" height="56" rx="7" stroke="#1264CE" stroke-width="5" /></svg>
+              </div>
+              <span class="project-tag">Client work · Finance</span>
+              <h3 class="h4">Vehicle finance CRM, OTO Vision</h3>
+              <p class="fw-light">Loan applications through credit review and approval, with LINE&nbsp;OA and call <span class="nw">follow-ups</span>.</p>
+              <ul class="work-tools" aria-label="Built with"><li>PHP</li><li>MySQL</li><li>Asterisk PBX</li><li>LINE OA</li></ul>
+              <button type="button" class="card-plus" aria-label="Read more: Vehicle finance CRM, OTO Vision">
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+              </button>
+            </div>
+
+            <div class="rf-cards-scroller-item work-card" role="listitem" data-open-exp="protollcall" data-client="3bissfix">
+              <div class="work-icon" aria-hidden="true">
+                <svg viewBox="0 0 170 170" fill="none"><rect x="30" y="30" width="110" height="74" rx="12" stroke="#1264CE" stroke-width="5" /> <path d="M70 104v14M100 104v14M56 122h58" stroke="#1264CE" stroke-width="5" stroke-linecap="round" /> <rect x="62" y="50" width="30" height="30" rx="6" stroke="#1264CE" stroke-width="5" /> <path d="M70 42v8M84 42v8M70 80v8M84 80v8M54 58h8M54 72h8M92 58h8M92 72h8" stroke="#1264CE" stroke-width="4" stroke-linecap="round" /> <path d="M138 116l-18 18m0-18a12.7 12.7 0 0 0 3 13 12.7 12.7 0 0 0 13 3l7 7a4 4 0 0 0 6 0l3-3a4 4 0 0 0 0-6l-7-7a12.7 12.7 0 0 0-3-13 12.7 12.7 0 0 0-13-3z" fill="#F5F5F7" stroke="#1264CE" stroke-width="5" stroke-linejoin="round" /></svg>
+              </div>
+              <span class="project-tag">Client work · Maintenance</span>
+              <h3 class="h4">Field service CRM, Treebisfix</h3>
+              <p class="fw-light">Repair jobs from intake to technician dispatch and <span class="nw">sign-off</span>, with LINE&nbsp;OA updates.</p>
+              <ul class="work-tools" aria-label="Built with"><li>PHP</li><li>MySQL</li><li>Asterisk PBX</li><li>LINE OA</li></ul>
+              <button type="button" class="card-plus" aria-label="Read more: Field service CRM, Treebisfix">
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+              </button>
+            </div>
+
+            <div class="rf-cards-scroller-item work-card" role="listitem" data-open-exp="protollcall" data-client="mediviss">
+              <div class="work-icon" aria-hidden="true">
+                <svg viewBox="0 0 170 170" fill="none"><g stroke="#1264CE" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><rect x="24" y="38" width="122" height="106" rx="16" /><path d="M24 72h122M58 26v24M112 26v24" /><path d="M66 108l13 13 26-26" /></g></svg>
+              </div>
+              <span class="project-tag">Client work · Healthcare</span>
+              <h3 class="h4">Patient CRM, Mediviss</h3>
+              <p class="fw-light">Appointments, doctor assignment and LINE&nbsp;OA recall reminders, with each patient's call history.</p>
+              <ul class="work-tools" aria-label="Built with"><li>PHP</li><li>MySQL</li><li>Asterisk CDR</li><li>LINE OA</li></ul>
+              <button type="button" class="card-plus" aria-label="Read more: Patient CRM, Mediviss">
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+              </button>
+            </div>
+
+            <div class="rf-cards-scroller-item work-card" role="listitem" data-open-exp="protollcall" data-client="yunnomori">
+              <div class="work-icon" aria-hidden="true">
+                <svg viewBox="0 0 170 170" fill="none"><g stroke="#1264CE" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"> <rect x="22" y="34" width="126" height="102" rx="16" /> <circle cx="62" cy="72" r="14" /> <path d="M38 114c2-13 11-20 24-20s22 7 24 20" /> <path d="M104 66h26M104 85h26M104 104h14" /> </g></svg>
+              </div>
+              <span class="project-tag">Client work · Hospitality</span>
+              <h3 class="h4">Guest reservations CRM, Yunomori</h3>
+              <p class="fw-light">Reservations and guest inquiries, with LINE&nbsp;OA confirmations, arrival instructions and surveys.</p>
+              <ul class="work-tools" aria-label="Built with"><li>PHP</li><li>MySQL</li><li>Asterisk PBX</li><li>LINE OA</li></ul>
+              <button type="button" class="card-plus" aria-label="Read more: Guest reservations CRM, Yunomori">
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+              </button>
+            </div>
+
+            <div class="rf-cards-scroller-item work-card" role="listitem" data-open-exp="protollcall" data-client="dpah">
+              <div class="work-icon" aria-hidden="true">
+                <svg viewBox="0 0 170 170" fill="none"><g stroke="#1264CE" stroke-width="5"><circle cx="55" cy="38" r="11" /><circle cx="85" cy="38" r="11" /><circle cx="115" cy="38" r="11" /><circle cx="55" cy="70" r="11" /><circle cx="85" cy="70" r="11" /><circle cx="115" cy="70" r="11" /><circle cx="55" cy="102" r="11" /><circle cx="85" cy="102" r="11" /><circle cx="115" cy="102" r="11" /><circle cx="85" cy="134" r="11" /></g></svg>
+              </div>
+              <span class="project-tag">Client work · Insurance</span>
+              <h3 class="h4">Accident and health insurance CRM, dp&nbsp;a&amp;h</h3>
+              <p class="fw-light">Quotes and <span class="nw">follow-ups</span>, six agent break statuses, LINE&nbsp;OA renewal reminders and a claims IVR.</p>
+              <ul class="work-tools" aria-label="Built with"><li>PHP</li><li>MySQL</li><li>Asterisk PBX</li><li>LINE OA</li></ul>
+              <button type="button" class="card-plus" aria-label="Read more: Accident and health insurance CRM, dp a&amp;h">
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+              </button>
+            </div>
+
+            <div class="rf-cards-scroller-item work-card" role="listitem" data-open-exp="protollcall" data-client="qprime">
+              <div class="work-icon" aria-hidden="true">
+                <svg viewBox="0 0 170 170" fill="none"><rect x="28" y="32" width="114" height="106" rx="14" stroke="#1264CE" stroke-width="5" /> <rect x="44" y="52" width="26" height="66" rx="7" stroke="#1264CE" stroke-width="5" /> <rect x="72" y="52" width="26" height="44" rx="7" stroke="#1264CE" stroke-width="5" /> <rect x="100" y="52" width="26" height="56" rx="7" stroke="#1264CE" stroke-width="5" /></svg>
+              </div>
+              <span class="project-tag">Client work · Real estate</span>
+              <h3 class="h4">Real estate sales CRM, Qprime</h3>
+              <p class="fw-light">Lead capture to site visit, negotiation and closing, with LINE&nbsp;OA <span class="nw">follow-up</span> at each stage.</p>
+              <ul class="work-tools" aria-label="Built with"><li>PHP</li><li>MySQL</li><li>Asterisk PBX</li><li>LINE OA</li></ul>
+              <button type="button" class="card-plus" aria-label="Read more: Real estate sales CRM, Qprime">
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+              </button>
+            </div>
+
+            <div class="rf-cards-scroller-item work-card" role="listitem" data-open-exp="protollcall" data-client="thaivan">
+              <div class="work-icon" aria-hidden="true">
+                <svg viewBox="0 0 170 170" fill="none"><g stroke="#1264CE" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M29 120a56 56 0 0 1 112 0" /><path d="M52 87l-7-7M85 72V62M118 87l7-7" /><path d="M85 120l22-30" /><path d="M36 142h98" /></g><circle cx="85" cy="120" r="8" fill="#1264CE" /></svg>
+              </div>
+              <span class="project-tag">Client work · Payments</span>
+              <h3 class="h4">Contact center analytics, Thaivan</h3>
+              <p class="fw-light">CDR and queue log analytics with live agent monitoring and SLA tracking.</p>
+              <ul class="work-tools" aria-label="Built with"><li>PHP</li><li>MySQL</li><li>Asterisk CDR</li><li>queuelog</li></ul>
+              <button type="button" class="card-plus" aria-label="Read more: Contact center analytics, Thaivan">
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+              </button>
+            </div>
+
+            <div class="rf-cards-scroller-item work-card" role="listitem" data-open-exp="protollcall" data-client="nova">
+              <div class="work-icon" aria-hidden="true">
+                <svg viewBox="0 0 170 170" fill="none"><g stroke="#1264CE" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><rect x="24" y="32" width="122" height="106" rx="14" /><path d="M44 114l26-30 20 16 36-42" /></g><circle cx="126" cy="58" r="6" fill="#1264CE" /></svg>
+              </div>
+              <span class="project-tag">Client work · Reporting</span>
+              <h3 class="h4">Operations reporting, Nova Organic</h3>
+              <p class="fw-light">Live queue and SLA dashboard and a bulk file import, plus sales report and permission updates.</p>
+              <ul class="work-tools" aria-label="Built with"><li>PHP</li><li>MySQL</li><li>Asterisk PBX</li></ul>
+              <button type="button" class="card-plus" aria-label="Read more: Operations reporting, Nova Organic">
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+              </button>
+            </div>
+
+            <div class="rf-cards-scroller-item work-card" role="listitem" data-open-exp="protollcall" data-client="mvmall">
+              <div class="work-icon" aria-hidden="true">
+                <svg viewBox="0 0 170 170" fill="none"><g stroke="#1264CE" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"> <path d="M88 118H36a12 12 0 0 1-12-12V44a12 12 0 0 1 12-12h86a12 12 0 0 1 12 12v16" /> <path d="M24 54h110M40 76h34M40 94h22" /> <rect x="102" y="72" width="46" height="72" rx="11" /> <path d="M119 84h12" /> </g> <circle cx="38" cy="43" r="3.5" fill="#1264CE" /> <circle cx="49" cy="43" r="3.5" fill="#1264CE" /> <circle cx="60" cy="43" r="3.5" fill="#1264CE" /> <circle cx="125" cy="131" r="3.5" fill="#1264CE" /></svg>
+              </div>
+              <span class="project-tag">Client work · E-commerce</span>
+              <h3 class="h4">Order support CRM, MVmall</h3>
+              <p class="fw-light">Order inquiries, returns and delivery disputes with SLA tracking and LINE&nbsp;OA order updates.</p>
+              <ul class="work-tools" aria-label="Built with"><li>PHP</li><li>MySQL</li><li>Asterisk PBX</li><li>LINE OA</li></ul>
+              <button type="button" class="card-plus" aria-label="Read more: Order support CRM, MVmall">
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+              </button>
+            </div>
+
+            <div class="rf-cards-scroller-item work-card" role="listitem" data-open-exp="protollcall" data-client="kijsiri">
+              <div class="work-icon" aria-hidden="true">
+                <svg viewBox="0 0 170 170" fill="none"><g stroke="#1264CE" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"> <rect x="22" y="34" width="126" height="102" rx="16" /> <circle cx="62" cy="72" r="14" /> <path d="M38 114c2-13 11-20 24-20s22 7 24 20" /> <path d="M104 66h26M104 85h26M104 104h14" /> </g></svg>
+              </div>
+              <span class="project-tag">Client work · Real estate</span>
+              <h3 class="h4">Property sales CRM, N&amp;S and Kijsiri</h3>
+              <p class="fw-light">One sales CRM for two linked companies, with each team limited to its own call recordings.</p>
+              <ul class="work-tools" aria-label="Built with"><li>PHP</li><li>MySQL</li><li>Asterisk PBX</li><li>LINE OA</li></ul>
+              <button type="button" class="card-plus" aria-label="Read more: Property sales CRM, N&amp;S and Kijsiri">
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+              </button>
+            </div>
+
+            <div class="rf-cards-scroller-item work-card" role="listitem" data-open-exp="protollcall" data-client="drorn">
+              <div class="work-icon" aria-hidden="true">
+                <svg viewBox="0 0 170 170" fill="none"><g stroke="#1264CE" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><rect x="24" y="38" width="122" height="106" rx="16" /><path d="M24 72h122M58 26v24M112 26v24" /><path d="M66 108l13 13 26-26" /></g></svg>
+              </div>
+              <span class="project-tag">Client work · Healthcare</span>
+              <h3 class="h4">Clinic appointment CRM, Dr.Orn</h3>
+              <p class="fw-light">Appointment scheduling and LINE&nbsp;OA reminders, with each patient's call history on profile.</p>
+              <ul class="work-tools" aria-label="Built with"><li>PHP</li><li>MySQL</li><li>Asterisk CDR</li><li>LINE OA</li></ul>
+              <button type="button" class="card-plus" aria-label="Read more: Clinic appointment CRM, Dr.Orn">
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+              </button>
+            </div>
+
+            <div class="rf-cards-scroller-item work-card" role="listitem" data-open-exp="protollcall" data-client="sbl">
+              <div class="work-icon" aria-hidden="true">
+                <svg viewBox="0 0 170 170" fill="none"><path d="M85 85c-12-18-30-30-44-24-16 7-16 41 0 48 14 6 32-6 44-24z" stroke="#1264CE" stroke-width="5" stroke-linejoin="round" /> <path d="M85 85c12-18 30-30 44-24 16 7 16 41 0 48-14 6-32-6-44-24z" stroke="#1264CE" stroke-width="5" stroke-linejoin="round" /> <circle cx="52" cy="85" r="5" fill="#1264CE" /> <circle cx="118" cy="85" r="5" fill="#1264CE" /></svg>
+              </div>
+              <span class="project-tag">Client work · Leasing</span>
+              <h3 class="h4">Customer service CRM, S.B.L. Leasing</h3>
+              <p class="fw-light">Full CRM setup through launch, case tracking with audit trail, and a call analytics dashboard.</p>
+              <ul class="work-tools" aria-label="Built with"><li>PHP</li><li>MySQL</li><li>Asterisk PBX</li></ul>
+              <button type="button" class="card-plus" aria-label="Read more: Customer service CRM, S.B.L. Leasing">
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+              </button>
+            </div>
+
+            <div class="rf-cards-scroller-item work-card" role="listitem" data-open-exp="protollcall" data-client="ishopping">
+              <div class="work-icon" aria-hidden="true">
+                <svg viewBox="0 0 170 170" fill="none"><g stroke="#1264CE" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"> <path d="M60 36V22h50v14M72 30h26" /> <rect x="36" y="36" width="98" height="112" rx="18" /> <rect x="52" y="52" width="66" height="30" rx="7" /> </g> <g fill="#1264CE"> <circle cx="63" cy="102" r="5" /><circle cx="85" cy="102" r="5" /><circle cx="107" cy="102" r="5" /> <circle cx="63" cy="125" r="5" /><circle cx="85" cy="125" r="5" /><circle cx="107" cy="125" r="5" /> </g></svg>
+              </div>
+              <span class="project-tag">Client work · TV shopping</span>
+              <h3 class="h4">TV shopping support CRM, iShopping</h3>
+              <p class="fw-light">Order inquiries, return requests and complaint logging, plus an agent productivity dashboard.</p>
+              <ul class="work-tools" aria-label="Built with"><li>PHP</li><li>MySQL</li><li>Asterisk PBX</li></ul>
+              <button type="button" class="card-plus" aria-label="Read more: TV shopping support CRM, iShopping">
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+              </button>
+            </div>
+
+            <div class="rf-cards-scroller-item work-card" role="listitem" data-open-exp="protollcall" data-client="maneydaeng">
+              <div class="work-icon" aria-hidden="true">
+                <svg viewBox="0 0 170 170" fill="none"><g stroke="#1264CE" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M98 24H54a12 12 0 0 0-12 12v98a12 12 0 0 0 12 12h62a12 12 0 0 0 12-12V54z" /><path d="M98 24v30h30" /><path d="M60 84h50M60 104h50M60 124h28" /></g></svg>
+              </div>
+              <span class="project-tag">Client work · Sales</span>
+              <h3 class="h4">Purchase order report, Manee Daeng</h3>
+              <p class="fw-light">Corrected the purchase order report so full price, discount and net price show correctly.</p>
+              <ul class="work-tools" aria-label="Built with"><li>PHP</li><li>MySQL</li></ul>
+              <button type="button" class="card-plus" aria-label="Read more: Purchase order report, Manee Daeng">
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+              </button>
+            </div>
+
+            <div class="rf-cards-scroller-item" role="listitem" data-tech="iot">
               <div class="project-img">
                 <img src="assets/img/projects/RealTimePulseTemperature Monitoring System/portfolio-details-3.avif"
                   alt="Real Time Pulse & Temperature Monitoring System with AWS and ThingsBoard" class="img-fluid"
@@ -2413,8 +2832,21 @@
               </button>
             </div>
 
-            <!-- Project 2 -->
-            <div class="rf-cards-scroller-item" role="region" aria-labelledby="project2-title" data-tech="php">
+            <div class="rf-cards-scroller-item" role="listitem" data-tech="python">
+              <div class="project-img">
+                <img src="assets/img/projects/Covid-19SpreadAnalysisWebsite/portfolio-details-2.avif"
+                  alt="Covid-19 Spread Analysis Website with Flask and Python" class="img-fluid" loading="lazy"
+                  decoding="async" width="1354" height="678" />
+              </div>
+              <span class="project-tag">Python / Flask</span>
+              <h3 class="h4" id="project3-title"><span class="nw">Covid-19</span> Spread Analysis Website</h3>
+              <p class="fw-light">Flask, HTML, CSS, Python libraries</p>
+              <button type="button" class="card-plus" aria-label="View screenshot: Covid-19 Spread Analysis Website">
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+              </button>
+            </div>
+
+            <div class="rf-cards-scroller-item" role="listitem" data-tech="php">
               <div class="project-img">
                 <img src="assets/img/projects/StudentProjectManagementSystem/portfolio-details-7.avif"
                   alt="Student Project Management System with PHP, MySQL, and HTML" class="img-fluid" loading="lazy"
@@ -2428,23 +2860,7 @@
               </button>
             </div>
 
-            <!-- Project 3 -->
-            <div class="rf-cards-scroller-item" role="region" aria-labelledby="project3-title" data-tech="python">
-              <div class="project-img">
-                <img src="assets/img/projects/Covid-19SpreadAnalysisWebsite/portfolio-details-2.avif"
-                  alt="Covid-19 Spread Analysis Website with Flask and Python" class="img-fluid" loading="lazy"
-                  decoding="async" width="1354" height="678" />
-              </div>
-              <span class="project-tag">Python / Flask</span>
-              <h3 class="h4" id="project3-title">Covid-19 Spread Analysis Website</h3>
-              <p class="fw-light">Flask, HTML, CSS, Python libraries</p>
-              <button type="button" class="card-plus" aria-label="View screenshot: Covid-19 Spread Analysis Website">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
-              </button>
-            </div>
-
-            <!-- Project 4 -->
-            <div class="rf-cards-scroller-item" role="region" aria-labelledby="project4-title" data-tech="java">
+            <div class="rf-cards-scroller-item" role="listitem" data-tech="java">
               <div class="project-img">
                 <img src="assets/img/projects/ClassroomBookingRecordSystem/portfolio-details-1.avif"
                   alt="Classroom Booking Record System using Java and NetBeans" class="img-fluid" loading="lazy"
@@ -2815,7 +3231,7 @@
   </button>
 
   <!-- Main JS -->
-  <script defer src="assets/js/main.min.js?v=2.50.0"></script>
+  <script defer src="assets/js/main.min.js?v=2.51.0"></script>
   <!-- Service Worker: cache assets for repeat visits -->
   <script>if ('serviceWorker' in navigator) { var _sw = function () { navigator.serviceWorker.register('sw.js') }; 'requestIdleCallback' in window ? requestIdleCallback(_sw) : window.addEventListener('load', _sw) }</script>
 
@@ -3468,7 +3884,7 @@
 
     <div class="exp-modal-section">
       <h3>Projects — Second Internship (Dec 2023 – Mar 2024)</h3>
-      <div class="exp-client-section">
+      <div class="exp-client-section" data-client="scg-booking">
         <div class="exp-client-section-header">
           <h3>Project Booking — Internal Reservation System</h3>
         </div>
@@ -3481,7 +3897,7 @@
             and reviewing approval queues.</li>
         </ul>
       </div>
-      <div class="exp-client-section">
+      <div class="exp-client-section" data-client="scg-refnumber">
         <div class="exp-client-section-header">
           <h3>Project Ref Number — Reference Code Generator</h3>
         </div>
@@ -3493,7 +3909,7 @@
           <li>Search and audit history — trace the lifecycle and usage of any reference code.</li>
         </ul>
       </div>
-      <div class="exp-client-section">
+      <div class="exp-client-section" data-client="scg-jobsouth">
         <div class="exp-client-section-header">
           <h3>Project Job South — Regional Job Management</h3>
         </div>
@@ -3504,9 +3920,9 @@
           <li>Regional summaries reporting job completion rates and workload distribution across teams.</li>
         </ul>
       </div>
-      <div class="exp-client-section">
+      <div class="exp-client-section" data-client="scg-familyday">
         <div class="exp-client-section-header">
-          <h3>Project Family Day Shop — Event E-Commerce</h3>
+          <h3>Project Family Day Shop — Event <span class="nw">E-Commerce</span></h3>
         </div>
         <ul>
           <li>Internal online shop for SCG's annual Family Day event — employees browse, select, and purchase
@@ -3519,7 +3935,7 @@
 
     <div class="exp-modal-section">
       <h3>Projects — First Internship (Apr – Jul 2023)</h3>
-      <div class="exp-client-section">
+      <div class="exp-client-section" data-client="scg-license">
         <div class="exp-client-section-header">
           <h3>Project License — Software License Management System</h3>
         </div>
@@ -3532,7 +3948,7 @@
             and department-level cost allocation.</li>
         </ul>
       </div>
-      <div class="exp-client-section">
+      <div class="exp-client-section" data-client="scg-assets">
         <div class="exp-client-section-header">
           <h3>Project Assets — Enterprise Asset Management Platform</h3>
         </div>
@@ -3547,6 +3963,25 @@
             reservation queues.</li>
         </ul>
       </div>
+    </div>
+    <p class="exp-sheet-cta">Interested in working together? <a href="#contact" class="more exp-sheet-link">Get in
+        touch<span class="chev" aria-hidden="true"></span></a></p>
+  </template>
+
+  <template id="exp-research">
+    <div class="exp-modal-header">
+      <div class="exp-modal-role-header">
+        <div>
+          <h2 class="exp-modal-title">Measuring of Words Similarity for Question Answering System for Diabetes</h2>
+          <div class="exp-modal-company">Journal of Applied Informatics and Technology (TCI-1)</div>
+        </div>
+      </div>
+      <div class="exp-modal-period">2023 &middot; Vol. 5 No. 2, July&ndash;December</div>
+    </div>
+
+    <div class="exp-modal-section">
+      <h3>Authors</h3>
+      <p class="exp-modal-overview">Chamnanhan, T., Phetkrachang, K., Sathiwantana, S., Chalearnnetkul, P., Choosong, C.</p>
     </div>
     <p class="exp-sheet-cta">Interested in working together? <a href="#contact" class="more exp-sheet-link">Get in
         touch<span class="chev" aria-hidden="true"></span></a></p>

@@ -52,6 +52,54 @@ test('client work leads My Projects, and every card shows without a filter row',
   await page.close();
 });
 
+test('every project card opens something real, and work comes before the student screenshots', async () => {
+  const { page } = await ctx.openPage();
+  const state = await page.evaluate(() => {
+    const items = [...document.querySelectorAll('#scroller > .rf-cards-scroller-item')];
+    const dead = items.filter((c) => {
+      if (!c.dataset.openExp) return !c.querySelector('.project-img img');
+      const t = document.getElementById('exp-' + c.dataset.openExp);
+      if (!t) return true;
+      const k = c.dataset.client;
+      return !!k && !t.content.querySelector(`.exp-filter-chip[data-filter="${k}"], .exp-client-section[data-client="${k}"]`);
+    }).map((c) => c.querySelector('h3').textContent);
+    const shots = items.map((c) => !!c.querySelector('.project-img'));
+    const firstShot = shots.indexOf(true);
+    return {
+      dead,
+      workAfterShots: firstShot < 0 ? 0 : shots.slice(firstShot).filter((s) => !s).length,
+      // a hyphenated name may stay only inside a no-wrap span
+      hyphenated: [...document.querySelectorAll('#portfolio h3')].map((h) => {
+        const c = h.cloneNode(true);
+        c.querySelectorAll('.nw').forEach((n) => n.remove());
+        return c.textContent;
+      }).filter((t) => /\w-\w/.test(t)),
+    };
+  });
+  assert.deepEqual(state.dead, [], 'a card whose + opens nothing, or a sheet without that client or project');
+  assert.equal(state.workAfterShots, 0, 'standouts first: the student screenshot cards close the row');
+  assert.deepEqual(state.hyphenated, [], 'a card title can break at a hyphen; reword it or wrap it in <span class="nw">');
+  await page.close();
+});
+
+test('an SCG card opens the SCG sheet on its own project', async () => {
+  const { page } = await ctx.openPage();
+  const want = await page.$eval('#scroller [data-open-exp="scg"][data-client="scg-familyday"]', (c) => c.dataset.client);
+  await page.$eval('#scroller [data-client="scg-familyday"] .card-plus', (b) => b.click());
+  await page.waitForSelector('.exp-lightbox.open');
+  await page.waitForTimeout(100);
+  const top = await page.evaluate(() => {
+    const inner = document.querySelector('.exp-lightbox-inner');
+    const edge = inner.getBoundingClientRect().top;
+    const sec = [...inner.querySelectorAll('.exp-client-section')].find((s) => s.getBoundingClientRect().bottom > edge + 20);
+    return sec && sec.dataset.client;
+  });
+  assert.equal(top, want, 'the SCG sheet did not open on the card\'s project');
+  await page.keyboard.press('Escape');
+  await page.waitForFunction(() => !document.querySelector('.exp-lightbox.open'));
+  await page.close();
+});
+
 test('a client-work card opens its story in the experience sheet, on that client', async () => {
   const { page } = await ctx.openPage();
   const want = await page.$eval('#portfolio .work-card[data-client]', (c) => c.dataset.client);
