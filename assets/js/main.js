@@ -212,6 +212,12 @@ var overlayHistory = (function () {
   var stack = [];        // close functions of the open overlays, top last
   var unwinding = false; // the next popstate is our own history.go()
   var pending = 0, timer = null;
+  var settled = []; // run once our own history step has landed
+  function flush() {
+    var fns = settled;
+    settled = [];
+    fns.forEach(function (fn) { fn(); });
+  }
   // An entry whose overlay is no longer on screen (left by a reload, or
   // reached with Forward) is stepped off, so Back is never a dead press
   function stale(depth) {
@@ -221,7 +227,9 @@ var overlayHistory = (function () {
     return true;
   }
   window.addEventListener('popstate', function (e) {
-    if (unwinding) { unwinding = false; return; }
+    // the browser restores the scroll position of the entry it lands on, so
+    // anything that scrolls waits a frame past it
+    if (unwinding) { unwinding = false; requestAnimationFrame(flush); return; }
     var depth = (e.state && e.state.overlay) || 0;
     if (stale(depth)) return;
     while (stack.length > depth) stack.pop()();
@@ -231,6 +239,9 @@ var overlayHistory = (function () {
     opened: function (close) {
       stack.push(close);
       try { history.pushState({ overlay: stack.length }, ''); } catch (e) { stack.pop(); }
+    },
+    afterSettle: function (fn) {
+      if (timer || unwinding) settled.push(fn); else fn();
     },
     closed: function (close) {
       var i = stack.lastIndexOf(close);
@@ -1172,6 +1183,9 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     lastY = y;
     toTop.classList.toggle('visible', show);
+    // reading progress on the ring: how close the end of the page is
+    var room = document.documentElement.scrollHeight - window.innerHeight;
+    toTop.style.setProperty('--p', room > 0 ? Math.min(1, y / room).toFixed(4) : '0');
   }
   function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
   window.addEventListener('scroll', onScroll, { passive: true });
@@ -1828,3 +1842,68 @@ document.addEventListener('DOMContentLoaded', function () {
   card.addEventListener('pointermove', light, { passive: true });
   card.addEventListener('pointerdown', light, { passive: true });
 })();
+
+/**
+ * Small rewards. On a computer an email address or phone number is copied
+ * when clicked (a phone link there has nothing to dial; a mail link still
+ * opens the mail app), and the CV and the contact card say they are on
+ * their way. One quiet toast, announced politely to screen readers.
+ */
+(function () {
+  var toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.setAttribute('role', 'status');
+  toast.setAttribute('aria-live', 'polite');
+  var check = document.createElement('span');
+  check.className = 'toast-check';
+  check.setAttribute('aria-hidden', 'true');
+  var text = document.createElement('span');
+  text.className = 'toast-text';
+  toast.appendChild(check);
+  toast.appendChild(text);
+  document.body.appendChild(toast);
+  var hideTimer = null;
+  function show(msg) {
+    text.textContent = msg;
+    toast.classList.add('is-shown');
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(function () { toast.classList.remove('is-shown'); }, 2400);
+  }
+  window._toast = show;
+
+  var desk = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)');
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a[href]');
+    if (!a) return;
+    var href = a.getAttribute('href');
+    if (/\.pdf$/i.test(href)) { show('Downloading the CV'); return; }
+    if (/\.vcf$/i.test(href)) { if (desk && desk.matches) show('Contact card downloaded'); return; }
+    var m = /^(mailto|tel):([^?]+)/i.exec(href);
+    if (!m || !desk || !desk.matches || !navigator.clipboard) return;
+    var tel = m[1].toLowerCase() === 'tel';
+    var shown = (a.querySelector('.info-value') || a).textContent.trim();
+    var value = tel && /^\+?[\d\s-]{6,}$/.test(shown) ? shown : decodeURIComponent(m[2]);
+    if (tel) e.preventDefault();
+    navigator.clipboard.writeText(value).then(function () {
+      show((tel ? 'Phone number copied: ' : 'Email copied: ') + value);
+    }, function () {});
+  });
+})();
+
+/**
+ * The foot of an experience sheet leads on: close it, then go to Contact
+ * once the sheet's history entry is gone (or the browser would put the
+ * scroll back where the sheet was opened).
+ */
+document.addEventListener('click', function (e) {
+  var link = e.target.closest && e.target.closest('.exp-sheet-link');
+  if (!link) return;
+  e.preventDefault();
+  var close = document.querySelector('.exp-lightbox.open .exp-lightbox-close');
+  if (close) close.click();
+  overlayHistory.afterSettle(function () {
+    var target = document.getElementById('contact');
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (target) target.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+  });
+});
