@@ -190,19 +190,6 @@ section {
   font-style: normal !important;
 }
 
-.fade {
-  opacity: 1;
-}
-
-.fade.show {
-  opacity: 1;
-}
-
-/* Override Bootstrap's .fade:not(.show) which hides non-modal elements using fade class */
-.fade:not(.show) {
-  opacity: 1;
-}
-
 /* Margin utility classes */
 .mt-2  { margin-top: 0.5rem; }
 .mt-3  { margin-top: 0.75rem; }
@@ -360,14 +347,6 @@ body:lang(th) {
 
 button:disabled {
   cursor: default;
-}
-
-.paddlenav ul {
-  display: flex;
-  justify-content: center;
-  list-style: none;
-  margin: 0;
-  padding: 0;
 }
 
 button {
@@ -762,7 +741,6 @@ button {
 }
 .filter-btn:active,
 .exp-filter-chip:active,
-.cta-mail:active,
 .cert-expand-btn:active,
 .cert-lightbox-close:active,
 .exp-lightbox-close:active {
@@ -801,7 +779,6 @@ button {
   #portfolio .rf-cards-scroller-item:hover,
   #skill .rf-cards-scroller-item:hover,
   .cert-card:hover,
-  .cta-mail:hover,
   .cert-expand-btn:hover {
     transform: none;
     box-shadow: none;
@@ -1454,7 +1431,6 @@ a.info-item:hover .info-value {
 
 /* ── Color: single primary text color (Apple HIG) ── */
 h1, h2, h3, h4, h5, h6 { color: var(--color-text); }
-.text-dark { color: var(--color-text) !important; }
 
 /* ── Typography Scale: Apple HIG Responsive Headings ── */
 /* Desktop >1068px: 56px / 700 / -0.01em / 1.06 */
@@ -1503,6 +1479,7 @@ h1, h2, h3, h4, h5, h6 { color: var(--color-text); }
 }
 .skip-link:focus { top: 16px; color: #fff; }
 .skip-link:not(:focus) { clip-path: inset(50%); }
+.rf-cards-scroller .skip-link { top: 16px; transition: none; }
 
 /* ── Focus States: Visible for all interactive elements (Apple HIG Accessibility) ── */
 :focus-visible {
@@ -2050,8 +2027,9 @@ a.info-item:hover .info-value { color: var(--color-link); }
   line-height: 1.47059;
   letter-spacing: -0.022em;
   color: #1D1D1F;
-  text-wrap: pretty; /* no lone last word */
 }
+#portfolio .rf-cards-scroller-item p.fw-light { text-wrap: pretty; }   /* no lone last word */
+.nw { white-space: nowrap; }   /* a hyphenated name stays on one line */
 /* the skill's mark, top left, as on Apple's values cards */
 #skill .rf-cards-scroller-item .skill-icon {
   display: block;
@@ -3016,12 +2994,18 @@ p.profile-bio-small,
   #resume .data-box:not(.contact-strip),
   #resume .contact-strip .info-item,
   #experience .data-box[data-exp],
+  #portfolio .rf-cards-scroller-item,
+  #skill .rf-cards-scroller-item,
   #certificates .cert-card { box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .35); }
 }
 @media (forced-colors: active) {
   #resume .data-box:not(.contact-strip),
   #resume .contact-strip .info-item,
   #experience .data-box[data-exp],
+  #portfolio .rf-cards-scroller-item,
+  #skill .rf-cards-scroller-item,
+  #portfolio .work-tools li,
+  .card-plus,
   #certificates .cert-card { border: 1px solid CanvasText; }
 }
 

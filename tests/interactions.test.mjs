@@ -68,12 +68,17 @@ test('every project card opens something real, and work comes before the student
     return {
       dead,
       workAfterShots: firstShot < 0 ? 0 : shots.slice(firstShot).filter((s) => !s).length,
-      hyphenated: [...document.querySelectorAll('#portfolio h3')].map((h) => h.textContent).filter((t) => /\w-\w/.test(t)),
+      // a hyphenated name may stay only inside a no-wrap span
+      hyphenated: [...document.querySelectorAll('#portfolio h3')].map((h) => {
+        const c = h.cloneNode(true);
+        c.querySelectorAll('.nw').forEach((n) => n.remove());
+        return c.textContent;
+      }).filter((t) => /\w-\w/.test(t)),
     };
   });
   assert.deepEqual(state.dead, [], 'a card whose + opens nothing, or a sheet without that client or project');
   assert.equal(state.workAfterShots, 0, 'standouts first: the student screenshot cards close the row');
-  assert.deepEqual(state.hyphenated, [], 'a card title breaks at a hyphen; reword it or use U+2011');
+  assert.deepEqual(state.hyphenated, [], 'a card title can break at a hyphen; reword it or wrap it in <span class="nw">');
   await page.close();
 });
 
