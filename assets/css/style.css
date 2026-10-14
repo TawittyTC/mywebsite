@@ -3024,3 +3024,138 @@ p.profile-bio-small,
   #experience .data-box[data-exp],
   #certificates .cert-card { border: 1px solid CanvasText; }
 }
+
+/*--------------------------------------------------------------
+# Small rewards and a clear ending (v2.49): reading progress on the
+  back-to-top button, the closing action row, the business card that
+  saves to Contacts, a quiet "Copied" toast, and a way forward at the
+  foot of every experience sheet
+--------------------------------------------------------------*/
+
+/* apple.com text link: 17px Regular in the link blue with a drawn "›" */
+.more {
+  color: var(--color-link);
+  font-weight: 400;
+  letter-spacing: -0.022em;
+  text-decoration: none;
+}
+.more:hover { text-decoration: underline; text-underline-offset: .12em; }
+.more .chev {
+  display: inline-block;
+  width: .42em;
+  height: .72em;
+  margin-left: .28em;
+  vertical-align: -.02em;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 14'%3E%3Cpath d='M1.2 1.2 6.8 7l-5.6 5.8' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 14'%3E%3Cpath d='M1.2 1.2 6.8 7l-5.6 5.8' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+@media (forced-colors: active) { .more .chev { forced-color-adjust: none; background: LinkText; } }
+
+/* the ring fills as the page is read: the end is always in sight */
+#back-to-top { --p: 0; }
+#back-to-top .btt-ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+  pointer-events: none;
+}
+#back-to-top .btt-ring circle {
+  fill: none;
+  stroke: var(--color-link);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dasharray: 100;
+  stroke-dashoffset: calc(100 - var(--p) * 100);
+  opacity: .9;
+}
+@media (forced-colors: active) { #back-to-top .btt-ring circle { stroke: CanvasText; } }
+
+/* closing CTA: the pill and its companion link on one row, Apple's size */
+.cta-row {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 16px 32px;
+}
+.cta-row .cta-pill {
+  margin: 0;
+  padding: 12px 22px;
+  font-size: 1rem;
+  font-weight: 400;
+  letter-spacing: -0.022em;
+  line-height: 1.17648;
+}
+.cta-row .more { padding: 8px 0; font-size: 1rem; }   /* 44px for a finger, same look */
+.biz-scene { margin-top: 64px; }
+.biz-save {
+  display: inline-block;
+  position: relative;
+  margin-top: 28px;
+  padding: 8px 0;
+  font-size: 1rem;
+}
+@media (max-width: 734px) {
+  .biz-scene { margin-top: 48px; }
+  .biz-save { margin-top: 20px; }
+}
+
+/* the foot of every experience sheet: a way forward, not a dead end */
+.exp-sheet-cta {
+  margin: 32px 0 0;
+  padding-top: 24px;
+  border-top: 1px solid #E8E8ED;
+  color: #1D1D1F;
+  font-size: 1rem;
+  line-height: 1.47059;
+  letter-spacing: -0.022em;
+  text-wrap: pretty;
+}
+.exp-sheet-link { white-space: nowrap; }
+
+/* "Copied" toast: a small glass capsule near the bottom of the screen */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(28px + env(safe-area-inset-bottom, 0px));
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: calc(100vw - 32px);
+  padding: 11px 18px 11px 12px;
+  border-radius: 980px;
+  background: rgba(255, 255, 255, .86);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
+  box-shadow: 0 0 0 .5px rgba(0, 0, 0, .08), 0 8px 28px rgba(0, 0, 0, .14);
+  color: #1D1D1F;
+  font-size: 15px;
+  line-height: 1.33;
+  letter-spacing: -0.01em;
+  opacity: 0;
+  transform: translate(-50%, 8px);
+  pointer-events: none;
+  transition: opacity .25s ease, transform .35s cubic-bezier(.32, .72, 0, 1);
+}
+.toast.is-shown { opacity: 1; transform: translate(-50%, 0); }
+.toast-check {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-link) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 22'%3E%3Cpath d='M6.5 11.4l3 3 6-6.4' fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 22px no-repeat;
+}
+.toast-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (prefers-reduced-motion: reduce) {
+  .toast { transition: opacity .2s ease; transform: translate(-50%, 0); }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .toast { background: #fff; -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
+@media (forced-colors: active) { .toast { border: 1px solid CanvasText; } }
