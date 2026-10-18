@@ -120,6 +120,74 @@ test('a client-work card opens its story in the experience sheet, on that client
   await page.close();
 });
 
+test('every project card shows a picture or its drawing, phones included', async () => {
+  // the owner: "many projects but no picture or icon, so they don't look interesting"
+  for (const width of [320, 390, 1440]) {
+    const { page } = await ctx.openPage({ viewport: { width, height: 900 }, isMobile: width < 800, hasTouch: width < 800 });
+    const bare = await page.$$eval('#scroller > .rf-cards-scroller-item', (cards) => cards.filter((c) => {
+      const v = c.querySelector('.work-icon svg, .project-img img');
+      const r = v && v.getBoundingClientRect();
+      return !r || r.width < 100 || getComputedStyle(v.closest('.work-icon, .project-img')).display === 'none';
+    }).map((c) => c.querySelector('h3').textContent));
+    assert.deepEqual(bare, [], `${width}px: a card with no visual, or one too small to see`);
+    await page.close();
+  }
+});
+
+test('"See all" lists every project; a row opens it in the sheet and Back returns to the list', async () => {
+  const { page } = await ctx.openPage({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+  const total = await page.$$eval('#scroller > .rf-cards-scroller-item', (c) => c.length);
+  assert.match(await page.textContent('[data-proj-all]'), new RegExp(`See all ${total} projects`));
+  await page.$eval('[data-proj-all]', (b) => { b.scrollIntoView({ block: 'center' }); b.click(); });
+  await page.waitForSelector('.exp-lightbox.open .proj-row');
+  // a row reads "Vehicle sales CRM" over "Inchcape Thailand · Automotive"
+  const names = await page.$$eval('.exp-lightbox .proj-row', (rows) => rows.map((r) => {
+    const client = r.querySelector('.proj-client');
+    return r.querySelector('.proj-name').textContent + (client ? `, ${client.textContent}` : '');
+  }));
+  const titles = await page.$$eval('#scroller > .rf-cards-scroller-item h3', (n) => n.map((e) => e.textContent));
+  assert.deepEqual([...names].sort(), [...titles].sort(), 'the list and the row disagree');
+  // a client row: its project opens in the same sheet, one Back from the list
+  const row = page.locator('.proj-row', { hasText: 'Kasikorn' });
+  // tapped where it is (a Playwright click would first scroll the sheet to suit itself)
+  await page.evaluate(() => { document.querySelector('.exp-lightbox-inner').scrollTop = 300; });
+  await row.evaluate((r) => r.click());
+  await page.waitForSelector('.proj-back');
+  const opened = await page.evaluate(() => document.querySelector('.exp-lightbox .exp-filter-chip.active')?.dataset.filter);
+  assert.equal(opened, 'kasikorn', 'the row did not open its own client');
+  // it lands on that client's story, clear of the "All projects" pill
+  await page.waitForTimeout(700);
+  const land = await page.evaluate(() => {
+    const inner = document.querySelector('.exp-lightbox-inner');
+    const top = (el) => el.getBoundingClientRect().top - inner.getBoundingClientRect().top;
+    const pill = document.querySelector('.proj-back');
+    return { story: top(document.querySelector('.exp-client-section[data-client="kasikorn"]')),
+      pill: top(pill) + pill.offsetHeight, height: inner.clientHeight };
+  });
+  assert.ok(land.story >= land.pill && land.story < land.height / 3,
+    `the client's story sits at ${Math.round(land.story)} of ${land.height}px (pill ends at ${Math.round(land.pill)})`);
+  await page.goBack();
+  await page.waitForFunction(() => document.querySelector('.exp-lightbox.open .proj-row') && !document.querySelector('.proj-back'));
+  const back = await page.evaluate(() => ({ top: document.querySelector('.exp-lightbox-inner').scrollTop, focus: document.activeElement.textContent }));
+  assert.equal(back.top, 300, 'the list did not come back where it was');
+  assert.match(back.focus, /Kasikorn/, 'focus did not return to the row');
+  // a screenshot row: the picture opens above the list, Escape closes only the picture
+  await page.locator('.proj-row', { hasText: 'Classroom' }).evaluate((r) => r.click());
+  await page.waitForSelector('.cert-lightbox.open');
+  assert.ok(await page.evaluate(() => !!document.elementFromPoint(innerWidth / 2, innerHeight / 2).closest('.cert-lightbox')),
+    'the screenshot opened under the list');
+  await page.keyboard.press('Escape');
+  await page.waitForFunction(() => !document.querySelector('.cert-lightbox.open'));
+  await page.waitForFunction(() => !!document.querySelector('.exp-lightbox.open .proj-row') && history.state && history.state.overlay === 1);
+  // a new project, then the X: both history steps are taken back off
+  await page.locator('.proj-row', { hasText: 'Genius Track' }).click();
+  await page.waitForSelector('.proj-back');
+  assert.match(await page.textContent('.exp-lightbox .exp-modal-title'), /Genius Track/);
+  await page.click('.exp-lightbox-close');
+  await page.waitForFunction(() => !document.querySelector('.exp-lightbox.open') && history.state === null);
+  await page.close();
+});
+
 test('Back closes an open sheet or picture instead of leaving the site', async () => {
   const { page } = await ctx.openPage();
   const site = page.url();
