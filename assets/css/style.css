@@ -392,14 +392,6 @@ button {
   overflow: hidden;
 }
 
-.rf-cards-scroller-item img {
-  width: 100%;
-  height: 450px;
-  object-fit: cover;
-  /* card has no padding → inner corners meet the card edge, so match its radius */
-  border-radius: var(--r-card) var(--r-card) 0 0;
-}
-
 @media (max-width: 768px) {
   .rf-cards-scroller-overflow {
     padding: 5px 0;
@@ -411,13 +403,6 @@ button {
     width: 240px;
     margin-right: 32px;
     transform: none !important;
-  }
-
-  .rf-cards-scroller-item img {
-    width: 100%;
-    height: 250px;
-    object-fit: cover;
-    border-radius: var(--r-card) var(--r-card) 0 0;
   }
 
   .paddlenav {
@@ -480,41 +465,6 @@ button {
 
 .rf-cards-scroller {
   position: relative;
-}
-
-/*--------------------------------------------------------------
-# Image Containers
---------------------------------------------------------------*/
-.project-img {
-  overflow: hidden;
-  width: 100%;
-  height: 450px;
-  border-radius: var(--r-card) var(--r-card) 0 0;
-  position: relative;
-}
-
-.project-img::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: var(--r-card) var(--r-card) 0 0;
-  background:
-    radial-gradient(ellipse 55% 55% at 0% 0%, rgba(255,255,255,0.45) 0%, transparent 100%),
-    radial-gradient(ellipse 55% 55% at 100% 0%, rgba(255,255,255,0.45) 0%, transparent 100%);
-  pointer-events: none;
-  z-index: 1;
-}
-
-.project-img img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  cursor: pointer;
-}
-
-@media (max-width: 768px) {
-  .project-img { height: 250px; }
 }
 
 .cert-img {
@@ -644,7 +594,7 @@ button {
   display: none;
   position: fixed;
   inset: 0;
-  z-index: 9999;
+  z-index: 10000;
   background: rgba(0,0,0,0.85);
   align-items: center;
   justify-content: center;
@@ -695,18 +645,6 @@ button {
 }
 
 
-/* Project tag pill */
-.project-tag {
-  display: inline-block;
-  margin: 14px 20px 0;
-  padding: 4px 12px;
-  border-radius: var(--r-capsule);
-  background: rgba(18, 100, 206, 0.08);
-  color: var(--color-link);
-  font-size: 0.8235rem;
-  font-weight: 500;
-  letter-spacing: 0.1px;
-}
 
 
 
@@ -1373,7 +1311,6 @@ a.info-item:hover .info-value {
      rules further down: source order decides ties in specificity) */
   #skill .rf-cards-scroller-item .skill-desc { font-size: 0.7647rem; }
   .rf-cards-scroller-item p.fw-light { font-size: 0.8235rem; }
-  .project-tag { font-size: 0.7059rem; }
   .fw-light { font-size: 0.8824rem; }
 }
 
@@ -1549,11 +1486,6 @@ select:focus-visible {
     min-height: 360px;
     padding: 24px;
   }
-  /* Project image on mobile: aspect ratio instead of fixed px */
-  .project-img {
-    height: auto;
-    aspect-ratio: 4 / 3;
-  }
 }
 
 /* ── Reduce Motion: Honor prefers-reduced-motion (Apple HIG Accessibility) ── */
@@ -1683,7 +1615,6 @@ select:focus-visible {
   .profile-bio-small { font-size: 1rem; }
   #skill .rf-cards-scroller-item .skill-desc { font-size: 1rem; }
   .rf-cards-scroller-item p.fw-light { font-size: 1rem; }
-  .project-tag { font-size: 0.8824rem; }
   .info-value { font-size: 1.0588rem; }
 }
 /* 2K tier — 1.13× */
@@ -1701,7 +1632,6 @@ select:focus-visible {
   .company-logo--lg { height: 81px; max-width: 181px; }
   .rf-cards-scroller-item { width: 339px; margin-right: 63px; }
   #skill .rf-cards-scroller-item { width: 384px; min-height: 508px; padding: 54px; }
-  .project-img { height: 508px; }
   :root { --sk-paddlenav-diameter: 41px; }
 }
 
@@ -1719,7 +1649,6 @@ select:focus-visible {
   .company-logo--lg { height: 104px; max-width: 232px; }
   .rf-cards-scroller-item { width: 435px; margin-right: 81px; }
   #skill .rf-cards-scroller-item { width: 493px; min-height: 653px; padding: 70px; }
-  .project-img { height: 653px; }
   :root { --sk-paddlenav-diameter: 52px; }
 
   /* the hero's clamps top out well below the viewport at this width */
@@ -1839,6 +1768,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
 .cert-expand-btn::after,
 .exp-card-cta::after,
 .exp-lightbox-close::after,
+.proj-back::after,
 .biz-contacts a::after,
 .resume-exp-link::after,
 .footer-copy-link::after {
@@ -1983,7 +1913,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
   overflow: visible;
   transition: transform .45s cubic-bezier(.32, .72, 0, 1), box-shadow .45s cubic-bezier(.32, .72, 0, 1);
 }
-#portfolio .rf-cards-scroller-item { padding-bottom: 88px; cursor: zoom-in; }
+#portfolio .rf-cards-scroller-item { min-height: 500px; padding-bottom: 88px; cursor: zoom-in; }
 #portfolio .rf-cards-scroller-item:last-child,
 #skill .rf-cards-scroller-item:last-child { margin-right: 0; }
 @media (hover: hover) and (pointer: fine) {
@@ -2028,6 +1958,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
   letter-spacing: -0.022em;
   color: #1D1D1F;
 }
+#portfolio .rf-cards-scroller-item h3 { text-wrap: balance; }
 #portfolio .rf-cards-scroller-item p.fw-light { text-wrap: pretty; }   /* no lone last word */
 .nw { white-space: nowrap; }   /* a hyphenated name stays on one line */
 /* the skill's mark, top left, as on Apple's values cards */
@@ -2049,7 +1980,6 @@ a.info-item:hover .info-value { color: var(--color-link); }
   border-radius: 0;
   overflow: visible;
 }
-#portfolio .project-img::after { display: none; }
 #portfolio .project-img img,
 #portfolio .rf-cards-scroller-item img {
   display: block;
@@ -2091,7 +2021,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
 @media (max-width: 1068px) {
   #portfolio .rf-cards-scroller-item,
   #skill .rf-cards-scroller-item { width: 376px; min-height: 500px; padding: 32px; margin-right: 26px; }
-  #portfolio .rf-cards-scroller-item { padding-bottom: 84px; }
+  #portfolio .rf-cards-scroller-item { min-height: 460px; padding-bottom: 84px; }
   #portfolio .rf-cards-scroller-item h3,
   #skill .rf-cards-scroller-item .title { font-size: 24px; line-height: 1.16667; letter-spacing: .009em; }
   #skill .rf-cards-scroller-item .skill-icon { width: 80px; height: 80px; margin-bottom: 24px; }
@@ -2122,10 +2052,12 @@ a.info-item:hover .info-value { color: var(--color-link); }
 @media (min-width: 2000px) {
   #portfolio .rf-cards-scroller-item,
   #skill .rf-cards-scroller-item { width: 497px; min-height: 622px; }
+  #portfolio .rf-cards-scroller-item { min-height: 515px; }
 }
 @media (min-width: 3000px) and (min-height: 1700px) {
   #portfolio .rf-cards-scroller-item,
   #skill .rf-cards-scroller-item { width: 638px; min-height: 798px; }
+  #portfolio .rf-cards-scroller-item { min-height: 610px; }
 }
 
 /*--------------------------------------------------------------
@@ -2658,61 +2590,114 @@ a.info-item:hover .info-value { color: var(--color-link); }
   .exp-clients-line { font-size: 0.7647rem; }
 }
 
-/* Client work at the front of My Projects: the project card's build with
-   the line drawing on top (as the skill and service cards have it) and
-   the tools at the foot where a screenshot would be. The card opens its
-   story in the experience sheet. */
-#portfolio .work-card { cursor: pointer; }
+/* My Projects, the apple.com gallery card: eyebrow, headline and one
+   line on top, the project's own line drawing large at the foot on every
+   screen (phones too), the round "+" beside it. The tools live in the
+   sheet the card opens. */
+#portfolio .work-card { cursor: pointer; padding-bottom: 32px; }
 #portfolio .work-icon {
-  order: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  aspect-ratio: 3 / 1;
-  margin: -16px -16px 24px;
+  order: 3;
+  margin-top: auto;
+  padding-top: 28px;
 }
 #portfolio .work-icon svg {
   display: block;
-  width: 24%;
+  width: 56%;
   height: auto;
   aspect-ratio: 1;
-}
-#portfolio .work-tools {
-  order: 3;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: auto 0 0;
-  padding: 24px 0 0;
-  list-style: none;
-}
-#portfolio .work-tools li {
-  padding: 6px 14px;
-  border-radius: 980px;
-  background: #fff;
-  color: #1D1D1F;
-  font-size: 14px;
-  line-height: 1.42859;
-  letter-spacing: -0.016em;
-  white-space: nowrap;
-}
-@media (max-width: 1068px) {
-  #portfolio .work-icon { aspect-ratio: 7 / 2; margin: -12px -12px 22px; }
+  margin: auto;
 }
 @media (max-width: 734px) {
-  #portfolio .work-icon { aspect-ratio: 7 / 2; margin: -8px -8px 20px; }
-  #portfolio .work-icon svg { width: 27%; }
-  #portfolio .work-tools { gap: 6px; padding-top: 20px; }
-  #portfolio .work-tools li { padding: 5px 12px; font-size: 12px; line-height: 1.33337; letter-spacing: -0.01em; }
+  /* the 2:3 phone card (260 x 392) grows less than its width on bigger
+     phones, so the words and the drawing don't drift apart */
+  #portfolio .rf-cards-scroller-item { aspect-ratio: auto; min-height: clamp(392px, calc(228px + 40.3vw), 430px); }
+  #portfolio .work-card { padding-bottom: 24px; }
+  #portfolio .work-icon { padding-top: 16px; }
+  #portfolio .work-icon svg { width: 62%; }
 }
-/* on a phone the words and tools fill the card; the drawing would make
-   every card in the row taller than the measured 2:3 shape */
-@media (max-width: 480px) {
-  #portfolio .work-icon { display: none; }
+
+/* Under the row: "See all" on the left, the paddles on the right */
+.proj-all {
+  margin-right: auto;
+  padding: 10px 0;
+  font-size: 17px;
+  line-height: 24px;
 }
-@media (prefers-contrast: more) {
-  #portfolio .work-tools li { box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .35); }
+
+/* The list behind "See all": one grey card of hairline rows per group
+   (the FAQ's build), each row the drawing in a round well, the name,
+   what it is and a chevron. A row opens its project in the same sheet;
+   "All projects", or Back, returns to the list where it was. */
+.proj-group { margin-top: 28px; }
+.proj-group h3 {
+  margin: 0 0 10px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #6E6E73;
 }
+.proj-rows {
+  margin: 0;
+  padding: 0 16px;
+  list-style: none;
+  border-radius: 18px;
+  background: #F5F5F7;
+}
+.proj-rows li + li { border-top: 1px solid #D2D2D7; }
+.proj-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-height: 64px;
+  padding: 10px 0;
+  text-align: left;
+}
+.proj-well {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #fff;
+  overflow: hidden;
+}
+.proj-well svg { width: 32px; height: 32px; }
+.proj-well svg * { stroke-width: 9px; }
+.proj-well img { width: 100%; height: 100%; object-fit: cover; }
+.proj-name {
+  display: block;
+  color: #1D1D1F;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.3125;
+  text-wrap: pretty;
+}
+.proj-kind { display: block; color: #6E6E73; font-size: 14px; line-height: 1.42859; }
+@media (hover: hover) { .proj-row:hover .proj-name { color: var(--color-link); } }
+.proj-text { flex: 1; }
+.proj-row .chev { flex: none; background: #86868B; }
+/* a project opened from the list: "All projects" pinned top left, level
+   with the close button, the story starting below the two */
+.proj-back {
+  position: sticky;
+  top: 0;
+  float: left;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  height: 40px;
+  padding: 0 16px 0 12px;
+  border-radius: 980px;
+  background: rgba(232, 232, 237, .9);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
+  font-size: 15px;
+}
+.proj-back .chev { margin: 0 6px 0 0; transform: scaleX(-1); }
+.proj-back + div { clear: both; padding-top: 8px; }
+.proj-back + div .exp-client-filter { position: static; box-shadow: none; }
 
 /* The current job's sheet on a phone: the client chips stay at the top
    while you read, clear of the close button, and each client folds to
@@ -3004,7 +2989,6 @@ p.profile-bio-small,
   #experience .data-box[data-exp],
   #portfolio .rf-cards-scroller-item,
   #skill .rf-cards-scroller-item,
-  #portfolio .work-tools li,
   .card-plus,
   #certificates .cert-card { border: 1px solid CanvasText; }
 }
@@ -3024,7 +3008,8 @@ p.profile-bio-small,
   text-decoration: none;
 }
 .more:hover { text-decoration: underline; text-underline-offset: .12em; }
-.more .chev {
+.more .chev,
+.proj-row .chev {
   display: inline-block;
   width: .42em;
   height: .72em;

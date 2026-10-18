@@ -359,7 +359,7 @@ var overlayHistory = (function () {
         (e.target === frame && !lightbox.classList.contains("lb-pan"))) closeLightbox();
   });
   document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape") closeLightbox();
+    if (e.key === "Escape" && lightbox.classList.contains("open")) { e.preventDefault(); closeLightbox(); }
     // Tab stays inside: the close button, and the screenshot when it pans
     if (e.key === "Tab" && lightbox.classList.contains("open")) {
       e.preventDefault();
@@ -412,6 +412,7 @@ var overlayHistory = (function () {
     }
   });
 
+  var back = null; // a project opened from the "See all" list: Back returns to the list
   function closeExp() {
     if (!lightbox.classList.contains('open')) return; // Escape pressed elsewhere
     lightbox.classList.remove('open');
@@ -421,6 +422,7 @@ var overlayHistory = (function () {
     // catching up, so the page is scrollable again immediately
     if (!document.querySelector('.cert-lightbox.open')) document.body.style.overflow = '';
     if (reduce) motion.jump(0); else motion.to(0);
+    if (back) { overlayHistory.closed(back); back = null; }
     overlayHistory.closed(closeExp);
   }
   closeBtn.addEventListener('click', function(e) {
@@ -431,7 +433,7 @@ var overlayHistory = (function () {
     if (e.target === lightbox) closeExp();
   });
   document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') closeExp();
+    if (e.key === 'Escape' && !e.defaultPrevented) closeExp();
     // trap Tab inside the open dialog (WCAG: modal focus containment);
     // yield to the cert lightbox if it is layered on top
     if (e.key === 'Tab' && lightbox.classList.contains('open') &&
@@ -457,11 +459,13 @@ var overlayHistory = (function () {
   });
 
   window._expLightboxOpen = function (html, source, client) {
-    if (!lightbox.classList.contains('open')) overlayHistory.opened(closeExp);
+    var was = lightbox.classList.contains('open');
+    if (!was) overlayHistory.opened(closeExp);
     while (inner.children.length > 1) inner.removeChild(inner.lastChild);
     const content = document.createElement('div');
     content.innerHTML = html;
     inner.appendChild(content);
+    inner.scrollTop = 0;
     // label the dialog by its title so screen readers announce which role opened
     var title = inner.querySelector('.exp-modal-title');
     if (title) {
@@ -474,7 +478,7 @@ var overlayHistory = (function () {
     }
     lightbox.classList.add('open');
     document.body.style.overflow = 'hidden';
-    lastFocus = document.activeElement;
+    if (!was) lastFocus = document.activeElement;
     // make it measurable, then grow it out of the card that was clicked
     lightbox.style.visibility = 'visible';
     anchorOrigin(inner, source);
@@ -565,6 +569,18 @@ var overlayHistory = (function () {
       if (sec) inner.scrollTop = Math.max(0, sec.offsetTop - 8);
     }
   };
+  window._expLightboxNest = function (html, source, client, restore) {
+    back = function () { back = null; restore(); };
+    overlayHistory.opened(back);
+    window._expLightboxOpen(html, source, client);
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'more proj-back';
+    b.innerHTML = '<span class="chev" aria-hidden="true"></span>All projects';
+    b.addEventListener('click', function () { history.back(); });
+    inner.insertBefore(b, closeBtn.nextSibling);
+    b.focus();
+  };
 })();
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -654,6 +670,61 @@ document.addEventListener("DOMContentLoaded", function () {
       window._certLightboxOpen(img.currentSrc || img.src, img.alt, card.querySelector(".project-img"), "Project screenshot",
         title ? title.textContent : "");
     });
+  });
+});
+
+/**
+ * "See all N projects" lists every card of the row in the sheet, grouped
+ * by its eyebrow (Client work, R&D, SCG, ...), the card's own drawing in
+ * a round well. Built from the cards, so the list can never disagree with
+ * the row. A row opens its project in the same sheet; Back returns here.
+ */
+document.addEventListener("DOMContentLoaded", function () {
+  var btn = document.querySelector("[data-proj-all]");
+  var inner = document.querySelector(".exp-lightbox-inner");
+  if (!btn || !inner || !window._expLightboxNest) return;
+  var cards = Array.prototype.slice.call(document.querySelectorAll("#scroller > .rf-cards-scroller-item"));
+  var count = btn.querySelector(".js-proj-count");
+  if (count) count.textContent = cards.length;
+  var esc = function (t) { var d = document.createElement("div"); d.textContent = t; return d.innerHTML.replace(/"/g, "&quot;"); };
+  var at = 0, from = null;
+  function list() {
+    var groups = {}, order = [];
+    cards.forEach(function (c, i) {
+      var tag = c.querySelector(".project-tag").textContent, cut = tag.indexOf(" · ");
+      var g = cut > 0 ? tag.slice(0, cut) : "Other projects";
+      var icon = c.querySelector(".work-icon svg"), img = c.querySelector(".project-img img");
+      // "Vehicle sales CRM, Inchcape Thailand": the name in bold, the client
+      // in grey beside what it is, so a name fits one line on a phone
+      var t = c.querySelector("h3").textContent, k = t.indexOf(", ");
+      if (!groups[g]) { groups[g] = []; order.push(g); }
+      groups[g].push('<li><button type="button" class="proj-row" data-i="' + i + '"><span class="proj-well" aria-hidden="true">' +
+        (icon ? icon.outerHTML : '<img src="' + esc(img.getAttribute("src")) + '" alt="">') +
+        '</span><span class="proj-text"><span class="proj-name">' + esc(k > 0 ? t.slice(0, k) : t) + '</span> <span class="proj-kind">' +
+        (k > 0 ? '<span class="proj-client">' + esc(t.slice(k + 2)) + "</span> · " : "") +
+        esc(cut > 0 ? tag.slice(cut + 3) : tag) + '</span></span><span class="chev" aria-hidden="true"></span></button></li>');
+    });
+    return '<div class="exp-modal-header"><h2 class="exp-modal-title">All projects</h2><div class="exp-modal-company">' +
+      cards.length + " projects, highlights first</div></div>" + order.map(function (g) {
+        return '<div class="proj-group"><h3>' + esc(g) + '</h3><ul class="proj-rows">' + groups[g].join("") + "</ul></div>";
+      }).join("");
+  }
+  function showList() {
+    window._expLightboxOpen(list(), btn);
+    inner.scrollTop = at;
+    var row = from && inner.querySelector('.proj-row[data-i="' + from + '"]');
+    if (row) row.focus({ preventScroll: true });
+  }
+  btn.addEventListener("click", function () { at = 0; from = null; showList(); });
+  inner.addEventListener("click", function (e) {
+    var row = e.target.closest(".proj-row");
+    if (!row) return;
+    var c = cards[+row.dataset.i];
+    // a screenshot card: its viewer opens over the list
+    if (!c.dataset.openExp) { c.click(); return; }
+    at = inner.scrollTop;
+    from = row.dataset.i;
+    window._expLightboxNest(document.getElementById("exp-" + c.dataset.openExp).innerHTML, row, c.dataset.client, showList);
   });
 });
 
