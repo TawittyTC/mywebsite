@@ -2677,7 +2677,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
 .proj-kind { display: block; color: #6E6E73; font-size: 14px; line-height: 1.42859; }
 @media (hover: hover) { .proj-row:hover .proj-name { color: var(--color-link); } }
 .proj-text { flex: 1; }
-.proj-row .chev { flex: none; background: #86868B; }
+.proj-row .chev { flex: none; color: #86868B; }
 /* a project opened from the list: "All projects" pinned top left, level
    with the close button, the story starting below the two */
 .proj-back {
@@ -2696,6 +2696,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
   font-size: 15px;
 }
 .proj-back .chev { margin: 0 6px 0 0; transform: scaleX(-1); }
+.proj-back:hover { text-decoration: none; background: #D8D8DF; }
 .proj-back + div { clear: both; padding-top: 8px; }
 .proj-back + div .exp-client-filter { position: static; box-shadow: none; }
 
@@ -2981,7 +2982,10 @@ p.profile-bio-small,
   #experience .data-box[data-exp],
   #portfolio .rf-cards-scroller-item,
   #skill .rf-cards-scroller-item,
-  #certificates .cert-card { box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .35); }
+  #certificates .cert-card,
+  .proj-rows { box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .35); }
+  .proj-rows li + li { border-top-color: rgba(0, 0, 0, .35); }
+  .proj-kind { color: #1D1D1F; }
 }
 @media (forced-colors: active) {
   #resume .data-box:not(.contact-strip),
@@ -2990,6 +2994,7 @@ p.profile-bio-small,
   #portfolio .rf-cards-scroller-item,
   #skill .rf-cards-scroller-item,
   .card-plus,
+  .proj-rows,
   #certificates .cert-card { border: 1px solid CanvasText; }
 }
 
@@ -3019,7 +3024,10 @@ p.profile-bio-small,
   -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 14'%3E%3Cpath d='M1.2 1.2 6.8 7l-5.6 5.8' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 14'%3E%3Cpath d='M1.2 1.2 6.8 7l-5.6 5.8' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
 }
-@media (forced-colors: active) { .more .chev { forced-color-adjust: none; background: LinkText; } }
+@media (forced-colors: active) {
+  .more .chev { forced-color-adjust: none; background: LinkText; }
+  .proj-row .chev { forced-color-adjust: none; background: ButtonText; }
+}
 
 /* the ring fills as the page is read: the end is always in sight */
 #back-to-top { --p: 0; }

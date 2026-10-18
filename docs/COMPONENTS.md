@@ -58,18 +58,23 @@
 </section>
 ```
 
-## 3. Project Card (การ์ดผลงาน มีรูป + แท็ก + ชื่อ)
+## 3. Project Card (การ์ดผลงาน: eyebrow + ชื่อ + หนึ่งบรรทัด + ภาพเส้นสีฟ้า + ปุ่ม +)
 
 ```html
-<div class="rf-cards-scroller-item" data-tech="iot">
-  <div class="project-img">
-    <img src="assets/img/project/xxx.webp" alt="ชื่อโปรเจกต์" loading="lazy">
-  </div>
-  <span class="project-tag">IoT / AWS</span>
-  <h4>ชื่อโปรเจกต์</h4>
-  <p class="fw-light">เทคโนโลยีที่ใช้</p>
+<!-- อยู่ใน #scroller ของ <section id="portfolio"> เท่านั้น (สไตล์ผูกกับ #portfolio) -->
+<div class="rf-cards-scroller-item work-card" role="listitem" data-open-exp="protollcall" data-client="kasikorn">
+  <div class="work-icon" aria-hidden="true"><svg viewBox="0 0 170 170" fill="none">…</svg></div>  <!-- เส้น #1264CE หนา 5 ไม่มีพื้นหลัง; CSS วางไว้ท้ายการ์ด -->
+  <span class="project-tag">Client work · Finance</span>      <!-- "กลุ่ม · ประเภท" -->
+  <h3 class="h4">Sales campaign CRM, Kasikorn Carabao</h3>   <!-- "ชื่องาน, ลูกค้า" -->
+  <p class="fw-light">หนึ่งบรรทัด จากข้อมูลใน sheet เท่านั้น</p>
+  <button type="button" class="card-plus" aria-label="Read more: Sales campaign CRM, Kasikorn Carabao">…</button>
 </div>
 ```
+
+- `data-open-exp` คือ id ของ `<template id="exp-…">` ที่ปุ่ม + เปิด; `data-client` เลือกลูกค้า (chip) หรือเลื่อนไปที่ `.exp-client-section` นั้น
+- งานมหาวิทยาลัยใช้ `<div class="project-img"><img …></div>` แทน `.work-icon` และปุ่ม + เปิดภาพหน้าจอ
+- "See all N projects" สร้างรายการจากการ์ดเหล่านี้เอง (แบ่งกลุ่มตาม eyebrow, แยกชื่อกับลูกค้าที่ ", ") จึงไม่ต้องแก้สองที่
+- คำที่มีขีดในชื่อ ห่อด้วย `<span class="nw">` เพื่อไม่ให้ตัดบรรทัดที่ขีด
 
 ## 4. Skill Card (การ์ดไอคอน + หัวข้อ + คำอธิบาย)
 

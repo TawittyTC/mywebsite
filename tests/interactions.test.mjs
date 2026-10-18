@@ -155,11 +155,30 @@ test('"See all" lists every project; a row opens it in the sheet and Back return
   await page.waitForSelector('.proj-back');
   const opened = await page.evaluate(() => document.querySelector('.exp-lightbox .exp-filter-chip.active')?.dataset.filter);
   assert.equal(opened, 'kasikorn', 'the row did not open its own client');
+  // it lands on that client's story, clear of the "All projects" pill
+  await page.waitForTimeout(700);
+  const land = await page.evaluate(() => {
+    const inner = document.querySelector('.exp-lightbox-inner');
+    const top = (el) => el.getBoundingClientRect().top - inner.getBoundingClientRect().top;
+    const pill = document.querySelector('.proj-back');
+    return { story: top(document.querySelector('.exp-client-section[data-client="kasikorn"]')),
+      pill: top(pill) + pill.offsetHeight, height: inner.clientHeight };
+  });
+  assert.ok(land.story >= land.pill && land.story < land.height / 3,
+    `the client's story sits at ${Math.round(land.story)} of ${land.height}px (pill ends at ${Math.round(land.pill)})`);
   await page.goBack();
   await page.waitForFunction(() => document.querySelector('.exp-lightbox.open .proj-row') && !document.querySelector('.proj-back'));
   const back = await page.evaluate(() => ({ top: document.querySelector('.exp-lightbox-inner').scrollTop, focus: document.activeElement.textContent }));
   assert.equal(back.top, 300, 'the list did not come back where it was');
   assert.match(back.focus, /Kasikorn/, 'focus did not return to the row');
+  // a screenshot row: the picture opens above the list, Escape closes only the picture
+  await page.locator('.proj-row', { hasText: 'Classroom' }).evaluate((r) => r.click());
+  await page.waitForSelector('.cert-lightbox.open');
+  assert.ok(await page.evaluate(() => !!document.elementFromPoint(innerWidth / 2, innerHeight / 2).closest('.cert-lightbox')),
+    'the screenshot opened under the list');
+  await page.keyboard.press('Escape');
+  await page.waitForFunction(() => !document.querySelector('.cert-lightbox.open'));
+  await page.waitForFunction(() => !!document.querySelector('.exp-lightbox.open .proj-row') && history.state && history.state.overlay === 1);
   // a new project, then the X: both history steps are taken back off
   await page.locator('.proj-row', { hasText: 'Genius Track' }).click();
   await page.waitForSelector('.proj-back');

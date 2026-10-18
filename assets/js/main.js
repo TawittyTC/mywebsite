@@ -577,9 +577,23 @@ var overlayHistory = (function () {
     b.type = 'button';
     b.className = 'more proj-back';
     b.innerHTML = '<span class="chev" aria-hidden="true"></span>All projects';
-    b.addEventListener('click', function () { history.back(); });
+    // screen readers hear which project they are in, not just the way back
+    var nm = source && source.querySelector('.proj-name');
+    if (nm) {
+      var note = document.createElement('span');
+      note.id = 'proj-back-note';
+      note.hidden = true;
+      note.textContent = nm.textContent;
+      b.appendChild(note);
+      b.setAttribute('aria-describedby', 'proj-back-note');
+    }
+    b.addEventListener('click', function () { history.back(); }, { once: true });
     inner.insertBefore(b, closeBtn.nextSibling);
-    b.focus();
+    b.focus({ preventScroll: true });
+    // the sheet opened on a project (scrolled to it): start it below the pill
+    var chip = inner.querySelector('.exp-filter-chip');
+    var t = inner.scrollTop && (chip ? chip.closest('.exp-modal-section') : inner.querySelector('.exp-client-section[data-client="' + client + '"]'));
+    if (t) inner.scrollTop = Math.max(0, t.offsetTop - parseFloat(getComputedStyle(inner).paddingTop) - b.offsetHeight - 8);
   };
 })();
 
@@ -697,15 +711,19 @@ document.addEventListener("DOMContentLoaded", function () {
       // "Vehicle sales CRM, Inchcape Thailand": the name in bold, the client
       // in grey beside what it is, so a name fits one line on a phone
       var t = c.querySelector("h3").textContent, k = t.indexOf(", ");
+      // "S.B.L. Leasing · Leasing" says it twice: keep the client alone
+      var client = k > 0 ? t.slice(k + 2) : "", kind = cut > 0 ? tag.slice(cut + 3) : tag;
+      if (client && client.indexOf(kind) >= 0) kind = "";
       if (!groups[g]) { groups[g] = []; order.push(g); }
       groups[g].push('<li><button type="button" class="proj-row" data-i="' + i + '"><span class="proj-well" aria-hidden="true">' +
         (icon ? icon.outerHTML : '<img src="' + esc(img.getAttribute("src")) + '" alt="">') +
         '</span><span class="proj-text"><span class="proj-name">' + esc(k > 0 ? t.slice(0, k) : t) + '</span> <span class="proj-kind">' +
-        (k > 0 ? '<span class="proj-client">' + esc(t.slice(k + 2)) + "</span> · " : "") +
-        esc(cut > 0 ? tag.slice(cut + 3) : tag) + '</span></span><span class="chev" aria-hidden="true"></span></button></li>');
+        (client ? '<span class="proj-client">' + esc(client) + "</span>" + (kind ? "&nbsp;· " : "") : "") +
+        (kind ? '<span class="nw">' + esc(kind) + "</span>" : "") +
+        '</span></span><span class="chev" aria-hidden="true"></span></button></li>');
     });
     return '<div class="exp-modal-header"><h2 class="exp-modal-title">All projects</h2><div class="exp-modal-company">' +
-      cards.length + " projects, highlights first</div></div>" + order.map(function (g) {
+      cards.length + " projects</div></div>" + order.map(function (g) {
         return '<div class="proj-group"><h3>' + esc(g) + '</h3><ul class="proj-rows">' + groups[g].join("") + "</ul></div>";
       }).join("");
   }
