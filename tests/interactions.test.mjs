@@ -140,15 +140,21 @@ test('"See all" lists every project; a row opens it in the sheet and Back return
   assert.match(await page.textContent('[data-proj-all]'), new RegExp(`See all ${total} projects`));
   await page.$eval('[data-proj-all]', (b) => { b.scrollIntoView({ block: 'center' }); b.click(); });
   await page.waitForSelector('.exp-lightbox.open .proj-row');
-  // a row reads "Vehicle sales CRM" over "Inchcape Thailand · Automotive"
-  const names = await page.$$eval('.exp-lightbox .proj-row', (rows) => rows.map((r) => {
-    const client = r.querySelector('.proj-client');
-    return r.querySelector('.proj-name').textContent + (client ? `, ${client.textContent}` : '');
-  }));
-  const titles = await page.$$eval('#scroller > .rf-cards-scroller-item h3', (n) => n.map((e) => e.textContent));
-  assert.deepEqual([...names].sort(), [...titles].sort(), 'the list and the row disagree');
+  // grouped by company, as SCG is: "Vehicle sales CRM" under "Inchcape Thailand";
+  // every card once, its name in the row and its company as the heading
+  const rows = await page.$$eval('.exp-lightbox .proj-row', (rs) => rs.map((r) => ({
+    i: Number(r.dataset.i), name: r.querySelector('.proj-name').textContent,
+    group: r.closest('.proj-group').querySelector('h3').textContent })));
+  const cards = await page.$$eval('#scroller > .rf-cards-scroller-item', (n) => n.map((c) => ({
+    title: c.querySelector('h3').textContent, company: c.dataset.company || '' })));
+  assert.deepEqual(rows.map((r) => r.i).sort((a, b) => a - b), cards.map((c, i) => i), 'the list and the row disagree');
+  for (const r of rows) {
+    const { title, company } = cards[r.i], k = title.indexOf(', ');
+    assert.equal(r.name, k > 0 ? title.slice(0, k) : title, `row ${r.i} is misnamed`);
+    assert.equal(r.group, company || title.slice(k + 2), `"${r.name}" sits under the wrong company`);
+  }
   // a client row: its project opens in the same sheet, one Back from the list
-  const row = page.locator('.proj-row', { hasText: 'Kasikorn' });
+  const row = page.locator('.proj-group', { has: page.locator('h3', { hasText: 'Kasikorn' }) }).locator('.proj-row');
   // tapped where it is (a Playwright click would first scroll the sheet to suit itself)
   await page.evaluate(() => { document.querySelector('.exp-lightbox-inner').scrollTop = 300; });
   await row.evaluate((r) => r.click());
@@ -168,7 +174,8 @@ test('"See all" lists every project; a row opens it in the sheet and Back return
     `the client's story sits at ${Math.round(land.story)} of ${land.height}px (pill ends at ${Math.round(land.pill)})`);
   await page.goBack();
   await page.waitForFunction(() => document.querySelector('.exp-lightbox.open .proj-row') && !document.querySelector('.proj-back'));
-  const back = await page.evaluate(() => ({ top: document.querySelector('.exp-lightbox-inner').scrollTop, focus: document.activeElement.textContent }));
+  const back = await page.evaluate(() => ({ top: document.querySelector('.exp-lightbox-inner').scrollTop,
+    focus: document.activeElement.closest('.proj-group')?.querySelector('h3').textContent }));
   assert.equal(back.top, 300, 'the list did not come back where it was');
   assert.match(back.focus, /Kasikorn/, 'focus did not return to the row');
   // a screenshot row: the picture opens above the list, Escape closes only the picture
@@ -180,7 +187,7 @@ test('"See all" lists every project; a row opens it in the sheet and Back return
   await page.waitForFunction(() => !document.querySelector('.cert-lightbox.open'));
   await page.waitForFunction(() => !!document.querySelector('.exp-lightbox.open .proj-row') && history.state && history.state.overlay === 1);
   // a new project, then the X: both history steps are taken back off
-  await page.locator('.proj-row', { hasText: 'Genius Track' }).click();
+  await page.locator('.proj-group', { has: page.locator('h3', { hasText: 'Genius Track' }) }).locator('.proj-row').click();
   await page.waitForSelector('.proj-back');
   assert.match(await page.textContent('.exp-lightbox .exp-modal-title'), /Genius Track/);
   await page.click('.exp-lightbox-close');
