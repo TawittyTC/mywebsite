@@ -689,8 +689,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
 /**
  * "See all N projects" lists every card of the row in the sheet, grouped
- * by its eyebrow (Client work, R&D, SCG, ...), the card's own drawing in
- * a round well. Built from the cards, so the list can never disagree with
+ * by company as SCG is (data-company, else the client after ", " in the
+ * title), the card's own drawing in a round well. Built from the cards, so the list can never disagree with
  * the row. A row opens its project in the same sheet; Back returns here.
  */
 document.addEventListener("DOMContentLoaded", function () {
@@ -713,17 +713,19 @@ document.addEventListener("DOMContentLoaded", function () {
       var t = c.querySelector("h3").textContent, k = t.indexOf(", ");
       var own = c.getAttribute("data-company"), g = own || (k > 0 ? t.slice(k + 2) : "Other projects");
       var kind = own ? tag : (cut > 0 ? tag.slice(cut + 3) : tag);
+      // "...research" needs no "Research ·" in front of what it is
+      if (own && cut > 0 && t.toLowerCase().indexOf(tag.slice(0, cut).toLowerCase()) >= 0) kind = tag.slice(cut + 3);
       if (g.indexOf(kind) >= 0) kind = "";   // "S.B.L. Leasing" needs no "Leasing"
       if (!groups[g]) { groups[g] = []; order.push(g); }
-      groups[g].push('<li><button type="button" class="proj-row" data-i="' + i + '"><span class="proj-well" aria-hidden="true">' +
+      groups[g].push('<li><button type="button" class="proj-row" data-i="' + i + '" aria-describedby="pg' + order.indexOf(g) + '"><span class="proj-well" aria-hidden="true">' +
         (icon ? icon.outerHTML : '<img src="' + esc(img.getAttribute("src")) + '" alt="">') +
         '</span><span class="proj-text"><span class="proj-name">' + esc(k > 0 ? t.slice(0, k) : t) + "</span>" +
         (kind ? ' <span class="proj-kind"><span class="nw">' + esc(kind) + "</span></span>" : "") +
         '</span><span class="chev" aria-hidden="true"></span></button></li>');
     });
     return '<div class="exp-modal-header"><h2 class="exp-modal-title">All projects</h2><div class="exp-modal-company">' +
-      cards.length + " projects</div></div>" + order.map(function (g) {
-        return '<div class="proj-group"><h3>' + esc(g) + '</h3><ul class="proj-rows">' + groups[g].join("") + "</ul></div>";
+      cards.length + " projects</div></div>" + order.map(function (g, j) {
+        return '<div class="proj-group"><h3 id="pg' + j + '">' + esc(g) + '</h3><ul class="proj-rows">' + groups[g].join("") + "</ul></div>";
       }).join("");
   }
   function showList() {
