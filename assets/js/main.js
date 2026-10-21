@@ -580,10 +580,10 @@ var overlayHistory = (function () {
     // screen readers hear which project they are in, not just the way back
     var nm = source && source.querySelector('.proj-name');
     if (nm) {
-      var note = document.createElement('span');
+      var note = document.createElement('span'), co = source.closest('.proj-group');
       note.id = 'proj-back-note';
       note.hidden = true;
-      note.textContent = nm.textContent;
+      note.textContent = nm.textContent + (co ? ', ' + co.querySelector('h3').textContent : '');
       b.appendChild(note);
       b.setAttribute('aria-describedby', 'proj-back-note');
     }
@@ -706,21 +706,20 @@ document.addEventListener("DOMContentLoaded", function () {
     var groups = {}, order = [];
     cards.forEach(function (c, i) {
       var tag = c.querySelector(".project-tag").textContent, cut = tag.indexOf(" · ");
-      var g = cut > 0 ? tag.slice(0, cut) : "Other projects";
       var icon = c.querySelector(".work-icon svg"), img = c.querySelector(".project-img img");
-      // "Vehicle sales CRM, Inchcape Thailand": the name in bold, the client
-      // in grey beside what it is, so a name fits one line on a phone
+      // grouped by company, as SCG is: "Vehicle sales CRM, Inchcape Thailand"
+      // sits under "Inchcape Thailand"; work with no client in its title
+      // names its company (Protollcall R&D, the university) in data-company
       var t = c.querySelector("h3").textContent, k = t.indexOf(", ");
-      // "S.B.L. Leasing · Leasing" says it twice: keep the client alone
-      var client = k > 0 ? t.slice(k + 2) : "", kind = cut > 0 ? tag.slice(cut + 3) : tag;
-      if (client && client.indexOf(kind) >= 0) kind = "";
+      var own = c.getAttribute("data-company"), g = own || (k > 0 ? t.slice(k + 2) : "Other projects");
+      var kind = own ? tag : (cut > 0 ? tag.slice(cut + 3) : tag);
+      if (g.indexOf(kind) >= 0) kind = "";   // "S.B.L. Leasing" needs no "Leasing"
       if (!groups[g]) { groups[g] = []; order.push(g); }
       groups[g].push('<li><button type="button" class="proj-row" data-i="' + i + '"><span class="proj-well" aria-hidden="true">' +
         (icon ? icon.outerHTML : '<img src="' + esc(img.getAttribute("src")) + '" alt="">') +
-        '</span><span class="proj-text"><span class="proj-name">' + esc(k > 0 ? t.slice(0, k) : t) + '</span> <span class="proj-kind">' +
-        (client ? '<span class="proj-client">' + esc(client) + "</span>" + (kind ? "&nbsp;· " : "") : "") +
-        (kind ? '<span class="nw">' + esc(kind) + "</span>" : "") +
-        '</span></span><span class="chev" aria-hidden="true"></span></button></li>');
+        '</span><span class="proj-text"><span class="proj-name">' + esc(k > 0 ? t.slice(0, k) : t) + "</span>" +
+        (kind ? ' <span class="proj-kind"><span class="nw">' + esc(kind) + "</span></span>" : "") +
+        '</span><span class="chev" aria-hidden="true"></span></button></li>');
     });
     return '<div class="exp-modal-header"><h2 class="exp-modal-title">All projects</h2><div class="exp-modal-company">' +
       cards.length + " projects</div></div>" + order.map(function (g) {
