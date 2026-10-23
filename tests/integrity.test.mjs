@@ -119,3 +119,12 @@ test('the CV link points at a PDF that exists', () => {
   assert.ok(cv, 'no CV download link');
   assert.ok(existsSync(join(ROOT, cv[1])), `${cv[1]} missing`);
 });
+
+test('every company logo a project card names exists, and stays small', () => {
+  const logos = [...new Set([...html.matchAll(/data-logo="([^"]+)"/g)].map((m) => m[1]))];
+  for (const src of logos) {
+    assert.ok(existsSync(join(ROOT, src)), `${src} missing`);
+    const kb = statSync(join(ROOT, src)).size / 1024;
+    assert.ok(kb <= 24, `${src} is ${kb.toFixed(0)}KB (budget 24KB)`);
+  }
+});
