@@ -717,7 +717,9 @@ document.addEventListener("DOMContentLoaded", function () {
       if (own && cut > 0 && t.toLowerCase().indexOf(tag.slice(0, cut).toLowerCase()) >= 0) kind = tag.slice(cut + 3);
       if (g.indexOf(kind) >= 0) kind = "";   // "S.B.L. Leasing" needs no "Leasing"
       if (!groups[g]) { groups[g] = []; order.push(g); }
-      // the company's logo, from whichever of its cards names one
+      // the company's logo, from whichever of its cards names one; each file
+      // is drawn at 3x its display size, and srcset alone (no 1x src) makes
+      // every screen show it at that size
       if (!logos[g] && c.getAttribute("data-logo")) logos[g] = c.getAttribute("data-logo");
       groups[g].push('<li><button type="button" class="proj-row" data-i="' + i + '" aria-describedby="pg' + order.indexOf(g) + '"><span class="proj-well" aria-hidden="true">' +
         (icon ? icon.outerHTML : '<img src="' + esc(img.getAttribute("src")) + '" alt="">') +
@@ -728,7 +730,7 @@ document.addEventListener("DOMContentLoaded", function () {
     return '<div class="exp-modal-header"><h2 class="exp-modal-title">All projects</h2><div class="exp-modal-company">' +
       cards.length + " projects</div></div>" + order.map(function (g, j) {
         return '<div class="proj-group"><h3 id="pg' + j + '"><span>' + esc(g) + '</span>' +
-          (logos[g] ? '<img class="proj-logo" src="' + esc(logos[g]) + '" alt="" loading="lazy" decoding="async">' : '') + '</h3><ul class="proj-rows">' + groups[g].join("") + "</ul></div>";
+          (logos[g] ? '<img class="proj-logo" srcset="' + esc(logos[g]) + ' 3x" alt="" loading="lazy" decoding="async">' : '') + '</h3><ul class="proj-rows">' + groups[g].join("") + "</ul></div>";
       }).join("");
   }
   function showList() {
