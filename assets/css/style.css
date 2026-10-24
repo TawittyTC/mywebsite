@@ -788,8 +788,9 @@ button {
 .hero-name-line:nth-child(2) {
   animation-delay: 0.14s;
 }
+/* from 1%, not 0: see heroFadeIn in index.html (LCP skips opacity:0 text) */
 @keyframes name-rise {
-  from { opacity: 0; transform: translateY(24px); }
+  from { opacity: .01; transform: translateY(24px); }
   to   { opacity: 1; transform: none; }
 }
 

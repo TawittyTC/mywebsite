@@ -56,10 +56,12 @@
   <link rel="preconnect" href="https://consent.cookiebot.com">
   <link rel="preconnect" href="https://www.googletagmanager.com">
 
-  <!-- Self-hosted fonts — no external DNS lookup -->
+  <!-- Self-hosted fonts — no external DNS lookup. Noto Sans Thai's Latin
+       face is not preloaded: Inter covers the same range and comes first in
+       every font stack, so that face is never drawn once Inter is in — the
+       preload only spent 31KB of a phone's first second on it. -->
   <link rel="preload" href="assets/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/notosansthai-thai.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="assets/fonts/notosansthai-latin.woff2" as="font" type="font/woff2" crossorigin>
 
   <!-- Critical CSS inlined: hero renders instantly, zero blocking requests -->
   <style>
@@ -181,7 +183,7 @@
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Inter', 'Noto Sans Thai', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-      line-height: 1.6;
+      line-height: 1.65;
       color: #1d1d1f;
       font-size: 1rem;
       font-weight: 400;
@@ -241,6 +243,258 @@
       }
     }
 
+    /* ── Hero geometry, mirrored from style.css ──
+       The loader hides the page until style.css applies, but the page is
+       laid out (and measured by main.js) before that whenever the
+       stylesheet arrives after the first frame, as it usually does on a
+       phone network. These copies give that first layout the hero's real
+       geometry, so nothing under the loader jumps when style.css lands
+       (CLS was up to 1.0 on mobile, 0.22 on desktop). Layout only: the
+       entrance animations and the loader fade stay in style.css, so they
+       still start when it applies. Keep in sync with style.css (a test
+       compares the hero with and without the stylesheet). */
+    :root {
+      --color-text: #1D1D1F;
+      --color-text-secondary: #6E6E73;
+      --color-link: #1264CE;
+      --r-capsule: 980px
+    }
+
+    html {
+      font-size: 106.25%
+    }
+
+    section {
+      padding: 220px 0;
+      overflow: hidden
+    }
+
+    #hero {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      min-height: -webkit-fill-available;
+      overflow: hidden;
+      background: #fff
+    }
+
+    @supports (min-height: 100svh) {
+      #hero {
+        height: 100svh;
+        min-height: 100svh
+      }
+    }
+
+    #hero .hero-grid {
+      display: flex;
+      align-items: center;
+      position: relative;
+      z-index: 2
+    }
+
+    .hero-scroll-hint {
+      position: absolute;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: var(--color-text);
+      opacity: 0.6;
+      pointer-events: none
+    }
+
+    #hero .hero-eyebrow {
+      margin: 0 0 22px;
+      font-size: 0.7647rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--color-text-secondary)
+    }
+
+    #hero h1.hero-name {
+      margin: 0;
+      font-size: clamp(2.8235rem, 6.4vw, 5.7647rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.08;
+      color: var(--color-text)
+    }
+
+    .hero-name-line {
+      display: block;
+      width: fit-content
+    }
+
+    #hero .hero-role {
+      margin: 18px 0 0;
+      font-size: clamp(1.1765rem, 2vw, 1.5294rem);
+      color: var(--color-text-secondary)
+    }
+
+    #hero .typed::after {
+      content: "";
+      display: inline-block;
+      width: 3px;
+      height: 0.95em;
+      margin-left: 3px;
+      vertical-align: text-bottom;
+      background: var(--color-link)
+    }
+
+    #hero-net,
+    #hero-net-labels {
+      position: absolute;
+      inset: 0;
+      pointer-events: none
+    }
+
+    #hero-net {
+      z-index: 0
+    }
+
+    #hero-net-labels {
+      z-index: 1
+    }
+
+    .hero-net-label {
+      position: absolute;
+      transform: translate(12px, -50%);
+      font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+      font-size: 0.6471rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      color: var(--color-text-secondary);
+      background: rgba(252, 252, 253, 0.72);
+      padding: 2px 7px;
+      border-radius: var(--r-capsule);
+      white-space: nowrap
+    }
+
+    #hero .hero-copy {
+      position: relative;
+      z-index: 2;
+      max-width: 620px;
+      text-align: left
+    }
+
+    @media (max-width: 992px) {
+      #hero {
+        justify-content: flex-start !important
+      }
+
+      #hero .hero-grid {
+        margin: 0;
+        padding-top: calc(48px + 9vh)
+      }
+
+      #hero .hero-copy {
+        text-align: center;
+        margin: 0 auto
+      }
+
+      #hero .hero-eyebrow {
+        font-size: 0.6471rem;
+        letter-spacing: 0.1em;
+        margin-bottom: 14px
+      }
+
+      #hero h1.hero-name {
+        font-size: clamp(2.2353rem, 10.5vw, 2.8235rem);
+        line-height: 1.12
+      }
+
+      .hero-net-label {
+        font-size: 0.5294rem
+      }
+
+      .hero-scroll-hint {
+        display: none
+      }
+
+      .hero-name-line {
+        margin-inline: auto
+      }
+    }
+
+    @media (max-width: 735px) {
+      section {
+        padding: 128px 0
+      }
+    }
+
+    @media (min-width: 2000px) {
+      html {
+        font-size: 118.75%
+      }
+
+      .container {
+        max-width: 1490px
+      }
+
+      section {
+        padding: 248px 0
+      }
+    }
+
+    @media (min-width: 3000px) and (min-height: 1700px) {
+      html {
+        font-size: 156.25%
+      }
+
+      .container {
+        max-width: 1910px
+      }
+
+      section {
+        padding: 319px 0
+      }
+    }
+
+    @media (orientation: landscape) and (max-height: 500px) {
+      #hero {
+        padding: 0;
+        height: auto;
+        min-height: 100svh
+      }
+
+      #hero .hero-grid {
+        padding-top: 40px;
+        padding-bottom: 40px
+      }
+    }
+
+    /* Images fit their column before the stylesheet applies: at natural
+       width (project shots ~1900px, the 520px profile photo) a phone lays
+       the page out zoomed out, then snaps back when the stylesheet lands.
+       .img-fluid is bootstrap's own rule; style.css sizes the photo. */
+    .img-fluid,
+    .profile-featured-img img {
+      max-width: 100%;
+      height: auto
+    }
+
+    img,
+    svg {
+      vertical-align: middle
+    }
+
+    /* Skip link off-screen from the first frame (style.css styles it):
+       in the flow it pushed the hero down 26px until the stylesheet came */
+    .skip-link {
+      position: absolute;
+      left: 16px;
+      top: -60px;
+      z-index: 3000
+    }
+
+    .skip-link:focus {
+      top: 16px
+    }
+
+    .skip-link:not(:focus) {
+      clip-path: inset(50%)
+    }
+
     @media(max-width:735px) {
       #hero h1 {
         letter-spacing: -2px
@@ -288,10 +542,14 @@
       }
     }
 
-    /* Hero text entrance animation (CSS replaces GSAP — no CDN request) */
+    /* Hero text entrance animation (CSS replaces GSAP — no CDN request).
+       Starts at 1% opacity, not 0: invisible (and under the loader), but
+       Chrome skips opacity:0 text when it records Largest Contentful Paint
+       and a compositor fade never repaints it, so from 0 the name was only
+       counted once the constellation's ink first repainted it */
     @keyframes heroFadeIn {
       from {
-        opacity: 0;
+        opacity: .01;
         transform: translateY(30px);
       }
 
@@ -1427,10 +1685,10 @@
   </style>
 
   <!-- Full CSS loaded async: no render blocking (bootstrap merged in) -->
-  <link rel="preload" href="assets/css/style.min.css?v=2.55.0" as="style"
+  <link rel="preload" href="assets/css/style.min.css?v=2.56.0" as="style"
     onload="this.onload=null;this.rel='stylesheet'">
   <noscript>
-    <link href="assets/css/style.min.css?v=2.55.0" rel="stylesheet">
+    <link href="assets/css/style.min.css?v=2.56.0" rel="stylesheet">
     <style>.proj-all{visibility:hidden}</style>
   </noscript>
 
@@ -1707,19 +1965,48 @@
   </script>
 
   <!-- Preload deferred JS to start downloading before parser reaches script tags -->
-  <link rel="preload" href="assets/js/main.min.js?v=2.55.0" as="script">
+  <link rel="preload" href="assets/js/main.min.js?v=2.56.0" as="script">
 
-  <script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="233b92be-5a2d-492b-b093-9c3ed14c9063"
-    type="text/javascript" async></script>
-
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-5LXKEPFT85"></script>
+  <!-- Google tag (gtag.js). The page view is queued here, stamped with the
+       time the page opened; gtag.js sends it when it arrives. -->
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag() { dataLayer.push(arguments); }
     gtag('js', new Date());
 
     gtag('config', 'G-5LXKEPFT85');
+
+    // The consent banner (Cookiebot) and gtag.js load once the page has
+    // loaded and the browser is idle, so neither competes with the first
+    // paint. Cookiebot comes first and gtag.js only after it has run, so its
+    // consent defaults are always in place before analytics reads the queue
+    // above (gtag.js still loads if uc.js is blocked, as it always has).
+    (function () {
+      var started = false;
+      function add(src, attrs, done) {
+        var s = document.createElement('script');
+        for (var k in attrs) s.setAttribute(k, attrs[k]);
+        if (done) s.onload = s.onerror = done;
+        s.async = true;
+        s.src = src;
+        document.head.appendChild(s);
+      }
+      function start() {
+        if (started) return;
+        started = true;
+        add('https://consent.cookiebot.com/uc.js', { id: 'Cookiebot', 'data-cbid': '233b92be-5a2d-492b-b093-9c3ed14c9063', type: 'text/javascript' }, function () {
+          add('https://www.googletagmanager.com/gtag/js?id=G-5LXKEPFT85', {});
+        });
+      }
+      function idle() {
+        if ('requestIdleCallback' in window) requestIdleCallback(start, { timeout: 2000 });
+        else setTimeout(start, 200);
+      }
+      if (document.readyState === 'complete') idle();
+      else window.addEventListener('load', idle);
+      // a page whose images take long to load still gets them in good time
+      setTimeout(start, 6000);
+    })();
   </script>
 
 </head>
@@ -3334,7 +3621,7 @@
   </button>
 
   <!-- Main JS -->
-  <script defer src="assets/js/main.min.js?v=2.55.0"></script>
+  <script defer src="assets/js/main.min.js?v=2.56.0"></script>
   <!-- Service Worker: cache assets for repeat visits -->
   <script>if ('serviceWorker' in navigator) { var _sw = function () { navigator.serviceWorker.register('sw.js') }; 'requestIdleCallback' in window ? requestIdleCallback(_sw) : window.addEventListener('load', _sw) }</script>
 

@@ -296,3 +296,51 @@ test('without JavaScript the loading cover still lifts', async () => {
   assert.equal(state, 'hidden', 'the loading cover never lifted without JavaScript');
   await page.close();
 });
+
+test('the hero is laid out the same before the stylesheet arrives', async () => {
+  // On a phone network style.css usually lands after the first frame. The
+  // loader hides the page meanwhile, but layout shifts still count, and
+  // main.js sizes the constellation from that first layout — so the
+  // inline critical CSS must already give the hero its final geometry.
+  const parts = ['#hero', '#hero .hero-grid', '#hero .hero-eyebrow', '#hero .hero-name-line:nth-child(1)',
+    '#hero .hero-name-line:nth-child(2)', '#hero .hero-role', '#hero-net', '#hero-net-labels'];
+  for (const [width, height, mobile] of [[390, 844, true], [844, 390, true], [1440, 900, false]]) {
+    const boxes = [];
+    for (const withStylesheet of [false, true]) {
+      // reduced motion: compare resting boxes, not mid-entrance transforms
+      const page = await ctx.browser.newPage({ viewport: { width, height }, isMobile: mobile, hasTouch: mobile, reducedMotion: 'reduce' });
+      await page.route(/main\.min\.js/, (r) => r.abort());
+      if (!withStylesheet) await page.route(/style\.min\.css/, (r) => r.abort());
+      await page.goto(ctx.srv.url + '/index.html', { waitUntil: 'load' });
+      await page.evaluate(() => document.fonts.ready);
+      boxes.push(await page.evaluate((sels) => [window.innerWidth, ...sels.map((s) => {
+        const r = document.querySelector(s).getBoundingClientRect();
+        return [s, Math.round(r.x), Math.round(r.y), Math.round(r.width), Math.round(r.height)];
+      })], parts));
+      await page.close();
+    }
+    assert.deepEqual(boxes[0], boxes[1], `${width}x${height}: the hero moves when style.css applies`);
+  }
+});
+
+test('the hero name counts as painted from the first frame (LCP)', async () => {
+  // Chrome leaves text at opacity 0 out of Largest Contentful Paint, and a
+  // compositor fade never repaints it — so the entrance animations start
+  // at 1% opacity, or the name only registered when the ink effect first
+  // repainted it, ~0.3s (4s+ in Lighthouse's mobile model) later.
+  for (const [width, height, mobile] of [[412, 823, true], [1350, 940, false]]) {
+    const { page } = await ctx.openPage({ viewport: { width, height }, isMobile: mobile, hasTouch: mobile });
+    const { fcp, lcp, el } = await page.evaluate(() => new Promise((resolve) => {
+      new PerformanceObserver((list) => {
+        const last = list.getEntries().at(-1);
+        resolve({
+          fcp: performance.getEntriesByName('first-contentful-paint')[0].startTime,
+          lcp: last.startTime, el: last.element ? last.element.className : '',
+        });
+      }).observe({ type: 'largest-contentful-paint', buffered: true });
+    }));
+    assert.equal(el, 'hero-name-line', `${width}px: LCP element is "${el}", not the name`);
+    assert.ok(lcp - fcp < 100, `${width}px: the name painted ${Math.round(lcp - fcp)}ms after first paint`);
+    await page.close();
+  }
+});
