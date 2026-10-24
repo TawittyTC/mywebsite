@@ -121,10 +121,12 @@ test('the CV link points at a PDF that exists', () => {
 });
 
 test('every company logo a project card names exists, and stays small', () => {
-  const logos = [...new Set([...html.matchAll(/data-logo="([^"]+)"/g)].map((m) => m[1]))];
+  // the list's small logos (data-logo) and the cards' large ones (clients/card/)
+  const logos = [...new Set([...html.matchAll(/data-logo="([^"]+)"/g), ...html.matchAll(/src="(assets\/img\/clients\/card\/[^"]+)"/g)].map((m) => m[1]))];
+  assert.ok(logos.length > 0, 'no client logos found');
   for (const src of logos) {
     assert.ok(existsSync(join(ROOT, src)), `${src} missing`);
     const kb = statSync(join(ROOT, src)).size / 1024;
-    assert.ok(kb <= 24, `${src} is ${kb.toFixed(0)}KB (budget 24KB)`);
+    assert.ok(kb <= 32, `${src} is ${kb.toFixed(0)}KB (budget 32KB)`);
   }
 });
