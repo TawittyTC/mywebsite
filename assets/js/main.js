@@ -97,7 +97,13 @@
     preloader.addEventListener("animationend", (e) => {
       if (e.target === preloader && /^loader-(out|gone)$/.test(e.animationName)) hideLoader();
     });
-    window.addEventListener("load", hideLoader);
+    // On load only once the stylesheet has applied (it gives the loader its
+    // loader-gone fade): load no longer waits for the analytics and consent
+    // scripts, so it can now come before the stylesheet, and lifting the
+    // loader then would show the page unstyled
+    window.addEventListener("load", () => {
+      if (/loader-gone/.test(getComputedStyle(preloader).animationName)) hideLoader();
+    });
     // Failsafe: never block the page for more than 2s from navigation start
     setTimeout(hideLoader, Math.max(0, 2000 - performance.now()));
   }
@@ -127,7 +133,22 @@
 
 })();
 
-
+/**
+ * Work the first screen does not show (arming the scroll reveals, the card
+ * rows, the back-to-top state) waits until the page has painted once, then
+ * runs as its own small task. A phone paints the hero and can answer a tap
+ * in between, and the layout those jobs measure is already fresh, so the
+ * measuring costs nothing extra. The timer covers a tab where frames stall.
+ */
+function afterPaint(fn) {
+  var go = function () {
+    if (!go) return;
+    go = null;
+    setTimeout(fn, 0);
+  };
+  requestAnimationFrame(function () { if (go) go(); });
+  setTimeout(function () { if (go) go(); }, 200);
+}
 
 /**
  * Two-parameter spring, the way Apple frames it: `response` is roughly how
@@ -970,9 +991,12 @@ function createCardScroller(scroller, options) {
       requestAnimationFrame(forward);
     };
 
+    var rowVisible = false;
     var startHintLoop = function () {
       clearInterval(hintInterval);
-      hintInterval = setInterval(runHint, 3000);
+      hintInterval = null;
+      // off screen nobody sees the nudge: it waits until the row is back
+      if (rowVisible) hintInterval = setInterval(runHint, 3000);
     };
 
     var onUserScroll = function () {
@@ -993,14 +1017,24 @@ function createCardScroller(scroller, options) {
     scroller.addEventListener('focusin', function () { isAnimating = false; onUserScroll(); });
 
     var hintStarted = false;
+    var firstCall = true;
     var hintObs = new IntersectionObserver(function (entries) {
-      if (entries.some(function (e) { return e.isIntersecting; }) && !hintStarted) {
+      var e = entries[entries.length - 1];
+      rowVisible = e.isIntersecting;
+      // the first hint still waits for 30% of the row, as it always has
+      var started = !hintStarted && rowVisible && (firstCall || e.intersectionRatio >= 0.3);
+      firstCall = false;
+      if (!rowVisible) {
+        clearInterval(hintInterval);
+        hintInterval = null;
+      } else if (started) {
         hintStarted = true;
-        hintObs.disconnect();
         runHint();
         startHintLoop();
+      } else if (hintStarted && !userScrolling && !hintInterval) {
+        startHintLoop();
       }
-    }, { threshold: 0.3 });
+    }, { threshold: [0, 0.3] });
     hintObs.observe(scroller);
   }
 
@@ -1017,10 +1051,13 @@ function createCardScroller(scroller, options) {
   return api;
 }
 
-// Auto-init every card scroller on the page
+// Auto-init every card scroller on the page (the rows sit far below the
+// hero, so they are set up once it has painted)
 document.addEventListener('DOMContentLoaded', function () {
-  document.querySelectorAll('[data-card-scroller]').forEach(function (el) {
-    createCardScroller(el);
+  afterPaint(function () {
+    document.querySelectorAll('[data-card-scroller]').forEach(function (el) {
+      createCardScroller(el);
+    });
   });
 });
 
@@ -1069,7 +1106,9 @@ var currentYear = new Date().getFullYear();
 document.getElementById('current-year').textContent = currentYear;
 
 // Scroll hint: nudge project cards on mobile to hint horizontal scroll
-window.addEventListener('load', function() {
+// (the row is far below the fold: it waits for the next paint after load)
+window.addEventListener('load', function () { afterPaint(scrollHint); });
+function scrollHint() {
   if (window.innerWidth > 1024) return;
   var scroller = document.getElementById('scroller');
   if (!scroller) return;
@@ -1077,7 +1116,7 @@ window.addEventListener('load', function() {
   scroller.addEventListener('animationend', function() {
     scroller.classList.remove('scroll-hint');
   }, { once: true });
-});
+}
 
 
 // Experience expand/collapse
@@ -1176,7 +1215,8 @@ document.addEventListener('DOMContentLoaded', function () {
       var w = window.innerWidth;
       if (!lockH || Math.abs(w - lockW) > 1) lockHero();
     };
-    lockHero();
+    // pinned to the height it already has, so it can wait for the first paint
+    afterPaint(function () { if (!lockH) lockHero(); });
     // Decide only once the viewport has SETTLED: mid-resize, innerWidth
     // and layout can read transient values that slip past the width
     // guard and re-pin the hero at a churned height. Debouncing means
@@ -1208,71 +1248,95 @@ document.addEventListener('DOMContentLoaded', function () {
       { sel: '#images-list .cert-card', travel: 44, scale: 1, stagger: 0.06, mod: 3 },
       { sel: '.closing-cta .cta-inner', travel: 56, scale: 0 }
     ];
-    var items = [];
-    GROUPS.forEach(function (g) {
-      var els = document.querySelectorAll(g.sel);
-      for (var i = 0; i < els.length; i++) {
-        if (els[i].getBoundingClientRect().top < window.innerHeight * 0.92) continue; // in view at load — leave as-is
-        els[i].classList.add('js-reveal');
-        items.push({
-          el: els[i], travel: g.travel, scale: g.scale, done: false, curY: 0, lastP: -1,
-          // shift the scrub window per column/index so grids cascade
-          shift: (g.mod ? (i % g.mod) : Math.min(i, 5)) * (g.stagger || 0)
-        });
-      }
+    var items = null;
+    // Everything armed here starts below the fold, so the arming waits for
+    // the first paint; all positions are read before any class is written,
+    // so the page is laid out once, not once per element. The elements are
+    // the ones on the page now, as the script runs (the certificate grid is
+    // built later, on DOMContentLoaded, and has never been part of this).
+    var lists = GROUPS.map(function (g) { return document.querySelectorAll(g.sel); });
+    afterPaint(function () {
+      var found = [];
+      var limit = window.innerHeight * 0.92;
+      GROUPS.forEach(function (g, gi) {
+        var els = lists[gi];
+        for (var i = 0; i < els.length; i++) {
+          if (els[i].getBoundingClientRect().top < limit) continue; // in view at load — leave as-is
+          found.push({
+            el: els[i], travel: g.travel, scale: g.scale, done: false, curY: 0, lastP: -1,
+            // shift the scrub window per column/index so grids cascade
+            shift: (g.mod ? (i % g.mod) : Math.min(i, 5)) * (g.stagger || 0)
+          });
+        }
+      });
+      found.forEach(function (it) { it.el.classList.add('js-reveal'); });
+      items = found;
+      if (items.length) setInterval(function () { scrubFrame(true); }, 250);
     });
-    if (items.length) {
-      // Continuous rAF loop, like the hero canvas: progress is recomputed
-      // from live viewport geometry every frame, so it needs no scroll
-      // events, no scrollY, and no cached offsets — in-app webviews that
-      // deliver scroll/resize events erratically still animate correctly.
-      // Position reads subtract our own applied translate so the
-      // animation never pollutes the measurement.
-      function scrubFrame() {
-        var vh = window.innerHeight;
-        var se = document.scrollingElement || document.documentElement;
-        // at the very end of the page nothing can travel further — settle all
-        var atEnd = se.scrollTop + vh >= se.scrollHeight - 2;
-        var end = vh * 0.58;
-        var i, tops = [];
-        for (i = 0; i < items.length; i++) { // read pass — no writes until all rects are taken
-          tops.push(items[i].el.getBoundingClientRect().top - items[i].curY);
-        }
-        for (i = 0; i < items.length; i++) {
-          var it = items[i];
-          var start = vh * (1.02 - it.shift);
-          var p = atEnd ? 1 : (start - tops[i]) / (start - end);
-          if (p > 1) p = 1;
-          if (p < 0) p = 0;
-          if (p === it.lastP) continue;
-          it.lastP = p;
-          if (p === 1) {
-            if (!it.done) {
-              it.done = true;
-              it.curY = 0;
-              it.el.classList.add('is-visible');
-              it.el.style.transition = '';
-              it.el.style.opacity = '';
-              it.el.style.transform = '';
-            }
-          } else {
-            var e = 1 - Math.pow(1 - p, 3);
-            if (it.done) { it.done = false; it.el.classList.remove('is-visible'); }
-            it.curY = it.travel * (1 - e);
-            it.el.style.transition = 'none';
-            it.el.style.opacity = e.toFixed(3);
-            it.el.style.transform = 'translateY(' + it.curY.toFixed(1) + 'px)' +
-              (it.scale ? ' scale(' + (0.94 + 0.06 * e).toFixed(4) + ')' : '');
+    // Continuous rAF loop, like the hero canvas: progress is recomputed
+    // from live viewport geometry every frame, so it needs no scroll
+    // events, no scrollY, and no cached offsets — in-app webviews that
+    // deliver scroll/resize events erratically still animate correctly.
+    // Position reads subtract our own applied translate so the
+    // animation never pollutes the measurement. A frame in which the
+    // page has neither scrolled nor changed size or length would give
+    // every element the progress it already has, so it reads nothing
+    // more; the 250ms pass below measures everything regardless.
+    // (The loop starts now, ahead of the hero's, so it reads layout
+    // before the hero writes to it in each frame.)
+    var seen = { top: -1, vh: -1, len: -1 };
+    function scrubFrame(force) {
+      if (!items) return; // not armed yet
+      var vh = window.innerHeight;
+      var se = document.scrollingElement || document.documentElement;
+      var top = se.scrollTop, len = se.scrollHeight;
+      if (force !== true && top === seen.top && vh === seen.vh && len === seen.len) return;
+      seen.top = top; seen.vh = vh; seen.len = len;
+      // at the very end of the page nothing can travel further — settle all
+      var atEnd = top + vh >= len - 2;
+      var end = vh * 0.58;
+      var i, tops = [];
+      for (i = 0; i < items.length; i++) { // read pass — no writes until all rects are taken
+        tops.push(items[i].el.getBoundingClientRect().top - items[i].curY);
+      }
+      for (i = 0; i < items.length; i++) {
+        var it = items[i];
+        var start = vh * (1.02 - it.shift);
+        var p = atEnd ? 1 : (start - tops[i]) / (start - end);
+        if (p > 1) p = 1;
+        if (p < 0) p = 0;
+        if (p === it.lastP) continue;
+        it.lastP = p;
+        if (p === 1) {
+          if (!it.done) {
+            it.done = true;
+            it.curY = 0;
+            it.el.classList.add('is-visible');
+            it.el.style.transition = '';
+            it.el.style.opacity = '';
+            it.el.style.transform = '';
           }
+        } else {
+          var e = 1 - Math.pow(1 - p, 3);
+          if (it.done) { it.done = false; it.el.classList.remove('is-visible'); }
+          it.curY = it.travel * (1 - e);
+          it.el.style.transition = 'none';
+          it.el.style.opacity = e.toFixed(3);
+          it.el.style.transform = 'translateY(' + it.curY.toFixed(1) + 'px)' +
+            (it.scale ? ' scale(' + (0.94 + 0.06 * e).toFixed(4) + ')' : '');
         }
       }
-      function tick() { scrubFrame(); requestAnimationFrame(tick); }
-      requestAnimationFrame(tick);
-      // Safety net: headless/battery-saver browsers can stall rAF while the
-      // screen is visually idle; a timer keeps settle-correctness independent
-      // of frame delivery (styles are only written when progress changes).
-      setInterval(scrubFrame, 250);
     }
+    function tick() {
+      if (items && !items.length) return; // nothing below the fold to reveal
+      scrubFrame();
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+    // Safety net (started with the arming above): headless/battery-saver
+    // browsers can stall rAF while the screen is visually idle; a timer keeps
+    // settle-correctness independent of frame delivery (styles are only
+    // written when progress changes).
   }
 })();
 
@@ -1287,7 +1351,9 @@ document.addEventListener('DOMContentLoaded', function () {
   // On a touch screen the button floats over what people tap (certificates,
   // FAQ rows), so there it shows only while they scroll back up
   var touch = window.matchMedia && window.matchMedia('(hover: none)').matches;
-  var lastY = window.scrollY || 0, upFrom = null;
+  // (lastY is taken by the first update, after the first paint: reading the
+  // scroll position here would lay out the whole page mid-script)
+  var lastY = 0, upFrom = null;
   var ticking = false;
   function update() {
     ticking = false;
@@ -1307,7 +1373,7 @@ document.addEventListener('DOMContentLoaded', function () {
   function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', onScroll, { passive: true });
-  update();
+  afterPaint(update); // hidden at the top of the page; measured once painted
 
   toTop.addEventListener('click', function () {
     window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
@@ -1323,7 +1389,9 @@ document.addEventListener('DOMContentLoaded', function () {
 (function () {
   var canvas = document.getElementById('hero-net');
   if (!canvas || !canvas.getContext) return;
-  var ctx = canvas.getContext('2d');
+  // the 2D context is created with the first sizing: creating it restyles
+  // and lays out the page, which the running script should not wait for
+  var ctx = null;
   var labelsHost = document.getElementById('hero-net-labels');
   var hero = document.getElementById('hero');
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -1347,10 +1415,13 @@ document.addEventListener('DOMContentLoaded', function () {
   function isMobile() { return W < 1025; }
   // warm on one side of the cluster blending to cool on the other
   function colorForX(x) {
-    var b = bounds();
+    var b = frameBounds || bounds();
     var t = Math.max(0, Math.min(1, (x - b.x0) / Math.max(b.x1 - b.x0, 1)));
     return t < 0.5 ? mix(WARM1, WARM2, t / 0.5) : mix(WARM2, COOL, (t - 0.5) / 0.5);
   }
+
+  // bounds() for the frame being drawn (colorForX runs for every link)
+  var frameBounds = null;
 
   var LABELS = ['CRM', 'POS', 'ASR', 'TTS', 'LLM', 'IVR'];
   var nodes = [], labelEls = [];
@@ -1368,6 +1439,7 @@ document.addEventListener('DOMContentLoaded', function () {
   var nameEl = hero.querySelector('.hero-name');
   var inkX = 62, inkR = 24, inkG = 119, inkB = 242;
   var inkNode = null, nextInkSwitch = 1.6;
+  var inkXWritten = '', inkCWritten = '';
 
   // ── Big-bang intro: the whole graph starts as one clustered blob,
   // trembles harder and harder, then detonates outward — every node
@@ -1490,6 +1562,9 @@ document.addEventListener('DOMContentLoaded', function () {
       var el = document.createElement('div');
       el.className = 'hero-net-label';
       el.textContent = text;
+      // kept out of layout until the first frame places it (it starts
+      // hidden there anyway), so it never jumps in from the corner
+      el.style.display = 'none';
       labelsHost.appendChild(el);
       labelEls.push(el);
     });
@@ -1534,6 +1609,11 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function resize() {
+    // Until the stylesheet lands the canvas is still in the hero's flow:
+    // sized then, it stands a screen tall and the page jumps when it leaves
+    // the flow (a layout shift of ~1). The loader covers the page until the
+    // stylesheet applies, so nothing is lost by waiting; the loop retries.
+    if (getComputedStyle(canvas).position !== 'absolute') return;
     var rect = hero.getBoundingClientRect();
     // WKWebViews (e.g. Facebook's in-app browser) can report a transient
     // 0-sized rect mid-layout — retry instead of building degenerate state
@@ -1559,6 +1639,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     // exact device-pixel mapping — fractional DPRs (Windows 125%/150%)
     // otherwise leave thin lines shimmering between pixels
+    if (!ctx) ctx = canvas.getContext('2d');
     ctx.setTransform(bw / W, 0, 0, bh / H, 0, 0);
     updateCopyRect();
     if (!nodes.length) {
@@ -1581,7 +1662,8 @@ document.addEventListener('DOMContentLoaded', function () {
       layoutW = W;
       layoutH = H;
     }
-    if (bitmapChanged && nodes.length) drawFrame(lastDrawT);
+    // (until the loop has drawn once there is no picture to keep)
+    if (bitmapChanged && nodes.length && painted) drawFrame(lastDrawT);
   }
 
   if (finePointer) {
@@ -1599,19 +1681,31 @@ document.addEventListener('DOMContentLoaded', function () {
   if ('ResizeObserver' in window) {
     new ResizeObserver(function () { resize(); }).observe(hero);
   }
-  window.addEventListener('load', function () { updateCopyRect(); resize(); }, { passive: true });
-  // web fonts can reflow the copy block after first paint
-  if (document.fonts && document.fonts.ready && document.fonts.ready.then) {
-    document.fonts.ready.then(updateCopyRect);
+  window.addEventListener('load', function () {
+    afterPaint(function () { updateCopyRect(); resize(); });
+  }, { passive: true });
+  // web fonts can reflow the copy block after first paint (asking for
+  // fonts.ready lays out the page, so that waits for the first paint too)
+  if (document.fonts && 'ready' in document.fonts) {
+    afterPaint(function () {
+      document.fonts.ready.then(function () { afterPaint(updateCopyRect); });
+    });
   }
   // iOS/WKWebView can purge a canvas backing store while the page is
   // hidden or restored from the back-forward cache — repaint on return
-  window.addEventListener('pageshow', resize, { passive: true });
+  // (the first pageshow of a fresh load has nothing to repaint yet: it
+  // only re-checks the size once the page has painted)
+  window.addEventListener('pageshow', function (e) {
+    if (e.persisted) resize(); else afterPaint(resize);
+  }, { passive: true });
   document.addEventListener('visibilitychange', function () {
     if (!document.hidden) resize();
   });
 
   function drawFrame(time) {
+    if (!ctx) return; // not sized yet
+    painted = true;
+    frameBounds = bounds();
     ctx.clearRect(0, 0, W, H);
     var ampScale = Math.max(1, Math.min(W / 1100, 2));
     // The blob lives BEHIND the name, so the keep-out fade is suspended
@@ -1777,8 +1871,12 @@ document.addEventListener('DOMContentLoaded', function () {
         inkR += (targetC.r - inkR) * 0.02;
         inkG += (targetC.g - inkG) * 0.02;
         inkB += (targetC.b - inkB) * 0.02;
-        nameEl.style.setProperty('--ink-x', inkX.toFixed(1) + '%');
-        nameEl.style.setProperty('--ink-c', 'rgb(' + Math.round(inkR) + ',' + Math.round(inkG) + ',' + Math.round(inkB) + ')');
+        // an unchanged value is not written again: each write restyles and
+        // repaints the name
+        var inkXs = inkX.toFixed(1) + '%';
+        var inkCs = 'rgb(' + Math.round(inkR) + ',' + Math.round(inkG) + ',' + Math.round(inkB) + ')';
+        if (inkXs !== inkXWritten) nameEl.style.setProperty('--ink-x', inkXWritten = inkXs);
+        if (inkCs !== inkCWritten) nameEl.style.setProperty('--ink-c', inkCWritten = inkCs);
       }
     }
 
@@ -1799,6 +1897,7 @@ document.addEventListener('DOMContentLoaded', function () {
           el.style.left = nx + 'px';
           el.style.top = ny + 'px';
           el.style.opacity = String(f * labelGate);
+          if (el.style.display) el.style.display = '';
         }
         if (f <= 0.02) continue;
         var col = colorForX(nx);
@@ -1834,25 +1933,36 @@ document.addEventListener('DOMContentLoaded', function () {
       ctx.fillStyle = 'rgba(255,255,255,' + (0.8 * sa).toFixed(3) + ')';
       ctx.beginPath(); ctx.arc(sx, sy, 1.1, 0, Math.PI * 2); ctx.fill();
     }
+    frameBounds = null;
   }
 
   var running = false, t0 = null, lastDrawT = 0.01;
-  var curtainUp = false;
+  var curtainUp = false, painted = false;
   function loop(ts) {
     if (!running) return;
     if (t0 === null) t0 = ts;
     // Hold the intro clock at zero until the page loader curtain lifts —
     // otherwise the cluster/shake plays hidden behind the overlay and
     // visitors only catch the tail of the explosion.
+    var held = false;
     if (!curtainUp) {
       var curtain = document.querySelector('.loader');
-      if (curtain && parseFloat(getComputedStyle(curtain).opacity) > 0.5) { t0 = ts; }
+      if (curtain && parseFloat(getComputedStyle(curtain).opacity) > 0.5) { t0 = ts; held = true; }
       else { curtainUp = true; }
     }
     // iOS batches resize events until scroll momentum ends; catch the
     // container changing size the moment it happens instead
     // (tolerance 2px: fractional-layout jitter must not trigger it)
     if (Math.abs(hero.clientWidth - W) > 2 || Math.abs(hero.clientHeight - H) > 2) resize();
+    // While the clock is held at zero every node is still fully transparent
+    // and the canvas is blank, so after one cleared frame there is nothing
+    // to draw until the curtain lifts (the blob's spot is still taken now)
+    if (held && painted && nodes.length) {
+      if (!introCluster) introCluster = clusterPoint();
+      lastDrawT = 0;
+      requestAnimationFrame(loop);
+      return;
+    }
     // Under reduced motion the scene drifts at half speed (no pulses,
     // no assembly) — never a hard freeze, and the continuous paint
     // keeps the canvas backing store alive on iOS/WKWebView.
@@ -1867,7 +1977,10 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   makeLabels();
-  resize();
+  // first sizing: the ResizeObserver's initial report, or the loop's size
+  // check on its first frame, whichever comes first — not here, where it
+  // would force a layout of the whole page while the script is running
+  if (!('ResizeObserver' in window)) resize();
 
   if ('IntersectionObserver' in window) {
     var io = new IntersectionObserver(function (entries) {
@@ -1958,6 +2071,40 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   card.addEventListener('pointermove', light, { passive: true });
   card.addEventListener('pointerdown', light, { passive: true });
+})();
+
+/**
+ * Decorations that loop forever — the section waves and the spark that
+ * travels the Experience line, the "Active" pulse, the card's drifting
+ * light — ask for a new frame on every screen refresh wherever they are on
+ * the page, and the waves, the spark and the pulse are painted by the main
+ * thread. Off screen nobody sees them, so there they wait, and they carry
+ * on from the same spot as they come back into view.
+ */
+(function () {
+  if (!('IntersectionObserver' in window) || !document.documentElement.getAnimations) return;
+  var hosts = document.querySelectorAll('.section-wave, .exp-status-active, .biz-scene');
+  if (!hosts.length) return;
+  var held = new Map(); // host -> the animations this paused
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      var host = e.target;
+      var svgs = host.querySelectorAll('svg');
+      if (e.isIntersecting) {
+        (held.get(host) || []).forEach(function (a) { a.play(); });
+        held.delete(host);
+        svgs.forEach(function (s) { if (s.unpauseAnimations) s.unpauseAnimations(); });
+      } else if (!held.has(host)) {
+        var mine = host.getAnimations({ subtree: true }).filter(function (a) {
+          return a.playState === 'running' && a.effect && a.effect.getTiming().iterations === Infinity;
+        });
+        mine.forEach(function (a) { a.pause(); });
+        held.set(host, mine);
+        svgs.forEach(function (s) { if (s.pauseAnimations) s.pauseAnimations(); });
+      }
+    });
+  }, { rootMargin: '200px 0px' });
+  hosts.forEach(function (h) { io.observe(h); });
 })();
 
 /**
