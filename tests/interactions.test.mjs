@@ -120,14 +120,17 @@ test('a client-work card opens its story in the experience sheet, on that client
   await page.close();
 });
 
-test('every project card shows a picture or its drawing, phones included', async () => {
-  // the owner: "many projects but no picture or icon, so they don't look interesting"
+test('every project card shows its client\'s logo, a picture or its drawing, phones included', async () => {
+  // the owner: "many projects but no picture or icon, so they don't look interesting",
+  // then: "where a company has a logo, put it in place of the card's drawing"
   for (const width of [320, 390, 1440]) {
     const { page } = await ctx.openPage({ viewport: { width, height: 900 }, isMobile: width < 800, hasTouch: width < 800 });
     const bare = await page.$$eval('#scroller > .rf-cards-scroller-item', (cards) => cards.filter((c) => {
-      const v = c.querySelector('.work-icon svg, .project-img img');
+      const v = c.querySelector('.work-logo img') || c.querySelector('.work-icon svg, .project-img img');
       const r = v && v.getBoundingClientRect();
-      return !r || r.width < 100 || getComputedStyle(v.closest('.work-icon, .project-img')).display === 'none';
+      // a logo is sized by its shape: a square mark is narrower than a wordmark
+      const min = v && v.closest('.work-logo') ? 64 : 100;
+      return !r || r.width < min || r.height < 12 || getComputedStyle(v.closest('.work-logo, .work-icon, .project-img')).display === 'none';
     }).map((c) => c.querySelector('h3').textContent));
     assert.deepEqual(bare, [], `${width}px: a card with no visual, or one too small to see`);
     await page.close();
