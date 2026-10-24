@@ -1096,6 +1096,17 @@
       }
     }
 
+    /* forced colours repaint the card: a logo could vanish, the drawing cannot */
+    @media (forced-colors: active) {
+      #portfolio .has-logo .work-logo {
+        display: none
+      }
+
+      #portfolio .has-logo .work-icon {
+        display: block
+      }
+    }
+
     /* See all: the company's logo at the far right of its name */
     .proj-group h3 {
       display: flex;
@@ -1415,10 +1426,10 @@
   </style>
 
   <!-- Full CSS loaded async: no render blocking (bootstrap merged in) -->
-  <link rel="preload" href="assets/css/style.min.css?v=2.54.0" as="style"
+  <link rel="preload" href="assets/css/style.min.css?v=2.55.0" as="style"
     onload="this.onload=null;this.rel='stylesheet'">
   <noscript>
-    <link href="assets/css/style.min.css?v=2.54.0" rel="stylesheet">
+    <link href="assets/css/style.min.css?v=2.55.0" rel="stylesheet">
     <style>.proj-all{visibility:hidden}</style>
   </noscript>
 
@@ -1695,7 +1706,7 @@
   </script>
 
   <!-- Preload deferred JS to start downloading before parser reaches script tags -->
-  <link rel="preload" href="assets/js/main.min.js?v=2.54.0" as="script">
+  <link rel="preload" href="assets/js/main.min.js?v=2.55.0" as="script">
 
   <script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="233b92be-5a2d-492b-b093-9c3ed14c9063"
     type="text/javascript" async></script>
@@ -2419,10 +2430,11 @@
               </button>
             </div>
 
-            <div class="rf-cards-scroller-item work-card" role="listitem" data-open-exp="geniustrack">
+            <div class="rf-cards-scroller-item work-card has-logo" role="listitem" data-open-exp="geniustrack" data-logo="assets/img/clients/genius-track.webp" data-logo-size="43.7x36">
               <div class="work-icon" aria-hidden="true">
                 <svg viewBox="0 0 170 170" fill="none"><g stroke="#1264CE" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M36 100V88a49 49 0 0 1 98 0v12" /><rect x="26" y="92" width="26" height="42" rx="12" /><rect x="118" y="92" width="26" height="42" rx="12" /><path d="M131 134v2c0 12-9 18-24 18h-9" /><path d="M85 64c2.5 12 7 16.5 19 19-12 2.5-16.5 7-19 19-2.5-12-7-16.5-19-19 12-2.5 16.5-7 19-19z" /></g><rect x="80" y="148" width="18" height="12" rx="6" fill="#1264CE" /></svg>
               </div>
+              <div class="work-logo" aria-hidden="true"><img src="assets/img/clients/card/genius-track.webp" alt="" width="369" height="305" style="--lw: 0.462" loading="lazy" decoding="async"></div>
               <span class="project-tag">Client work · Voice AI</span>
               <h3 class="h4">AI&nbsp;voice&nbsp;agent, Genius&nbsp;Track</h3>
               <p class="fw-light">Finished and about to be handed over for the client to use.</p>
@@ -2488,7 +2500,7 @@
               <div class="work-icon" aria-hidden="true">
                 <svg viewBox="0 0 170 170" fill="none"><g stroke="#1264CE" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"> <path d="M76 30c4 27 14 37 41 41-27 4-37 14-41 41-4-27-14-37-41-41 27-4 37-14 41-41z" /> <path d="M124 98c2 11 6 15 17 17-11 2-15 6-17 17-2-11-6-15-17-17 11-2 15-6 17-17z" /> <path d="M38 126v12M52 120v24M66 128v8" /> </g> <circle cx="132" cy="40" r="5" fill="#1264CE" /></svg>
               </div>
-              <div class="work-logo" aria-hidden="true"><img src="assets/img/clients/card/protollcall.webp" alt="" width="414" height="273" style="--lw: 0.517" loading="lazy" decoding="async"></div>
+              <div class="work-logo" aria-hidden="true"><img src="assets/img/clients/card/protollcall.webp" alt="" width="414" height="272" style="--lw: 0.518" loading="lazy" decoding="async"></div>
               <span class="project-tag">R&amp;D · Voice AI</span>
               <h3 class="h4">Voice AI pipeline for contact centers</h3>
               <p class="fw-light">Prototyped Thai and English call handling, ASR to LLM to TTS, and benchmarked ASR engines.</p>
@@ -2514,7 +2526,7 @@
               <div class="work-icon" aria-hidden="true">
                 <svg viewBox="0 0 170 170" fill="none"><circle cx="85" cy="50" r="22" stroke="#1264CE" stroke-width="5" /> <circle cx="85" cy="50" r="8" fill="#1264CE" /> <circle cx="38" cy="120" r="16" stroke="#1264CE" stroke-width="5" /> <circle cx="85" cy="128" r="16" stroke="#1264CE" stroke-width="5" /> <circle cx="132" cy="120" r="16" stroke="#1264CE" stroke-width="5" /> <path d="M73 68 45 106M85 72v40M97 68l28 38" stroke="#1264CE" stroke-width="5" stroke-linecap="round" /> <path d="M107 28l4-9 4 9 9 4-9 4-4 9-4-9-9-4 9-4z" fill="#1264CE" /></svg>
               </div>
-              <div class="work-logo" aria-hidden="true"><img src="assets/img/clients/card/protollcall.webp" alt="" width="414" height="273" style="--lw: 0.517" loading="lazy" decoding="async"></div>
+              <div class="work-logo" aria-hidden="true"><img src="assets/img/clients/card/protollcall.webp" alt="" width="414" height="272" style="--lw: 0.518" loading="lazy" decoding="async"></div>
               <span class="project-tag">R&amp;D · Agentic AI</span>
               <h3 class="h4">Agentic AI for business workflows</h3>
               <p class="fw-light">Orchestrator and <span class="nw">sub-agents</span> with tool calling, for lead qualification and <span class="nw">after-call</span> work.</p>
@@ -2569,10 +2581,11 @@
               </button>
             </div>
 
-            <div class="rf-cards-scroller-item work-card" role="listitem" data-open-exp="protollcall" data-client="genie">
+            <div class="rf-cards-scroller-item work-card has-logo" role="listitem" data-open-exp="protollcall" data-client="genie" data-logo="assets/img/clients/genie-properties.webp" data-logo-size="74x29.7">
               <div class="work-icon" aria-hidden="true">
                 <svg viewBox="0 0 170 170" fill="none"><rect x="28" y="32" width="114" height="106" rx="14" stroke="#1264CE" stroke-width="5" /> <path d="M28 62h114" stroke="#1264CE" stroke-width="5" /> <circle cx="43" cy="47" r="3.5" fill="#1264CE" /> <circle cx="56" cy="47" r="3.5" fill="#1264CE" /> <circle cx="69" cy="47" r="3.5" fill="#1264CE" /> <path d="M68 85 52 100l16 15M102 85l16 15-16 15M92 81l-14 38" stroke="#1264CE" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" /></svg>
               </div>
+              <div class="work-logo" aria-hidden="true"><img src="assets/img/clients/card/genie-properties.webp" alt="" width="531" height="212" style="--lw: 0.664" loading="lazy" decoding="async"></div>
               <span class="project-tag">Client work · CTI</span>
               <h3 class="h4">Softphone CTI APIs, Genie Properties</h3>
               <p class="fw-light">Click to call from their CRM, plus APIs for call history, live agent status and recordings.</p>
@@ -2724,10 +2737,11 @@
               </button>
             </div>
 
-            <div class="rf-cards-scroller-item work-card" role="listitem" data-open-exp="protollcall" data-client="oto">
+            <div class="rf-cards-scroller-item work-card has-logo" role="listitem" data-open-exp="protollcall" data-client="oto" data-logo="assets/img/clients/oto-vision.webp" data-logo-size="120x18">
               <div class="work-icon" aria-hidden="true">
                 <svg viewBox="0 0 170 170" fill="none"><rect x="28" y="32" width="114" height="106" rx="14" stroke="#1264CE" stroke-width="5" /> <rect x="44" y="52" width="26" height="66" rx="7" stroke="#1264CE" stroke-width="5" /> <rect x="72" y="52" width="26" height="44" rx="7" stroke="#1264CE" stroke-width="5" /> <rect x="100" y="52" width="26" height="56" rx="7" stroke="#1264CE" stroke-width="5" /></svg>
               </div>
+              <div class="work-logo" aria-hidden="true"><img src="assets/img/clients/card/oto-vision.webp" alt="" width="640" height="95" style="--lw: 0.8" loading="lazy" decoding="async"></div>
               <span class="project-tag">Client work · Finance</span>
               <h3 class="h4">Vehicle finance CRM, OTO Vision</h3>
               <p class="fw-light">Loan applications through credit review and approval, with LINE&nbsp;OA and call <span class="nw">follow-ups</span>.</p>
@@ -2736,10 +2750,11 @@
               </button>
             </div>
 
-            <div class="rf-cards-scroller-item work-card" role="listitem" data-open-exp="protollcall" data-client="3bissfix">
+            <div class="rf-cards-scroller-item work-card has-logo" role="listitem" data-open-exp="protollcall" data-client="3bissfix" data-logo="assets/img/clients/treebisfix.webp" data-logo-size="79.3x27.7">
               <div class="work-icon" aria-hidden="true">
                 <svg viewBox="0 0 170 170" fill="none"><rect x="30" y="30" width="110" height="74" rx="12" stroke="#1264CE" stroke-width="5" /> <path d="M70 104v14M100 104v14M56 122h58" stroke="#1264CE" stroke-width="5" stroke-linecap="round" /> <rect x="62" y="50" width="30" height="30" rx="6" stroke="#1264CE" stroke-width="5" /> <path d="M70 42v8M84 42v8M70 80v8M84 80v8M54 58h8M54 72h8M92 58h8M92 72h8" stroke="#1264CE" stroke-width="4" stroke-linecap="round" /> <path d="M138 116l-18 18m0-18a12.7 12.7 0 0 0 3 13 12.7 12.7 0 0 0 13 3l7 7a4 4 0 0 0 6 0l3-3a4 4 0 0 0 0-6l-7-7a12.7 12.7 0 0 0-3-13 12.7 12.7 0 0 0-13-3z" fill="#F5F5F7" stroke="#1264CE" stroke-width="5" stroke-linejoin="round" /></svg>
               </div>
+              <div class="work-logo" aria-hidden="true"><img src="assets/img/clients/card/treebisfix.webp" alt="" width="568" height="199" style="--lw: 0.71" loading="lazy" decoding="async"></div>
               <span class="project-tag">Client work · Maintenance</span>
               <h3 class="h4">Field service CRM, Treebisfix</h3>
               <p class="fw-light">Repair jobs from intake to technician dispatch and <span class="nw">sign-off</span>, with LINE&nbsp;OA updates.</p>
@@ -2748,10 +2763,11 @@
               </button>
             </div>
 
-            <div class="rf-cards-scroller-item work-card" role="listitem" data-open-exp="protollcall" data-client="mediviss">
+            <div class="rf-cards-scroller-item work-card has-logo" role="listitem" data-open-exp="protollcall" data-client="mediviss" data-logo="assets/img/clients/mediviss.webp" data-logo-size="75.3x29">
               <div class="work-icon" aria-hidden="true">
                 <svg viewBox="0 0 170 170" fill="none"><g stroke="#1264CE" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><rect x="24" y="38" width="122" height="106" rx="16" /><path d="M24 72h122M58 26v24M112 26v24" /><path d="M66 108l13 13 26-26" /></g></svg>
               </div>
+              <div class="work-logo" aria-hidden="true"><img src="assets/img/clients/card/mediviss.webp" alt="" width="540" height="209" style="--lw: 0.676" loading="lazy" decoding="async"></div>
               <span class="project-tag">Client work · Healthcare</span>
               <h3 class="h4">Patient CRM, Mediviss</h3>
               <p class="fw-light">Appointments, doctor assignment and LINE&nbsp;OA recall reminders, with each patient's call history.</p>
@@ -2773,10 +2789,11 @@
               </button>
             </div>
 
-            <div class="rf-cards-scroller-item work-card" role="listitem" data-open-exp="protollcall" data-client="dpah">
+            <div class="rf-cards-scroller-item work-card has-logo" role="listitem" data-open-exp="protollcall" data-client="dpah" data-logo="assets/img/clients/dp-ah.webp" data-logo-size="83.7x26.3">
               <div class="work-icon" aria-hidden="true">
                 <svg viewBox="0 0 170 170" fill="none"><g stroke="#1264CE" stroke-width="5"><circle cx="55" cy="38" r="11" /><circle cx="85" cy="38" r="11" /><circle cx="115" cy="38" r="11" /><circle cx="55" cy="70" r="11" /><circle cx="85" cy="70" r="11" /><circle cx="115" cy="70" r="11" /><circle cx="55" cy="102" r="11" /><circle cx="85" cy="102" r="11" /><circle cx="115" cy="102" r="11" /><circle cx="85" cy="134" r="11" /></g></svg>
               </div>
+              <div class="work-logo" aria-hidden="true"><img src="assets/img/clients/card/dp-ah.webp" alt="" width="599" height="188" style="--lw: 0.749" loading="lazy" decoding="async"></div>
               <span class="project-tag">Client work · Insurance</span>
               <h3 class="h4">Accident and health insurance CRM, dp&nbsp;a&amp;h</h3>
               <p class="fw-light">Quotes and <span class="nw">follow-ups</span>, six agent break statuses, LINE&nbsp;OA renewal reminders and a claims IVR.</p>
@@ -2837,10 +2854,11 @@
               </button>
             </div>
 
-            <div class="rf-cards-scroller-item work-card" role="listitem" data-open-exp="protollcall" data-client="kijsiri">
+            <div class="rf-cards-scroller-item work-card has-logo" role="listitem" data-open-exp="protollcall" data-client="kijsiri" data-logo="assets/img/clients/ns-kijsiri.webp" data-logo-size="61.3x35.7">
               <div class="work-icon" aria-hidden="true">
                 <svg viewBox="0 0 170 170" fill="none"><g stroke="#1264CE" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"> <rect x="22" y="34" width="126" height="102" rx="16" /> <circle cx="62" cy="72" r="14" /> <path d="M38 114c2-13 11-20 24-20s22 7 24 20" /> <path d="M104 66h26M104 85h26M104 104h14" /> </g></svg>
               </div>
+              <div class="work-logo" aria-hidden="true"><img src="assets/img/clients/card/ns-kijsiri.webp" alt="" width="440" height="256" style="--lw: 0.55" loading="lazy" decoding="async"></div>
               <span class="project-tag">Client work · Real estate</span>
               <h3 class="h4">Property sales CRM, N&amp;S and Kijsiri</h3>
               <p class="fw-light">One sales CRM for two linked companies, with each team limited to its own call recordings.</p>
@@ -2862,10 +2880,11 @@
               </button>
             </div>
 
-            <div class="rf-cards-scroller-item work-card" role="listitem" data-open-exp="protollcall" data-client="sbl">
+            <div class="rf-cards-scroller-item work-card has-logo" role="listitem" data-open-exp="protollcall" data-client="sbl" data-logo="assets/img/clients/sbl-leasing.webp" data-logo-size="64.7x34">
               <div class="work-icon" aria-hidden="true">
                 <svg viewBox="0 0 170 170" fill="none"><path d="M85 85c-15.6-23.4-39-39-57.2-31.2-20.8 9.1-20.8 53.3 0 62.4 18.2 7.8 41.6-7.8 57.2-31.2z" stroke="#1264CE" stroke-width="5" stroke-linejoin="round" /> <path d="M85 85c15.6-23.4 39-39 57.2-31.2 20.8 9.1 20.8 53.3 0 62.4-18.2 7.8-41.6-7.8-57.2-31.2z" stroke="#1264CE" stroke-width="5" stroke-linejoin="round" /> <circle cx="42" cy="85" r="6" fill="#1264CE" /> <circle cx="128" cy="85" r="6" fill="#1264CE" /></svg>
               </div>
+              <div class="work-logo" aria-hidden="true"><img src="assets/img/clients/card/sbl-leasing.webp" alt="" width="463" height="244" style="--lw: 0.579" loading="lazy" decoding="async"></div>
               <span class="project-tag">Client work · Leasing</span>
               <h3 class="h4">Customer service CRM, S.B.L. Leasing</h3>
               <p class="fw-light">Full CRM setup through launch, case tracking with audit trail, and a call analytics dashboard.</p>
@@ -3314,7 +3333,7 @@
   </button>
 
   <!-- Main JS -->
-  <script defer src="assets/js/main.min.js?v=2.54.0"></script>
+  <script defer src="assets/js/main.min.js?v=2.55.0"></script>
   <!-- Service Worker: cache assets for repeat visits -->
   <script>if ('serviceWorker' in navigator) { var _sw = function () { navigator.serviceWorker.register('sw.js') }; 'requestIdleCallback' in window ? requestIdleCallback(_sw) : window.addEventListener('load', _sw) }</script>
 
