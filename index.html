@@ -1401,7 +1401,9 @@
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      margin: 20px 0 8px
+      margin: 20px 0 8px;
+      /* room for the sticky close button when the sheet opens scrolled to the chips */
+      padding-right: 48px
     }
 
     .exp-filter-chip {
@@ -1685,10 +1687,10 @@
   </style>
 
   <!-- Full CSS loaded async: no render blocking (bootstrap merged in) -->
-  <link rel="preload" href="assets/css/style.min.css?v=2.56.0" as="style"
+  <link rel="preload" href="assets/css/style.min.css?v=2.57.0" as="style"
     onload="this.onload=null;this.rel='stylesheet'">
   <noscript>
-    <link href="assets/css/style.min.css?v=2.56.0" rel="stylesheet">
+    <link href="assets/css/style.min.css?v=2.57.0" rel="stylesheet">
     <style>.proj-all{visibility:hidden}</style>
   </noscript>
 
@@ -1965,7 +1967,7 @@
   </script>
 
   <!-- Preload deferred JS to start downloading before parser reaches script tags -->
-  <link rel="preload" href="assets/js/main.min.js?v=2.56.0" as="script">
+  <link rel="preload" href="assets/js/main.min.js?v=2.57.0" as="script">
 
   <!-- Google tag (gtag.js). The page view is queued here, stamped with the
        time the page opened; gtag.js sends it when it arrives. -->
@@ -2786,9 +2788,9 @@
 
             <div class="rf-cards-scroller-item work-card" role="listitem" data-open-exp="protollcall" data-client="tsr">
               <div class="work-icon" aria-hidden="true">
-                <svg viewBox="0 0 170 170" fill="none"><g stroke="#1264CE" stroke-width="5"><circle cx="55" cy="38" r="11" /><circle cx="85" cy="38" r="11" /><circle cx="115" cy="38" r="11" /><circle cx="55" cy="70" r="11" /><circle cx="85" cy="70" r="11" /><circle cx="115" cy="70" r="11" /><circle cx="55" cy="102" r="11" /><circle cx="85" cy="102" r="11" /><circle cx="115" cy="102" r="11" /><circle cx="85" cy="134" r="11" /></g></svg>
+                <svg viewBox="0 0 170 170" fill="none"><g stroke="#1264CE" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M58 30H44a12 12 0 0 0-12 13c3 50 45 92 95 95a12 12 0 0 0 13-12v-14l-28-10-14 14c-17-8-30-21-38-38l14-14z" /><circle cx="112" cy="58" r="28" /><path d="M112 42v16l11 8" /></g></svg>
               </div>
-              <span class="project-tag">Client work · Voice automation</span>
+              <span class="project-tag">Client work · Outbound</span>
               <h3 class="h4">Auto IVR payment reminders, TSR</h3>
               <p class="fw-light">Calls customers before and after due dates on its own, from lists pulled by API, up to 30 lines at once.</p>
               <button type="button" class="card-plus" aria-label="Read more: Auto IVR payment reminders, TSR">
@@ -2887,9 +2889,9 @@
               </div>
               <div class="work-logo" aria-hidden="true"><img src="assets/img/clients/card/aioi-bangkok.webp" alt="" width="640" height="95" style="--lw: 0.8" loading="lazy" decoding="async"></div>
               <span class="project-tag">Client work · Insurance</span>
-              <h3 class="h4">Callback queue and dashboard, Aioi&nbsp;Bangkok&nbsp;Insurance</h3>
-              <p class="fw-light">Callers who ask for a callback wait in a queue that agents clear with one click, with dashboards and reports.</p>
-              <button type="button" class="card-plus" aria-label="Read more: Callback queue and dashboard, Aioi Bangkok Insurance">
+              <h3 class="h4">Callback queue, Aioi Bangkok Insurance</h3>
+              <p class="fw-light">A callback queue where agents call each caller back in one click, with dashboards and reports.</p>
+              <button type="button" class="card-plus" aria-label="Read more: Callback queue, Aioi Bangkok Insurance">
                 <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
               </button>
             </div>
@@ -3226,7 +3228,7 @@
               <div class="work-logo" aria-hidden="true"><img src="assets/img/clients/card/poch-laundry.webp" alt="" width="470" height="240" style="--lw: 0.588" loading="lazy" decoding="async"></div>
               <span class="project-tag">Client work · Franchise</span>
               <h3 class="h4">Customer records, Poch&nbsp;Laundry</h3>
-              <p class="fw-light">Required shop and customer details on every case, plus a customer data report.</p>
+              <p class="fw-light">Required customer name, shop, type and province, plus a customer data report.</p>
               <button type="button" class="card-plus" aria-label="Read more: Customer records, Poch Laundry">
                 <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
               </button>
@@ -3250,7 +3252,7 @@
               </div>
               <span class="project-tag">Client work · Outbound</span>
               <h3 class="h4">Even lead sharing, AME</h3>
-              <p class="fw-light">New leads go only to agents who need them, so everyone ends up with the same number to call.</p>
+              <p class="fw-light">When more leads are uploaded, uncalled numbers are shared out so every agent ends up with the same total.</p>
               <button type="button" class="card-plus" aria-label="Read more: Even lead sharing, AME">
                 <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
               </button>
@@ -3327,7 +3329,7 @@
 
           <!-- Navigation Arrows for Scroller -->
           <div class="paddlenav paddlenav-alpha paddlenav-framed paddlenav-elevated">
-            <button type="button" class="more proj-all" data-proj-all>See all <span class="js-proj-count">41</span> projects<span
+            <button type="button" class="more proj-all" data-proj-all>See all <span class="js-proj-count">46</span> projects<span
                 class="chev" aria-hidden="true"></span></button>
             <!-- Previous Arrow -->
             <button type="button" class="paddlenav-arrow paddlenav-arrow-previous" aria-label="Previous project" data-scroller-prev>
@@ -3683,7 +3685,7 @@
   </button>
 
   <!-- Main JS -->
-  <script defer src="assets/js/main.min.js?v=2.56.0"></script>
+  <script defer src="assets/js/main.min.js?v=2.57.0"></script>
   <!-- Service Worker: cache assets for repeat visits -->
   <script>if ('serviceWorker' in navigator) { var _sw = function () { navigator.serviceWorker.register('sw.js') }; 'requestIdleCallback' in window ? requestIdleCallback(_sw) : window.addEventListener('load', _sw) }</script>
 
@@ -3831,16 +3833,16 @@
           <li>Implemented scheduled crontab for monthly data import with corrected date logic; fixed import conditions
             and deployed to production overnight to meet billing deadlines.</li>
           <li>Generated secure access link for Report Agent Login-Logout (billing use only), with a log of every login.</li>
-          <li><strong>Privacy &amp; security:</strong> exported PTP, Call Result, FCR Action Code Detail and Service Detail
-            reports now blank or hash personal data; applied the security patch for the Azure Single Sign-On library
-            (10.0.7).</li>
-          <li><strong>Predictive dialer:</strong> added a duration column to the Call Monitor report and a screen where
-            KBAO sets the predictive ringing time themselves; carried caller numbers from AIS mobile lines through SIP
-            headers on FreePBX into the CRM.</li>
-          <li><strong>Data quality:</strong> input checks on Collection and FCR notes (phone format, 1,000-character notes,
-            latitude/longitude for visit location), fixed line breaks that split report rows, and cleaned up queue names
-            in the inbound queue report.</li>
-          <li>Prepared attachment images (FCR photos and LINE chat images) for KBAO’s object storage archive.</li>
+          <li><strong>Privacy:</strong> Personal data is now blanked or hashed in exported PTP, Call Result, FCR Action
+            Code Detail and Service Detail reports.</li>
+          <li><strong>Predictive Dialer:</strong> Added a duration column to the Call Monitor report and a screen where
+            KBAO sets the predictive ringing time themselves.</li>
+          <li><strong>Caller ID:</strong> Caller numbers from AIS mobile lines now reach the CRM through SIP headers on
+            FreePBX.</li>
+          <li><strong>Data Quality:</strong> Added input checks on Collection and FCR notes (phone format, notes up to 1,000
+            characters, latitude and longitude for visit location), fixed line breaks that split report rows, and cleaned
+            up queue names in the inbound queue report.</li>
+          <li>Prepared attachment images (FCR photos and LINE chat images) for KBAO's object storage archive.</li>
         </ul>
       </div>
 
@@ -3864,14 +3866,14 @@
             routing and multi-group campaign support.</li>
           <li>Developed audit log system for all admin menu actions (create/edit/delete/update) for compliance tracking.
           </li>
-          <li><strong>New reports:</strong> sales by media slot, where each user sees only their own slots; and products by
+          <li><strong>New Reports:</strong> Sales by media slot, where each user sees only their own slots; and products by
             airtime, showing inbound calls (total, answered, abandoned), POs, sets, sales and net amount, with every PO one
             tap away.</li>
           <li>Added sort arrows to every column of every report, export on dropdown list settings, channel lists that match
             the call queue names, and a unique caller count; reports 6 and 7 now list every channel, including retired ones.</li>
           <li>Logged queries slower than 5 seconds and made searches default to today when no date is set. Fixed the airtime
-            page so “select all” deletes only the search results.</li>
-          <li>Wrote technical handover documentation for the Happy Monix codebase, so another developer team can carry on.</li>
+            page so "select all" deletes only the search results.</li>
+          <li>Wrote technical documentation for the Happy Monix codebase, covering its structure for future developers.</li>
         </ul>
       </div>
 
@@ -3882,12 +3884,12 @@
           <span class="exp-client-tag">Multilingual IVR System</span>
         </div>
         <ul>
-          <li>Built an <strong>outbound IVR call-out API</strong> connected to VietJet Thailand’s back end, so their team
+          <li>Built an <strong>outbound IVR call-out API</strong> connected to VietJet Thailand's back end, so their team
             creates and runs call campaigns from their own platform. Passengers hear the prompts (route, date and time) in
-            Thai, English, Chinese, Japanese or Vietnamese, chosen from the phone number’s country code.</li>
+            Thai, English, Chinese, Japanese or Vietnamese, chosen from the phone number's country code.</li>
           <li>Passengers press 1 to accept a new flight or 2 to decline; call status, whether they answered and their reply
             all show in the reports.</li>
-          <li>Designed and built a production <strong>multilingual IVR</strong> (Thai and English) — callers select
+          <li>Designed and built the production <strong>inbound IVR</strong> (Thai and English) — callers select
             their preferred language at entry, and all subsequent prompts adapt accordingly.</li>
           <li>Live API-integrated call flows: callers input booking references or flight numbers via DTMF to receive
             real-time flight status, baggage allowance, and refund policy — spoken via dynamic <strong>TTS
@@ -3905,8 +3907,8 @@
           <span class="exp-client-tag">Auto IVR Outbound</span>
         </div>
         <ul>
-          <li>Built an <strong>IVR Outbound Management</strong> system for payment reminder calls: mobile number setup, IVR and call flow design, and announcements voiced by an AI voicebot.</li>
-          <li>Developed an <strong>API</strong> that pulls customer lists from TSR’s system to create outbound campaigns, and an auto dialer that works through them, capped at 30 concurrent lines.</li>
+          <li>Built the <strong>IVR Outbound Management</strong> module for payment reminder calls, which plays announcements voiced by an AI voice bot.</li>
+          <li>Developed an <strong>API</strong> that pulls customer lists from TSR's system to create outbound campaigns, and an auto dialer that works through them, capped at 30 concurrent lines.</li>
           <li>Designed the outbound dashboard and two reports: Auto IVR Summary and Auto IVR Detail.</li>
           <li>Final tuning: new scripts and voice prompts for the pre-due and overdue call sets, and separate weekday and weekend rounds for pulling data and calling.</li>
         </ul>
@@ -3927,7 +3929,6 @@
             Call Answered %; displayed as visual comparison against actuals.</li>
           <li>Monthly/YTD overview tables (Call Offered, Answered, Abandoned, Avg Wait/Talk times), queue statistics,
             agent statistics, and YTD bar chart with export capability.</li>
-          <li>Delivered a third round of design changes requested by the client.</li>
         </ul>
       </div>
 
@@ -3962,7 +3963,7 @@
           <li>Full export capability: CSV, Excel, and PDF report downloads for all dashboard views.</li>
           <li>Data pipeline: raw CDR + CRM event ingestion → aggregation layer → dashboard, with scheduled
             pre-aggregation for fast load times.</li>
-          <li>Built a working <strong>AI voice demo</strong> for Digiserve’s bid to KBJ Capital (October 2026): it answers
+          <li>Built a working <strong>AI voice demo</strong> for Digiserve's bid to KBJ Capital (October 2026): it answers
             the call, asks what the caller needs and answers common payment questions.</li>
         </ul>
       </div>
@@ -4024,7 +4025,7 @@
       <div class="exp-client-section" data-client="oto">
         <div class="exp-client-section-header">
           <img src="https://logo.clearbit.com/oto.co.th" alt="" onerror="this.style.display='none'">
-          <h3>OTO Vision Co., Ltd.</h3>
+          <h3>OTO Vision Co., Ltd. <span style="font-weight:400;color:#6e6e73">(OTO Shopping)</span></h3>
           <span class="exp-client-tag">TV Shopping CRM</span>
         </div>
         <ul>
@@ -4069,11 +4070,11 @@
             appointments; automated reminders and calendar-based conflict detection.</li>
           <li>Developed duplicate lead detection system for agents; built policy expiry alert automation and outbound
             follow-up call scheduling for new customer acquisition.</li>
-          <li>Implemented CTI popup integration with PhoneLite softphone — agents receive screen-pop with caller context
+          <li>Implemented CTI popup integration with PhonerLite softphone — agents receive screen-pop with caller context
             on incoming/outgoing calls; extension status control via Webphone for break/ACW reporting.</li>
           <li>Built configurable lead distribution with count-based allocation rules; added bulk policy assignment
             checkboxes, Call Status column on policy page, and Created-by tracking for supervisor oversight.</li>
-          <li><strong>Lead status &amp; data API (2026):</strong> New/Follow lead status on the outbound list, filters by
+          <li><strong>Lead Status &amp; Data API:</strong> New/Follow lead status on the outbound list, filters by
             call result, a required expiry date, filters on appointments, a reminder pop-up that tucks into the corner,
             LINE OA links on lists, contacts and reports, a fuller report 7 with Excel export, and an API so ISV can pull
             report 7 into their own dashboard.</li>
@@ -4085,14 +4086,14 @@
 
       <div class="exp-client-section" data-client="aioi">
         <div class="exp-client-section-header">
-          <h3>Aioi Bangkok Insurance <span style="font-weight:400;color:#6e6e73">(SE-ABI)</span></h3>
+          <h3>Aioi Bangkok Insurance <span style="font-weight:400;color:#6e6e73">(ABI)</span></h3>
           <span class="exp-client-tag">Callback &amp; Call Reports</span>
         </div>
         <ul>
           <li>Built a <strong>Callback</strong> menu: callers who ask to be called back wait in a queue, agents call them from the screen with one click, and a badge counts the callbacks still waiting.</li>
           <li>Built a dashboard of all inbound calls, split into normal calls and callback requests. Callbacks no longer count as abandoned, so the abandon rate only counts callers who hung up.</li>
           <li>Added reports for inbound call detail, callback detail, service summary with percentages, and agent summary. Only supervisors can play or download call recordings.</li>
-          <li>Calls transferred from the client’s internal phone system cannot be called back, so they stay out of the callback count and show as handled on the dashboard. Limited the claim form to Dry Claim cases only.</li>
+          <li>Calls transferred from the insurer's internal phone system cannot be called back, so they stay out of the callback count and show as handled on the dashboard. Limited the claim form to Dry Claim cases only.</li>
           <li>During the September 2026 floods, switched the callback counter from a daily reset to a running total and cleared callbacks already handled by mobile phone, then restored the daily reset once things eased.</li>
         </ul>
       </div>
@@ -4238,11 +4239,10 @@
             Break) and generated associated status activity reports.</li>
           <li>Automated policy renewal reminders and lapse-prevention campaigns via LINE OA; claim inquiry IVR for
             self-service status checks before agent escalation.</li>
-          <li>Rebuilt the case form to the client’s field list and built an <strong>API</strong> that sends each case to
-            iSurvey (Orbit); restored the caller pop-up search with case history and add-customer.</li>
+          <li>Reworked the case form to the client's field list and built an <strong>API</strong> that sends each case on to
+            an external system; restored the caller popup search, with case history and a button to add a customer.</li>
           <li>Set up a separate team for a new insurance project: 8 agent accounts in their own group, a policy form only
-            they can see (with fields copied from GISWeb), their own queue, and a callback box on the dashboard. Went live
-            in July 2026.</li>
+            they can see, their own queue, and a callback box on the dashboard. Went live in July 2026.</li>
         </ul>
       </div>
 
@@ -4333,8 +4333,8 @@
           <span class="exp-client-tag">Customer Records</span>
         </div>
         <ul>
-          <li>Made the key customer fields required on every case: customer name, branch or shop name, customer type and province.</li>
-          <li>Hid the informer fields the team did not use, and added a customer data report based on the customer screen.</li>
+          <li>Made the key customer fields required: customer name, branch or shop name, customer type and province.</li>
+          <li>Hid the informer type field, and added a customer data report based on the customer screen.</li>
         </ul>
       </div>
 
@@ -4345,7 +4345,6 @@
         </div>
         <ul>
           <li>Masked customer phone numbers for the supervisor role and across all reports.</li>
-          <li>Fixed a display bug on the product page.</li>
         </ul>
       </div>
 
@@ -4540,8 +4539,7 @@
       <h3>What it does</h3>
       <ul>
         <li>Answers the call, greets the caller and asks what they need.</li>
-        <li>Answers short questions from the client’s list, such as a payment that has not shown up in the app yet, and how to pay by QR code.</li>
-        <li>Built in October 2026 on a test number, for Digiserve’s presentation to KBJ Capital.</li>
+        <li>Answers short questions from the client's list, such as a payment that has not shown up in the app yet, and how to pay by QR code.</li>
       </ul>
     </div>
     <p class="exp-sheet-cta">Interested in working together? <a href="#contact" class="more exp-sheet-link">Get in
@@ -4568,7 +4566,6 @@
       <h3>What it does</h3>
       <ul>
         <li>Makes outbound calls, following the call flow, script and product details set by the client.</li>
-        <li>Comes with a test page where the client can try the calls themselves.</li>
       </ul>
     </div>
     <p class="exp-sheet-cta">Interested in working together? <a href="#contact" class="more exp-sheet-link">Get in
