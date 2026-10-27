@@ -157,7 +157,8 @@ test('"See all" lists every project; a row opens it in the sheet and Back return
     assert.equal(r.group, company || title.slice(k + 2), `"${r.name}" sits under the wrong company`);
   }
   // a client row: its project opens in the same sheet, one Back from the list
-  const row = page.locator('.proj-group', { has: page.locator('h3', { hasText: 'Kasikorn' }) }).locator('.proj-row');
+  const row = page.locator('.proj-group', { has: page.locator('h3', { hasText: 'Kasikorn' }) })
+    .locator('.proj-row', { hasText: 'Sales campaign CRM' });
   // tapped where it is (a Playwright click would first scroll the sheet to suit itself)
   await page.evaluate(() => { document.querySelector('.exp-lightbox-inner').scrollTop = 300; });
   await row.evaluate((r) => r.click());
