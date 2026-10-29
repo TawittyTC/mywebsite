@@ -10,7 +10,7 @@
   * { box-sizing: border-box; }
   html, body { margin: 0; background: #fff; }
   body { font-family: 'Inter', -apple-system, 'Helvetica Neue', Arial, sans-serif; color: var(--ink);
-         font-size: 9pt; line-height: 1.38; padding: 12mm 14mm 10mm; }
+         font-size: 9pt; line-height: 1.38; padding: 10mm 14mm 9mm; }
   a { color: var(--blue); text-decoration: none; }
   header { display: flex; justify-content: space-between; align-items: flex-end; gap: 12mm;
            padding-bottom: 4mm; border-bottom: 1px solid var(--line); }
@@ -29,6 +29,9 @@
   li { margin: 0 0 .5mm; }
   li::marker { color: var(--blue); }
   .clients { margin-top: 1.2mm; color: var(--grey); }
+  .projects { display: grid; grid-template-columns: 1fr 1fr; gap: 1.6mm 9mm; }
+  .projects p b { font-weight: 600; }
+  .projects .who { color: var(--grey); }
   .two { display: grid; grid-template-columns: 1fr 1fr; gap: 0 9mm; }
   .skills { display: grid; grid-template-columns: 27mm 1fr; gap: 1.1mm 3mm; }
   .skills dt { font-weight: 600; }
@@ -51,31 +54,29 @@
   </div>
 </header>
 
-<p class="summary">Full-stack developer and computer engineer who has shipped custom CRM systems for 32 companies across
-Thailand, solo from requirements to production, with hands-on experience in AI engineering: LLM integration, voice AI
-(ASR, TTS, speech-to-speech) and agentic AI systems for business automation.</p>
+<p class="summary">Full-stack developer who has shipped custom CRM and contact-center systems for
+<span style="white-space:nowrap">32 companies</span> across Thailand, solo from requirements to production, and now builds AI voice agents and agentic AI prototypes.</p>
 
 <h2>Experience</h2>
 <div class="job">
   <div class="job-head"><div class="job-title">Full Stack Developer <span>· Protollcall Advance Service Co., Ltd.</span></div><div class="when">June 2024 – Present</div></div>
   <ul>
-    <li>Architected and shipped tailor-made enterprise CRM systems for 32 clients in healthcare, finance, insurance and
-      <span style="white-space:nowrap">e-commerce</span>, as the sole full-stack developer across the complete SDLC.</li>
-    <li>Integrated Asterisk PBX telephony (AGI, AMI, Dialplan), AI-powered IVR (TTS/ASR/LLM), predictive dialers,
-      real-time analytics dashboards and multi-channel APIs (LINE, Telegram, webhooks).</li>
-    <li>Delivered and maintained 60+ customization tickets, from UI/UX enhancements to backend logic and database optimization.</li>
-    <li>Hardened security per OWASP guidelines (XSS fixes, HSTS, session security, password policy) and built audit logging for compliance.</li>
-    <li>Researched and prototyped agentic AI: an orchestrator coordinating sub-agents, LLM voice pipelines (ASR → LLM → TTS) and real-time speech-to-speech.</li>
+    <li>Architected and shipped tailor-made CRM and contact-center systems for 32 clients in healthcare, finance, insurance,
+      aviation and <span style="white-space:nowrap">e-commerce</span>, as the sole full-stack developer across the complete SDLC.</li>
+    <li>Built AI voice agents, auto IVR outbound systems fed by client APIs, and multilingual IVR, on Asterisk PBX
+      (AGI, AMI, Dialplan) with predictive dialers, CTI pop-ups, dashboards, and webhook, LINE&nbsp;OA and Telegram integrations.</li>
+    <li>Delivered and maintained 60+ customization tickets; hardened security per OWASP (XSS fixes, HSTS, password policy),
+      added audit logging and masked personal data in report exports.</li>
+    <li>Prototyped agentic AI with an orchestrator and sub-agents, and real-time LLM voice pipelines.</li>
   </ul>
-  <p class="clients">Clients include Bangkok Hospital Chiang Mai, Kasikorn Carabao, Thai VietJet Air, Isuzu Thailand, Rabbit Card and Inchcape Thailand.</p>
+  <p class="clients">Clients include Bangkok Hospital Chiang Mai, Insurverse, Inchcape Thailand, Rabbit Card and Isuzu Thailand.</p>
 </div>
 <div class="job">
   <div class="job-head"><div class="job-title">Full Stack Developer Intern <span>· The Siam Cement Group (SCG)</span></div><div class="when">April 2023 – March 2024</div></div>
   <ul>
-    <li>Two internships, 6 internal platforms delivered end-to-end; built REST APIs (Laravel) and Bootstrap/JavaScript front ends with MVC, validation, CSRF protection and authentication.</li>
-    <li>Dec 2023 – Mar 2024: 4 production apps for the Center of Excellence &amp; Data Driven department: a reservation system,
-      document reference tracker, area-based job dispatch platform and an event e-commerce store with inventory.</li>
-    <li>Apr – Jul 2023: a software license request and approval workflow, and a company-wide IT asset tracking platform with full lifecycle management, used group-wide by 2,000+ people.</li>
+    <li>Two internships (Apr – Jul 2023, Dec 2023 – Mar 2024), six internal platforms built end to end: Laravel REST APIs and Bootstrap/JavaScript front ends with MVC, CSRF protection and authentication.</li>
+    <li>A license approval workflow and an IT asset tracker, used group-wide by 2,000+ people; then reservation,
+      <span style="white-space:nowrap">document reference</span>, job dispatch and event store apps for the Center of Excellence &amp; Data Driven department.</li>
   </ul>
 </div>
 <div class="job">
@@ -85,17 +86,33 @@ Thailand, solo from requirements to production, with hands-on experience in AI e
   </ul>
 </div>
 
+<h2>Selected projects</h2>
+<div class="projects">
+  <p><b>AI voice agents</b> <span class="who">· Genius Track, Digiserve</span><br>Outbound calls from Genius Track's script, and
+    an inbound demo for Digiserve's bid to KBJ Capital.</p>
+  <p><b>Auto IVR payment reminders</b> <span class="who">· TSR Living Solution</span><br>Outbound campaigns built from
+    customer lists pulled by API, up to 30 lines at once, with a dashboard and reports.</p>
+  <p><b>Flight change call-outs</b> <span class="who">· Thai VietJet Air</span><br>A campaign API linked to VietJet's back end;
+    prompts in five languages, picked by phone country code.</p>
+  <p><b>Collection CRM</b> <span class="who">· Kasikorn Carabao</span><br>Predictive dialer, dashboards over large daily call
+    logs, LINE image sending and chatbot hand-off.</p>
+  <p><b>TV shopping CRM</b> <span class="who">· Happy Products</span><br>Airtime, orders and telesales in one CRM, with
+    warehouse stock sync and airtime sales reports.</p>
+  <p><b>Callback system</b> <span class="who">· Aioi Bangkok Insurance</span><br>A one-click callback queue for agents, an inbound
+    call dashboard and call reports.</p>
+</div>
+
 <div class="two">
   <div>
     <h2>Education</h2>
     <p><b>Bachelor's degree, Computer Engineering</b></p>
-    <p class="muted">Rajamangala University of Technology Srivijaya · June 2020 – April 2024 · GPAX 3.64</p>
+    <p class="muted">Rajamangala University of Technology Srivijaya<br>June 2020 – April 2024 · GPAX 3.64</p>
     <p style="margin-top:2mm"><b>Vocational Certificate, Information Technology</b></p>
-    <p class="muted">Songkhla Technical College · May 2017 – March 2019 · GPAX 3.84</p>
+    <p class="muted">Songkhla Technical College<br>May 2017 – March 2019 · GPAX 3.84</p>
   </div>
   <div>
     <h2>Achievements</h2>
-    <p><b>Professional Qualification, Software &amp; Applications System Tester, Level 4</b></p>
+    <p><b>Software &amp; Applications System Tester, Level 4</b></p>
     <p class="muted">Thailand Professional Qualification Institute (TPQI)</p>
     <p style="margin-top:2mm"><b>Published research (TCI-1)</b></p>
     <p class="muted">“Measuring of Words Similarity for Question Answering System for Diabetes”. Journal of Applied
@@ -106,8 +123,8 @@ Thailand, solo from requirements to production, with hands-on experience in AI e
 <h2>Skills</h2>
 <dl class="skills">
   <dt>Web</dt><dd>PHP, Python, JavaScript, React, Flask, Laravel, REST API, HTML5 / CSS3, Bootstrap, UX/UI</dd>
-  <dt>AI</dt><dd>LLM integration (GPT, Gemini, Claude), multi-agent orchestration, ASR, TTS, speech-to-speech, AI IVR, chatbots</dd>
-  <dt>Telephony</dt><dd>Asterisk PBX (AGI, AMI, Dialplan), predictive dialers, call analytics</dd>
+  <dt>AI</dt><dd>LLMs (GPT, Gemini, Claude), AI voice agents, agentic AI, ASR, TTS, speech-to-speech, chatbots</dd>
+  <dt>Telephony</dt><dd>Asterisk PBX (AGI, AMI, Dialplan), SIP, predictive dialers, auto IVR, CTI, call analytics</dd>
   <dt>Data</dt><dd>MySQL, MSSQL, query tuning, ORM</dd>
   <dt>DevOps</dt><dd>Docker, Git, CI, AWS, Linux, Zabbix</dd>
   <dt>Security</dt><dd>OWASP, XSS, CSRF, SSL/TLS, HSTS</dd>
