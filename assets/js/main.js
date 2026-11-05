@@ -90,7 +90,7 @@
     const hideLoader = () => {
       if (done) return;
       done = true;
-      preloader.style.transition = 'opacity 0.25s';
+      preloader.style.transition = 'opacity .25s cubic-bezier(.22, 1, .36, 1)';
       preloader.style.opacity = '0';
       setTimeout(() => { if (preloader.parentNode) preloader.remove(); }, 260);
     };
@@ -106,28 +106,6 @@
     });
     // Failsafe: never block the page for more than 2s from navigation start
     setTimeout(hideLoader, Math.max(0, 2000 - performance.now()));
-  }
-
-  /**
-   * Hero type effect — native (replaces Typed.js, saves 11KB)
-   */
-  const typedEl = select(".typed");
-  if (typedEl) {
-    const items = typedEl.getAttribute("data-typed-items").split(",").map(s => s.trim());
-    let i = 0, j = 0, deleting = false;
-    function typeTick() {
-      const cur = items[i];
-      typedEl.textContent = cur.slice(0, j);
-      if (!deleting) {
-        j++;
-        if (j > cur.length) { deleting = true; setTimeout(typeTick, 2000); return; }
-      } else {
-        j--;
-        if (j < 0) { j = 0; deleting = false; i = (i + 1) % items.length; }
-      }
-      setTimeout(typeTick, deleting ? 50 : 100);
-    }
-    typeTick();
   }
 
 
@@ -282,6 +260,13 @@ var overlayHistory = (function () {
   };
 })();
 
+// What opened an overlay decides where focus lands in it: from the keyboard
+// its close button takes focus and shows the ring; from a mouse or a finger
+// the dialog itself does, so no ring appears on a button nobody aimed at
+var viaKeys = false;
+document.addEventListener("keydown", function () { viaKeys = true; }, true);
+document.addEventListener("pointerdown", function () { viaKeys = false; }, true);
+
 // Cert lightbox
 (function () {
   const lightbox = document.createElement("div");
@@ -289,6 +274,7 @@ var overlayHistory = (function () {
   lightbox.setAttribute("role", "dialog");
   lightbox.setAttribute("aria-modal", "true");
   lightbox.setAttribute("aria-label", "Certificate preview");
+  lightbox.tabIndex = -1;
   const lbImg = document.createElement("img");
   // the frame lets a wide screenshot be panned on a narrow phone
   const frame = document.createElement("div");
@@ -299,7 +285,7 @@ var overlayHistory = (function () {
   const closeBtn = document.createElement("button");
   closeBtn.className = "cert-lightbox-close";
   closeBtn.setAttribute("aria-label", "Close");
-  closeBtn.innerHTML = "&#x2715;";
+  closeBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg>'; // the drawn cross, like every other icon
   lightbox.appendChild(frame);
   lightbox.appendChild(caption);
   lightbox.appendChild(closeBtn);
@@ -349,8 +335,14 @@ var overlayHistory = (function () {
       frame.removeAttribute("tabindex");
       frame.removeAttribute("aria-label");
     }
-    if (pan) caption.textContent = (title ? title + " · " : "") + "Swipe to see the whole screen";
-    if (pan) caption.hidden = false;
+    // the swipe hint gets its own line, so a wrap never starts a line with " · "
+    if (pan) {
+      var hint = document.createElement("span");
+      hint.className = "cert-lightbox-hint";
+      hint.textContent = "Swipe to see the whole screen";
+      caption.append(" ", hint);   // the space keeps the two apart when read aloud
+      caption.hidden = false;
+    }
     // one viewer serves certificates and project screenshots alike
     lightbox.setAttribute("aria-label", label || "Certificate preview");
     lightbox.classList.add("open");
@@ -360,7 +352,7 @@ var overlayHistory = (function () {
     anchorOrigin(lbImg, source);
     frame.scrollLeft = 0;
     if (reduce) motion.jump(1); else motion.to(1);
-    closeBtn.focus();
+    (viaKeys ? closeBtn : lightbox).focus({ preventScroll: true });
   }
   function closeLightbox() {
     if (!lightbox.classList.contains("open")) return; // Escape pressed elsewhere
@@ -400,12 +392,22 @@ var overlayHistory = (function () {
   lightbox.setAttribute('aria-label', 'Experience details');
   const inner = document.createElement('div');
   inner.className = 'exp-lightbox-inner';
+  inner.tabIndex = -1;
   const closeBtn = document.createElement('button');
   closeBtn.className = 'exp-lightbox-close';
   closeBtn.setAttribute('aria-label', 'Close');
-  closeBtn.innerHTML = '&#x2715;';
-  inner.appendChild(closeBtn);
+  closeBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg>';
+  // the close button (and "All projects") ride a bar the sheet scrolls
+  // under, so they never sit on top of words, logos or chevrons
+  const bar = document.createElement('div');
+  bar.className = 'exp-lightbox-bar';
+  bar.appendChild(closeBtn);
+  inner.appendChild(bar);
   lightbox.appendChild(inner);
+  const stuck = function () { bar.classList.toggle('is-stuck', inner.scrollTop > 0); };
+  inner.addEventListener('scroll', stuck, { passive: true });
+  // a target scrolled to sits this far below the top edge: clear of the bar
+  const clear = function () { return bar.offsetHeight + 16; };
   document.body.appendChild(lightbox);
 
   let lastFocus = null;
@@ -472,9 +474,9 @@ var overlayHistory = (function () {
       } else if (!e.shiftKey && document.activeElement === last) {
         e.preventDefault();
         first.focus();
-      } else if (!inner.contains(document.activeElement)) {
+      } else if (!inner.contains(document.activeElement) || document.activeElement === inner) {
         e.preventDefault();
-        first.focus();
+        (e.shiftKey ? last : first).focus();
       }
     }
   });
@@ -483,6 +485,8 @@ var overlayHistory = (function () {
     var was = lightbox.classList.contains('open');
     if (!was) overlayHistory.opened(closeExp);
     while (inner.children.length > 1) inner.removeChild(inner.lastChild);
+    var pill = bar.querySelector('.proj-back');
+    if (pill) bar.removeChild(pill);
     const content = document.createElement('div');
     content.innerHTML = html;
     inner.appendChild(content);
@@ -504,7 +508,7 @@ var overlayHistory = (function () {
     lightbox.style.visibility = 'visible';
     anchorOrigin(inner, source);
     if (reduce) motion.jump(1); else motion.to(1);
-    closeBtn.focus();
+    (viaKeys ? closeBtn : inner).focus({ preventScroll: true });
 
     // Initialize client filter chips
     var chips = inner.querySelectorAll('.exp-filter-chip');
@@ -555,8 +559,8 @@ var overlayHistory = (function () {
           }
         });
         // chosen from the stuck row further down: bring the story up under it
-        if (phone && clientsBlock && inner.scrollTop > clientsBlock.offsetTop - 8) {
-          inner.scrollTop = clientsBlock.offsetTop - 8;
+        if (phone && clientsBlock && inner.scrollTop > clientsBlock.offsetTop - 16) {
+          inner.scrollTop = clientsBlock.offsetTop - 16;
         }
       };
       chips.forEach(function (chip) {
@@ -567,28 +571,18 @@ var overlayHistory = (function () {
       if (preset && clientsBlock) {
         // opened from a client-work card: straight to that client
         choose(preset);
-        inner.scrollTop = Math.max(0, clientsBlock.offsetTop - 8);
+        // phone: the heading slips under the bar and the chip row sits
+        // stuck right below it, the story 8px under the row
+        inner.scrollTop = Math.max(0, clientsBlock.offsetTop - (phone ? 16 : clear()));
         var row = preset.parentNode;
-        row.scrollLeft = preset.offsetLeft - row.offsetLeft - 18;
-      } else {
-        // Hint animation: bounce non-"All" chips after modal opens
-        setTimeout(function () {
-          var delay = 0;
-          chips.forEach(function (chip) {
-            if (chip.dataset.filter === 'all') return;
-            setTimeout(function () {
-              chip.classList.add('hint');
-              chip.addEventListener('animationend', function () { chip.classList.remove('hint'); }, { once: true });
-            }, delay);
-            delay += 70;
-          });
-        }, 450);
+        row.scrollLeft = preset.offsetLeft - row.offsetLeft - 20;
       }
     } else if (client) {
       // a sheet without client chips (SCG): open it on that project
       var sec = inner.querySelector('.exp-client-section[data-client="' + client + '"]');
-      if (sec) inner.scrollTop = Math.max(0, sec.offsetTop - 8);
+      if (sec) inner.scrollTop = Math.max(0, sec.offsetTop - clear());
     }
+    stuck();
   };
   window._expLightboxNest = function (html, source, client, restore) {
     back = function () { back = null; restore(); };
@@ -609,12 +603,12 @@ var overlayHistory = (function () {
       b.setAttribute('aria-describedby', 'proj-back-note');
     }
     b.addEventListener('click', function () { history.back(); }, { once: true });
-    inner.insertBefore(b, closeBtn.nextSibling);
-    b.focus({ preventScroll: true });
-    // the sheet opened on a project (scrolled to it): start it below the pill
+    bar.insertBefore(b, closeBtn);
+    if (viaKeys) b.focus({ preventScroll: true });
+    // the sheet opened on a project (scrolled to it): start it clear of the bar
     var chip = inner.querySelector('.exp-filter-chip');
     var t = inner.scrollTop && (chip ? chip.closest('.exp-modal-section') : inner.querySelector('.exp-client-section[data-client="' + client + '"]'));
-    if (t) inner.scrollTop = Math.max(0, t.offsetTop - parseFloat(getComputedStyle(inner).paddingTop) - b.offsetHeight - 8);
+    if (t) inner.scrollTop = Math.max(0, t.offsetTop - clear());
   };
 })();
 
@@ -626,7 +620,7 @@ document.addEventListener('DOMContentLoaded', function () {
       '.exp-filter-chip[data-filter]:not([data-filter="all"]):not([data-filter="general"])'
     );
     var clientCount = chips.length;
-    // Update stat number + data-count for count-up
+    // Update the stat number and its data-count
     var statSpan = document.querySelector('[data-exp="protollcall"] .exp-stat-clients');
     if (statSpan) { statSpan.dataset.count = clientCount; statSpan.textContent = clientCount; }
     // Update the count wherever it is written: the card and its sheet
@@ -647,43 +641,8 @@ document.addEventListener('DOMContentLoaded', function () {
       if (tmpl) window._expLightboxOpen(tmpl.innerHTML, card);
     });
   });
-
-  // ── Count-up animation for stat numbers ──
-  function countUp(el) {
-    var target = parseInt(el.dataset.count, 10);
-    if (isNaN(target) || target <= 0) return;
-    var dur = 700, t0 = performance.now();
-    el.textContent = '0';
-    (function step(now) {
-      var p = Math.min((now - t0) / dur, 1);
-      el.textContent = Math.round((1 - Math.pow(1 - p, 3)) * target);
-      if (p < 1) requestAnimationFrame(step);
-    }(performance.now()));
-  }
-
-  // ── Card stagger + count-up when card enters viewport ──
-  var expCards = Array.from(document.querySelectorAll('#experience .data-box[data-exp]'));
-  if ('IntersectionObserver' in window) {
-    var cardObs = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (!entry.isIntersecting) return;
-        var idx = expCards.indexOf(entry.target);
-        entry.target.style.animationDelay = (idx * 80) + 'ms';
-        entry.target.classList.add('card-visible');
-        var btn = entry.target.querySelector('.exp-card-btn');
-        if (btn) setTimeout(function () { btn.classList.add('hint-loop'); }, idx * 80 + 400);
-        var countEls = entry.target.querySelectorAll('.js-count[data-count]');
-        if (countEls.length) setTimeout(function () { countEls.forEach(countUp); }, idx * 80 + 300);
-        cardObs.unobserve(entry.target);
-      });
-    }, { threshold: 0.2 });
-    expCards.forEach(function (card) { cardObs.observe(card); });
-  } else {
-    expCards.forEach(function (card) {
-      card.classList.add('card-visible');
-      card.querySelectorAll('.js-count[data-count]').forEach(countUp);
-    });
-  }
+  // (the stat numbers are written final in the page: nothing counts up,
+  // and the cards enter with the one reveal below, like every block)
 });
 
 // Project cards open their screenshot whole, the way an apple.com card's
@@ -782,6 +741,43 @@ document.addEventListener("DOMContentLoaded", function () {
   const imagesList = document.getElementById("images-list");
   if (!imagesList) return;
 
+  // what each certificate is, read from the certificate itself (img-N is N)
+  const names = [
+    "Internship letter, SCG, April to July 2023",
+    "Internship letter, SCG, December 2023 to March 2024",
+    "Systems Tester, Professional Qualification Level 4, TPQI, 2022",
+    "Digital industry qualification training, ARIT, 2021",
+    "Second place, academic quiz, Songkhla Polytechnic College, 2019",
+    "Research presentation award, Very good, AUC 2023",
+    "Command Prompt 101, BorntoDev, 2019",
+    "Essential SQL for Everyone, BorntoDev, 2019",
+    "Fundamentals of Graphic Design, BorntoDev, 2019",
+    "Introduction to Computer Science, BorntoDev, 2020",
+    "Chatbots for online shops, BorntoDev, 2020",
+    "Notebook repair service, short course, Songkhla Polytechnic College, 2017",
+    "Microsoft Excel basics, Starfish Labz, 2020",
+    "Computing science and coding, Starfish Labz, 2020",
+    "Startup Thailand League 2021, online coaching and Mega Hackathon",
+    "Hour of Code with Minecraft, Code.org",
+    "The Hour of Code, Code.org",
+    "English for communication, short course, Songkhla Polytechnic College, 2017",
+    "English public speaking contest, Songkhla vocational education, 2018",
+    "GitHub for Developer, BorntoDev, 2022",
+    "Computer repair service, short course, Songkhla Polytechnic College, 2017",
+    "Notebook repair, short course in Thai, Songkhla Polytechnic College, 2017",
+    "Computer repair, short course in Thai, Songkhla Polytechnic College, 2017",
+    "Computer repair service, short course, Songkhla Polytechnic College, 2017",
+    "Introduction to JavaScript, BorntoDev, 2020",
+    "Lite: Fundamental Web Dev with HTML5 & CSS3, BorntoDev, 2022",
+    "Coding, a skill for the future, Starfish Labz, 2020",
+    "Python programming for beginners, Starfish Labz, 2020",
+    "Basic Software Testing, BorntoDev, 2025",
+    "NDG Linux Essentials, Cisco Networking Academy, 2023",
+    "Improving work efficiency with AI, Thai MOOC",
+    "Claude 101, Anthropic",
+    "Claude Code 101, Anthropic"
+  ];
+
   function buildCerts() {
     if (imagesList.dataset.loaded) return;
     imagesList.dataset.loaded = "1";
@@ -794,7 +790,8 @@ document.addEventListener("DOMContentLoaded", function () {
       wrapper.classList.add("cert-img");
       const imgElement = document.createElement("img");
       const src = `assets/img/certificate/img-${i}.avif`;
-      const alt = "Tanapol Certificate " + i;
+      const name = names[i - 1];
+      const alt = "Certificate: " + name;
       imgElement.src = src;
       imgElement.className = "img-fluid";
       imgElement.alt = alt;
@@ -802,15 +799,15 @@ document.addEventListener("DOMContentLoaded", function () {
       imgElement.draggable = false;
       const expandBtn = document.createElement("button");
       expandBtn.className = "cert-expand-btn";
-      expandBtn.setAttribute("aria-label", "View certificate fullscreen");
+      expandBtn.setAttribute("aria-label", "View certificate: " + name);
       expandBtn.innerHTML = "+";
       expandBtn.addEventListener("click", function (e) {
         e.stopPropagation();
-        window._certLightboxOpen(src, alt, card);
+        window._certLightboxOpen(src, alt, card, "Certificate preview", name);
       });
       card.style.cursor = "pointer";
       card.addEventListener("click", function () {
-        window._certLightboxOpen(src, alt, card);
+        window._certLightboxOpen(src, alt, card, "Certificate preview", name);
       });
       wrapper.appendChild(imgElement);
       card.appendChild(wrapper);
@@ -950,91 +947,31 @@ function createCardScroller(scroller, options) {
   update();
   setTimeout(update, 500);
 
-  // Mobile: nudge the row left-and-back every few seconds to hint that
-  // it scrolls horizontally; pause while (and shortly after) the user
-  // interacts, and fire the first hint when the row enters the viewport.
-  if (window.innerWidth <= 1024 && !reduceMotion) {
-    var hintDistance = 80;
-    var duration = 250;
-    var userScrolling = false;
-    var isAnimating = false;
-    var scrollEndTimer = null;
-    var hintInterval = null;
-
-    var easeInOut = function (t) {
-      return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
-    };
-
+  // Mobile: nudge the row left and back once, the first time it comes
+  // into view, to show that it scrolls sideways. It never repeats, and a
+  // touch, a scroll or a keyboard focus in the row cancels it.
+  if (window.innerWidth <= 1024 && !reduceMotion && 'IntersectionObserver' in window) {
+    var hintDone = false;
+    var cancelHint = function () { hintDone = true; };
+    scroller.addEventListener('touchstart', cancelHint, { passive: true });
+    scroller.addEventListener('focusin', cancelHint);
     var runHint = function () {
-      if (userScrolling || isAnimating) return;
-      var maxScrollLeft = scroller.scrollWidth - scroller.clientWidth;
-      var atRightEnd = scroller.scrollLeft >= maxScrollLeft - 1;
-      var dir = atRightEnd ? -1 : 1;
-      isAnimating = true;
-      var baseScroll = scroller.scrollLeft;
-      var fwdStart = performance.now();
-      function forward(ts) {
-        if (userScrolling) { isAnimating = false; return; }
-        var p = Math.min((ts - fwdStart) / duration, 1);
-        scroller.scrollLeft = baseScroll + dir * hintDistance * easeInOut(p);
-        if (p < 1) { requestAnimationFrame(forward); return; }
-        var bkStart = performance.now();
-        function back(ts2) {
-          if (userScrolling) { isAnimating = false; return; }
-          var p2 = Math.min((ts2 - bkStart) / duration, 1);
-          scroller.scrollLeft = baseScroll + dir * hintDistance * (1 - easeInOut(p2));
-          if (p2 < 1) { requestAnimationFrame(back); return; }
-          isAnimating = false;
-        }
-        requestAnimationFrame(back);
-      }
-      requestAnimationFrame(forward);
+      var dir = scroller.scrollLeft >= scroller.scrollWidth - scroller.clientWidth - 1 ? -1 : 1;
+      var base = scroller.scrollLeft, t0 = performance.now();
+      (function step(ts) {
+        if (hintDone) return;
+        // 40px out and back in 600ms, each leg on an ease-out
+        var p = Math.min((ts - t0) / 600, 1);
+        var e = p < 0.5 ? 1 - Math.pow(1 - p * 2, 3) : Math.pow(2 - p * 2, 3);
+        scroller.scrollLeft = base + dir * 40 * e;
+        if (p < 1) requestAnimationFrame(step); else hintDone = true;
+      })(t0);
     };
-
-    var rowVisible = false;
-    var startHintLoop = function () {
-      clearInterval(hintInterval);
-      hintInterval = null;
-      // off screen nobody sees the nudge: it waits until the row is back
-      if (rowVisible) hintInterval = setInterval(runHint, 3000);
-    };
-
-    var onUserScroll = function () {
-      if (isAnimating) return;
-      userScrolling = true;
-      clearInterval(hintInterval);
-      hintInterval = null;
-      clearTimeout(scrollEndTimer);
-      scrollEndTimer = setTimeout(function () {
-        userScrolling = false;
-        startHintLoop();
-      }, 10000);
-    };
-
-    scroller.addEventListener('touchstart', onUserScroll, { passive: true });
-    scroller.addEventListener('scroll', onUserScroll, { passive: true });
-    // a keyboard user moving through the row stops the hint at once
-    scroller.addEventListener('focusin', function () { isAnimating = false; onUserScroll(); });
-
-    var hintStarted = false;
-    var firstCall = true;
     var hintObs = new IntersectionObserver(function (entries) {
-      var e = entries[entries.length - 1];
-      rowVisible = e.isIntersecting;
-      // the first hint still waits for 30% of the row, as it always has
-      var started = !hintStarted && rowVisible && (firstCall || e.intersectionRatio >= 0.3);
-      firstCall = false;
-      if (!rowVisible) {
-        clearInterval(hintInterval);
-        hintInterval = null;
-      } else if (started) {
-        hintStarted = true;
-        runHint();
-        startHintLoop();
-      } else if (hintStarted && !userScrolling && !hintInterval) {
-        startHintLoop();
-      }
-    }, { threshold: [0, 0.3] });
+      if (hintDone || entries[entries.length - 1].intersectionRatio < 0.3) return;
+      hintObs.disconnect();
+      runHint();
+    }, { threshold: 0.3 });
     hintObs.observe(scroller);
   }
 
@@ -1105,61 +1042,6 @@ document.addEventListener('DOMContentLoaded', function () {
 var currentYear = new Date().getFullYear();
 document.getElementById('current-year').textContent = currentYear;
 
-// Scroll hint: nudge project cards on mobile to hint horizontal scroll
-// (the row is far below the fold: it waits for the next paint after load)
-window.addEventListener('load', function () { afterPaint(scrollHint); });
-function scrollHint() {
-  if (window.innerWidth > 1024) return;
-  var scroller = document.getElementById('scroller');
-  if (!scroller) return;
-  scroller.classList.add('scroll-hint');
-  scroller.addEventListener('animationend', function() {
-    scroller.classList.remove('scroll-hint');
-  }, { once: true });
-}
-
-
-// Experience expand/collapse
-document.addEventListener('DOMContentLoaded', function () {
-  document.querySelectorAll('.exp-body').forEach(function (body) {
-    var btn = body.nextElementSibling;
-    if (!btn || !btn.classList.contains('exp-toggle')) return;
-    // If content fits within max-height, remove restriction and hide button
-    if (body.scrollHeight <= 105) {
-      body.style.maxHeight = 'none';
-      body.style.maskImage = 'none';
-      body.style.webkitMaskImage = 'none';
-      btn.hidden = true;
-      return;
-    }
-    btn.addEventListener('click', function () {
-      var open = body.classList.toggle('open');
-      btn.classList.toggle('open', open);
-      btn.setAttribute('aria-expanded', String(open));
-      btn.querySelector('.exp-lbl').textContent = open ? 'See less' : 'See more';
-    });
-  });
-
-  // Hint animation: bounce chevron when card first enters viewport
-  if ('IntersectionObserver' in window) {
-    var hintObs = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (!entry.isIntersecting) return;
-        var btn = entry.target.querySelector('.exp-toggle:not([hidden])');
-        if (btn && !btn.classList.contains('open')) {
-          btn.classList.add('hint');
-          btn.addEventListener('animationend', function () {
-            btn.classList.remove('hint');
-          }, { once: true });
-        }
-        hintObs.unobserve(entry.target);
-      });
-    }, { threshold: 0.5 });
-    document.querySelectorAll('#experience .data-box').forEach(function (box) {
-      hintObs.observe(box);
-    });
-  }
-});
 
 // Dynamic duration for Protollcall (current employer)
 (function () {
@@ -1172,14 +1054,14 @@ document.addEventListener('DOMContentLoaded', function () {
   if (months < 0) { years--; months += 12; }
   var parts = [];
   if (years > 0) parts.push(years + (years === 1 ? ' yr' : ' yrs'));
-  if (months > 0) parts.push(months + (months === 1 ? ' month' : ' months'));
-  el.textContent = parts.join(' ') || '1 month';
+  if (months > 0) parts.push(months + (months === 1 ? ' mo' : ' mos'));
+  el.textContent = parts.join(' ') || '1 mo';
 })();
 
 
 /**
- * Hero motion — copy scroll drift/fade + scroll reveals
- * All transform/opacity, rAF-throttled, gated on motion preference.
+ * Hero height lock + the one-shot block reveals.
+ * Transform and opacity only, gated on motion preference.
  */
 (function () {
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -1231,112 +1113,58 @@ document.addEventListener('DOMContentLoaded', function () {
     }, { passive: true });
   }
 
-  // ---- Scroll-scrub reveals (Apple product-page feel) ----
-  // Progress is a pure function of where the element sits in the
-  // viewport, so entrances scrub with the scroll in both directions and
-  // can never desync or be skipped (no IntersectionObserver, no one-shot
-  // state). Elements ease from translate/scale/fade to identity as they
-  // travel from the viewport bottom to ~60% up; once settled the inline
-  // styles are cleared so CSS hover transforms take over.
+  // ---- Reveals: one short fade-and-rise per block, once ----
+  // A block that starts below the fold waits at opacity 0 (.js-reveal) and
+  // plays a single 12px rise as it comes in: never tied to the scroll
+  // position, never replayed when you scroll back. An IntersectionObserver
+  // starts it. In-app webviews have delivered those entries late, so a
+  // light sweep on a timer also shows anything the scroll has already
+  // carried past the line, and stops once nothing is left waiting.
   if (!reduce) {
-    var GROUPS = [
-      { sel: '.section-title', travel: 64, scale: 0 },
-      { sel: '#resume .data-box', travel: 56, scale: 1 },
-      { sel: '#experience .data-box', travel: 56, scale: 1 },
-      { sel: '#skill .boxWhyScg', travel: 56, scale: 1 },
-      { sel: '#portfolio .rf-cards-scroller-item', travel: 56, scale: 1, stagger: 0.05 },
-      { sel: '#images-list .cert-card', travel: 44, scale: 1, stagger: 0.06, mod: 3 },
-      { sel: '.closing-cta .cta-inner', travel: 56, scale: 0 }
-    ];
-    var items = null;
-    // Everything armed here starts below the fold, so the arming waits for
-    // the first paint; all positions are read before any class is written,
-    // so the page is laid out once, not once per element. The elements are
-    // the ones on the page now, as the script runs (the certificate grid is
-    // built later, on DOMContentLoaded, and has never been part of this).
-    var lists = GROUPS.map(function (g) { return document.querySelectorAll(g.sel); });
+    var lists = ['.section-title', '#resume .data-box', '#experience .data-box',
+      '#portfolio .rf-cards-scroller-item', '.closing-cta .cta-inner'
+    ].map(function (sel) { return document.querySelectorAll(sel); });
+    // everything armed here starts below the fold, so arming waits for the
+    // first paint, and all positions are read before any class is written
     afterPaint(function () {
-      var found = [];
-      var limit = window.innerHeight * 0.92;
-      GROUPS.forEach(function (g, gi) {
-        var els = lists[gi];
+      var pending = [], io = null, timer = 0;
+      var line = function () { return window.innerHeight * 0.92; };
+      lists.forEach(function (els) {
         for (var i = 0; i < els.length; i++) {
-          if (els[i].getBoundingClientRect().top < limit) continue; // in view at load — leave as-is
-          found.push({
-            el: els[i], travel: g.travel, scale: g.scale, done: false, curY: 0, lastP: -1,
-            // shift the scrub window per column/index so grids cascade
-            shift: (g.mod ? (i % g.mod) : Math.min(i, 5)) * (g.stagger || 0)
-          });
+          if (els[i].getBoundingClientRect().top >= line()) pending.push(els[i]);
         }
       });
-      found.forEach(function (it) { it.el.classList.add('js-reveal'); });
-      items = found;
-      if (items.length) setInterval(function () { scrubFrame(true); }, 250);
-    });
-    // Continuous rAF loop, like the hero canvas: progress is recomputed
-    // from live viewport geometry every frame, so it needs no scroll
-    // events, no scrollY, and no cached offsets — in-app webviews that
-    // deliver scroll/resize events erratically still animate correctly.
-    // Position reads subtract our own applied translate so the
-    // animation never pollutes the measurement. A frame in which the
-    // page has neither scrolled nor changed size or length would give
-    // every element the progress it already has, so it reads nothing
-    // more; the 250ms pass below measures everything regardless.
-    // (The loop starts now, ahead of the hero's, so it reads layout
-    // before the hero writes to it in each frame.)
-    var seen = { top: -1, vh: -1, len: -1 };
-    function scrubFrame(force) {
-      if (!items) return; // not armed yet
-      var vh = window.innerHeight;
-      var se = document.scrollingElement || document.documentElement;
-      var top = se.scrollTop, len = se.scrollHeight;
-      if (force !== true && top === seen.top && vh === seen.vh && len === seen.len) return;
-      seen.top = top; seen.vh = vh; seen.len = len;
-      // at the very end of the page nothing can travel further — settle all
-      var atEnd = top + vh >= len - 2;
-      var end = vh * 0.58;
-      var i, tops = [];
-      for (i = 0; i < items.length; i++) { // read pass — no writes until all rects are taken
-        tops.push(items[i].el.getBoundingClientRect().top - items[i].curY);
-      }
-      for (i = 0; i < items.length; i++) {
-        var it = items[i];
-        var start = vh * (1.02 - it.shift);
-        var p = atEnd ? 1 : (start - tops[i]) / (start - end);
-        if (p > 1) p = 1;
-        if (p < 0) p = 0;
-        if (p === it.lastP) continue;
-        it.lastP = p;
-        if (p === 1) {
-          if (!it.done) {
-            it.done = true;
-            it.curY = 0;
-            it.el.classList.add('is-visible');
-            it.el.style.transition = '';
-            it.el.style.opacity = '';
-            it.el.style.transform = '';
+      if (!pending.length) return;
+      var show = function (list) {
+        var vw = window.innerWidth, vh = window.innerHeight, k = 0;
+        var boxes = list.map(function (el) { return el.getBoundingClientRect(); });
+        list.forEach(function (el, i) {
+          var at = pending.indexOf(el), b = boxes[i];
+          if (at < 0) return;
+          pending.splice(at, 1);
+          if (io) io.unobserve(el);
+          el.classList.add('is-visible');
+          // only what is on screen plays it (50ms apart, six at most);
+          // a block the scroll already passed simply shows
+          if (el.animate && b.bottom > 0 && b.top < vh && b.right > 0 && b.left < vw) {
+            el.animate([{ opacity: 0, transform: 'translateY(12px)' }, { opacity: 1, transform: 'none' }],
+              { duration: 450, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', delay: Math.min(k++, 5) * 50, fill: 'backwards' });
           }
-        } else {
-          var e = 1 - Math.pow(1 - p, 3);
-          if (it.done) { it.done = false; it.el.classList.remove('is-visible'); }
-          it.curY = it.travel * (1 - e);
-          it.el.style.transition = 'none';
-          it.el.style.opacity = e.toFixed(3);
-          it.el.style.transform = 'translateY(' + it.curY.toFixed(1) + 'px)' +
-            (it.scale ? ' scale(' + (0.94 + 0.06 * e).toFixed(4) + ')' : '');
-        }
+        });
+        if (!pending.length) { clearInterval(timer); if (io) io.disconnect(); }
+      };
+      pending.forEach(function (el) { el.classList.add('js-reveal'); });
+      if ('IntersectionObserver' in window) {
+        io = new IntersectionObserver(function (entries) {
+          show(entries.filter(function (e) { return e.isIntersecting; }).map(function (e) { return e.target; }));
+        }, { rootMargin: '0px 0px -8% 0px' });
+        pending.forEach(function (el) { io.observe(el); });
       }
-    }
-    function tick() {
-      if (items && !items.length) return; // nothing below the fold to reveal
-      scrubFrame();
-      requestAnimationFrame(tick);
-    }
-    requestAnimationFrame(tick);
-    // Safety net (started with the arming above): headless/battery-saver
-    // browsers can stall rAF while the screen is visually idle; a timer keeps
-    // settle-correctness independent of frame delivery (styles are only
-    // written when progress changes).
+      timer = setInterval(function () {
+        var y = line();
+        show(pending.filter(function (el) { return el.getBoundingClientRect().top < y; }));
+      }, 300);
+    });
   }
 })();
 
@@ -1380,11 +1208,14 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 })();
 /**
- * Hero constellation — his multi-agent systems as a living graph.
- * Nodes drift and connect; six labeled nodes (CRM/POS/ASR/TTS/LLM/IVR);
- * cursor gently repels nearby nodes and links to them like a peer.
- * Desktop: cluster on the right of the copy. Mobile: below the copy.
- * Pauses off-screen; renders a single static frame under reduced motion.
+ * Hero constellation — his multi-agent systems as a living graph, and
+ * one of the page's two moments. The intro plays once, then the nodes
+ * drift slowly and an occasional signal crosses a link; six labeled
+ * nodes (CRM/POS/ASR/TTS/LLM/IVR); a fine pointer gently repels nearby
+ * nodes and links to them like a peer. Desktop: cluster on the right of
+ * the copy. Mobile: around the copy. Pauses off-screen and in a hidden
+ * tab; under reduced motion it is one still picture (kept painted, so a
+ * purged canvas heals, but never moving).
  */
 (function () {
   var canvas = document.getElementById('hero-net');
@@ -1401,28 +1232,12 @@ document.addEventListener('DOMContentLoaded', function () {
   var CONNECT = 130, MOUSE_DIST = 120;
   var mouse = { x: -9999, y: -9999, active: false };
 
-  function hexToRgb(h) {
-    return { r: parseInt(h.slice(1, 3), 16), g: parseInt(h.slice(3, 5), 16), b: parseInt(h.slice(5, 7), 16) };
-  }
-  var WARM1 = hexToRgb('#1877F2'), WARM2 = hexToRgb('#5AA7FF'), COOL = hexToRgb('#64748B');
-  function lerp(a, b, t) { return a + (b - a) * t; }
-  function mix(c1, c2, t) {
-    return { r: Math.round(lerp(c1.r, c2.r, t)), g: Math.round(lerp(c1.g, c2.g, t)), b: Math.round(lerp(c1.b, c2.b, t)) };
-  }
+  // one ink for the whole graph, the accent #1264CE; depth comes from alpha
+  var BLUE = { r: 18, g: 100, b: 206 };
   function rgba(c, a) { return 'rgba(' + c.r + ',' + c.g + ',' + c.b + ',' + a + ')'; }
   // "compact" layout — phones AND iPads (≤1024px) get the graph
   // surrounding the copy; past iPad it's the desktop right-side field
   function isMobile() { return W < 1025; }
-  // warm on one side of the cluster blending to cool on the other
-  function colorForX(x) {
-    var b = frameBounds || bounds();
-    var t = Math.max(0, Math.min(1, (x - b.x0) / Math.max(b.x1 - b.x0, 1)));
-    return t < 0.5 ? mix(WARM1, WARM2, t / 0.5) : mix(WARM2, COOL, (t - 0.5) / 0.5);
-  }
-
-  // bounds() for the frame being drawn (colorForX runs for every link)
-  var frameBounds = null;
-
   var LABELS = ['CRM', 'POS', 'ASR', 'TTS', 'LLM', 'IVR'];
   var nodes = [], labelEls = [];
   var pulses = [], nextPulse = 0.9; // signals travelling along the links
@@ -1435,11 +1250,6 @@ document.addEventListener('DOMContentLoaded', function () {
   // which composition the graph was laid out for: desktop keeps it to the
   // right of the copy, phones put it in the band below
   var layoutMobile = null;
-  // eased state for the node-lit name ink
-  var nameEl = hero.querySelector('.hero-name');
-  var inkX = 62, inkR = 24, inkG = 119, inkB = 242;
-  var inkNode = null, nextInkSwitch = 1.6;
-  var inkXWritten = '', inkCWritten = '';
 
   // ── Big-bang intro: the whole graph starts as one clustered blob,
   // trembles harder and harder, then detonates outward — every node
@@ -1523,8 +1333,8 @@ document.addEventListener('DOMContentLoaded', function () {
       // Organic drift: each node breathes around its home point on two
       // layered sines with incommensurate frequencies — a Lissajous
       // wander that never visibly repeats and is a pure function of time
-      // (frame-rate independent, perfectly smooth). Frequencies are
-      // tuned to read as alive within the first second of looking.
+      // (frame-rate independent, perfectly smooth). Slow and small, so
+      // the graph reads as calm at a glance and alive when watched.
       var dir = Math.random() * Math.PI * 2;
       nodes.push({
         // home as FRACTIONS of the hero size — recomputed every frame,
@@ -1532,10 +1342,11 @@ document.addEventListener('DOMContentLoaded', function () {
         // delivers resize events late during scroll; fractions don't care)
         fx: x / (layoutW || W), fy: y / (layoutH || H),
         x: x, y: y,
-        a1: (special ? 10 : 16) + Math.random() * (special ? 8 : 16),
-        a2: 5 + Math.random() * 7,
-        f1: 0.5 + Math.random() * 0.3,
-        f2: 0.95 + Math.random() * 0.55,
+        // a calm drift: a few px either way, a slow cycle (25 to 40s)
+        a1: (special ? 6 : 9) + Math.random() * (special ? 5 : 9),
+        a2: 3 + Math.random() * 4,
+        f1: 0.16 + Math.random() * 0.1,
+        f2: 0.3 + Math.random() * 0.16,
         p1: Math.random() * Math.PI * 2,
         p2: Math.random() * Math.PI * 2,
         p3: Math.random() * Math.PI * 2,
@@ -1550,7 +1361,6 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     }
     pulses = [];
-    inkNode = null;
     introCluster = null; // re-pick on relayout (only matters mid-intro)
   }
 
@@ -1666,7 +1476,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (bitmapChanged && nodes.length && painted) drawFrame(lastDrawT);
   }
 
-  if (finePointer) {
+  if (finePointer && !reduce) {
     hero.addEventListener('mousemove', function (e) {
       var r = canvas.getBoundingClientRect();
       mouse.x = e.clientX - r.left;
@@ -1698,14 +1508,17 @@ document.addEventListener('DOMContentLoaded', function () {
   window.addEventListener('pageshow', function (e) {
     if (e.persisted) resize(); else afterPaint(resize);
   }, { passive: true });
+  // a hidden tab draws nothing; back in view it repaints and carries on
   document.addEventListener('visibilitychange', function () {
-    if (!document.hidden) resize();
+    if (document.hidden) { running = false; return; }
+    resize();
+    var r = hero.getBoundingClientRect();
+    if (!running && r.bottom > 0 && r.top < window.innerHeight) { running = true; requestAnimationFrame(loop); }
   });
 
   function drawFrame(time) {
     if (!ctx) return; // not sized yet
     painted = true;
-    frameBounds = bounds();
     ctx.clearRect(0, 0, W, H);
     var ampScale = Math.max(1, Math.min(W / 1100, 2));
     // The blob lives BEHIND the name, so the keep-out fade is suspended
@@ -1773,7 +1586,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // never makes a sound the visitor did not ask for)
     if (!reduce && introCluster && it >= SHAKE_END && it < SHAKE_END + 0.7) {
       var rp = (it - SHAKE_END) / 0.7;
-      ctx.strokeStyle = rgba(WARM1, (1 - rp) * 0.35);
+      ctx.strokeStyle = rgba(BLUE, (1 - rp) * 0.35);
       ctx.lineWidth = 2 - rp;
       ctx.beginPath();
       ctx.arc(introCluster.x, introCluster.y, 10 + rp * rp * 340, 0, Math.PI * 2);
@@ -1781,9 +1594,9 @@ document.addEventListener('DOMContentLoaded', function () {
       ctx.lineWidth = 1;
     }
 
-    // signals: bright dots travelling along links — the system talking
+    // signals: now and then one dot travels a link — the system talking
     if (!reduce && it > 1.4) {
-      if (time >= nextPulse && pulses.length < 4) {
+      if (time >= nextPulse && !pulses.length) {
         var A = nodes[(Math.random() * nodes.length) | 0];
         if (A && A.f > 0.35) {
           var B = null, bd = Infinity;
@@ -1794,9 +1607,9 @@ document.addEventListener('DOMContentLoaded', function () {
             var qd = qdx * qdx + qdy * qdy;
             if (qd < CONNECT * CONNECT * 4 && qd > 400 && Math.random() < 0.4 && qd < bd) { bd = qd; B = nq; }
           }
-          if (B) pulses.push({ a: A, b: B, t0: time, dur: 0.8 + Math.random() * 0.5 });
+          if (B) pulses.push({ a: A, b: B, t0: time, dur: 1.6 + Math.random() * 0.6 });
         }
-        nextPulse = time + 0.35 + Math.random() * 0.55;
+        nextPulse = time + 2.5 + Math.random() * 2;
       }
       pulses = pulses.filter(function (p) { return time - p.t0 < p.dur; });
     }
@@ -1816,7 +1629,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var d2 = dx * dx + dy * dy;
         if (d2 < CONNECT * CONNECT) {
           var d = Math.sqrt(d2);
-          ctx.strokeStyle = rgba(colorForX((ax + bx) / 2), (1 - d / CONNECT) * 0.3 * lf);
+          ctx.strokeStyle = rgba(BLUE, (1 - d / CONNECT) * 0.26 * lf);
           ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by); ctx.stroke();
         }
       }
@@ -1824,13 +1637,13 @@ document.addEventListener('DOMContentLoaded', function () {
         var dxc = ax - mouse.x, dyc = ay - mouse.y;
         var dc2 = dxc * dxc + dyc * dyc;
         if (dc2 < CONNECT * CONNECT) {
-          ctx.strokeStyle = rgba(colorForX(ax), (1 - Math.sqrt(dc2) / CONNECT) * 0.16 * na.f);
+          ctx.strokeStyle = rgba(BLUE, (1 - Math.sqrt(dc2) / CONNECT) * 0.14 * na.f);
           ctx.beginPath(); ctx.moveTo(mouse.x, mouse.y); ctx.lineTo(ax, ay); ctx.stroke();
         }
       }
     }
 
-    // hairline from the copy block to the nearest node, breathing
+    // hairline from the copy block to the nearest node, steady
     var anchor = anchorPoint();
     var nearest = null, best = Infinity;
     for (var k = 0; k < nodes.length; k++) {
@@ -1841,46 +1654,11 @@ document.addEventListener('DOMContentLoaded', function () {
       if (dd < best) { best = dd; nearest = nk; }
     }
     if (nearest) {
-      var breathe = 0.08 + 0.08 * (0.5 + 0.5 * Math.sin(time * 0.9));
-      var g = ctx.createLinearGradient(anchor.x, anchor.y, nearest.x + nearest.px, nearest.y + nearest.py);
-      g.addColorStop(0, rgba(WARM2, breathe));
-      g.addColorStop(1, rgba(COOL, breathe));
-      ctx.strokeStyle = g;
+      ctx.strokeStyle = rgba(BLUE, 0.12);
       ctx.beginPath(); ctx.moveTo(anchor.x, anchor.y); ctx.lineTo(nearest.x + nearest.px, nearest.y + nearest.py); ctx.stroke();
-
-      // The name mirrors the constellation's ink: the glow in the
-      // letters tracks one agent node at a time — its horizontal spot
-      // in the name matches where that agent sits in the cluster, in
-      // that agent's own color. Focus glides to another agent every
-      // few seconds.
-      if (nameEl) {
-        if (time >= nextInkSwitch) {
-          nextInkSwitch = time + 3.5 + Math.random() * 2.5;
-          var cands = [];
-          for (var ci = 0; ci < nodes.length; ci++) {
-            if (nodes[ci].special && nodes[ci].f > 0.4) cands.push(nodes[ci]);
-          }
-          inkNode = cands.length ? cands[(Math.random() * cands.length) | 0] : nearest;
-        }
-        var src = (inkNode && inkNode.f > 0.3) ? inkNode : nearest;
-        var cb = bounds();
-        var targetC = colorForX(src.x + src.px);
-        var rel = ((src.x + src.px) - cb.x0) / Math.max(cb.x1 - cb.x0, 1);
-        var targetX = 12 + Math.max(0, Math.min(1, rel)) * 76;
-        inkX += (targetX - inkX) * 0.02;
-        inkR += (targetC.r - inkR) * 0.02;
-        inkG += (targetC.g - inkG) * 0.02;
-        inkB += (targetC.b - inkB) * 0.02;
-        // an unchanged value is not written again: each write restyles and
-        // repaints the name
-        var inkXs = inkX.toFixed(1) + '%';
-        var inkCs = 'rgb(' + Math.round(inkR) + ',' + Math.round(inkG) + ',' + Math.round(inkB) + ')';
-        if (inkXs !== inkXWritten) nameEl.style.setProperty('--ink-x', inkXWritten = inkXs);
-        if (inkCs !== inkCWritten) nameEl.style.setProperty('--ink-c', inkCWritten = inkCs);
-      }
     }
 
-    // nodes (clearer: brighter cores, wider halos on specials);
+    // nodes: solid cores; the six labelled ones get a hairline ring, no halo;
     // near the copy block they shrink with their fade and disappear
     // (labels stay hidden until just after the detonation — a crowd of
     // words inside the shaking blob would be noise)
@@ -1900,17 +1678,16 @@ document.addEventListener('DOMContentLoaded', function () {
           if (el.style.display) el.style.display = '';
         }
         if (f <= 0.02) continue;
-        var col = colorForX(nx);
         var r = nm.r * (0.35 + 0.65 * f);
-        ctx.fillStyle = rgba(col, 0.16 * f);
-        ctx.beginPath(); ctx.arc(nx, ny, r + 9 * f, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = rgba(col, 0.95 * f);
+        ctx.strokeStyle = rgba(BLUE, 0.25 * f);
+        ctx.beginPath(); ctx.arc(nx, ny, r + 4 * f, 0, Math.PI * 2); ctx.stroke();
+        ctx.fillStyle = rgba(BLUE, 0.95 * f);
         ctx.beginPath(); ctx.arc(nx, ny, r, 0, Math.PI * 2); ctx.fill();
         ctx.fillStyle = 'rgba(251,251,253,' + (0.95 * f) + ')';
         ctx.beginPath(); ctx.arc(nx, ny, 2.4 * f, 0, Math.PI * 2); ctx.fill();
       } else {
         if (f <= 0.02) continue;
-        ctx.fillStyle = rgba(colorForX(nx), 0.8 * f);
+        ctx.fillStyle = rgba(BLUE, 0.7 * f);
         ctx.beginPath(); ctx.arc(nx, ny, nm.r * (0.35 + 0.65 * f), 0, Math.PI * 2); ctx.fill();
       }
     }
@@ -1925,22 +1702,22 @@ document.addEventListener('DOMContentLoaded', function () {
       var sy = pu.a.y + pu.a.py + (pu.b.y + pu.b.py - pu.a.y - pu.a.py) * pe;
       var sa = Math.sin(Math.PI * pr) * Math.min(pu.a.f, pu.b.f) * fadeAt(sx, sy);
       if (sa <= 0.02) continue;
-      var sc = colorForX(sx);
-      ctx.fillStyle = rgba(sc, 0.18 * sa);
-      ctx.beginPath(); ctx.arc(sx, sy, 7, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = rgba(sc, 0.9 * sa);
+      ctx.fillStyle = rgba(BLUE, 0.9 * sa);
       ctx.beginPath(); ctx.arc(sx, sy, 2.6, 0, Math.PI * 2); ctx.fill();
       ctx.fillStyle = 'rgba(255,255,255,' + (0.8 * sa).toFixed(3) + ')';
       ctx.beginPath(); ctx.arc(sx, sy, 1.1, 0, Math.PI * 2); ctx.fill();
     }
-    frameBounds = null;
   }
 
-  var running = false, t0 = null, lastDrawT = 0.01;
+  var running = false, t0 = null, lastDrawT = 0.01, lastPaintTs = 0, lastTs = 0;
   var curtainUp = false, painted = false;
   function loop(ts) {
     if (!running) return;
     if (t0 === null) t0 = ts;
+    // a pause (off screen, hidden tab) holds the clock, so the graph
+    // carries on from where it stopped instead of jumping ahead
+    if (lastTs && ts - lastTs > 100) t0 += ts - lastTs;
+    lastTs = ts;
     // Hold the intro clock at zero until the page loader curtain lifts —
     // otherwise the cluster/shake plays hidden behind the overlay and
     // visitors only catch the tail of the explosion.
@@ -1963,10 +1740,18 @@ document.addEventListener('DOMContentLoaded', function () {
       requestAnimationFrame(loop);
       return;
     }
-    // Under reduced motion the scene drifts at half speed (no pulses,
-    // no assembly) — never a hard freeze, and the continuous paint
-    // keeps the canvas backing store alive on iOS/WKWebView.
-    lastDrawT = (ts - t0) / (reduce ? 2000 : 1000);
+    // Under reduced motion the clock stands still: the same picture every
+    // time, no intro, no drift, no signals. It is still repainted four
+    // times a second, which keeps the canvas backing store alive on
+    // iOS/WKWebView and heals a purged bitmap.
+    if (reduce) {
+      if (painted && ts - lastPaintTs < 250) { requestAnimationFrame(loop); return; }
+      lastPaintTs = ts;
+      drawFrame(lastDrawT = 0);
+      requestAnimationFrame(loop);
+      return;
+    }
+    lastDrawT = (ts - t0) / 1000;
     if (replayQueued) { // bfcache reopen: restart the intro on this clock
       replayQueued = false;
       introT0 = lastDrawT;
@@ -2009,10 +1794,10 @@ document.addEventListener('DOMContentLoaded', function () {
 })();
 
 /**
- * BizCard — Apple Card-style 3D tilt.
- * Fine pointers tilt the card directly; elsewhere it sways gently on
- * its own. A specular glare tracks the tilt via --gx/--gy. Runs only
- * while visible; skipped entirely under reduced motion.
+ * BizCard — Apple Card-style 3D tilt, the page's other moment. It tilts
+ * only toward a pointer or a finger (a few degrees) and eases back flat
+ * when that leaves or lifts; with nothing pointing at it the card lies
+ * still and no frame is drawn. Skipped entirely under reduced motion.
  */
 (function () {
   var card = document.getElementById('biz-card');
@@ -2021,40 +1806,36 @@ document.addEventListener('DOMContentLoaded', function () {
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (reduce) return; // the card is fully readable standing still
 
-  var run = false, raf = null, hover = false;
-  var tx = 0, ty = 0, cx = 0, cy = 0;
-
-  function frame(ts) {
-    if (!run) { raf = null; return; }
-    var t = ts / 1000;
-    if (!hover) { // idle: a slow left-right sway, like the Apple Card promo
-      tx = Math.sin(t * 0.85) * 17;
-      ty = Math.cos(t * 0.6) * 8;
+  var raf = null, tx = 0, ty = 0, cx = 0, cy = 0;
+  function frame() {
+    cx += (tx - cx) * 0.12;
+    cy += (ty - cy) * 0.12;
+    if (!tx && !ty && Math.abs(cx) < 0.05 && Math.abs(cy) < 0.05) {
+      cx = cy = 0;
+      card.style.transform = '';
+      raf = null;
+      return;
     }
-    cx += (tx - cx) * 0.08;
-    cy += (ty - cy) * 0.08;
     card.style.transform = 'rotateY(' + cx.toFixed(2) + 'deg) rotateX(' + cy.toFixed(2) + 'deg)';
     raf = requestAnimationFrame(frame);
   }
-
-  if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-    scene.addEventListener('pointermove', function (e) {
-      var r = scene.getBoundingClientRect();
-      var px = (e.clientX - r.left) / r.width - 0.5;
-      var py = (e.clientY - r.top) / r.height - 0.5;
-      hover = true;
-      tx = px * 34;
-      ty = -py * 22;
-    });
-    scene.addEventListener('pointerleave', function () { hover = false; });
+  function go() { if (!raf) raf = requestAnimationFrame(frame); }
+  function aim(e) {
+    var r = scene.getBoundingClientRect();
+    tx = ((e.clientX - r.left) / r.width - 0.5) * 12;   // ±6deg
+    ty = -((e.clientY - r.top) / r.height - 0.5) * 8;   // ±4deg
+    go();
   }
-
-  var io = new IntersectionObserver(function (entries) {
-    var vis = entries[entries.length - 1].isIntersecting;
-    if (vis && !run) { run = true; if (!raf) raf = requestAnimationFrame(frame); }
-    else if (!vis) { run = false; }
-  }, { threshold: 0.1 });
-  io.observe(scene);
+  function rest(e) {
+    if (e.type === 'pointerup' && e.pointerType === 'mouse') return; // still over it
+    tx = ty = 0;
+    go();
+  }
+  scene.addEventListener('pointermove', aim, { passive: true });
+  scene.addEventListener('pointerdown', aim, { passive: true });
+  ['pointerleave', 'pointerup', 'pointercancel'].forEach(function (t) {
+    scene.addEventListener(t, rest, { passive: true });
+  });
 })();
 
 /**
@@ -2071,40 +1852,6 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   card.addEventListener('pointermove', light, { passive: true });
   card.addEventListener('pointerdown', light, { passive: true });
-})();
-
-/**
- * Decorations that loop forever — the section waves and the spark that
- * travels the Experience line, the "Active" pulse, the card's drifting
- * light — ask for a new frame on every screen refresh wherever they are on
- * the page, and the waves, the spark and the pulse are painted by the main
- * thread. Off screen nobody sees them, so there they wait, and they carry
- * on from the same spot as they come back into view.
- */
-(function () {
-  if (!('IntersectionObserver' in window) || !document.documentElement.getAnimations) return;
-  var hosts = document.querySelectorAll('.section-wave, .exp-status-active, .biz-scene');
-  if (!hosts.length) return;
-  var held = new Map(); // host -> the animations this paused
-  var io = new IntersectionObserver(function (entries) {
-    entries.forEach(function (e) {
-      var host = e.target;
-      var svgs = host.querySelectorAll('svg');
-      if (e.isIntersecting) {
-        (held.get(host) || []).forEach(function (a) { a.play(); });
-        held.delete(host);
-        svgs.forEach(function (s) { if (s.unpauseAnimations) s.unpauseAnimations(); });
-      } else if (!held.has(host)) {
-        var mine = host.getAnimations({ subtree: true }).filter(function (a) {
-          return a.playState === 'running' && a.effect && a.effect.getTiming().iterations === Infinity;
-        });
-        mine.forEach(function (a) { a.pause(); });
-        held.set(host, mine);
-        svgs.forEach(function (s) { if (s.pauseAnimations) s.pauseAnimations(); });
-      }
-    });
-  }, { rootMargin: '200px 0px' });
-  hosts.forEach(function (h) { io.observe(h); });
 })();
 
 /**

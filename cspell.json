@@ -43,7 +43,6 @@
     "ACW", "HSTS", "XSS", "DTMF", "TTS", "ASR", "LLM", "CDR", "IVR",
     "CTI", "PBX", "QM", "CRM", "UAT",
     "FCR", "AHT", "SLA", "YTD", "KPI",
-    "clearbit",
     "protollcallcrm",
     "airhex",
     "phplite",
@@ -72,6 +71,8 @@
     "Phonerlite",
     "SpyCall",
     "spycall",
-    "queuemetrics"
+    "queuemetrics",
+    "BorntoDev", "Bornto", "Labz", "TPQI", "ARIT", "MOOC", "Chatbots", "Hackathon",
+    "pointercancel", "pointerup"
   ]
 }

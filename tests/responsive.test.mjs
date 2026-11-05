@@ -199,11 +199,19 @@ test('on a phone every control answers a 44px finger (Apple HIG)', async () => {
   await page.close();
 });
 
-test('hero rotates three roles, strongest first', async () => {
-  const { page } = await ctx.openPage();
-  const items = await page.$eval('#hero .typed', (el) => el.dataset.typedItems.split(',').map((s) => s.trim()));
-  assert.equal(items[0], 'Full-Stack Developer', 'the first role a visitor sees is the headline one');
-  assert.ok(items.length <= 3, `${items.length} roles — most visitors scroll on after one or two`);
+test('the hero role line fits on one line on a phone, with nothing cut off', async () => {
+  const { page } = await ctx.openPage({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+  await page.evaluate(() => document.fonts.ready);
+  const m = await page.$eval('#hero .hero-role', (el) => {
+    const range = document.createRange(); range.selectNodeContents(el);
+    const tops = new Set([...range.getClientRects()].filter((r) => r.width > 0).map((r) => Math.round(r.top)));
+    const r = range.getBoundingClientRect();
+    return { text: el.textContent.trim(), lines: tops.size, left: r.left, right: r.right,
+      over: el.scrollWidth - el.clientWidth, vw: document.documentElement.clientWidth };
+  });
+  assert.match(m.text, /^Full-stack developer and AI engineer$/);
+  assert.equal(m.lines, 1, `the role line wraps to ${m.lines} lines at 390px`);
+  assert.ok(m.over <= 0 && m.left >= 0 && m.right <= m.vw, `the role line runs out of its box (${Math.round(m.left)}–${Math.round(m.right)} of ${m.vw})`);
   await page.close();
 });
 
@@ -214,7 +222,7 @@ test('the hero name never loses letters, on 4K screens or with a larger reader f
     await cdp.send('Page.setFontSizes', { fontSizes: { standard: font, fixed: 13 } });
     await page.reload({ waitUntil: 'load' });
     await page.evaluate(() => document.fonts.ready);
-    // the gradient ink is painted only inside each line's own box, so the box must hold every glyph
+    // each line's box must hold every glyph (it centres the line on phones)
     const lines = await page.$$eval('.hero-name-line', (els) => els.map((el) => {
       const r = document.createRange(); r.selectNodeContents(el);
       return { text: r.getBoundingClientRect().width, box: el.getBoundingClientRect().width };

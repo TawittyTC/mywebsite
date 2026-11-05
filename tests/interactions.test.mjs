@@ -82,19 +82,44 @@ test('every project card opens something real, and work comes before the student
   await page.close();
 });
 
+test('no hyphenated word can break at its hyphen, on the page or in any sheet', async () => {
+  const { page } = await ctx.openPage();
+  const loose = await page.evaluate(() => {
+    const out = [];
+    const scan = (root, where) => {
+      const tw = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+      let n;
+      while ((n = tw.nextNode())) {
+        const el = n.parentElement;
+        if (!el || el.closest('script, style, svg, noscript, head')) continue;
+        for (const m of n.data.matchAll(/[A-Za-z0-9]+(?:-[A-Za-z0-9]+)+/g)) {
+          if (!el.closest('.nw, .svc-nw')) out.push(`${where}: ${m[0]}`);
+        }
+      }
+    };
+    scan(document.body, 'page');
+    document.querySelectorAll('template[id^="exp-"]').forEach((t) => scan(t.content, t.id));
+    return out;
+  });
+  assert.deepEqual(loose, [], 'wrap each hyphenated word in <span class="nw"> so a line never ends on its hyphen');
+  await page.close();
+});
+
 test('an SCG card opens the SCG sheet on its own project', async () => {
   const { page } = await ctx.openPage();
   const want = await page.$eval('#scroller [data-open-exp="scg"][data-client="scg-familyday"]', (c) => c.dataset.client);
   await page.$eval('#scroller [data-client="scg-familyday"] .card-plus', (b) => b.click());
   await page.waitForSelector('.exp-lightbox.open');
   await page.waitForTimeout(100);
-  const top = await page.evaluate(() => {
+  const { top, clear } = await page.evaluate(() => {
     const inner = document.querySelector('.exp-lightbox-inner');
-    const edge = inner.getBoundingClientRect().top;
+    // the sheet scrolls under its top bar: what shows starts at the bar's foot
+    const edge = inner.querySelector('.exp-lightbox-bar').getBoundingClientRect().bottom;
     const sec = [...inner.querySelectorAll('.exp-client-section')].find((s) => s.getBoundingClientRect().bottom > edge + 20);
-    return sec && sec.dataset.client;
+    return { top: sec && sec.dataset.client, clear: sec && sec.getBoundingClientRect().top >= edge };
   });
   assert.equal(top, want, 'the SCG sheet did not open on the card\'s project');
+  assert.ok(clear, 'the project opened with its top under the sheet\'s bar');
   await page.keyboard.press('Escape');
   await page.waitForFunction(() => !document.querySelector('.exp-lightbox.open'));
   await page.close();
@@ -239,15 +264,22 @@ test('project and skill paddlenav arrows actually scroll their scrollers', async
   await page.close();
 });
 
-test('typed role line cycles through roles', async () => {
+test('the hero role line is static text that stays put', async () => {
   const { page } = await ctx.openPage();
-  const seen = new Set();
-  for (let i = 0; i < 14 && seen.size < 2; i++) {
-    const t = (await page.textContent('#hero .typed')).trim();
-    if (t.length > 3) seen.add(t);
-    await page.waitForTimeout(500);
-  }
-  assert.ok(seen.size >= 2, `typed line stuck; saw only: ${[...seen].join(' | ')}`);
+  assert.equal(await page.locator('#hero .typed, [data-typed-items]').count(), 0, 'a typing effect is back in the hero');
+  // let the one-time entrance finish, then the line must simply sit there
+  await page.waitForFunction(() => document.querySelector('#hero .hero-role').getAnimations().every((a) => a.playState === 'finished'));
+  const read = () => page.$eval('#hero .hero-role', (el) => {
+    const r = el.getBoundingClientRect(), cs = getComputedStyle(el);
+    return { text: el.textContent.replace(/\s+/g, ' ').trim(), x: Math.round(r.x), w: Math.round(r.width),
+      shown: r.width > 0 && r.height > 0 && cs.visibility === 'visible' && +cs.opacity > 0.9 };
+  });
+  const first = await read();
+  assert.equal(first.text, 'Full-stack developer and AI engineer');
+  assert.ok(first.shown, 'the role line is not visible');
+  // no typing and no deleting: the words and their box hold still
+  await page.waitForTimeout(1200);
+  assert.deepEqual(await read(), first, 'the role line changed on its own');
   await page.close();
 });
 
@@ -265,6 +297,29 @@ test('footer: live year, employment duration, labelled social + contact links', 
   }
   assert.ok(await page.locator('a[href^="mailto:"]').count() >= 1, 'mailto link missing');
   assert.ok(await page.locator('a[href^="tel:"]').count() >= 1, 'tel link missing');
+  await page.close();
+});
+
+test('a pointer open puts no focus ring on the close button; the keyboard ring stays round', async () => {
+  const { page } = await ctx.openPage();
+  const close = () => page.evaluate(() => {
+    const c = document.querySelector('.exp-lightbox.open .exp-lightbox-close, .cert-lightbox.open .cert-lightbox-close');
+    return { ring: c.matches(':focus-visible'), focused: document.activeElement === c, radius: getComputedStyle(c).borderRadius };
+  });
+  for (const [open, sel] of [['#experience .data-box[data-exp="protollcall"]', '.exp-lightbox.open'], ['#images-list .cert-card', '.cert-lightbox.open']]) {
+    await page.locator(open).first().scrollIntoViewIfNeeded();
+    await page.click(open);
+    await page.waitForSelector(sel);
+    const byPointer = await close();
+    assert.ok(!byPointer.ring && !byPointer.focused, `${sel}: a click put focus and its ring on the close button`);
+    // Tab from the dialog lands on the close button: the ring follows its round shape
+    await page.keyboard.press('Tab');
+    const byKeys = await close();
+    assert.ok(byKeys.focused && byKeys.ring, `${sel}: Tab did not reach the close button`);
+    assert.equal(byKeys.radius, '50%', `${sel}: the focus ring squared the round close button`);
+    await page.keyboard.press('Escape');
+    await page.waitForFunction((s) => !document.querySelector(s), sel);
+  }
   await page.close();
 });
 
@@ -337,18 +392,20 @@ test('mouse sweep across the hero: nodes repel, no errors', async () => {
   await page.close();
 });
 
-test('name ink follows the nodes (CSS vars driven and changing)', async () => {
+test('the name stays solid dark text while the constellation runs (no ink sweep)', async () => {
+  // owner decision: the name is solid #1D1D1F with no gradient or shimmer;
+  // the constellation no longer repaints it
   const { page } = await ctx.openPage();
   await page.waitForTimeout(3000);
-  const read = () => page.$eval('#hero .hero-name', (el) => ({
-    x: el.style.getPropertyValue('--ink-x'),
-    c: el.style.getPropertyValue('--ink-c'),
+  const read = () => page.$$eval('#hero .hero-name-line', (els) => els.map((el) => {
+    const cs = getComputedStyle(el);
+    return [cs.color, cs.webkitTextFillColor, cs.backgroundImage, cs.webkitBackgroundClip || cs.backgroundClip,
+      el.parentElement.style.cssText].join(' | ');
   }));
   const a = await read();
-  assert.ok(a.x && a.c, 'ink vars not set');
-  await page.waitForTimeout(6000);
-  const b = await read();
-  assert.ok(a.x !== b.x || a.c !== b.c, 'name ink frozen — not following nodes');
+  for (const v of a) assert.equal(v, 'rgb(29, 29, 31) | rgb(29, 29, 31) | none | border-box | ', `name not solid: ${v}`);
+  await page.waitForTimeout(4000);
+  assert.deepEqual(await read(), a, 'the name changed while the constellation ran');
   await page.close();
 });
 
@@ -386,8 +443,11 @@ test('no blank-frame flicker while animating (bitmap never reads empty)', async 
     for (let i = 0; i < 25; i++) {
       await new Promise((r) => setTimeout(r, 37)); // deliberately not rAF-aligned
       const d = g.getImageData(0, 0, c.width, c.height).data;
+      // every 16th pixel: the calm drift can park a sparser grid over only a
+      // few faint lines for a whole second, which read like an empty canvas
+      // (a real blank frame is 0 here; a drawn one is hundreds)
       let n = 0;
-      for (let j = 3; j < d.length; j += 4096) if (d[j] > 8) n++;
+      for (let j = 3; j < d.length; j += 64) if (d[j] > 8) n++;
       if (n < 3) blanks++;
     }
     return blanks;
