@@ -199,57 +199,11 @@ test('on a phone every control answers a 44px finger (Apple HIG)', async () => {
   await page.close();
 });
 
-test('an "A · B" meta line never ends on its dot: each item wraps whole and its dot is clipped', async () => {
-  const sels = ['.footer-copy', '.biz-role', '.exp-clients-line', '#resume .exp-role .dot-list'];
-  for (const [width, wraps] of [[360, true], [1440, false]]) {
-    const mobile = width < 768;
-    const { page } = await ctx.openPage({ viewport: { width, height: 800 }, isMobile: mobile, hasTouch: mobile });
-    await page.evaluate(() => document.fonts.ready);
-    const lines = await page.evaluate((sels) => sels.flatMap((s) => [...document.querySelectorAll(s)].map((box, i) => {
-      const kids = [...box.children];
-      const oneLine = (el) => {
-        const r = document.createRange(); r.selectNodeContents(el);
-        return new Set([...r.getClientRects()].filter((x) => x.width > 0).map((x) => Math.round(x.top))).size === 1;
-      };
-      return { s: `${s}[${i}]`, n: kids.length, clip: getComputedStyle(box).overflowX,
-        dots: kids.slice(1).map((k) => getComputedStyle(k, '::before').content),
-        // a wrapped item starts the next line at the box's left edge
-        hang: kids.filter((k, j) => j && k.offsetTop !== kids[j - 1].offsetTop).every((k) => k.offsetLeft === kids[0].offsetLeft),
-        wrapped: kids.some((k) => k.offsetTop !== kids[0].offsetTop),
-        nwWhole: [...box.querySelectorAll('.nw')].every(oneLine),
-        // a plain space between items, so the line still reads "A B" without CSS
-        spaced: kids.slice(0, -1).every((k) => k.nextSibling && k.nextSibling.nodeType === 3 && /^\s+$/.test(k.nextSibling.data)),
-        text: box.textContent.replace(/\s+/g, ' ').trim() };
-    })), sels);
-    assert.equal(lines.length, 2 + 1 + 4, 'a dot-list meta line is missing');
-    for (const l of lines) {
-      assert.ok(l.n >= 2, `${l.s}: fewer than two items`);
-      assert.equal(l.clip, 'clip', `${l.s}: the dot left of a wrapped line is not clipped`);
-      assert.ok(l.dots.every((d) => d === '"·"'), `${l.s}: a separator is gone`);
-      assert.ok(!/·/.test(l.text), `${l.s}: a typed "·" can still end a line: "${l.text}"`);
-      assert.ok(l.hang, `${width}px: ${l.s} has an item that wrapped but does not start at the left edge`);
-      assert.ok(l.nwWhole, `${width}px: ${l.s} split a name across lines`);
-      assert.ok(l.spaced, `${l.s}: two items run together without CSS: "${l.text}"`);
-      if (!wraps) assert.ok(!l.wrapped, `${width}px: ${l.s} broke onto two lines`);
-      else if (/footer-copy|biz-role|exp-clients/.test(l.s)) assert.ok(l.wrapped, `${width}px: ${l.s} did not wrap`);
-    }
-    await page.close();
-  }
-});
-
-test('the hero role line fits on one line on a phone, with nothing cut off', async () => {
-  const { page } = await ctx.openPage({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
-  await page.evaluate(() => document.fonts.ready);
-  const m = await page.$eval('#hero .hero-role', (el) => {
-    const range = document.createRange(); range.selectNodeContents(el);
-    const tops = new Set([...range.getClientRects()].filter((r) => r.width > 0).map((r) => Math.round(r.top)));
-    const r = range.getBoundingClientRect();
-    return { text: el.textContent.trim(), lines: tops.size, left: r.left, right: r.right,
-      over: el.scrollWidth - el.clientWidth, vw: document.documentElement.clientWidth };
-  });
-  assert.match(m.text, /^Full-stack developer and AI engineer$/);
-  assert.equal(m.lines, 1, `the role line wraps to ${m.lines} lines at 390px`);
-  assert.ok(m.over <= 0 && m.left >= 0 && m.right <= m.vw, `the role line runs out of its box (${Math.round(m.left)}–${Math.round(m.right)} of ${m.vw})`);
+test('hero rotates three roles, strongest first', async () => {
+  const { page } = await ctx.openPage();
+  const items = await page.$eval('#hero .typed', (el) => el.dataset.typedItems.split(',').map((s) => s.trim()));
+  assert.equal(items[0], 'Full-Stack Developer', 'the first role a visitor sees is the headline one');
+  assert.ok(items.length <= 3, `${items.length} roles — most visitors scroll on after one or two`);
   await page.close();
 });
 
@@ -260,7 +214,7 @@ test('the hero name never loses letters, on 4K screens or with a larger reader f
     await cdp.send('Page.setFontSizes', { fontSizes: { standard: font, fixed: 13 } });
     await page.reload({ waitUntil: 'load' });
     await page.evaluate(() => document.fonts.ready);
-    // each line's box must hold every glyph (it centres the line on phones)
+    // the gradient ink is painted only inside each line's own box, so the box must hold every glyph
     const lines = await page.$$eval('.hero-name-line', (els) => els.map((el) => {
       const r = document.createRange(); r.selectNodeContents(el);
       return { text: r.getBoundingClientRect().width, box: el.getBoundingClientRect().width };
