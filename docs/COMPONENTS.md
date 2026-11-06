@@ -153,7 +153,7 @@ Escape/แตะพื้นหลังได้ อยู่ในระบบ
 <section id="contact" class="closing-cta">
   <div class="container">
     <div class="cta-inner">
-      <h2 class="cta-headline">Open to <span class="nw">full-time</span> and freelance work</h2>
+      <h2 class="cta-headline">Let's build<br>what's next.</h2>
       <p class="cta-sub">ข้อความรอง…</p>
       <div class="cta-row">
         <a class="btn-pill cta-pill" href="mailto:you@mail.com">Get in touch</a>
