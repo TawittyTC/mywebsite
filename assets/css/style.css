@@ -187,6 +187,14 @@ section {
 #footer .border-top { margin-top: 32px; padding-top: 20px; }
 /* the meta line sits below the content it closes, not above it */
 .footer-copy { font-size: 0.7647rem; line-height: 20px; }
+/* "A · B" meta lines: B's dot hangs in the gap before it, so when B wraps
+   the dot falls left of the box and is clipped, and no line ends on a dot
+   (as .exp-meta does). Clipped on x only, so the link's focus ring and
+   44px tap target keep their height; nothing is positioned, so the
+   wrapped B never sits over that tap target. A long B that wraps on its
+   own line keeps no lone last word ("…Technology / Srivijaya") */
+.dot-list { display: flex; flex-wrap: wrap; column-gap: .75em; overflow-x: clip; text-wrap: pretty; }
+.dot-list > * + *::before { content: '\00b7'; display: inline-block; width: .75em; margin-left: -.75em; text-align: center; }
 @media (max-width: 734px) { #footer { padding-top: 48px; } }
 
 
@@ -873,7 +881,7 @@ button {
 .biz-logo {
   font-family: ui-monospace, 'SF Mono', Menlo, monospace;
   font-size: 0.7647rem;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.22em;
   color: var(--color-text-secondary);
 }
@@ -891,7 +899,7 @@ button {
   margin-top: 4px;
 }
 .biz-contacts {
-  gap: 6px 14px;
+  gap: 4px 12px;
   flex-wrap: wrap;
 }
 .biz-contacts a {
@@ -1145,15 +1153,16 @@ h1, h2, h3, h4, h5, h6 { color: var(--color-text); }
 /*--------------------------------------------------------------
 # Scroll reveals
 --------------------------------------------------------------*/
-/* Hero copy gets a subtle scroll transform from JS */
+/* Hero copy sits above the constellation canvas and its labels */
 #hero .hero-copy { position: relative; z-index: 2; }
 
 /* Reveal: only armed by JS (.js-reveal), so without it everything shows.
    A block waits hidden below the fold until main.js plays its one
-   fade-and-rise; after that the class changes nothing */
+   fade-and-rise; after that the class changes nothing. In print (and
+   under reduced motion) every block shows, scrolled to or not */
 .js-reveal:not(.is-visible) { opacity: 0; }
 
-@media (prefers-reduced-motion: reduce) {
+@media print, (prefers-reduced-motion: reduce) {
   .js-reveal { opacity: 1 !important; }
 }
 
@@ -1215,6 +1224,7 @@ h1, h2, h3, h4, h5, h6 { color: var(--color-text); }
   .rf-cards-scroller-item { width: 340px; margin-right: 64px; }
   #skill .rf-cards-scroller-item { width: 384px; min-height: 508px; padding: 56px; }
   :root { --sk-paddlenav-diameter: 40px; }
+  #experience .exp-card-cta { bottom: 36px; }   /* bigger chips, same 36px padding */
 }
 
 /* 4K tier — 1.45× (height guard keeps 3440×1440 ultrawides on the 2K step) */
@@ -1232,6 +1242,7 @@ h1, h2, h3, h4, h5, h6 { color: var(--color-text); }
   .rf-cards-scroller-item { width: 436px; margin-right: 80px; }
   #skill .rf-cards-scroller-item { width: 492px; min-height: 652px; padding: 72px; }
   :root { --sk-paddlenav-diameter: 52px; }
+  #experience .exp-card-cta { bottom: 40px; }
 
   /* the hero's clamps top out well below the viewport at this width */
 }
@@ -1362,6 +1373,8 @@ a.info-item:hover .info-value { color: var(--color-link); }
   height: max(100%, 44px);
   transform: translate(-50%, -50%);
 }
+.exp-lightbox-close,
+.proj-back,
 .biz-contacts a,
 .resume-exp-link,
 .footer-copy-link { position: relative; }
@@ -1393,7 +1406,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
 # Kept from the apple.com redesign (v2.37.0)
 --------------------------------------------------------------*/
 /* Contact: one grey surface split by hairlines into three columns (rows
-   on phones), each the mark, a quiet label and the value large */
+   below 992px), each the mark, a quiet label and the value large */
 .contact-strip .info-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -1435,15 +1448,17 @@ a.info-item:hover .info-value { color: var(--color-link); }
   transition: color .16s var(--ease-out);
 }
 .contact-strip .info-item[href^="tel:"] .info-value { white-space: nowrap; }
-@media (max-width: 734px) {
+@media (max-width: 991px) {
   .contact-strip .info-grid { grid-template-columns: 1fr; }
   .contact-strip .info-item { flex-direction: row; align-items: center; gap: 12px; min-height: 64px; padding: 12px 0; }
   .contact-strip .info-item + .info-item { border-left: 0; border-top: 1px solid rgba(29, 29, 31, .08); }
   .contact-strip .info-icon { margin: 0; }
+  /* 20px + the row's 12px matches the 32px sides on tablets (phones: 16px) */
+  #resume .data-box.contact-strip { padding-top: 20px; padding-bottom: 20px; }
 }
 
 /* social marks: the accent glyph in a white well on the grey card */
-.profile-featured .social-links { gap: 10px; margin: 1.4118rem 0 0; }
+.profile-featured .social-links { gap: 12px; margin: 1.4118rem 0 0; }
 .profile-featured .social-links a {
   width: 44px;
   height: 44px;
@@ -1542,8 +1557,12 @@ a.info-item:hover .info-value { color: var(--color-link); }
   letter-spacing: -0.022em;
   color: #1D1D1F;
 }
-#portfolio .rf-cards-scroller-item h3 { text-wrap: pretty; }
-#portfolio .rf-cards-scroller-item p.fw-light { text-wrap: pretty; }   /* no lone last word */
+#portfolio .rf-cards-scroller-item h3 { text-wrap: balance; }
+#portfolio .rf-cards-scroller-item p.fw-light,
+#skill .rf-cards-scroller-item .skill-desc,
+#resume .profile-bio,
+#experience .data-box[data-exp] > .profile-bio-small.mt-3,
+#experience .exp-role > p.profile-bio-small { text-wrap: pretty; }   /* no lone last word */
 .nw { white-space: nowrap; }   /* a hyphenated name stays on one line */
 /* the skill's mark, top left, as on Apple's values cards */
 #skill .rf-cards-scroller-item .skill-icon {
@@ -1627,7 +1646,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
   #portfolio .project-tag { font-size: 14px; line-height: 1.28577; letter-spacing: 0; }
   #portfolio .rf-cards-scroller-item h3,
   #skill .rf-cards-scroller-item .title { font-size: 21px; line-height: 1.19048; letter-spacing: .011em; margin-bottom: 12px; }
-  #portfolio .rf-cards-scroller-item h3 { font-size: 20px; line-height: 24px; }
+  #portfolio .rf-cards-scroller-item h3 { font-size: 19px; line-height: 24px; letter-spacing: 0; }   /* "Sales campaign CRM," fits the 212px title */
   #portfolio .rf-cards-scroller-item p.fw-light,
   #skill .rf-cards-scroller-item .skill-desc { font-size: 14px; line-height: 1.42859; letter-spacing: 0; }
   #skill .rf-cards-scroller-item .skill-icon { width: 72px; height: 72px; margin: -6px 0 20px -8px; }
@@ -1739,7 +1758,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
 @media (max-width: 734px) {
   #skill .rf-cards-scroller-item .skill-icon { width: 56px; height: 56px; padding: 6px; margin: 0 0 20px; border-radius: 16px; }
   #skill .skill-tag { font-size: 14px; line-height: 1.28577; letter-spacing: 0; }
-  #skill .skill-tools { gap: 6px; padding-top: 20px; }
+  #skill .skill-tools { padding-top: 20px; }
   #skill .skill-tools li { padding: 4px 12px; font-size: 12px; line-height: 1.33337; }
 }
 @media (prefers-contrast: more) {
@@ -1759,7 +1778,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
   padding: 9.5% 0;
 }
 @media (max-width: 1068px) {
-  #skill .rf-cards-scroller-item .skill-icon { width: auto; height: auto; margin: -12px -12px 22px; }
+  #skill .rf-cards-scroller-item .skill-icon { width: auto; height: auto; margin: -12px -12px 24px; }
 }
 @media (max-width: 734px) {
   #skill .rf-cards-scroller-item .skill-icon { width: auto; height: auto; margin: -8px -8px 20px; padding: 8% 0; }
@@ -1852,7 +1871,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
    and no chip is left alone on the last one */
 #services .svc-chips {
   min-width: 0;
-  margin: 0 -10px -10px 0;
+  margin: 0 -8px -8px 0;
   padding: 0;
   list-style: none;
   font-size: 0;                 /* no stray spaces between chips */
@@ -1860,7 +1879,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
 }
 #services .svc-chips li {
   display: inline-block;
-  margin: 0 10px 10px 0;
+  margin: 0 8px 8px 0;
   padding: 6px 14px;
   border-radius: 980px;
   background: #fff;
@@ -1892,7 +1911,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
   background: #F5F5F7;
 }
 #services .faq details { border: 0; }
-#services .faq details + details { border-top: 1px solid #D2D2D7; }
+#services .faq details + details { border-top: 1px solid #D2D2D7; transition: border-color .16s var(--ease-out); }
 /* the whole row is the control; it reaches 12px past the text on each
    side so the focus ring has room to breathe */
 #services .faq summary {
@@ -1911,15 +1930,20 @@ a.info-item:hover .info-value { color: var(--color-link); }
   line-height: 1.36842;
   letter-spacing: 0;
   color: #1D1D1F;
-  text-wrap: pretty;
   -webkit-tap-highlight-color: transparent;
   transition: background-color .16s var(--ease-out);
 }
+/* balanced, so no question ends on a lone word or particle */
+#services .faq summary > .faq-q { text-wrap: balance; }
 /* hover: one surface step, on the same box the focus ring draws (closed
    rows only: an open answer tucks up into that box); the phone's folded
    client is the one client card that acts, so it answers too */
 @media (hover: hover) {
   #services .faq details:not([open]) > summary:hover { background: rgba(29, 29, 31, .04); }
+  /* the separators either side of the hovered row step aside, as in
+     Apple's lists, so the plate is not cut by lines shorter than it */
+  #services .faq details:has(> summary:hover):not([open]),
+  #services .faq details:has(> summary:hover):not([open]) + details { border-top-color: transparent; }
   .exp-clients-folded .exp-client-section:not(.is-open):hover { background: #F0F0F3; }
 }
 #services .faq summary::-webkit-details-marker { display: none; }
@@ -1995,8 +2019,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
   #services .svc-card p { font-size: 14px; line-height: 1.42859; letter-spacing: 0; }
   #services .svc-more { gap: 12px; padding-top: 24px; padding-bottom: 24px; }
   #services .svc-card.svc-more h3 { margin: 0; font-size: 15px; line-height: 1.33337; letter-spacing: 0; }
-  #services .svc-chips { margin: 0 -6px -6px 0; }
-  #services .svc-chips li { margin: 0 6px 6px 0; padding: 4px 12px; font-size: 12px; line-height: 1.33337; }
+  #services .svc-chips li { padding: 4px 12px; font-size: 12px; line-height: 1.33337; }
   #services .faq { margin-top: 80px; }
   #services .faq h3 { margin-bottom: 28px; font-size: 28px; line-height: 1.14286; }
   #services .faq-list { --faq-pull: -6px; padding: 4px 20px; }
@@ -2156,9 +2179,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
   line-height: 1.5;
   letter-spacing: 0;
   color: var(--color-text-secondary);
-  text-wrap: pretty;
 }
-.exp-clients-more { white-space: nowrap; }
 @media (max-width: 768px) {
   .exp-clients-line { font-size: 0.7059rem; }
 }
@@ -2429,9 +2450,9 @@ a.info-item:hover .info-value { color: var(--color-link); }
   #experience .data-box[data-exp] { transition: box-shadow .3s var(--ease-out), transform .16s var(--ease-out); }
   #experience .data-box[data-exp]:hover { box-shadow: 0 8px 24px rgba(0, 0, 0, .06); }
 }
-/* centred on the last chip row (card padding + half a chip − half the button) */
-.exp-card-cta { right: 20px; bottom: 34px; gap: 0; }
-.exp-card-cta-label { display: none; }   /* the button keeps its "Read more: …" name */
+/* centred on the last chip row (card padding + half a chip − half the button),
+   its right edge on the content edge (right = card padding) */
+.exp-card-cta { right: 36px; bottom: 34px; border-radius: 50%; }   /* the focus ring follows the round "+" */
 .exp-card-btn { width: 36px; height: 36px; background: var(--sk-paddlenav-background); }
 .exp-card-btn svg { width: 36px; height: 36px; fill: rgba(0, 0, 0, .56); transition: fill .16s var(--ease-out); }
 #experience .data-box[data-exp]:hover .exp-card-btn { background: rgba(223, 223, 227, .9); }
@@ -2536,14 +2557,14 @@ p.profile-bio-small,
 @media (max-width: 1068px) {
   #resume .data-box,
   #experience .data-box[data-exp] { padding: 32px; }
-  .exp-card-cta { bottom: 30px; }
+  .exp-card-cta { bottom: 30px; right: 32px; }
 }
 @media (max-width: 768px) { .exp-card-cta { bottom: 28px; } }
 @media (max-width: 734px) {
   #resume .data-box,
   #experience .data-box[data-exp] { padding: 28px; }
   #resume .data-box.contact-strip { padding-top: 16px; padding-bottom: 16px; }
-  .exp-card-cta { bottom: 24px; }
+  .exp-card-cta { bottom: 24px; right: 28px; }
   #experience .data-box { margin-bottom: 20px; }
   #resume .contact-strip { margin-top: 20px; }
   #resume .resume-title { margin: 56px 0 20px; }

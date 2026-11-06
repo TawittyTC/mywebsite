@@ -97,10 +97,28 @@ test('no hyphenated word can break at its hyphen, on the page or in any sheet', 
         }
       }
     };
+    window.__scanHyphens = (root, where) => { out.length = 0; scan(root, where); return out.slice(); };
     scan(document.body, 'page');
     document.querySelectorAll('template[id^="exp-"]').forEach((t) => scan(t.content, t.id));
-    return out;
+    return out.slice();
   });
+  // text that JS copies out of the page keeps the wrapper: the "See all" list ...
+  await page.$eval('[data-proj-all]', (b) => b.click());
+  await page.waitForSelector('.exp-lightbox.open .proj-row');
+  loose.push(...await page.evaluate(() => window.__scanHyphens(document.querySelector('.exp-lightbox-inner'), 'all projects')));
+  await page.keyboard.press('Escape');
+  await page.waitForFunction(() => !document.querySelector('.exp-lightbox.open'));
+  // ... and every screenshot card's caption
+  const shots = await page.$$eval('#scroller > .rf-cards-scroller-item', (cs) => cs
+    .map((c, i) => (c.querySelector('.project-img img') && !c.dataset.openExp ? i : -1)).filter((i) => i >= 0));
+  assert.ok(shots.length >= 4, `only ${shots.length} screenshot cards`);
+  for (const i of shots) {
+    await page.evaluate((k) => document.querySelectorAll('#scroller > .rf-cards-scroller-item')[k].click(), i);
+    await page.waitForSelector('.cert-lightbox.open');
+    loose.push(...await page.evaluate(() => window.__scanHyphens(document.querySelector('.cert-lightbox-caption'), 'caption')));
+    await page.keyboard.press('Escape');
+    await page.waitForFunction(() => !document.querySelector('.cert-lightbox.open'));
+  }
   assert.deepEqual(loose, [], 'wrap each hyphenated word in <span class="nw"> so a line never ends on its hyphen');
   await page.close();
 });
@@ -224,6 +242,30 @@ test('"See all" lists every project; a row opens it in the sheet and Back return
   await page.close();
 });
 
+test('with a mouse, "All projects" goes back to the list; the title clears the pill by 16px', async () => {
+  const { page } = await ctx.openPage();
+  await page.$eval('[data-proj-all]', (b) => { b.scrollIntoView({ block: 'center' }); b.click(); });
+  await page.waitForSelector('.exp-lightbox.open .proj-row');
+  await page.locator('.proj-group', { has: page.locator('h3', { hasText: 'Genius Track' }) }).locator('.proj-row').click();
+  await page.waitForSelector('.proj-back');
+  await page.waitForTimeout(300);
+  const geo = await page.evaluate(() => {
+    const pill = document.querySelector('.proj-back').getBoundingClientRect();
+    const title = document.querySelector('.exp-lightbox .exp-modal-title').getBoundingClientRect();
+    const hit = document.elementFromPoint(pill.left + pill.width / 2, pill.top + pill.height / 2);
+    return { gap: title.top - pill.bottom, hitsPill: !!(hit && hit.closest('.proj-back')),
+      closeSlop: getComputedStyle(document.querySelector('.exp-lightbox-close'), '::after').width };
+  });
+  assert.ok(geo.gap >= 16, `the title starts ${Math.round(geo.gap)}px under the pill`);
+  // each bar button's hit-slop is its own 44px, not the whole bar
+  assert.ok(geo.hitsPill, 'the close button\'s hit area covers the "All projects" pill');
+  assert.equal(geo.closeSlop, '44px', 'the close button\'s hit area spans the bar');
+  const box = await page.locator('.proj-back').boundingBox();
+  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+  await page.waitForFunction(() => document.querySelector('.exp-lightbox.open .proj-row') && !document.querySelector('.proj-back'));
+  await page.close();
+});
+
 test('Back closes an open sheet or picture instead of leaving the site', async () => {
   const { page } = await ctx.openPage();
   const site = page.url();
@@ -320,6 +362,64 @@ test('a pointer open puts no focus ring on the close button; the keyboard ring s
     await page.keyboard.press('Escape');
     await page.waitForFunction((s) => !document.querySelector(s), sel);
   }
+  // the experience card's round "+": the ring follows the circle, not its square button
+  await page.locator('#experience .exp-card-cta').first().scrollIntoViewIfNeeded();
+  await page.$eval('#experience .exp-card-cta', (b) => b.focus());
+  await page.keyboard.press('Shift+Tab');
+  await page.keyboard.press('Tab');
+  const plus = await page.$eval('#experience .exp-card-cta', (b) => ({ ring: b.matches(':focus-visible'), radius: getComputedStyle(b).borderRadius }));
+  assert.ok(plus.ring, 'Tab did not put a ring on the experience card\'s "+"');
+  assert.equal(plus.radius, '50%', 'the focus ring squared the round "+"');
+  await page.close();
+});
+
+test('a card opened by a click hands focus back to its own button on close, so Tab carries on from there', async () => {
+  const { page } = await ctx.openPage();
+  const cases = [
+    ['#experience .data-box[data-exp="scg"] h3', '.exp-lightbox', '.exp-lightbox-close', '.data-box', '.exp-card-cta'],
+    ['#scroller > [data-open-exp] h3', '.exp-lightbox', '.exp-lightbox-close', '.rf-cards-scroller-item', '.card-plus'],
+    ['#scroller > .rf-cards-scroller-item:not([data-open-exp]):has(.project-img img) h3', '.cert-lightbox', '.cert-lightbox-close', '.rf-cards-scroller-item', '.card-plus'],
+    ['#images-list .cert-card img', '.cert-lightbox', '.cert-lightbox-close', '.cert-card', '.cert-expand-btn'],
+  ];
+  const where = (open, [card, btn, box]) => page.$eval(open, (el, [card, btn, box]) => {
+    const a = document.activeElement;
+    return { own: a === el.closest(card).querySelector(btn), inDialog: !!a.closest(box), ring: a.matches(':focus-visible'),
+      name: a.className || a.tagName };
+  }, [card, btn, box]);
+  for (const [open, box, closeSel, card, btn] of cases) {
+    await page.locator(open).first().scrollIntoViewIfNeeded();
+    await page.click(open);
+    await page.waitForSelector(`${box}.open`);
+    await page.click(`${box}.open ${closeSel}`);
+    await page.waitForFunction((b) => !document.querySelector(`${b}.open`), box);
+    for (const wait of [100, 1200]) {
+      await page.waitForTimeout(wait);
+      const f = await where(open, [card, btn, box]);
+      assert.ok(f.own && !f.inDialog, `${open}: ${wait}ms after close, focus is on ${f.name}, not the card's own button`);
+      assert.ok(!f.ring, `${open}: a pointer close put a focus ring on the card's button`);
+    }
+    const y = await page.evaluate(() => window.scrollY);
+    await page.keyboard.press('Tab');
+    const next = await page.evaluate(() => ({ y: window.scrollY, skip: document.activeElement.matches('.skip-link') }));
+    assert.ok(!next.skip && next.y > 0, `${open}: Tab after closing jumped to the top of the page (${y} → ${next.y})`);
+  }
+  await page.close();
+});
+
+test('a tap anywhere on the screenshot caption closes it, the swipe hint included', async () => {
+  const { page } = await ctx.openPage({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, reducedMotion: 'reduce' });
+  const open = () => page.evaluate(() => [...document.querySelectorAll('#scroller > .rf-cards-scroller-item')]
+    .find((c) => c.textContent.includes('Real Time Pulse')).click());
+  await open();
+  await page.waitForSelector('.cert-lightbox.open.lb-pan .cert-lightbox-hint');
+  // a tap on the wide picture pans it, so it keeps the viewer open
+  const img = await page.locator('.cert-lightbox img').boundingBox();
+  await page.touchscreen.tap(195, img.y + img.height / 2);
+  await page.waitForTimeout(200);
+  assert.ok(await page.evaluate(() => document.querySelector('.cert-lightbox').classList.contains('open')), 'a tap on the panning picture closed it');
+  const hint = await page.locator('.cert-lightbox-hint').boundingBox();
+  await page.touchscreen.tap(hint.x + hint.width / 2, hint.y + hint.height / 2);
+  await page.waitForFunction(() => !document.querySelector('.cert-lightbox.open'));
   await page.close();
 });
 
@@ -377,6 +477,67 @@ test('reduced motion: constellation still paints and still self-heals', async ()
   await page.waitForTimeout(300);
   assert.ok(await page.evaluate(inkCount()) > 500, 'no repaint after wipe under reduced motion');
   await page.close();
+});
+
+test('the constellation runs one loop: a tab coming back never adds one, and reduced motion wakes 4 times a second', async () => {
+  for (const reducedMotion of ['no-preference', 'reduce']) {
+    const page = await ctx.browser.newPage({ viewport: { width: 1440, height: 900 }, reducedMotion });
+    // a hidden tab: Chrome holds queued frames and runs them on return
+    await page.addInitScript(() => {
+      let hidden = false;
+      const held = [], raf = window.requestAnimationFrame.bind(window);
+      Object.defineProperty(document, 'hidden', { get: () => hidden });
+      Object.defineProperty(document, 'visibilityState', { get: () => (hidden ? 'hidden' : 'visible') });
+      // loop calls, and the distinct frames they ran in: one loop makes
+      // one call a frame, however busy or slow the machine is
+      window.__loops = 0; window.__frames = 0;
+      let lastTs = -1;
+      window.requestAnimationFrame = (cb) => raf(function run(ts) {
+        if (hidden) { held.push(run); return; }
+        if (/\.loader/.test(String(cb))) {   // the constellation's loop
+          window.__loops++;
+          if (ts !== lastTs) { window.__frames++; lastTs = ts; }
+        }
+        return cb(ts);
+      });
+      window.__tab = (hide) => {
+        hidden = hide;
+        document.dispatchEvent(new Event('visibilitychange'));
+        if (!hide) held.splice(0).forEach((f) => raf(f));
+      };
+    });
+    await page.goto(ctx.srv.url + '/index.html', { waitUntil: 'load' });
+    await page.waitForFunction(() => !document.querySelector('.loader'), null, { timeout: 8000 });
+    const still = reducedMotion === 'reduce';
+    // the still picture's wake count is sampled once the page has settled
+    await page.waitForTimeout(still ? 1800 : 800);
+    const rate = async (ms = 1000) => {
+      const read = () => page.evaluate(() => [window.__loops, window.__frames]);
+      const [l0, f0] = await read();
+      await page.waitForTimeout(ms);
+      const [l1, f1] = await read();
+      return { loops: l1 - l0, frames: f1 - f0 };
+    };
+    const before = await rate(still ? 2000 : 1000);
+    for (let i = 0; i < 2; i++) {
+      await page.evaluate(() => window.__tab(true));
+      await page.waitForTimeout(300);
+      await page.evaluate(() => window.__tab(false));
+      await page.waitForTimeout(200);
+    }
+    const after = await rate();
+    if (still) {
+      assert.ok(before.loops >= 4 && before.loops <= 12, `reduced motion: the still picture woke ${before.loops} times in 2 seconds`);
+      assert.ok(after.loops <= 6, `reduced motion: ${after.loops} wakes a second after the tab came back`);
+    } else {
+      assert.ok(before.loops > 20, `the constellation is not running (${before.loops} frames a second)`);
+      assert.ok(after.loops > 20, `the constellation stopped after the tab came back (${after.loops} frames a second)`);
+      for (const [when, r] of [['at load', before], ['after the tab came back', after]]) {
+        assert.ok(r.loops / r.frames <= 1.05, `stacked loops ${when}: ${r.loops} calls over ${r.frames} frames`);
+      }
+    }
+    await page.close();
+  }
 });
 
 test('mouse sweep across the hero: nodes repel, no errors', async () => {

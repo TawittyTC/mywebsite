@@ -279,6 +279,22 @@ test('prefers-reduced-motion: no parallax, no reveal-gating, titles visible', as
   await page.close();
 });
 
+test('printing (or Save as PDF) before scrolling shows every block', async () => {
+  const { page } = await openPage();
+  await page.waitForTimeout(600);
+  const armed = await page.evaluate(() => [...document.querySelectorAll('.js-reveal:not(.is-visible)')].length);
+  assert.ok(armed > 10, `only ${armed} blocks wait below the fold`);
+  await page.emulateMedia({ media: 'print' });
+  const hidden = await page.evaluate(() => [...document.querySelectorAll('.js-reveal')]
+    .filter((el) => getComputedStyle(el).opacity !== '1').map((el) => el.className));
+  assert.deepEqual(hidden, [], 'blocks still waiting for a scroll print blank');
+  // on screen they still wait for their one fade-and-rise
+  await page.emulateMedia({ media: 'screen' });
+  assert.equal(await page.evaluate(() => [...document.querySelectorAll('.js-reveal:not(.is-visible)')]
+    .filter((el) => getComputedStyle(el).opacity === '0').length), armed, 'the screen reveal changed');
+  await page.close();
+});
+
 test('mobile viewport renders hero and certificates', async () => {
   const { page, errors } = await openPage({
     viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true,

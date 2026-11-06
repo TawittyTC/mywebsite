@@ -262,6 +262,20 @@ test('the business card tilts only with the pointer, rests flat without it, and 
   assert.notEqual(tilted, a, 'card did not follow the pointer');
   assert.ok(deg(tilted, 'Y') > 2 && deg(tilted, 'X') > 1, `tilt is not toward the pointer: "${tilted}"`);
   assert.ok(Math.abs(deg(tilted, 'Y')) <= 6.01 && Math.abs(deg(tilted, 'X')) <= 4.01, `tilt is more than a few degrees: "${tilted}"`);
+  // a pointer resting on the card holds the tilt without drawing a frame
+  await page.evaluate(() => {
+    window.__tiltFrames = 0;
+    const raf = window.requestAnimationFrame.bind(window);
+    window.requestAnimationFrame = (cb) => raf((ts) => { if (String(cb).includes('rotateY')) window.__tiltFrames++; return cb(ts); });
+  });
+  await page.waitForTimeout(600);
+  const parked = await page.evaluate(() => { window.__tiltFrames = 0; return document.getElementById('biz-card').style.transform; });
+  await page.waitForTimeout(500);
+  assert.equal(await page.evaluate(() => window.__tiltFrames), 0, 'the card draws frames while the pointer rests on it');
+  assert.equal(await idle(), parked, 'the resting tilt drifted');
+  await page.mouse.move(box.x + box.w * 0.2, box.y + box.h * 0.8, { steps: 4 });
+  await page.waitForTimeout(500);
+  assert.notEqual(await idle(), parked, 'a new pointer move did not tilt the card again');
   // the pointer leaves: it eases back flat and then stops drawing
   await page.mouse.move(2, 2, { steps: 4 });
   await page.waitForTimeout(1200);
@@ -287,6 +301,28 @@ test('the business card tilts only with the pointer, rests flat without it, and 
   assert.equal(await rp.$eval('#biz-card', (el) => el.style.transform), '',
     'card must stand still under reduced motion');
   await rp.close();
+});
+
+test('reduced motion: a link to a section jumps there, with no glide', async () => {
+  const page = await ctx.browser.newPage({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
+  // every distinct scroll position, frame by frame, from the first frame on
+  await page.addInitScript(() => {
+    window.__ys = [];
+    const tick = () => {
+      const y = Math.round(window.scrollY);
+      if (window.__ys.at(-1) !== y) window.__ys.push(y);
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  });
+  await page.goto(ctx.srv.url + '/index.html#contact', { waitUntil: 'load' });
+  await page.waitForTimeout(1000);
+  const { ys, want } = await page.evaluate(() => ({ ys: window.__ys,
+    want: Math.round(document.querySelector('#contact').getBoundingClientRect().top + window.scrollY) }));
+  // only the browser's own anchor jump; the load handler re-aims there instantly
+  assert.ok(ys.filter((y) => y > 0).length <= 2, `the page glided through ${ys.length} positions: ${ys.slice(0, 8).join(', ')}`);
+  assert.equal(ys.at(-1), want, 'the page did not land on the section');
+  await page.close();
 });
 
 test('the business card keeps its coloured light inside the glass', async () => {

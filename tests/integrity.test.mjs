@@ -45,7 +45,7 @@ test('every FAQPage question is visible on the page', () => {
   const faq = blocks.find((b) => b['@type'] === 'FAQPage');
   if (!faq) return;
   const decode = (s) => s.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
-  const shown = [...html.matchAll(/<summary>([\s\S]*?)<\/summary>/g)].map((m) => decode(m[1].trim()));
+  const shown = [...html.matchAll(/<summary>([\s\S]*?)<\/summary>/g)].map((m) => decode(m[1].replace(/<[^>]+>/g, '').trim()));
   const missing = faq.mainEntity.map((q) => q.name).filter((q) => !shown.includes(q));
   assert.deepEqual(missing, [], 'FAQ questions only in JSON-LD');
 });
@@ -147,15 +147,21 @@ test('client logos in the sheets are local files, never a remote logo service', 
   }
 });
 
-test('the line drawings use one stroke and carry no AI sparkle', () => {
+test('the line drawings use one stroke, and the two AI drawings the owner named carry no sparkle', () => {
   // the thin blue drawings (skills, projects, services) share stroke-width 5
   const drawings = [...html.matchAll(/<svg[^>]*viewBox="0 0 170 170"[\s\S]*?<\/svg>/g)].map((m) => m[0]);
   assert.ok(drawings.length >= 20, `only ${drawings.length} line drawings found`);
   const widths = new Set(drawings.flatMap((d) => [...d.matchAll(/stroke-width="([\d.]+)"/g)].map((m) => m[1])));
   assert.deepEqual([...widths], ['5'], `drawings mix stroke widths: ${[...widths].join(', ')}`);
-  // four-point sparkle paths (the ✨ tell) are gone
+  // the owner approved swapping the sparkle in the Agentic AI skill drawing
+  // and the AI service card only. The Genius Track headset (index.html, the
+  // geniustrack card, shown in See all) still has its four-point star. It is
+  // outside the approved list, so ask the owner before changing it.
   const sparkle = /M107 28l4-9|c4 27 14 37 41 41|c2 11 6 15 17 17/;
-  assert.ok(!sparkle.test(html), 'a sparkle path is back in a drawing');
+  assert.ok(!sparkle.test(html), 'a sparkle path is back in the Agentic AI drawing or the AI service card');
+  // pin the known exception, so any other star added later fails
+  const stars = drawings.filter((d) => /c2\.5 12 7 16\.5 19 19-12 2\.5/.test(d));
+  assert.equal(stars.length, 1, 'the Genius Track headset star is the one known four-point star');
 });
 
 test('contact icons are line icons in one size', () => {

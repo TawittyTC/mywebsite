@@ -73,6 +73,6 @@
     "spycall",
     "queuemetrics",
     "BorntoDev", "Bornto", "Labz", "TPQI", "ARIT", "MOOC", "Chatbots", "Hackathon",
-    "pointercancel", "pointerup"
+    "pointercancel", "pointerup", "rgba", "uppercased"
   ]
 }

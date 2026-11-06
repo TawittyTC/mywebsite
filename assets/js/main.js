@@ -4,6 +4,23 @@
  * Author: BootstrapMade.com
  * License: https://bootstrapmade.com/license/
  */
+
+// The site's one ease-out curve, cubic-bezier(0.22, 1, 0.36, 1), for the
+// few motions drawn frame by frame here (easeOutQuint is its JS form)
+function easeOut(p) { return 1 - Math.pow(1 - p, 5); }
+
+// Text that JS copies out of the page keeps the page's rule: a hyphenated
+// word ("Covid-19") sits in a no-wrap span, so no line ends on its hyphen.
+// The raw text is split first and each piece escaped after, so an entity
+// such as "&amp;" is never cut
+function nwHTML(t) {
+  var d = document.createElement("div");
+  return String(t || "").split(/([A-Za-z0-9]+(?:-[A-Za-z0-9]+)+)/).map(function (s, i) {
+    d.textContent = s;
+    return i % 2 ? '<span class="nw">' + d.innerHTML + "</span>" : d.innerHTML;
+  }).join("");
+}
+
 (function () {
   "use strict";
 
@@ -20,56 +37,30 @@
   };
 
   /**
-   * Easy event listener function
-   */
-  const on = (type, el, listener, all = false) => {
-    let selectEl = select(el, all);
-    if (selectEl) {
-      if (all) {
-        selectEl.forEach((e) => e.addEventListener(type, listener));
-      } else {
-        selectEl.addEventListener(type, listener);
-      }
-    }
-  };
-
-  /**
-   * Scrolls to an element with offset
+   * Scrolls to an element; under reduced motion it jumps
    */
   const scrollto = (el, duration = 600) => {
     let element = select(el);
     if (!element) return;
     let start = window.scrollY;
-    let target = element.getBoundingClientRect().top + window.scrollY - 60;
+    let target = element.getBoundingClientRect().top + window.scrollY;
+    if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      window.scrollTo(0, target);
+      return;
+    }
     let startTime = null;
-    const ease = (t) => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
     const step = (timestamp) => {
       if (!startTime) startTime = timestamp;
       let progress = Math.min((timestamp - startTime) / duration, 1);
-      window.scrollTo(0, start + (target - start) * ease(progress));
+      window.scrollTo(0, start + (target - start) * easeOut(progress));
       if (progress < 1) requestAnimationFrame(step);
     };
     requestAnimationFrame(step);
   };
 
-
   /**
-   * Scrool with ofset on links with a class name .scrollto
-   */
-  on(
-    "click",
-    ".scrollto",
-    function (e) {
-      if (select(this.hash)) {
-        e.preventDefault();
-        scrollto(this.hash);
-      }
-    },
-    true
-  );
-
-  /**
-   * Scroll with ofset on page load with hash links in the url
+   * On load, re-aim at the section named in the URL hash (the layout may
+   * have moved since the browser's own anchor jump)
    */
   window.addEventListener("load", () => {
     if (window.location.hash) {
@@ -266,6 +257,15 @@ var overlayHistory = (function () {
 var viaKeys = false;
 document.addEventListener("keydown", function () { viaKeys = true; }, true);
 document.addEventListener("pointerdown", function () { viaKeys = false; }, true);
+// where focus goes back to on close. A click on a card's body leaves focus
+// on <body>, which cannot hold it (the next Tab would start at the top of
+// the page), so the overlay hands focus back to that card's own button
+function opener(source) {
+  var a = document.activeElement;
+  if (a && a !== document.body) return a;
+  var card = source && source.closest && source.closest(".rf-cards-scroller-item, .data-box, .cert-card");
+  return card && card.querySelector(".card-plus, .exp-card-cta, .cert-expand-btn");
+}
 
 // Cert lightbox
 (function () {
@@ -317,7 +317,7 @@ document.addEventListener("pointerdown", function () { viaKeys = false; }, true)
     if (!lightbox.classList.contains("open")) overlayHistory.opened(closeLightbox);
     lbImg.src = src;
     lbImg.alt = alt;
-    caption.textContent = title || "";
+    caption.innerHTML = nwHTML(title);
     caption.hidden = !title;
     // A wide screenshot on a portrait phone would shrink to a strip too
     // small to read: show it tall enough to read and let it pan sideways
@@ -348,7 +348,7 @@ document.addEventListener("pointerdown", function () { viaKeys = false; }, true)
     lightbox.classList.add("open");
     lightbox.style.display = "flex";
     document.body.style.overflow = "hidden";
-    lastFocus = document.activeElement;
+    lastFocus = opener(source);
     anchorOrigin(lbImg, source);
     frame.scrollLeft = 0;
     if (reduce) motion.jump(1); else motion.to(1);
@@ -362,13 +362,13 @@ document.addEventListener("pointerdown", function () { viaKeys = false; }, true)
     // scroll is handed back on the dismissal itself, not when the fade ends
     if (!document.querySelector(".exp-lightbox.open")) document.body.style.overflow = "";
     if (reduce) motion.jump(0); else motion.to(0);
-    if (lastFocus && typeof lastFocus.focus === "function") lastFocus.focus();
+    if (lastFocus && typeof lastFocus.focus === "function") lastFocus.focus({ preventScroll: true });
     lastFocus = null;
     overlayHistory.closed(closeLightbox);
   }
   closeBtn.addEventListener("click", closeLightbox);
   lightbox.addEventListener("click", function (e) {
-    if (e.target === lightbox || e.target === caption ||
+    if (e.target === lightbox || caption.contains(e.target) ||
         (e.target === frame && !lightbox.classList.contains("lb-pan"))) closeLightbox();
   });
   document.addEventListener("keydown", function (e) {
@@ -439,7 +439,7 @@ document.addEventListener("pointerdown", function () { viaKeys = false; }, true)
   function closeExp() {
     if (!lightbox.classList.contains('open')) return; // Escape pressed elsewhere
     lightbox.classList.remove('open');
-    if (lastFocus && typeof lastFocus.focus === 'function') lastFocus.focus();
+    if (lastFocus && typeof lastFocus.focus === 'function') lastFocus.focus({ preventScroll: true });
     lastFocus = null;
     // the dismissal is honoured at once; the fade out is only the picture
     // catching up, so the page is scrollable again immediately
@@ -503,7 +503,7 @@ document.addEventListener("pointerdown", function () { viaKeys = false; }, true)
     }
     lightbox.classList.add('open');
     document.body.style.overflow = 'hidden';
-    if (!was) lastFocus = document.activeElement;
+    if (!was) lastFocus = opener(source);
     // make it measurable, then grow it out of the card that was clicked
     lightbox.style.visibility = 'visible';
     anchorOrigin(inner, source);
@@ -704,13 +704,13 @@ document.addEventListener("DOMContentLoaded", function () {
       if (!logos[g] && c.getAttribute("data-logo")) logos[g] = [c.getAttribute("data-logo"), (c.getAttribute("data-logo-size") || "").split("x")];
       groups[g].push('<li><button type="button" class="proj-row" data-i="' + i + '" aria-describedby="pg' + order.indexOf(g) + '"><span class="proj-well" aria-hidden="true">' +
         (icon ? icon.outerHTML : '<img src="' + esc(img.getAttribute("src")) + '" alt="">') +
-        '</span><span class="proj-text"><span class="proj-name">' + esc(k > 0 ? t.slice(0, k) : t) + "</span>" +
+        '</span><span class="proj-text"><span class="proj-name">' + nwHTML(k > 0 ? t.slice(0, k) : t) + "</span>" +
         (kind ? ' <span class="proj-kind"><span class="nw">' + esc(kind) + "</span></span>" : "") +
         '</span><span class="chev" aria-hidden="true"></span></button></li>');
     });
     return '<div class="exp-modal-header"><h2 class="exp-modal-title">All projects</h2><div class="exp-modal-company">' +
       cards.length + " projects</div></div>" + order.map(function (g, j) {
-        return '<div class="proj-group"><h3 id="pg' + j + '"><span>' + esc(g) + '</span>' +
+        return '<div class="proj-group"><h3 id="pg' + j + '"><span>' + nwHTML(g) + '</span>' +
           (logos[g] ? '<img class="proj-logo" srcset="' + esc(logos[g][0]) + ' 3x" width="' + esc(logos[g][1][0] || "") +
             '" height="' + esc(logos[g][1][1] || "") + '" alt="" loading="lazy" decoding="async">' : '') + '</h3><ul class="proj-rows">' + groups[g].join("") + "</ul></div>";
       }).join("");
@@ -909,8 +909,8 @@ function createCardScroller(scroller, options) {
     function frame(now) {
       if (glide !== g) return; // cancelled or replaced by a newer glide
       var p = Math.min(1, (now - t0) / dur);
-      // ease-in-out: leaves gently, travels, settles without a bump
-      var e = p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+      // the site's one ease-out curve: off at once, settles without a bump
+      var e = easeOut(p);
       scroller.scrollLeft = from + dist * e;
       if (p < 1) g.raf = requestAnimationFrame(frame);
       else { glide = null; update(); }
@@ -960,9 +960,9 @@ function createCardScroller(scroller, options) {
       var base = scroller.scrollLeft, t0 = performance.now();
       (function step(ts) {
         if (hintDone) return;
-        // 40px out and back in 600ms, each leg on an ease-out
+        // 40px out and back in 600ms, each leg on the one ease-out curve
         var p = Math.min((ts - t0) / 600, 1);
-        var e = p < 0.5 ? 1 - Math.pow(1 - p * 2, 3) : Math.pow(2 - p * 2, 3);
+        var e = p < 0.5 ? easeOut(p * 2) : 1 - easeOut(p * 2 - 1);
         scroller.scrollLeft = base + dir * 40 * e;
         if (p < 1) requestAnimationFrame(step); else hintDone = true;
       })(t0);
@@ -1118,8 +1118,9 @@ document.getElementById('current-year').textContent = currentYear;
   // plays a single 12px rise as it comes in: never tied to the scroll
   // position, never replayed when you scroll back. An IntersectionObserver
   // starts it. In-app webviews have delivered those entries late, so a
-  // light sweep on a timer also shows anything the scroll has already
-  // carried past the line, and stops once nothing is left waiting.
+  // light sweep after each scroll or resize also shows anything already
+  // carried past the line; with the page at rest nothing runs, and the
+  // listeners go once nothing is left waiting.
   if (!reduce) {
     var lists = ['.section-title', '#resume .data-box', '#experience .data-box',
       '#portfolio .rf-cards-scroller-item', '.closing-cta .cta-inner'
@@ -1127,7 +1128,7 @@ document.getElementById('current-year').textContent = currentYear;
     // everything armed here starts below the fold, so arming waits for the
     // first paint, and all positions are read before any class is written
     afterPaint(function () {
-      var pending = [], io = null, timer = 0;
+      var pending = [], io = null, sweepT = 0;
       var line = function () { return window.innerHeight * 0.92; };
       lists.forEach(function (els) {
         for (var i = 0; i < els.length; i++) {
@@ -1151,8 +1152,22 @@ document.getElementById('current-year').textContent = currentYear;
               { duration: 450, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', delay: Math.min(k++, 5) * 50, fill: 'backwards' });
           }
         });
-        if (!pending.length) { clearInterval(timer); if (io) io.disconnect(); }
+        if (!pending.length) {
+          window.removeEventListener('scroll', onMove);
+          window.removeEventListener('resize', onMove);
+          clearTimeout(sweepT);
+          if (io) io.disconnect();
+        }
       };
+      // at most one sweep per 150ms, and always one after the last event,
+      // when the geometry is final (a timeout: rAF can stall in some
+      // headless and battery-saver browsers)
+      var sweep = function () {
+        sweepT = 0;
+        var y = line();
+        show(pending.filter(function (el) { return el.getBoundingClientRect().top < y; }));
+      };
+      var onMove = function () { if (!sweepT) sweepT = setTimeout(sweep, 150); };
       pending.forEach(function (el) { el.classList.add('js-reveal'); });
       if ('IntersectionObserver' in window) {
         io = new IntersectionObserver(function (entries) {
@@ -1160,10 +1175,8 @@ document.getElementById('current-year').textContent = currentYear;
         }, { rootMargin: '0px 0px -8% 0px' });
         pending.forEach(function (el) { io.observe(el); });
       }
-      timer = setInterval(function () {
-        var y = line();
-        show(pending.filter(function (el) { return el.getBoundingClientRect().top < y; }));
-      }, 300);
+      window.addEventListener('scroll', onMove, { passive: true });
+      window.addEventListener('resize', onMove, { passive: true });
     });
   }
 })();
@@ -1386,10 +1399,9 @@ document.getElementById('current-year').textContent = currentYear;
   var copyRect = null;
   function updateCopyRect() {
     if (!copyEl) { copyRect = null; return; }
-    // Use untransformed offset geometry. getBoundingClientRect bakes in
-    // the scroll-parallax translate — when an in-app browser fires
-    // resize mid-scroll (toolbar collapse), that poisoned the keep-out
-    // zone onto the cluster and hid nearly every node.
+    // Use untransformed offset geometry: it ignores any transform, so an
+    // in-app browser resize mid-scroll (toolbar collapse) cannot shift the
+    // keep-out zone onto the cluster and hide nearly every node.
     var top = 0, left = 0, el = copyEl;
     while (el && el !== hero && el.offsetParent) {
       top += el.offsetTop;
@@ -1513,7 +1525,7 @@ document.getElementById('current-year').textContent = currentYear;
     if (document.hidden) { running = false; return; }
     resize();
     var r = hero.getBoundingClientRect();
-    if (!running && r.bottom > 0 && r.top < window.innerHeight) { running = true; requestAnimationFrame(loop); }
+    if (!running && r.bottom > 0 && r.top < window.innerHeight) { running = true; kick(); }
   });
 
   function drawFrame(time) {
@@ -1709,9 +1721,14 @@ document.getElementById('current-year').textContent = currentYear;
     }
   }
 
-  var running = false, t0 = null, lastDrawT = 0.01, lastPaintTs = 0, lastTs = 0;
+  var running = false, queued = 0, t0 = null, lastDrawT = 0.01, lastTs = 0, stillTimer = 0;
   var curtainUp = false, painted = false;
+  // one loop at a time: every start (observer, scroll watchdog, a tab
+  // coming back) goes through kick(), so a frame Chrome held for a hidden
+  // tab and a fresh start never run as two loops side by side
+  function kick() { if (!queued) queued = requestAnimationFrame(loop); }
   function loop(ts) {
+    queued = 0;
     if (!running) return;
     if (t0 === null) t0 = ts;
     // a pause (off screen, hidden tab) holds the clock, so the graph
@@ -1737,18 +1754,20 @@ document.getElementById('current-year').textContent = currentYear;
     if (held && painted && nodes.length) {
       if (!introCluster) introCluster = clusterPoint();
       lastDrawT = 0;
-      requestAnimationFrame(loop);
+      kick();
       return;
     }
     // Under reduced motion the clock stands still: the same picture every
     // time, no intro, no drift, no signals. It is still repainted four
     // times a second, which keeps the canvas backing store alive on
-    // iOS/WKWebView and heals a purged bitmap.
+    // iOS/WKWebView and heals a purged bitmap. The repaint waits on one
+    // shared timer, not on every frame; clearing it first folds any
+    // restart from the observer, the scroll watchdog or visibilitychange
+    // back into a single chain.
     if (reduce) {
-      if (painted && ts - lastPaintTs < 250) { requestAnimationFrame(loop); return; }
-      lastPaintTs = ts;
       drawFrame(lastDrawT = 0);
-      requestAnimationFrame(loop);
+      clearTimeout(stillTimer);
+      stillTimer = setTimeout(kick, 250);
       return;
     }
     lastDrawT = (ts - t0) / 1000;
@@ -1758,7 +1777,7 @@ document.getElementById('current-year').textContent = currentYear;
       introCluster = null;
     }
     drawFrame(lastDrawT);
-    requestAnimationFrame(loop);
+    kick();
   }
 
   makeLabels();
@@ -1772,7 +1791,7 @@ document.getElementById('current-year').textContent = currentYear;
       // entries arrive oldest-first and browsers (Firefox especially)
       // batch several per callback — always act on the newest state
       var vis = entries[entries.length - 1].isIntersecting;
-      if (vis && !running) { running = true; requestAnimationFrame(loop); }
+      if (vis && !running) { running = true; kick(); }
       else if (!vis) { running = false; }
     }, { threshold: 0 });
     io.observe(hero);
@@ -1783,13 +1802,13 @@ document.getElementById('current-year').textContent = currentYear;
         var r = hero.getBoundingClientRect();
         if (r.bottom > 0 && r.top < window.innerHeight) {
           running = true;
-          requestAnimationFrame(loop);
+          kick();
         }
       }
     }, { passive: true });
   } else {
     running = true;
-    requestAnimationFrame(loop);
+    kick();
   }
 })();
 
@@ -1810,14 +1829,13 @@ document.getElementById('current-year').textContent = currentYear;
   function frame() {
     cx += (tx - cx) * 0.12;
     cy += (ty - cy) * 0.12;
-    if (!tx && !ty && Math.abs(cx) < 0.05 && Math.abs(cy) < 0.05) {
-      cx = cy = 0;
-      card.style.transform = '';
-      raf = null;
-      return;
-    }
-    card.style.transform = 'rotateY(' + cx.toFixed(2) + 'deg) rotateX(' + cy.toFixed(2) + 'deg)';
-    raf = requestAnimationFrame(frame);
+    // the ease stops on whatever it was aiming at, so a pointer resting on
+    // the card holds its tilt without drawing a frame (the snap is < .05deg)
+    var done = Math.abs(tx - cx) < 0.05 && Math.abs(ty - cy) < 0.05;
+    if (done) { cx = tx; cy = ty; }
+    card.style.transform = done && !tx && !ty ? '' :
+      'rotateY(' + cx.toFixed(2) + 'deg) rotateX(' + cy.toFixed(2) + 'deg)';
+    raf = done ? null : requestAnimationFrame(frame);
   }
   function go() { if (!raf) raf = requestAnimationFrame(frame); }
   function aim(e) {

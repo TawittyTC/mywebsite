@@ -217,12 +217,6 @@
       z-index: -2
     }
 
-    #hero p {
-      color: #6e6e73;
-      margin: 24px 0 0 0;
-      font-size: clamp(1.1765rem, 2.5vw, 1.6471rem);
-    }
-
     @media(max-width:992px) {
       #hero {
         text-align: center
@@ -559,11 +553,10 @@
 
     .exp-card-cta {
       position: absolute;
-      bottom: 20px;
-      right: 20px;
+      bottom: 34px;
+      right: 36px;
       display: flex;
       align-items: center;
-      gap: 8px;
       border: 0;
       background: none;
       padding: 0;
@@ -571,17 +564,11 @@
       cursor: pointer
     }
 
-    .exp-card-cta-label {
-      font-size: 0.8824rem;
-      font-weight: 600;
-      color: #1264CE
-    }
-
     .exp-card-btn {
-      width: 40px;
-      height: 40px;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
-      background: rgba(18, 100, 206, .1);
+      background: rgba(210, 210, 215, .64);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -590,9 +577,9 @@
     }
 
     .exp-card-btn svg {
-      width: 20px;
-      height: 20px;
-      fill: #1264CE
+      width: 36px;
+      height: 36px;
+      fill: rgba(0, 0, 0, .56)
     }
 
     .exp-card-highlights {
@@ -607,13 +594,16 @@
 
     /* the corner "+" sits on the last chip row. This chip-high blank keeps
        its place there; when the row is full the blank wraps, and the "+"
-       gets a row of its own instead of covering a chip */
+       gets a row of its own instead of covering a chip. The blank is the
+       button (its right edge on the content edge) plus a 16/12/8px gap */
     #experience .exp-card-highlights::after {
       content: '\200b';
-      flex: 0 0 28px;
+      flex: 0 0 44px;
       padding: 4px 0;
       font-size: 0.8235rem
     }
+    @media (max-width: 1068px) { #experience .exp-card-highlights::after { flex-basis: 40px } }
+    @media (max-width: 734px) { #experience .exp-card-highlights::after { flex-basis: 36px } }
 
     .exp-card-highlights .hl {
       font-size: 0.8235rem;
@@ -681,7 +671,7 @@
     .exp-role {
       position: relative;
       padding-left: 24px;
-      padding-bottom: 6px;
+      padding-bottom: 8px;
     }
 
     .exp-role::before {
@@ -706,12 +696,13 @@
          centres on it at 3.75, not at 4 */
       left: 3.75px;
       top: 22px;
-      bottom: -2px;
+      bottom: -1px;
       width: 1.5px;
       background: rgba(0, 0, 0, .08);
     }
 
-    .exp-role-period {
+    /* the child selector outranks .profile-bio-small's margin: 0 */
+    .exp-role > .exp-role-period {
       font-weight: 500;
       color: #1d1d1f;
       margin: 0 0 4px;
@@ -722,7 +713,7 @@
       font-size: 0.9412rem;
       color: #1d1d1f;
       line-height: 1.4;
-      margin-bottom: 2px;
+      margin-bottom: 4px;
     }
 
     /* Stats bar inside experience cards */
@@ -755,7 +746,6 @@
       display: flex;
       align-items: baseline;
       justify-content: center;
-      gap: 1px;
       font-variant-numeric: tabular-nums
     }
 
@@ -896,6 +886,12 @@
       box-shadow: 0 1px 0 rgba(29, 29, 31, .08)
     }
 
+    /* a nested project: "All projects" sits over the title, so the title
+       starts 16px under the pill, as it does under clear() when scrolled */
+    .exp-lightbox-bar:has(.proj-back) {
+      margin-bottom: 8px
+    }
+
     .exp-lightbox-close {
       flex: none;
       background: rgba(232, 232, 237, .9);
@@ -949,11 +945,13 @@
       line-height: 1.2
     }
 
+    /* balanced, so "Ltd." or "(SCG)" never sits alone on a phone */
     .exp-modal-company {
       font-size: 0.9412rem;
       color: #6e6e73;
       font-weight: 400;
-      line-height: 1.4
+      line-height: 1.4;
+      text-wrap: balance
     }
 
     /* Period: quiet secondary text, not a badge */
@@ -971,7 +969,7 @@
     .exp-modal-tech {
       display: flex;
       flex-wrap: wrap;
-      gap: 6px;
+      gap: 8px;
       margin-bottom: 0
     }
 
@@ -1212,9 +1210,7 @@
     /* section heads lead the client names under them (16px) by size,
        not by a heavier weight */
     .exp-modal-section > h3 {
-      display: flex;
-      align-items: center;
-      gap: 10px;
+      display: block;
       font-size: 1.0588rem;
       line-height: 24px;
       font-weight: 600;
@@ -1266,7 +1262,6 @@
       .exp-modal-section > h3 { font-size: 0.9412rem; }
       .exp-modal-tech span { font-size: 0.7059rem; }
       .exp-modal-period { font-size: 0.7059rem; }
-      .exp-card-cta-label { font-size: 0.8235rem; }
       .exp-modal-company { font-size: 0.8824rem; letter-spacing: 0; }
       .exp-filter-chip { font-size: 0.7647rem; }
       .exp-client-section-header h3 { font-size: 0.8824rem; letter-spacing: 0; }
@@ -1276,7 +1271,6 @@
     /* Resolution-tiered desktop scale — see the PPI table in style.css.
        Each tier multiplies the baseline design: FHD 1.06x, 2K 1.13x, 4K 1.45x. */
     @media (min-width: 1500px) {
-      .exp-card-cta-label { font-size: 0.9412rem; }
       .exp-card-highlights .hl,
       #experience .exp-card-highlights::after { font-size: 0.8824rem; }
       .exp-stat-label { font-size: 0.8824rem; }
@@ -1322,10 +1316,10 @@
   </style>
 
   <!-- Full CSS loaded async: no render blocking (bootstrap merged in) -->
-  <link rel="preload" href="assets/css/style.min.css?v=2.61.0" as="style"
+  <link rel="preload" href="assets/css/style.min.css?v=2.62.0" as="style"
     onload="this.onload=null;this.rel='stylesheet'">
   <noscript>
-    <link href="assets/css/style.min.css?v=2.61.0" rel="stylesheet">
+    <link href="assets/css/style.min.css?v=2.62.0" rel="stylesheet">
     <style>.proj-all{visibility:hidden}</style>
   </noscript>
 
@@ -1602,7 +1596,7 @@
   </script>
 
   <!-- Preload deferred JS to start downloading before parser reaches script tags -->
-  <link rel="preload" href="assets/js/main.min.js?v=2.61.0" as="script">
+  <link rel="preload" href="assets/js/main.min.js?v=2.62.0" as="script">
 
   <!-- Google tag (gtag.js). The page view is queued here, stamped with the
        time the page opened; gtag.js sends it when it arrives. -->
@@ -1804,13 +1798,13 @@
                   <div class="exp-roles" style="margin-top:0">
                     <div class="exp-role">
                       <h4 class="exp-role-title">Computer Engineering</h4>
-                      <p class="fw-light profile-bio-small">Bachelor's degree &middot; Rajamangala University of Technology Srivijaya</p>
-                      <div class="fw-light profile-bio-small" style="margin-bottom:24px">June 2020&nbsp;– April 2024 &middot; GPAX 3.64</div>
+                      <p class="fw-light profile-bio-small dot-list"><span class="nw">Bachelor's degree</span> <span>Rajamangala University of Technology Srivijaya</span></p>
+                      <div class="fw-light profile-bio-small dot-list" style="margin-bottom:24px"><span class="nw">June 2020 – April 2024</span> <span class="nw">GPAX 3.64</span></div>
                     </div>
                     <div class="exp-role">
                       <h4 class="exp-role-title">Information Technology</h4>
-                      <p class="fw-light profile-bio-small">Vocational Certificate &middot; Songkhla Technical College, Songkhla</p>
-                      <div class="fw-light profile-bio-small">May 2017&nbsp;– March 2019 &middot; GPAX 3.84</div>
+                      <p class="fw-light profile-bio-small dot-list"><span class="nw">Vocational Certificate</span> <span>Songkhla Technical College, Songkhla</span></p>
+                      <div class="fw-light profile-bio-small dot-list"><span class="nw">May 2017 – March 2019</span> <span class="nw">GPAX 3.84</span></div>
                     </div>
                   </div>
                 </div>
@@ -1832,7 +1826,7 @@
                       <p class="fw-light profile-bio-small">Chamnanhan, T., Phetkrachang, K., Sathiwantana, S.,
                         Chalearnnetkul, P., Choosong, C. (2023). &ldquo;Measuring of Words Similarity for Question
                         Answering System for Diabetes&rdquo;. Journal of Applied Informatics and Technology, Vol. 5
-                        No. 2, July&ndash;December.</p>
+                        No. 2, <span class="nw">July&ndash;December.</span></p>
                     </div>
                   </div>
                 </div>
@@ -1896,9 +1890,10 @@
                       </div>
                     </div>
 
-                    <p class="exp-clients-line">Clients include Bangkok Hospital Chiang&nbsp;Mai&nbsp;· Kasikorn&nbsp;Carabao&nbsp;·
-                      Thai VietJet&nbsp;Air&nbsp;· Isuzu&nbsp;Thailand&nbsp;· Rabbit&nbsp;Card&nbsp;· Inchcape&nbsp;Thailand
-                      <span class="exp-clients-more">+ <span class="js-client-more">27</span> more</span></p>
+                    <p class="exp-clients-line dot-list"><span>Clients include <span class="nw">Bangkok Hospital Chiang Mai</span></span>
+                      <span class="nw">Kasikorn Carabao</span> <span class="nw">Thai VietJet Air</span> <span class="nw">Isuzu Thailand</span>
+                      <span class="nw">Rabbit Card</span> <span class="nw">Inchcape Thailand
+                      <span class="exp-clients-more">+ <span class="js-client-more">27</span> more</span></span></p>
 
                     <div class="exp-card-highlights profile-bio-small">
                       <span class="hl">Asterisk PBX / CTI</span>
@@ -1909,7 +1904,6 @@
                     </div>
                     <button type="button" class="exp-card-cta"
                       aria-label="Read more: Full Stack Developer at Protollcall Advance Service">
-                      <span class="exp-card-cta-label" aria-hidden="true">Read more</span>
                       <span class="exp-card-btn">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" aria-hidden="true" focusable="false">
                           <path
@@ -1968,7 +1962,6 @@
                   </div>
                   <button type="button" class="exp-card-cta"
                     aria-label="Read more: Full Stack Developer Intern at The Siam Cement Group">
-                    <span class="exp-card-cta-label" aria-hidden="true">Read more</span>
                     <span class="exp-card-btn">
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" aria-hidden="true" focusable="false">
                         <path
@@ -2018,7 +2011,6 @@
                   </div>
                   <button type="button" class="exp-card-cta"
                     aria-label="Read more: Computer Technician Intern at Advice IT Infinite">
-                    <span class="exp-card-cta-label" aria-hidden="true">Read more</span>
                     <span class="exp-card-btn">
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" aria-hidden="true" focusable="false">
                         <path
@@ -2304,7 +2296,7 @@
               </div>
               <div class="work-logo" aria-hidden="true"><img src="assets/img/clients/card/kasikorn-carabao.webp" alt="" width="336" height="336" style="--lw: 0.42" loading="lazy" decoding="async"></div>
               <span class="project-tag">Client work · Finance</span>
-              <h3 class="h4" id="work2-title">Sales campaign CRM, Kasikorn Carabao</h3>
+              <h3 class="h4" id="work2-title">Sales&nbsp;campaign CRM, Kasikorn Carabao</h3>
               <p class="fw-light">Predictive dialer, repayment tracking and agent dashboards over large daily call logs.</p>
               <button type="button" class="card-plus" aria-label="Read more: Sales campaign CRM, Kasikorn Carabao">
                 <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
@@ -2404,7 +2396,7 @@
               <div class="work-logo" aria-hidden="true"><img src="assets/img/clients/card/kbj-capital.webp" alt="" width="640" height="95" style="--lw: 0.8" loading="lazy" decoding="async"></div>
               <span class="project-tag">Client work · Voice AI</span>
               <h3 class="h4">AI&nbsp;voice&nbsp;bot, KBJ&nbsp;Capital</h3>
-              <p class="fw-light">Answers the call, asks what the caller needs and handles short questions like a missing payment or paying by QR code.</p>
+              <p class="fw-light">A demo for Digiserve's bid. It answers the call, asks what the caller needs and handles payment questions.</p>
               <button type="button" class="card-plus" aria-label="Read more: AI voice bot, KBJ Capital">
                 <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
               </button>
@@ -2618,7 +2610,7 @@
               </div>
               <div class="work-logo" aria-hidden="true"><img src="assets/img/clients/card/digiserve.webp" alt="" width="526" height="215" style="--lw: 0.657" loading="lazy" decoding="async"></div>
               <span class="project-tag">Client work · Analytics</span>
-              <h3 class="h4">Customer analytics, Digiserve</h3>
+              <h3 class="h4">Customer&nbsp;analytics, Digiserve</h3>
               <p class="fw-light">One view of calls, LINE and email, with <span class="nw">drill-down</span>, period comparison and exports.</p>
               <button type="button" class="card-plus" aria-label="Read more: Customer analytics, Digiserve">
                 <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
@@ -2980,7 +2972,7 @@
               </div>
               <div class="work-logo" aria-hidden="true"><img src="assets/img/clients/card/happy-products.webp" alt="" width="600" height="188" style="--lw: 0.75" loading="lazy" decoding="async"></div>
               <span class="project-tag">Client work · Documentation</span>
-              <h3 class="h4">Monix codebase docs, Happy Products</h3>
+              <h3 class="h4">Monix&nbsp;codebase docs, Happy Products</h3>
               <p class="fw-light">Technical docs for the Happy Monix codebase, covering its classes, views, controllers and assets.</p>
               <button type="button" class="card-plus" aria-label="Read more: Monix codebase docs, Happy Products">
                 <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
@@ -3229,55 +3221,55 @@
           <h3>คำถามที่พบบ่อย</h3>
           <div class="faq-list">
             <details>
-              <summary>ธนพล ชำนาญหาญ คือใคร?</summary>
+              <summary><span class="faq-q">ธนพล ชำนาญหาญ คือใคร?</span></summary>
               <p>ธนพล ชำนาญหาญ (Tanapol Chamnanhan) คือ <span class="nw">Full-Stack</span> Developer และ Software Engineer จากกรุงเทพมหานคร มีประสบการณ์กว่า 2 ปีในการพัฒนาระบบ CRM, เว็บแอปพลิเคชัน และระบบ AI สำหรับองค์กรในไทย 33 แห่ง</p>
             </details>
             <details>
-              <summary>ธนพล ชำนาญหาญ รับทำเว็บไซต์กรุงเทพหรือไม่?</summary>
+              <summary><span class="faq-q">ธนพล ชำนาญหาญ รับทำเว็บไซต์กรุงเทพหรือไม่?</span></summary>
               <p>รับครับ ธนพล ชำนาญหาญ รับทำเว็บไซต์ทุกประเภท ทั้ง Corporate Website, Landing Page, <span class="nw">E-Commerce</span> และ Web Application พร้อมให้บริการในกรุงเทพและทั่วประเทศไทย ติดต่อได้ที่ <a href="mailto:tanapol.ch@rmutsvmail.com">tanapol.ch@rmutsvmail.com</a></p>
             </details>
             <details>
-              <summary>รับทำระบบ CRM กรุงเทพ ติดต่อได้อย่างไร?</summary>
+              <summary><span class="faq-q">รับทำระบบ CRM กรุงเทพ ติดต่อได้อย่างไร?</span></summary>
               <p>ธนพล ชำนาญหาญ รับทำระบบ CRM แบบ Custom สำหรับองค์กร มีประสบการณ์จริงจากการพัฒนา CRM ให้บริษัท 33 แห่ง อาทิ Bangkok Hospital Chiang Mai, Kasikorn Carabao, Thai VietJet Air ติดต่อ <a href="mailto:tanapol.ch@rmutsvmail.com">tanapol.ch@rmutsvmail.com</a> หรือ <a href="tel:+66962437210" class="svc-nw">+66 962 437 210</a></p>
             </details>
             <details>
-              <summary>รับทำระบบ POS (Point of Sale) กรุงเทพมีไหม?</summary>
+              <summary><span class="faq-q">รับทำระบบ POS <span class="svc-nw">(Point of Sale)</span> <span class="svc-nw">กรุงเทพมีไหม?</span></span></summary>
               <p>มีครับ ธนพล ชำนาญหาญ รับพัฒนาระบบ POS แบบ Custom ทั้งจุดขาย, ระบบสต็อกสินค้า, รายงานยอดขาย และการเชื่อมต่อกับระบบอื่น ราคาเหมาะสม ปรึกษาฟรีที่ <a href="mailto:tanapol.ch@rmutsvmail.com">tanapol.ch@rmutsvmail.com</a></p>
             </details>
             <details>
-              <summary>ธนพล ชำนาญหาญ กำลังหางานอยู่ไหม?</summary>
+              <summary><span class="faq-q">ธนพล ชำนาญหาญ กำลังหางานอยู่ไหม?</span></summary>
               <p>ใช่ครับ ธนพล ชำนาญหาญ เปิดรับโอกาสงานใหม่ ทั้งตำแหน่ง Software Engineer, <span class="nw">Full-Stack</span> Developer, Web Developer และ Programmer ในกรุงเทพหรือรูปแบบ Remote ติดต่อ HR ได้ที่ <a href="mailto:tanapol.ch@rmutsvmail.com">tanapol.ch@rmutsvmail.com</a> หรือ LinkedIn: <a href="https://www.linkedin.com/in/tanapol-chamnanhan/">linkedin.com/in/<wbr><span class="svc-nw">tanapol-chamnanhan/</span></a></p>
             </details>
             <details lang="en">
-              <summary>How can I hire Tanapol as a Software Engineer or Web Developer?</summary>
-              <p>Contact Tanapol Chamnanhan (<span lang="th">ธนพล ชำนาญหาญ</span>) via email <a href="mailto:tanapol.ch@rmutsvmail.com">tanapol.ch@rmutsvmail.com</a> or LinkedIn <a href="https://www.linkedin.com/in/tanapol-chamnanhan/">linkedin.com/in/<wbr><span class="svc-nw">tanapol-chamnanhan/</span></a>. <span class="svc-nw">Bangkok-based</span> <span class="svc-nw">Full-Stack</span> Developer open to <span class="svc-nw">full-time</span>, contract, and freelance opportunities in Software Engineering, Web Development, CRM/POS system development.</p>
+              <summary><span class="faq-q">How can I hire Tanapol as a Software Engineer or Web Developer?</span></summary>
+              <p>Contact Tanapol Chamnanhan (<span lang="th" class="svc-nw">ธนพล ชำนาญหาญ</span>) via email <a href="mailto:tanapol.ch@rmutsvmail.com">tanapol.ch@rmutsvmail.com</a> or LinkedIn <a href="https://www.linkedin.com/in/tanapol-chamnanhan/">linkedin.com/in/<wbr><span class="svc-nw">tanapol-chamnanhan/</span></a>. <span class="svc-nw">Bangkok-based</span> <span class="svc-nw">Full-Stack</span> Developer open to <span class="svc-nw">full-time</span>, contract, and freelance opportunities in Software Engineering, Web Development, CRM/POS system development.</p>
             </details>
             <details>
-              <summary>โปรแกรมเมอร์รับทำเว็บไซต์กรุงเทพ ราคาเท่าไหร่?</summary>
+              <summary><span class="faq-q">โปรแกรมเมอร์รับทำเว็บไซต์กรุงเทพ ราคาเท่าไหร่?</span></summary>
               <p>ธนพล ชำนาญหาญ รับทำเว็บไซต์และพัฒนาระบบ ราคาขึ้นอยู่กับ scope งาน ปรึกษาฟรีก่อน ไม่มีค่าใช้จ่าย ติดต่อได้ที่ <a href="mailto:tanapol.ch@rmutsvmail.com">tanapol.ch@rmutsvmail.com</a> หรือโทร <a href="tel:+66962437210" class="svc-nw">+66 962 437 210</a> เพื่อรับใบเสนอราคา</p>
             </details>
             <details>
-              <summary>ขั้นตอนการทำงานเป็นอย่างไร?</summary>
+              <summary><span class="faq-q">ขั้นตอนการทำงานเป็นอย่างไร?</span></summary>
               <p>เริ่มจากคุยความต้องการกันก่อน ปรึกษาฟรี จากนั้นผมสรุปขอบเขตงาน ระยะเวลา และราคาให้ตกลงกันก่อนเริ่ม แล้วพัฒนาตั้งแต่ออกแบบฐานข้อมูลจนระบบขึ้นใช้งานจริง พร้อมส่งมอบเอกสารการใช้งาน</p>
             </details>
             <details>
-              <summary>ใช้เวลาทำนานแค่ไหน?</summary>
+              <summary><span class="faq-q">ใช้เวลาทำนานแค่ไหน?</span></summary>
               <p>ขึ้นอยู่กับขอบเขตงาน หลังคุยรายละเอียดแล้วผมจะแจ้งระยะเวลาที่ชัดเจนก่อนเริ่มงานทุกครั้ง</p>
             </details>
             <details>
-              <summary>หลังส่งงานแล้วมีดูแลต่อไหม?</summary>
+              <summary><span class="faq-q">หลังส่งงานแล้วมีดูแลต่อไหม?</span></summary>
               <p>มีครับ ผมดูแลระบบต่อหลังส่งมอบได้ ทั้งแก้ไขปัญหาและเพิ่มฟีเจอร์ใหม่ เงื่อนไขการดูแลตกลงกันตอนสรุปขอบเขตงาน</p>
             </details>
             <details>
-              <summary>ธนพล ชำนาญหาญ รับพัฒนา AI Agent และระบบ AI สำหรับธุรกิจไหม?</summary>
+              <summary><span class="faq-q">ธนพล ชำนาญหาญ <span class="svc-nw">รับพัฒนา AI Agent</span> และระบบ AI สำหรับธุรกิจไหม?</span></summary>
               <p>รับครับ ธนพล ชำนาญหาญ รับพัฒนา AI Agent และระบบ AI สำหรับธุรกิจ — Agentic AI (<span class="nw">Multi-Agent</span> Orchestration, <span class="nw">Sub-Agents</span>), LLM Integration (GPT, Gemini, Claude), Voice AI (ASR, TTS, <span class="nw">Speech-to-Speech</span> แบบ Realtime), AI Chatbot และ AI IVR สำหรับ Contact Center ติดต่อ <a href="mailto:tanapol.ch@rmutsvmail.com">tanapol.ch@rmutsvmail.com</a></p>
             </details>
             <details lang="en">
-              <summary>Does Tanapol Chamnanhan build AI agents and voice AI systems?</summary>
+              <summary><span class="faq-q">Does <span class="svc-nw">Tanapol Chamnanhan</span> build AI agents and voice AI systems?</span></summary>
               <p>Yes. Tanapol Chamnanhan designs and builds agentic AI systems (orchestrator + <span class="nw">sub-agent</span> architectures, <span class="nw">multi-agent</span> orchestration), LLM integrations (GPT, Gemini, Claude), and voice AI pipelines (ASR, TTS, realtime <span class="nw">speech-to-speech</span>) for business automation and contact centers. Based in Bangkok, Thailand — contact <a href="mailto:tanapol.ch@rmutsvmail.com">tanapol.ch@rmutsvmail.com</a></p>
             </details>
             <details lang="en">
-              <summary>What technologies does Tanapol Chamnanhan use for CRM and POS development?</summary>
+              <summary><span class="faq-q">What technologies does <span class="svc-nw">Tanapol Chamnanhan</span> use for CRM and POS development?</span></summary>
               <p>Tanapol Chamnanhan builds CRM and POS systems using PHP, Python, JavaScript, MySQL, React, RESTful APIs, and integrations with LINE Messaging API, Telegram Bot, Payment Gateways, and Asterisk PBX for call center functionality. Based in Bangkok, Thailand.</p>
             </details>
           </div>
@@ -3312,7 +3304,7 @@
                 </div>
                 <div>
                   <div class="biz-name">Tanapol Chamnanhan</div>
-                  <div class="biz-role"><span class="nw">Full-stack</span> developer · <span class="nw">CRM, POS &amp; AI voice agents</span></div>
+                  <div class="biz-role dot-list"><span class="nw">Full-stack developer</span> <span class="nw">CRM, POS &amp; AI voice agents</span></div>
                 </div>
                 <div class="biz-row biz-contacts">
                   <a href="mailto:tanapol.ch@rmutsvmail.com">tanapol.ch@rmutsvmail.com</a>
@@ -3339,7 +3331,7 @@
         <div class="col-12 col-md-6">
           <div style="font-size: 1rem;font-weight:600;color:#1d1d1f;margin-bottom:8px;letter-spacing:-0.2px;">Tanapol
             Chamnanhan</div>
-          <div class="fw-light" style="font-size: 0.8235rem;color:#6e6e73;line-height:1.6;"><span class="nw">Full-stack</span> developer &amp;
+          <div class="fw-light" style="font-size: 0.8235rem;color:#6e6e73;line-height:1.6;text-wrap:pretty;"><span class="nw">Full-stack</span> developer &amp;
             software engineer based in Bangkok, Thailand</div>
         </div>
 
@@ -3381,8 +3373,8 @@
 
       <div class="border-top">
         <!-- copyright text -->
-        <div class="footer-copy">&copy; <span id="current-year">2026</span>
-          <a href="https://tawittytc.github.io/mywebsite" class="text-body-secondary footer-copy-link">Tanapol Chamnanhan</a> · <span class="nw">Built and
+        <div class="footer-copy dot-list"><span class="nw">&copy; <span id="current-year">2026</span>
+          <a href="https://tawittytc.github.io/mywebsite" class="text-body-secondary footer-copy-link">Tanapol Chamnanhan</a></span> <span class="nw">Built and
           maintained by hand</span>
         </div>
       </div>
@@ -3400,7 +3392,7 @@
   </button>
 
   <!-- Main JS -->
-  <script defer src="assets/js/main.min.js?v=2.61.0"></script>
+  <script defer src="assets/js/main.min.js?v=2.62.0"></script>
   <!-- Service Worker: cache assets for repeat visits -->
   <script>if ('serviceWorker' in navigator) { var _sw = function () { navigator.serviceWorker.register('sw.js') }; 'requestIdleCallback' in window ? requestIdleCallback(_sw) : window.addEventListener('load', _sw) }</script>
 
@@ -3511,7 +3503,7 @@
       <div class="exp-client-section" data-client="bkk-hosp">
         <div class="exp-client-section-header">
           <img srcset="assets/img/clients/bangkok-hospital.webp 3x" width="95.3" height="23" alt="" loading="lazy" decoding="async">
-          <h3>BCM <span style="font-weight:400;color:#6e6e73">(Bangkok Hospital Chiang Mai)</span></h3>
+          <h3>BCM <span style="font-weight:400;color:#6e6e73">(Bangkok Hospital Chiang&nbsp;Mai)</span></h3>
           <span class="exp-client-tag">Healthcare CRM</span>
         </div>
         <ul>
@@ -3564,8 +3556,7 @@
       <div class="exp-client-section" data-client="happy">
         <div class="exp-client-section-header">
           <img srcset="assets/img/clients/happy-products.webp 3x" width="83.7" height="26.3" alt="" loading="lazy" decoding="async">
-          <h3>Happy Products &amp; Services Co., Ltd. <span style="font-weight:400;color:#6e6e73">(Tnews, Happy
-              Shopping)</span></h3>
+          <h3>Happy Products &amp; Services Co., Ltd. <span style="font-weight:400;color:#6e6e73">(Tnews, Happy&nbsp;Shopping)</span></h3>
           <span class="exp-client-tag"><span class="nw">End-to-end</span> CRM</span>
         </div>
         <ul>
@@ -3756,7 +3747,7 @@
       <div class="exp-client-section" data-client="oto">
         <div class="exp-client-section-header">
           <img srcset="assets/img/clients/oto-vision.webp 3x" width="120" height="18" alt="" loading="lazy" decoding="async">
-          <h3>OTO Vision Co., Ltd. <span style="font-weight:400;color:#6e6e73">(OTO Shopping)</span></h3>
+          <h3>OTO Vision Co., Ltd. <span style="font-weight:400;color:#6e6e73">(OTO&nbsp;Shopping)</span></h3>
           <span class="exp-client-tag">TV shopping CRM</span>
         </div>
         <ul>
@@ -4132,7 +4123,7 @@
         <img src="assets/img/scg-logo.avif" alt="SCG" class="exp-modal-company-logo"
           onerror="this.style.display='none'">
         <div>
-          <h2 class="exp-modal-title">Full Stack Developer Intern</h2>
+          <h2 class="exp-modal-title">Full Stack <span class="nw">Developer Intern</span></h2>
           <div class="exp-modal-company">at The Siam Cement Group (SCG)</div>
         </div>
       </div>
@@ -4171,7 +4162,7 @@
     </div>
 
     <div class="exp-modal-section">
-      <h3>Projects — second internship (Dec 2023 – Mar 2024)</h3>
+      <h3>Projects — second internship <span class="nw">(Dec 2023 – Mar 2024)</span></h3>
       <div class="exp-client-section" data-client="scg-booking">
         <div class="exp-client-section-header">
           <h3>Project Booking — internal reservation system</h3>
@@ -4222,7 +4213,7 @@
     </div>
 
     <div class="exp-modal-section">
-      <h3>Projects — first internship (Apr – Jul 2023)</h3>
+      <h3>Projects — first internship <span class="nw">(Apr – Jul 2023)</span></h3>
       <div class="exp-client-section" data-client="scg-license">
         <div class="exp-client-section-header">
           <h3>Project License — software license management system</h3>
@@ -4652,7 +4643,7 @@
     <div class="exp-modal-header">
       <div class="exp-modal-role-header">
         <div>
-          <h2 class="exp-modal-title">Measuring of Words Similarity for Question Answering System for Diabetes</h2>
+          <h2 class="exp-modal-title">Measuring of Words Similarity for Question Answering System <span class="nw">for Diabetes</span></h2>
           <div class="exp-modal-company">Journal of Applied Informatics and Technology (<span class="nw">TCI-1</span>)</div>
         </div>
       </div>
@@ -4673,7 +4664,7 @@
         <img src="assets/img/advice-logo.avif" alt="Advice IT Infinite" class="exp-modal-company-logo"
           onerror="this.style.display='none'">
         <div>
-          <h2 class="exp-modal-title">Computer Technician Intern</h2>
+          <h2 class="exp-modal-title">Computer <span class="nw">Technician Intern</span></h2>
           <div class="exp-modal-company">at Advice IT Infinite Co., Ltd.</div>
         </div>
       </div>
