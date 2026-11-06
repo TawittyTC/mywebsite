@@ -99,8 +99,15 @@ test('page loads with no console errors and no failed asset requests', async () 
 test('hero renders name, eyebrow and the multi-agent constellation', async () => {
   const { page } = await openPage();
   assert.match(await page.textContent('#hero h1'), /Tanapol Chamnanhan/);
-  assert.match(await page.textContent('#hero .hero-eyebrow'), /Software Engineer/);
-  await page.waitForFunction(() => document.querySelector('#hero .typed')?.textContent.length > 0);
+  // sentence case, set as written: no uppercase transform, no wide tracking
+  assert.equal((await page.textContent('#hero .hero-eyebrow')).trim(), 'Software engineer · Bangkok');
+  const eyebrow = await page.$eval('#hero .hero-eyebrow', (el) => {
+    const cs = getComputedStyle(el);
+    return { transform: cs.textTransform, tracking: parseFloat(cs.letterSpacing) / parseFloat(cs.fontSize) };
+  });
+  assert.equal(eyebrow.transform, 'none', 'the eyebrow is uppercased again');
+  assert.ok(eyebrow.tracking >= 0 && eyebrow.tracking <= 0.02, `eyebrow tracking ${eyebrow.tracking.toFixed(3)}em is not normal or slightly open`);
+  assert.equal((await page.textContent('#hero .hero-role')).trim(), 'Full-stack developer and AI engineer');
   assert.equal(await page.locator('#hero-net').count(), 1, 'constellation canvas missing');
   const labels = await page.$$eval('#hero-net-labels .hero-net-label', (els) => els.map((e) => e.textContent));
   assert.deepEqual(labels.sort(), ['ASR', 'CRM', 'IVR', 'LLM', 'POS', 'TTS'], 'labeled nodes missing');
@@ -192,13 +199,13 @@ test('scrolling the whole page leaves no reveal-hidden content behind', async ()
   await page.close();
 });
 
-test('scroll-scrub: entering elements animate with scroll, then settle clean', async () => {
+test('reveals: a block fades and rises 12px once as it enters, then stays put', async () => {
   const { page } = await openPage();
   await page.waitForTimeout(600);
-  // park a mid-page card just inside the scrub window (top at ~88% of viewport)
+  const sel = '#experience .data-box.js-reveal';
   // (bootstrap sets scroll-behavior: smooth, so wait for the scroll to arrive)
-  const park = (frac) => page.evaluate(async (f) => {
-    const el = document.querySelector('#experience .data-box.js-reveal');
+  const park = (frac) => page.evaluate(async ([s, f]) => {
+    const el = document.querySelector(s);
     let y = 0;
     for (let n = el; n; n = n.offsetParent) y += n.offsetTop;
     const target = Math.max(0, Math.round(y - window.innerHeight * f));
@@ -210,24 +217,46 @@ test('scroll-scrub: entering elements animate with scroll, then settle clean', a
         else setTimeout(poll, 50);
       })();
     });
-  }, frac);
-  await park(0.88);
-  await page.waitForTimeout(200);
-  const mid = await page.$eval('#experience .data-box.js-reveal',
-    (el) => ({ opacity: el.style.opacity, transform: el.style.transform }));
-  const midOpacity = parseFloat(mid.opacity);
-  assert.ok(midOpacity > 0 && midOpacity < 0.99,
-    `mid-entry element should be partially faded, got opacity "${mid.opacity}"`);
-  assert.ok(mid.transform.includes('translateY'),
-    `mid-entry element should be translated, got "${mid.transform}"`);
-  // scroll it well past the settle line — inline styles must clear (hover CSS owns it again)
-  await park(0.25);
-  await page.waitForTimeout(200);
-  const done = await page.$eval('#experience .data-box.js-reveal',
-    (el) => ({ visible: el.classList.contains('is-visible'), transform: el.style.transform, opacity: el.style.opacity }));
-  assert.ok(done.visible, 'element should be settled (is-visible) past the scrub window');
-  assert.equal(done.transform, '', 'inline transform must be cleared after settling');
-  assert.equal(done.opacity, '', 'inline opacity must be cleared after settling');
+  }, [sel, frac]);
+  // still below the fold: armed, hidden, and not moved by the scroll
+  await park(1.3);
+  await page.waitForTimeout(400);
+  const waiting = await page.$eval(sel, (el) => ({
+    visible: el.classList.contains('is-visible'), opacity: getComputedStyle(el).opacity, inline: el.style.cssText }));
+  assert.equal(waiting.visible, false, 'a block below the fold was revealed early');
+  assert.equal(waiting.opacity, '0', 'a waiting block should be hidden');
+  assert.equal(waiting.inline, '', 'the scroll position must not write styles onto a block (no scrub)');
+  // it enters: one short fade-and-rise on the one curve
+  await park(0.6);
+  await page.waitForFunction((s) => document.querySelector(s).classList.contains('is-visible'), sel);
+  const anim = await page.$eval(sel, (el) => {
+    const a = el.getAnimations()[0];
+    if (!a) return null;
+    const k = a.effect.getKeyframes();
+    const t = a.effect.getTiming();
+    return { from: [String(k[0].opacity), k[0].transform], to: [String(k.at(-1).opacity), k.at(-1).transform],
+      duration: t.duration, delay: t.delay, easing: t.easing, iterations: t.iterations };
+  });
+  assert.ok(anim, 'the entering block did not animate');
+  assert.deepEqual(anim.from, ['0', 'translateY(12px)'], 'the reveal should start 12px low and transparent');
+  assert.deepEqual(anim.to, ['1', 'none'], 'the reveal should land in place, fully opaque');
+  assert.ok(anim.duration >= 300 && anim.duration <= 500, `reveal lasts ${anim.duration}ms`);
+  assert.ok(anim.delay <= 250, `reveal waits ${anim.delay}ms`);
+  assert.equal(anim.iterations, 1, 'the reveal must play once');
+  assert.match(anim.easing, /cubic-bezier\(0\.22, 1, 0\.36, 1\)/, `reveal easing is ${anim.easing}`);
+  // done: in place, opaque, nothing left running or written inline
+  await page.waitForTimeout(800);
+  const done = await page.$eval(sel, (el) => ({ opacity: getComputedStyle(el).opacity,
+    transform: getComputedStyle(el).transform, running: el.getAnimations().length, inline: el.style.cssText }));
+  assert.deepEqual(done, { opacity: '1', transform: 'none', running: 0, inline: '' }, 'the block did not settle clean');
+  // scrolling back up never hides it again, and coming back never replays it
+  await park(1.3);
+  await page.waitForTimeout(300);
+  await park(0.6);
+  await page.waitForTimeout(100);
+  const again = await page.$eval(sel, (el) => ({ visible: el.classList.contains('is-visible'),
+    opacity: getComputedStyle(el).opacity, running: el.getAnimations().length }));
+  assert.deepEqual(again, { visible: true, opacity: '1', running: 0 }, 'the reveal reversed or replayed');
   await page.close();
 });
 
@@ -250,6 +279,22 @@ test('prefers-reduced-motion: no parallax, no reveal-gating, titles visible', as
   await page.close();
 });
 
+test('printing (or Save as PDF) before scrolling shows every block', async () => {
+  const { page } = await openPage();
+  await page.waitForTimeout(600);
+  const armed = await page.evaluate(() => [...document.querySelectorAll('.js-reveal:not(.is-visible)')].length);
+  assert.ok(armed > 10, `only ${armed} blocks wait below the fold`);
+  await page.emulateMedia({ media: 'print' });
+  const hidden = await page.evaluate(() => [...document.querySelectorAll('.js-reveal')]
+    .filter((el) => getComputedStyle(el).opacity !== '1').map((el) => el.className));
+  assert.deepEqual(hidden, [], 'blocks still waiting for a scroll print blank');
+  // on screen they still wait for their one fade-and-rise
+  await page.emulateMedia({ media: 'screen' });
+  assert.equal(await page.evaluate(() => [...document.querySelectorAll('.js-reveal:not(.is-visible)')]
+    .filter((el) => getComputedStyle(el).opacity === '0').length), armed, 'the screen reveal changed');
+  await page.close();
+});
+
 test('mobile viewport renders hero and certificates', async () => {
   const { page, errors } = await openPage({
     viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true,
@@ -261,15 +306,26 @@ test('mobile viewport renders hero and certificates', async () => {
   await page.close();
 });
 
-test('hero stays clean: no navbar, no CTA buttons; name lines carry the ink treatment', async () => {
+test('hero stays clean: no navbar, no CTA buttons, no wash; the name is solid text', async () => {
   const { page } = await openPage();
   assert.equal(await page.locator('#site-nav').count(), 0, 'navbar should be removed');
   assert.equal(await page.locator('#hero .hero-btn').count(), 0, 'CTA buttons should be removed');
-  const clipped = await page.$$eval('#hero .hero-name-line', (els) =>
-    els.map((el) => getComputedStyle(el).webkitBackgroundClip || getComputedStyle(el).backgroundClip)
-  );
-  assert.equal(clipped.length, 2, 'expected two name lines');
-  clipped.forEach((v) => assert.equal(v, 'text', 'name gradient ink missing'));
+  const lines = await page.$$eval('#hero .hero-name-line', (els) => els.map((el) => {
+    const cs = getComputedStyle(el);
+    return { clip: cs.webkitBackgroundClip || cs.backgroundClip, bg: cs.backgroundImage, fill: cs.webkitTextFillColor };
+  }));
+  assert.equal(lines.length, 2, 'expected two name lines');
+  for (const l of lines) {
+    assert.notEqual(l.clip, 'text', 'the name is still gradient text');
+    assert.equal(l.bg, 'none', 'the name carries a background image');
+    assert.equal(l.fill, 'rgb(29, 29, 31)', 'the name is not solid #1D1D1F');
+  }
+  // no radial colour wash behind the copy or behind the closing headline
+  const washes = await page.evaluate(() => ['#hero .hero-copy', '#contact'].map((s) =>
+    getComputedStyle(document.querySelector(s), '::before').backgroundImage));
+  washes.forEach((w) => assert.ok(!/gradient/.test(w), `colour wash still behind the copy: ${w}`));
+  const cta = await page.$eval('#contact .cta-headline', (el) => getComputedStyle(el).backgroundImage);
+  assert.equal(cta, 'none', 'the closing headline is still gradient text');
   await page.close();
 });
 

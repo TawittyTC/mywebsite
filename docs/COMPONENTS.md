@@ -29,7 +29,8 @@
 สิ่งที่ได้อัตโนมัติเมื่อใส่ `data-card-scroller`:
 - ลูกศรเลื่อนทีละก้าว (ค่าเริ่ม 400px — ปรับได้ด้วย `data-scroller-step="480"`)
 - ลูกศร enable/disable ตามตำแหน่งซ้ายสุด/ขวาสุดเอง
-- มือถือ: การ์ดขยับซ้าย-กลับเป็นจังหวะเพื่อบอกว่าเลื่อนได้ และหยุดเมื่อผู้ใช้แตะเอง
+- มือถือ: การ์ดขยับซ้าย-กลับ 40px **ครั้งเดียว** ตอนแถวเข้าจอครั้งแรก เพื่อบอกว่าเลื่อนได้
+  ไม่วนซ้ำ และยกเลิกทันทีถ้าผู้ใช้แตะหรือ focus ในแถว
 
 ลูกศรถูกหาจาก `[data-scroller-prev]` / `[data-scroller-next]` ภายใน `<section>`
 เดียวกัน (หนึ่ง section ต่อหนึ่ง scroller) — ควบคุมด้วยโค้ดได้ผ่าน
@@ -87,10 +88,11 @@
 </div>
 ```
 
-## 5. Experience / ประวัติ Card (`.data-box` — การ์ดใหญ่มีเงาพัก)
+## 5. Experience / ประวัติ Card (`.data-box` — การ์ดใหญ่ ไม่มีเงาตอนพัก)
 
-การ์ดเอนกประสงค์ พื้นขาว มุม `--r-card` (28px) เงานุ่มตอนพัก ลอยขึ้นตอน hover
-scroll-scrub entrance อัตโนมัติ (การ์ดใน `#resume`/`#experience` ถูก arm ให้เอง)
+การ์ดเอนกประสงค์ พื้นขาว มุม `--r-card` (28px) ไม่มีเงาตอนพัก การ์ดที่กดได้ (`[data-exp]`)
+ตอน hover แค่มีเงา `0 8px 24px rgba(0,0,0,.06)` ไม่ขยาย ไม่ลอย; การ์ดใน `#resume`/`#experience`
+ได้ reveal อัตโนมัติ: จางเข้า + ลอยขึ้น 12px ครั้งเดียวตอนเข้าจอ
 
 ```html
 <div class="data-box">
@@ -101,9 +103,9 @@ scroll-scrub entrance อัตโนมัติ (การ์ดใน `#resum
 ```
 
 ของประกอบที่ใช้ร่วมกับการ์ดนี้ได้ (ดู markup จริงใน `index.html` ที่ `#experience`):
-- ชิปสถานะ: `<span class="exp-status-active">Active</span>` (เขียว = semantic)
-- ชิประยะเวลา: `<span class="exp-duration">2 yr</span>`
-- ตัวเลขนับขึ้นเมื่อเลื่อนถึง: `<span class="js-count" data-count="27">27</span>`
+- จุดงานปัจจุบัน: `<span class="exp-status-active" aria-hidden="true"></span>` จุดน้ำเงิน 6px นิ่ง (ไม่กะพริบ) หน้าวันที่
+- ระยะเวลาในบรรทัด meta เดียวกับวันที่: `<span class="exp-duration">2 yrs 5 mos</span>`
+- ตัวเลขสถิติ: `<span class="js-count" data-count="27">27</span>` เขียนค่าจริงไว้ใน HTML เลย (ไม่นับขึ้นจาก 0)
 - แถวสถิติ: `.exp-card-stats > .exp-stat-item > .exp-stat-num / .exp-stat-label`
 - ชิป tech: `.exp-card-stack > span`
 
@@ -141,17 +143,21 @@ Grid ใบ cert ถูกสร้างด้วย JS จาก array — เ
 กดการ์ดแล้วเปิด lightbox เต็มจอ (`.cert-lightbox`) พร้อม entrance zoom — ปิดด้วย
 Escape/แตะพื้นหลังได้ อยู่ในระบบอยู่แล้ว ไม่ต้องเขียนเพิ่ม
 
-## 8. Closing CTA (section ปิดท้าย gradient headline)
+## 8. Closing CTA (section ปิดท้าย หัวข้อสีทึบ)
+
+หัวข้อ `.cta-headline` เป็นตัวหนังสือสีทึบ `#1D1D1F` ไม่มี gradient ไม่มีแสงฟุ้งข้างหลัง
+`.cta-sub` ใช้สีรอง `#6E6E73`; ปุ่มหลักหนึ่งปุ่ม (`.btn-pill`) + ลิงก์รอง (`.more`)
+นามบัตร Liquid Glass (`#biz-card`) เอียงตาม pointer/นิ้วเท่านั้น (ไม่แกว่งเอง) แสงข้างในอยู่นิ่ง
 
 ```html
 <section id="contact" class="closing-cta">
   <div class="container">
     <div class="cta-inner">
-      <h2 class="cta-headline">Let's build<br>what's next.</h2>
+      <h2 class="cta-headline">Open to <span class="nw">full-time</span> and freelance work</h2>
       <p class="cta-sub">ข้อความรอง…</p>
-      <div class="cta-actions">
-        <a class="cta-mail" href="mailto:you@mail.com">you@mail.com</a>
-        <a class="cta-tel" href="tel:+66000000000">+66 00 000 0000</a>
+      <div class="cta-row">
+        <a class="btn-pill cta-pill" href="mailto:you@mail.com">Get in touch</a>
+        <a class="more" href="cv.pdf" download>Download CV<span class="chev" aria-hidden="true"></span></a>
       </div>
     </div>
   </div>
@@ -164,10 +170,16 @@ Escape/แตะพื้นหลังได้ อยู่ในระบบ
 
 - **มุมโค้ง concentric**: มุมใน = มุมนอก − ช่องว่าง (โทเคน `--r-card` 28 /
   `--r-card-sm` 18 / `--r-min` 12 / `--r-capsule` แคปซูล)
-- **สี 60/30/10**: พื้นขาว 60% / เทากลาง `--color-fill` 30% / สีอำพัน
-  `--color-link` (#B4602A) 10% — สีเขียวใช้เฉพาะสถานะ
-- **Motion**: easing เดียวทั้งเว็บ `--ease-swift`; ปุ่มทุกปุ่มมี press feedback
-  (`:active` scale); การ์ดใหม่ใน section ที่ระบุไว้จะได้ scroll-scrub entrance เอง
-  (เพิ่ม selector ได้ในตัวแปร `GROUPS` ใน `main.js`)
+- **สี 60/30/10**: พื้นขาว 60% / เทากลาง `--color-fill` 30% / สีน้ำเงิน
+  `--color-link` (#1264CE) 10% — accent สีเดียวบนไล่เทา ไม่มี gradient ไม่มี glow สี
+- **Motion**: easing เดียวทั้งเว็บ `--ease-out` = `cubic-bezier(0.22, 1, 0.36, 1)` ไม่มี spring
+  ที่เด้งเกิน; hover/press .16s, เมนู .2s, ของที่เข้าจอ .3–.45s
+  - hover ของการ์ดและปุ่ม = เปลี่ยนพื้นหรือเงาเท่านั้น **ห้าม scale**; กด (`:active`) ย่อได้ไม่เกิน `scale(.97–.98)`
+  - reveal = จางเข้า + ลอยขึ้น 12px ครั้งเดียวตอนเข้าจอ (IntersectionObserver), เหลื่อมกัน 50ms
+    สูงสุด 6 ชิ้น; ไม่ผูกกับตำแหน่ง scroll (ไม่มี scroll-scrub) และไม่เล่นซ้ำตอนเลื่อนกลับ
+    — เพิ่ม selector ได้ใน list ของบล็อก reveal ใน `main.js`; ไม่มี JS เนื้อหาก็แสดงครบ
+  - เส้นคลื่นใต้หัวข้อวาดเข้ามาครั้งเดียวแล้วนิ่ง; สิ่งที่ขยับเองได้มีแค่ constellation ใน hero
+    และนามบัตร Liquid Glass — นอกนั้นห้าม animation วนไม่รู้จบ
+  - `prefers-reduced-motion: reduce`: ไม่มีอะไรขยับ (constellation เป็นภาพนิ่ง, ไม่มี reveal, ไม่มี tilt)
 - **แก้ไฟล์แล้วต้อง**: รัน `./build.sh`, bump เวอร์ชัน `?v=` ใน `index.html` +
   `sw.js` ให้ตรงกัน, bump `CACHE` ใน `sw.js`, แล้ว `npm test` (45 เทส) ก่อน merge

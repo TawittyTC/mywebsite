@@ -1,6 +1,6 @@
 // Full-loop scenario coverage: complete user journeys and component
 // interplay — the seams where individual features meet (scroller ×
-// filter × scrub × modal × lightbox) and where past bugs lived.
+// filter × reveal × modal × lightbox) and where past bugs lived.
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { createContext, inkCount } from './helpers.mjs';
@@ -170,15 +170,22 @@ test('skills filter shows only its category and never touches project cards', as
   await page.close();
 });
 
-test('experience stats count up to their exact data-count values', async () => {
+test('experience stats show their exact data-count values, in one number format, without counting up', async () => {
   const { page } = await ctx.openPage();
-  await page.$eval('#experience .data-box[data-exp]', (el) => el.scrollIntoView({ block: 'center' }));
-  await page.waitForTimeout(1600); // stagger + 700ms count animation
-  const wrong = await page.$$eval('#experience .data-box[data-exp]:first-of-type .js-count[data-count]',
-    (els) => els
-      .filter((el) => el.textContent.trim() !== el.dataset.count)
-      .map((el) => `${el.textContent.trim()} != ${el.dataset.count}`));
-  assert.deepEqual(wrong, [], `counters did not reach targets: ${wrong.join(', ')}`);
+  const card = '#experience .data-box[data-exp]:first-of-type';
+  const read = () => page.$$eval(`${card} .js-count[data-count]`, (els) => els
+    .filter((el) => el.textContent.trim() !== Number(el.dataset.count).toLocaleString('en-US'))
+    .map((el) => `${el.textContent.trim()} != ${Number(el.dataset.count).toLocaleString('en-US')}`));
+  // final before the card is ever on screen, and the same once it has entered:
+  // a number that never changes does not tick up from 0
+  assert.deepEqual(await read(), [], 'counters are not written final');
+  await page.$eval(card, (el) => el.scrollIntoView({ block: 'center' }));
+  for (let i = 0; i < 4; i++) {
+    await page.waitForTimeout(150);
+    // one format across the page: 2,000 (with a thousands separator), never 2000
+    const wrong = await read();
+    assert.deepEqual(wrong, [], `counters changed on entry: ${wrong.join(', ')}`);
+  }
   await page.close();
 });
 
@@ -232,27 +239,121 @@ test('certificate lightbox shows the exact card clicked, replays, and unlocks sc
   await page.close();
 });
 
-test('3D business card sways on its own and stays static under reduced motion', async () => {
+test('the business card tilts only with the pointer, rests flat without it, and stays still under reduced motion', async () => {
   const { page } = await ctx.openPage();
   await page.$eval('#biz-scene', (el) => el.scrollIntoView({ block: 'center' }));
+  await page.mouse.move(2, 2); // the pointer is nowhere near the card
+  await page.waitForTimeout(600);
+  // owner decision: no idle sway, so with nothing pointing at it nothing moves
+  const idle = () => page.$eval('#biz-card', (el) => el.style.transform);
+  const a = await idle();
   await page.waitForTimeout(700);
-  const a = await page.$eval('#biz-card', (el) => el.style.transform);
+  assert.equal(await idle(), a, 'card moved with no pointer input (idle sway)');
+  assert.ok(!/rotate[XY]\((?!0(\.0+)?deg)/.test(a), `card rests tilted with no pointer input: "${a}"`);
+  // the pointer over its top-right corner tilts it toward that corner
+  const box = await page.$eval('#biz-card', (el) => {
+    const r = el.getBoundingClientRect();
+    return { x: r.left, y: r.top, w: r.width, h: r.height };
+  });
+  await page.mouse.move(box.x + box.w * 0.85, box.y + box.h * 0.2, { steps: 4 });
   await page.waitForTimeout(500);
-  const b = await page.$eval('#biz-card', (el) => el.style.transform);
-  assert.ok(a.includes('rotate'), `card is not tilting (transform: "${a}")`);
-  assert.notEqual(a, b, 'card transform frozen — sway loop not running');
+  const tilted = await idle();
+  const deg = (t, axis) => parseFloat((t.match(new RegExp(`rotate${axis}\\((-?[\\d.]+)deg`)) || [0, 0])[1]);
+  assert.notEqual(tilted, a, 'card did not follow the pointer');
+  assert.ok(deg(tilted, 'Y') > 2 && deg(tilted, 'X') > 1, `tilt is not toward the pointer: "${tilted}"`);
+  assert.ok(Math.abs(deg(tilted, 'Y')) <= 6.01 && Math.abs(deg(tilted, 'X')) <= 4.01, `tilt is more than a few degrees: "${tilted}"`);
+  // a pointer resting on the card holds the tilt without drawing a frame
+  await page.evaluate(() => {
+    window.__tiltFrames = 0;
+    const raf = window.requestAnimationFrame.bind(window);
+    window.requestAnimationFrame = (cb) => raf((ts) => { if (String(cb).includes('rotateY')) window.__tiltFrames++; return cb(ts); });
+  });
+  await page.waitForTimeout(600);
+  const parked = await page.evaluate(() => { window.__tiltFrames = 0; return document.getElementById('biz-card').style.transform; });
+  await page.waitForTimeout(500);
+  assert.equal(await page.evaluate(() => window.__tiltFrames), 0, 'the card draws frames while the pointer rests on it');
+  assert.equal(await idle(), parked, 'the resting tilt drifted');
+  await page.mouse.move(box.x + box.w * 0.2, box.y + box.h * 0.8, { steps: 4 });
+  await page.waitForTimeout(500);
+  assert.notEqual(await idle(), parked, 'a new pointer move did not tilt the card again');
+  // the pointer leaves: it eases back flat and then stops drawing
+  await page.mouse.move(2, 2, { steps: 4 });
+  await page.waitForTimeout(1200);
+  assert.equal(await idle(), '', 'card did not settle flat after the pointer left');
   // contacts on the card are real links
   const links = await page.$$eval('#biz-card a', (els) => els.map((e) => e.getAttribute('href')));
   assert.ok(links.some((h) => h.startsWith('mailto:')), 'no mailto link on the card');
   assert.ok(links.some((h) => h.startsWith('tel:')), 'no tel link on the card');
+  // the light pools stand still
+  const pools = await page.$eval('#biz-card .biz-light', (el) =>
+    ['::before', '::after'].map((p) => getComputedStyle(el, p).animationName));
+  assert.deepEqual(pools, ['none', 'none'], 'the light pools still drift');
   await page.close();
 
   const { page: rp } = await ctx.openPage({ reducedMotion: 'reduce' });
   await rp.$eval('#biz-scene', (el) => el.scrollIntoView({ block: 'center' }));
+  const rb = await rp.$eval('#biz-card', (el) => {
+    const r = el.getBoundingClientRect();
+    return { x: r.left + r.width * 0.85, y: r.top + r.height * 0.2 };
+  });
+  await rp.mouse.move(rb.x, rb.y, { steps: 4 });
   await rp.waitForTimeout(600);
   assert.equal(await rp.$eval('#biz-card', (el) => el.style.transform), '',
     'card must stand still under reduced motion');
   await rp.close();
+});
+
+test('reduced motion: a link to a section jumps there, with no glide', async () => {
+  const page = await ctx.browser.newPage({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
+  // every distinct scroll position, frame by frame, from the first frame on
+  await page.addInitScript(() => {
+    window.__ys = [];
+    const tick = () => {
+      const y = Math.round(window.scrollY);
+      if (window.__ys.at(-1) !== y) window.__ys.push(y);
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  });
+  await page.goto(ctx.srv.url + '/index.html#contact', { waitUntil: 'load' });
+  await page.waitForTimeout(1000);
+  const { ys, want } = await page.evaluate(() => ({ ys: window.__ys,
+    want: Math.round(document.querySelector('#contact').getBoundingClientRect().top + window.scrollY) }));
+  // only the browser's own anchor jump; the load handler re-aims there instantly
+  assert.ok(ys.filter((y) => y > 0).length <= 2, `the page glided through ${ys.length} positions: ${ys.slice(0, 8).join(', ')}`);
+  assert.equal(ys.at(-1), want, 'the page did not land on the section');
+  await page.close();
+});
+
+test('the business card keeps its coloured light inside the glass', async () => {
+  // owner decision: the Liquid Glass look stays, but no light spills past
+  // the card's edge and nothing outside it is tinted
+  const { page } = await ctx.openPage();
+  await page.$eval('#biz-scene', (el) => el.scrollIntoView({ block: 'center' }));
+  await page.waitForTimeout(400);
+  const r = await page.evaluate(() => {
+    const card = document.getElementById('biz-card');
+    const light = card.querySelector(':scope > .biz-light');
+    const scene = document.getElementById('biz-scene');
+    const lc = light && getComputedStyle(light);
+    // every shadow outside the card must be a neutral grey
+    const outer = getComputedStyle(card).boxShadow.split(/,(?![^(]*\))/).filter((x) => !/inset/.test(x));
+    const tinted = outer.filter((x) => {
+      const m = x.match(/rgba?\((\d+), (\d+), (\d+)/);
+      return m && Math.max(+m[1], +m[2], +m[3]) - Math.min(+m[1], +m[2], +m[3]) > 4;
+    });
+    return {
+      light: !!light,
+      clipped: lc && lc.overflow === 'hidden' && lc.position === 'absolute' && lc.inset === '0px',
+      pools: ['::before', '::after'].map((p) => getComputedStyle(scene, p).content),
+      tinted,
+    };
+  });
+  assert.ok(r.light, 'the light pools are not inside the card');
+  assert.ok(r.clipped, 'the light layer does not clip to the card');
+  assert.deepEqual(r.pools, ['none', 'none'], 'light pools still sit behind the card, outside its edge');
+  assert.deepEqual(r.tinted, [], `coloured shadow outside the card: ${r.tinted.join(' / ')}`);
+  await page.close();
 });
 
 test('hero intro replays when the page returns from the back-forward cache', async () => {
@@ -271,7 +372,7 @@ test('hero intro replays when the page returns from the back-forward cache', asy
   await page.close();
 });
 
-test('cert grid shows everything at once; exp teasers clamp to three lines', async () => {
+test('cert grid shows everything at once; exp teasers end inside their three-line clamp', async () => {
   const { page } = await ctx.openPage();
   await page.$eval('#certificates', (el) => el.scrollIntoView());
   await page.waitForSelector('#images-list .cert-card');
@@ -283,13 +384,24 @@ test('cert grid shows everything at once; exp teasers clamp to three lines', asy
   }));
   assert.equal(grid.hidden, 0, `${grid.hidden} cert cards hidden — disclosure should be gone`);
   assert.equal(grid.btn, false, 'the Show-all button should no longer exist');
-  // experience teaser clamps to three lines; the modal carries the full story
-  const clamp = await page.$$eval('#experience .data-box[data-exp] .profile-bio-small',
-    (els) => els
-      .map((el) => ({ clamped: getComputedStyle(el).webkitLineClamp, h: el.offsetHeight, sh: el.scrollHeight }))
-      .sort((a, b) => (b.sh - b.h) - (a.sh - a.h))[0]); // the most-overflowing card
-  assert.equal(String(clamp.clamped), '3', 'experience description is not line-clamped');
-  assert.ok(clamp.h < clamp.sh, 'clamp has no effect — teaser shows everything');
+  // each certificate is named for what it is, not "Certificate 7"
+  const alts = await page.$$eval('#images-list img', (imgs) => imgs.map((i) => i.alt));
+  const vague = alts.filter((a) => !/^Certificate: \S/.test(a) || /\bCertificate \d+$/.test(a));
+  assert.deepEqual(vague, [], 'a certificate image without its real name in the alt text');
+  // each experience teaser is one short sentence that ends inside the
+  // three-line clamp (the clamp stays as a guard): no sentence is cut off
+  // with an ellipsis, on a desktop or a phone; the modal carries the full story
+  const teasers = (pg) => pg.$$eval('#experience .data-box[data-exp] .profile-bio-small:not(.exp-card-highlights)',
+    (els) => els.map((el) => ({ text: el.textContent.trim().slice(0, 40), clamped: getComputedStyle(el).webkitLineClamp,
+      h: el.clientHeight, sh: el.scrollHeight })));
+  const phone = await ctx.openPage({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+  for (const [w, list] of [[1440, await teasers(page)], [390, await teasers(phone.page)]]) {
+    for (const t of list) {
+      assert.equal(String(t.clamped), '3', `${w}px: "${t.text}" lost its three-line clamp`);
+      assert.ok(t.sh <= t.h + 1, `${w}px: "${t.text}…" runs past three lines and is cut off`);
+    }
+  }
+  await phone.page.close();
   // the highlight-chip row shares the type class but must stay flex —
   // clamping it once shattered the pills across lines
   const chips = await page.$eval('#experience .data-box[data-exp] .exp-card-highlights',
@@ -350,7 +462,7 @@ test('violent jump-scrolling then landing anywhere leaves nothing half-faded', a
   await page.close();
 });
 
-test('every section carries its themed wave and the waves actually animate', async () => {
+test('every section carries its themed wave, drawn in once and then still', async () => {
   const { page } = await ctx.openPage();
   // one wave per section: resume, experience, skill, portfolio, certificates, services
   // (the closing CTA deliberately has none)
@@ -358,112 +470,89 @@ test('every section carries its themed wave and the waves actually animate', asy
     els.map((el) => el.closest('section')?.id || ''));
   assert.deepEqual(homes, ['resume', 'experience', 'skill', 'portfolio', 'certificates', 'services'],
     'expected exactly one wave in each content section, in page order');
-  // each themed part is animated (computed style, not just class names)
-  const anims = await page.evaluate(() => {
-    const name = (sel) => getComputedStyle(document.querySelector(sel)).animationName;
-    return {
-      flow: name('#resume .wave-flow'),
-      dot: name('#experience .wave-dot'),
-      bar: name('#skill .wave-bar'),
-      signal: name('#portfolio .wave-signal'),
-      ribbon: name('#certificates .wave-ribbon'),
-      servicesRibbon: name('#services .wave-ribbon'),
-    };
-  });
-  for (const [part, anim] of Object.entries(anims)) {
-    assert.notEqual(anim, 'none', `${part} wave is not animated`);
-  }
   // solid strokes only — dashed lines were rejected as visually noisy
   const dashed = await page.$$eval('.section-wave path', (els) =>
     els.filter((el) => getComputedStyle(el).strokeDasharray !== 'none').length);
   assert.equal(dashed, 0, `${dashed} wave paths still use dashed strokes`);
-  // the Experience spark exists for the SMIL journey animation
-  assert.ok(await page.$('#experience .wave-spark'), 'experience spark missing');
   // decorative only: hidden from assistive tech and never intercepts input
   const decorative = await page.$$eval('.section-wave', (els) =>
     els.every((el) => el.getAttribute('aria-hidden') === 'true'));
   assert.ok(decorative, 'waves must be aria-hidden');
+  // owner decision: each wave draws in once as its title arrives, then stays
+  // still. Walk every section so each draw gets armed, sampling as it plays
+  const looping = [];
+  for (const id of homes) {
+    await page.$eval(`#${id} .section-wave`, (el) => el.scrollIntoView({ block: 'center' }));
+    await page.waitForTimeout(120);
+    looping.push(...await page.$eval(`#${id} .section-wave`, (host) => {
+      const bad = [];
+      for (const el of [host, ...host.querySelectorAll('*')]) {
+        const cs = getComputedStyle(el);
+        if (cs.animationName !== 'none' && cs.animationIterationCount.split(',').some((n) => n.trim() === 'infinite')) {
+          bad.push(`${el.tagName} ${cs.animationName}`);
+        }
+      }
+      host.getAnimations({ subtree: true }).forEach((an) => {
+        if (an.effect.getTiming().iterations === Infinity) bad.push(`animation ${an.animationName || an.id}`);
+      });
+      // SMIL is invisible to getAnimations: no repeatCount="indefinite" either
+      host.querySelectorAll('animate, animateMotion, animateTransform, set').forEach((el) => {
+        if (el.getAttribute('repeatCount') === 'indefinite' || el.getAttribute('repeatDur') === 'indefinite') {
+          bad.push(`SMIL ${el.tagName}`);
+        }
+      });
+      return bad.map((b) => `${host.closest('section').id}: ${b}`);
+    }));
+  }
+  assert.deepEqual(looping, [], `wave parts still loop forever: ${looping.join(' | ')}`);
+  // and once drawn nothing in any wave is still running
+  await page.waitForTimeout(900);
+  const running = await page.$$eval('.section-wave', (els) => els.flatMap((el) =>
+    el.getAnimations({ subtree: true }).filter((a) => a.playState === 'running')
+      .map(() => el.closest('section').id)));
+  assert.deepEqual(running, [], `waves still moving after their draw: ${running.join(', ')}`);
   await page.close();
 });
 
-test('the SCG timeline pulse rides the connector from the oldest entry to the newest', async () => {
+test('the SCG timeline is still: its nodes and connector share one axis and nothing travels it', async () => {
   const { page } = await ctx.openPage();
   const card = '#experience [data-exp="scg"]';
-  // the reveal observer arms the animation; scroll the card into view first
-  await page.$eval(card, (el) => el.scrollIntoView());
-  await page.waitForFunction((sel) => document.querySelector(sel).classList.contains('card-visible'), card);
+  await page.$eval(card, (el) => el.scrollIntoView({ block: 'center' }));
+  await page.waitForTimeout(700);
 
-  // one pulse per connector: the last entry has none below it
-  const sparks = await page.$$eval(`${card} .exp-role-spark`, (els) =>
-    els.map((el) => getComputedStyle(el).display));
-  assert.equal(sparks.length, 2, 'expected a pulse element on each timeline entry');
-  assert.deepEqual(sparks, ['block', 'none'], 'only the entry with a connector may show a pulse');
-
-  const orb = await page.$eval(`${card} .exp-role-spark`, (el) => {
-    const cs = getComputedStyle(el, '::after');
-    const track = el.getBoundingClientRect();
-    return { anim: cs.animationName, radius: cs.borderTopLeftRadius, trackH: track.height };
-  });
-  assert.notEqual(orb.anim, 'none', 'the timeline pulse is not animated');
-  assert.ok(parseFloat(orb.radius) >= 3, 'the pulse must be round');
-
-  // node, connector and pulse must sit on one vertical axis — a half-pixel
+  // node and connector must sit on one vertical axis — a half-pixel
   // of drift here is plainly visible against a 1.5px line
   const axis = await page.$eval(`${card} .exp-role`, (role) => {
     const mid = (pseudo) => {
       const cs = getComputedStyle(role, pseudo);
       return parseFloat(cs.left) + parseFloat(cs.width) / 2;
     };
-    const track = role.querySelector('.exp-role-spark');
-    const ts = getComputedStyle(track);
-    const os = getComputedStyle(track, '::after');
-    return {
-      dot: mid('::before'),
-      line: mid('::after'),
-      orb: parseFloat(ts.left) + parseFloat(ts.width) / 2
-        + parseFloat(os.marginLeft) + parseFloat(os.width) / 2,
-    };
+    return { dot: mid('::before'), line: mid('::after') };
   });
   assert.ok(Math.abs(axis.line - axis.dot) < 0.5,
     `connector is off the node axis by ${(axis.line - axis.dot).toFixed(2)}px`);
-  assert.ok(Math.abs(axis.orb - axis.dot) < 0.5,
-    `pulse is off the node axis by ${(axis.orb - axis.dot).toFixed(2)}px`);
+  // the newest entry carries the blue node, the older one stays grey
+  const nodes = await page.$$eval(`${card} .exp-role`, (roles) =>
+    roles.map((r) => getComputedStyle(r, '::before').backgroundColor));
+  assert.equal(nodes.length, 2, 'expected two timeline entries');
+  assert.equal(nodes[0], 'rgb(18, 100, 206)', 'the current entry should carry the blue node');
+  assert.notEqual(nodes[1], nodes[0], 'the older entry should not be blue');
 
-  // sample a full cycle: where the orb actually goes, and what colour it is
-  const frames = [];
-  for (let i = 0; i < 14; i++) {
-    frames.push(await page.$eval(`${card} .exp-role-spark`, (el) => {
-      const cs = getComputedStyle(el, '::after');
-      return { y: el.getBoundingClientRect().top + parseFloat(cs.top),
-        rgb: (cs.backgroundColor.match(/\d+/g) || []).map(Number), op: parseFloat(cs.opacity) };
-    }));
-    await page.waitForTimeout(300);
-  }
-  const seen = frames.filter((f) => f.op > 0.6);
-  assert.ok(seen.length >= 4, 'expected to catch the pulse mid-travel');
-
-  // the two ends of the run are the two nodes themselves, not points near them
-  const dots = await page.$$eval(`${card} .exp-role`, (roles) => roles.map((r) => {
-    const cs = getComputedStyle(r, '::before');
-    return r.getBoundingClientRect().top + parseFloat(cs.top) + parseFloat(cs.height) / 2;
-  }));
-  const [newest, oldest] = dots;
-  const lowest = Math.max(...seen.map((f) => f.y));
-  const highest = Math.min(...seen.map((f) => f.y));
-  assert.ok(Math.abs(highest - newest) <= 3,
-    `pulse should finish on the current node (ended ${highest.toFixed(1)}, node at ${newest.toFixed(1)})`);
-  assert.ok(oldest - lowest <= 8,
-    `pulse should set out from the older node (started ${lowest.toFixed(1)}, node at ${oldest.toFixed(1)})`);
-
-  // and it changes colour on the way: grey at the bottom, link blue at the top
-  const low = seen.reduce((a, b) => (a.y > b.y ? a : b));
-  const high = seen.reduce((a, b) => (a.y < b.y ? a : b));
-  assert.ok(low.rgb[0] > 150, `pulse should leave the older node grey, got rgb(${low.rgb})`);
-  // sampled every 300ms, the top frame can land a hair before the last
-  // keyframe: within 3 of link blue on every channel is arriving as it
-  const blue = [18, 100, 206];
-  assert.ok(high.rgb.slice(0, 3).every((c, i) => Math.abs(c - blue[i]) <= 3),
-    `pulse should arrive as link blue, got rgb(${high.rgb})`);
+  // owner decision: nothing on a job card moves on its own — no orb rides
+  // the connector, and no element in the card runs an animation
+  assert.equal(await page.$$eval(`${card} .exp-role-spark`, (els) => els.length), 0,
+    'the travelling timeline orb is still in the card');
+  const moving = await page.$eval(card, (el) => {
+    const out = [];
+    for (const n of [el, ...el.querySelectorAll('*')]) {
+      for (const p of ['', '::before', '::after']) {
+        const cs = getComputedStyle(n, p || null);
+        if (cs.animationName !== 'none') out.push(`${n.className}${p} ${cs.animationName}`);
+      }
+    }
+    return out;
+  });
+  assert.deepEqual(moving, [], `animated parts in the job card: ${moving.join(' | ')}`);
   await page.close();
 });
 
@@ -483,8 +572,8 @@ test('a sheet grows from the card that opened it and never jumps back when re-gr
     new DOMMatrixReadOnly(getComputedStyle(document.querySelector('.exp-lightbox-inner')).transform).a > 0.995);
 
   // The growth point must track the trigger. Pinning it to an exact pixel
-  // would be chasing sub-pixel reflow (the scroll lock and the reveal scrub
-  // both nudge the card as it opens), so prove the behaviour instead: move
+  // would be chasing sub-pixel reflow (the scroll lock can nudge the card
+  // as it opens), so prove the behaviour instead: move
   // the trigger, and the origin has to travel with it and stay on the sheet.
   const originOf = () => page.evaluate(() => {
     const inner = document.querySelector('.exp-lightbox-inner');
