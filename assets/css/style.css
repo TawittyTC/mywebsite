@@ -1424,15 +1424,18 @@ h1, h2, h3, h4, h5, h6 { color: var(--color-text); }
   outline: 2px solid var(--color-link);
   outline-offset: 3px;
 }
-/* The ring follows each control's own shape: a radius set here turned the
-   round close button, the "+" and the paddles into rounded squares while
-   they held focus. Plain text links keep the soft corner; :where() carries
-   no weight, so a link with a radius of its own keeps it. */
-:where(a:focus-visible) { border-radius: 6px; }
-/* Two buttons draw no box of their own, and the reset gives every button
-   square corners (which outranks :where): the ring says what shape they are. */
+/* The ring follows each control's own shape: a radius forced here turned
+   the round close button, the "+", the paddles and the pills into rounded
+   squares while they held focus. A control with no shape of its own gets
+   the soft 6px corner: :where() carries no weight, so any radius a control
+   sets for itself wins. The reset gives every button square corners with
+   the weight of one tag; the second selector weighs the same and comes
+   later, so it rounds only the buttons that never chose a shape (text
+   buttons, the rows of the See-all list). */
+:where(:focus-visible),
+button:where(:focus-visible) { border-radius: 6px; }
+/* the round "+" on an Experience card is drawn by an inner element */
 .exp-card-cta:focus-visible { border-radius: 50%; }
-button.more:focus-visible { border-radius: 6px; }
 button:focus-visible,
 a:focus-visible,
 input:focus-visible,
