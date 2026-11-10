@@ -125,7 +125,7 @@
     function typeTick() {
       const cur = items[i];
       // the article follows the role, and changes while nothing is typed
-      if (lead && j === 0 && !deleting) lead.nodeValue = lead.nodeValue.replace(/\ban? $/, /^[aeiou]/i.test(cur) ? "an " : "a ");
+      if (lead && j === 0 && !deleting) lead.nodeValue = lead.nodeValue.replace(/\ban?(\s+)$/, (/^[aeiou]/i.test(cur) ? "an" : "a") + "$1");
       typedEl.textContent = cur.slice(0, j);
       if (!deleting) {
         j++;
