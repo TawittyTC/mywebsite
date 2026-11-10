@@ -1430,8 +1430,12 @@ h1, h2, h3, h4, h5, h6 { color: var(--color-text); }
 :focus-visible {
   outline: 2px solid var(--color-link);
   outline-offset: 3px;
-  border-radius: 6px;
 }
+/* The ring follows each control's own shape: a radius set here turned the
+   round close button, the "+" and the paddles into rounded squares while
+   they held focus. Plain text links keep the soft corner; :where() carries
+   no weight, so a link with a radius of its own keeps it. */
+:where(a:focus-visible) { border-radius: 6px; }
 button:focus-visible,
 a:focus-visible,
 input:focus-visible,
