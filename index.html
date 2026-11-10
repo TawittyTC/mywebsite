@@ -69,7 +69,7 @@
     @font-face {
       font-family: 'Inter';
       font-style: normal;
-      font-weight: 400 600;
+      font-weight: 400 700;
       font-display: swap;
       src: url('assets/fonts/inter-latin.woff2') format('woff2');
       unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD
@@ -78,7 +78,7 @@
     @font-face {
       font-family: 'Noto Sans Thai';
       font-style: normal;
-      font-weight: 400 600;
+      font-weight: 400 700;
       font-display: swap;
       src: url('assets/fonts/notosansthai-thai.woff2') format('woff2');
       unicode-range: U+02D7, U+0303, U+0331, U+0E01-0E5B, U+200C-200D, U+25CC
@@ -87,7 +87,7 @@
     @font-face {
       font-family: 'Noto Sans Thai';
       font-style: normal;
-      font-weight: 400 600;
+      font-weight: 400 700;
       font-display: swap;
       src: url('assets/fonts/notosansthai-latin.woff2') format('woff2');
       unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD
@@ -294,12 +294,13 @@
 
     .hero-scroll-hint {
       position: absolute;
-      bottom: 80px;
+      bottom: 69px;
       left: 50%;
       transform: translateX(-50%);
+      padding: 11px;
+      z-index: 3;
       color: var(--color-text);
-      opacity: 0.6;
-      pointer-events: none
+      opacity: 0.6
     }
 
     #hero .hero-eyebrow {
@@ -821,27 +822,6 @@
       border-radius: 980px;
       padding: 3px 10px;
       margin-top: 4px
-    }
-
-    /* Card stagger entry animation */
-    @keyframes card-enter {
-      from {
-        opacity: 0;
-        transform: translateY(22px)
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0)
-      }
-    }
-
-    #experience .data-box[data-exp] {
-      opacity: 0
-    }
-
-    #experience .data-box[data-exp].card-visible {
-      animation: card-enter .55s cubic-bezier(.16, 1, .3, 1) both
     }
 
     /* Extra padding-bottom so CTA button never crowds content */
@@ -1495,13 +1475,27 @@
       margin-bottom: 16px
     }
 
+    /* the client's own logo, from the site's files, on a row of its own
+       above the name at every width: the names then start on one edge and
+       a wide wordmark never pushes the tag off the name's row. Each tag
+       carries its height (two thirds of the size the See-all list uses,
+       24px at most); the picture sits at the left of the row */
     .exp-client-section-header img {
-      width: 24px;
-      height: 24px;
+      flex: 0 0 100%;
       object-fit: contain;
-      border-radius: 6px;
-      flex-shrink: 0;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, .1)
+      object-position: left center;
+      pointer-events: none   /* the box is the whole row: only the heading takes taps and drags */
+    }
+
+    /* two files have a white ground of their own: let the card show through */
+    .exp-client-section-header img[src$="ns-kijsiri.webp"],
+    .exp-client-section-header img[src$="mediviss.webp"] {
+      mix-blend-mode: multiply
+    }
+
+    /* on a dark forced-colours canvas a multiplied picture is all black */
+    @media (forced-colors: active) {
+      .exp-client-section-header img { mix-blend-mode: normal !important }
     }
 
     .exp-client-section-header h3 {
@@ -1687,10 +1681,10 @@
   </style>
 
   <!-- Full CSS loaded async: no render blocking (bootstrap merged in) -->
-  <link rel="preload" href="assets/css/style.min.css?v=2.63.0" as="style"
+  <link rel="preload" href="assets/css/style.min.css?v=2.64.0" as="style"
     onload="this.onload=null;this.rel='stylesheet'">
   <noscript>
-    <link href="assets/css/style.min.css?v=2.63.0" rel="stylesheet">
+    <link href="assets/css/style.min.css?v=2.64.0" rel="stylesheet">
     <style>.proj-all{visibility:hidden}</style>
   </noscript>
 
@@ -1967,7 +1961,7 @@
   </script>
 
   <!-- Preload deferred JS to start downloading before parser reaches script tags -->
-  <link rel="preload" href="assets/js/main.min.js?v=2.63.0" as="script">
+  <link rel="preload" href="assets/js/main.min.js?v=2.64.0" as="script">
 
   <!-- Google tag (gtag.js). The page view is queued here, stamped with the
        time the page opened; gtag.js sends it when it arrives. -->
@@ -2036,12 +2030,12 @@
         </div>
       </div>
 
-      <div class="hero-scroll-hint" aria-hidden="true">
+      <a class="hero-scroll-hint scrollto" href="#resume" aria-label="Scroll to Resume">
         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"
-          stroke-linecap="round" stroke-linejoin="round">
+          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
           <polyline points="6 9 12 15 18 9"></polyline>
         </svg>
-      </div>
+      </a>
     </section>
 
     <!-- ======= Resume Section ======= -->
@@ -2073,7 +2067,7 @@
         <div class="row">
           <div class="col-lg-12">
 
-            <h3 class="resume-title mt-5">Profile</h3>
+            <h3 class="resume-title">Profile</h3>
 
             <!-- Featured Profile Card -->
             <div class="row">
@@ -2175,7 +2169,7 @@
               </div>
             </div>
 
-            <h3 class="resume-title mt-5">Education</h3>
+            <h3 class="resume-title">Education</h3>
 
             <div class="row">
               <div class="col-md-12">
@@ -2196,7 +2190,7 @@
               </div>
             </div>
 
-            <h3 class="resume-title mt-5">Achievement</h3>
+            <h3 class="resume-title">Achievement</h3>
             <div class="row">
               <div class="col-md-12">
                 <div class="data-box">
@@ -3842,7 +3836,7 @@
   </button>
 
   <!-- Main JS -->
-  <script defer src="assets/js/main.min.js?v=2.63.0"></script>
+  <script defer src="assets/js/main.min.js?v=2.64.0"></script>
   <!-- Service Worker: cache assets for repeat visits -->
   <script>if ('serviceWorker' in navigator) { var _sw = function () { navigator.serviceWorker.register('sw.js') }; 'requestIdleCallback' in window ? requestIdleCallback(_sw) : window.addEventListener('load', _sw) }</script>
 
@@ -3953,7 +3947,7 @@
 
       <div class="exp-client-section" data-client="bkk-hosp">
         <div class="exp-client-section-header">
-          <img src="https://logo.clearbit.com/bangkokhospital.com" alt="" onerror="this.style.display='none'">
+          <img src="assets/img/clients/bangkok-hospital.webp" width="62" height="15" alt="" loading="lazy" decoding="async">
           <h3>BCM <span style="font-weight:400;color:#6e6e73">(Bangkok Hospital Chiang Mai)</span></h3>
           <span class="exp-client-tag">Healthcare CRM</span>
         </div>
@@ -3971,7 +3965,7 @@
 
       <div class="exp-client-section" data-client="kasikorn">
         <div class="exp-client-section-header">
-          <img src="https://logo.clearbit.com/kasikornbank.com" alt="" onerror="this.style.display='none'">
+          <img src="assets/img/clients/kasikorn-carabao.webp" width="24" height="24" alt="" loading="lazy" decoding="async">
           <h3>Kasikorn Carabao Co., Ltd. <span style="font-weight:400;color:#6e6e73">(KBAO)</span></h3>
           <span class="exp-client-tag">Sales Campaign CRM</span>
         </div>
@@ -4006,7 +4000,7 @@
 
       <div class="exp-client-section" data-client="happy">
         <div class="exp-client-section-header">
-          <img src="https://logo.clearbit.com/happyproducts.co.th" alt="" onerror="this.style.display='none'">
+          <img src="assets/img/clients/happy-products.webp" width="57" height="18" alt="" loading="lazy" decoding="async">
           <h3>Happy Products &amp; Services Co., Ltd. <span style="font-weight:400;color:#6e6e73">(Tnews, Happy
               Shopping)</span></h3>
           <span class="exp-client-tag">End-to-End CRM</span>
@@ -4037,7 +4031,7 @@
 
       <div class="exp-client-section" data-client="vietjet">
         <div class="exp-client-section-header">
-          <img src="https://logo.clearbit.com/vietjetair.com" alt="" onerror="this.style.display='none'">
+          <img src="assets/img/clients/thai-vietjet.webp" width="61" height="16" alt="" loading="lazy" decoding="async">
           <h3>Thai VietJet Air Joint Stock Co., Ltd. <span style="font-weight:400;color:#6e6e73">(VietJet)</span></h3>
           <span class="exp-client-tag">Multilingual IVR System</span>
         </div>
@@ -4074,7 +4068,7 @@
 
       <div class="exp-client-section" data-client="artelia">
         <div class="exp-client-section-header">
-          <img src="https://logo.clearbit.com/artelia.com" alt="" onerror="this.style.display='none'">
+          <img src="assets/img/clients/artelia.webp" width="78" height="8" alt="" loading="lazy" decoding="async">
           <h3>Artelia Cornerstone Ltd.</h3>
           <span class="exp-client-tag">Operations Dashboard</span>
         </div>
@@ -4093,7 +4087,7 @@
 
       <div class="exp-client-section" data-client="livplus">
         <div class="exp-client-section-header">
-          <img src="https://logo.clearbit.com/livplus.co.th" alt="" onerror="this.style.display='none'">
+          <img src="assets/img/clients/livplus.webp" width="46" height="21" alt="" loading="lazy" decoding="async">
           <h3>LivPlus Health Solution Co., Ltd. <span style="font-weight:400;color:#6e6e73">(LivPlus)</span></h3>
           <span class="exp-client-tag">Analytics &amp; Scheduled Reports</span>
         </div>
@@ -4110,7 +4104,7 @@
 
       <div class="exp-client-section" data-client="digiserve">
         <div class="exp-client-section-header">
-          <img src="https://logo.clearbit.com/digiserve.co.th" alt="" onerror="this.style.display='none'">
+          <img src="assets/img/clients/digiserve.webp" width="49" height="20" alt="" loading="lazy" decoding="async">
           <h3>Digiserve Corporation Co., Ltd. <span style="font-weight:400;color:#6e6e73">(Digiserve)</span></h3>
           <span class="exp-client-tag">Customer Analytics</span>
         </div>
@@ -4156,7 +4150,7 @@
 
       <div class="exp-client-section" data-client="netbay">
         <div class="exp-client-section-header">
-          <img src="https://logo.clearbit.com/netbay.co.th" alt="" onerror="this.style.display='none'">
+          <img src="assets/img/clients/netbay.webp" width="61" height="16" alt="" loading="lazy" decoding="async">
           <h3>Netbay Public Company Limited <span style="font-weight:400;color:#6e6e73">(Netbay)</span></h3>
           <span class="exp-client-tag">IT Services CRM</span>
         </div>
@@ -4179,7 +4173,7 @@
 
       <div class="exp-client-section" data-client="inchcape">
         <div class="exp-client-section-header">
-          <img src="https://logo.clearbit.com/inchcape.co.th" alt="" onerror="this.style.display='none'">
+          <img src="assets/img/clients/inchcape.webp" width="70" height="14" alt="" loading="lazy" decoding="async">
           <h3>Inchcape (Thailand) Co., Ltd.</h3>
           <span class="exp-client-tag">Automotive Sales CRM</span>
         </div>
@@ -4195,7 +4189,7 @@
 
       <div class="exp-client-section" data-client="oto">
         <div class="exp-client-section-header">
-          <img src="https://logo.clearbit.com/oto.co.th" alt="" onerror="this.style.display='none'">
+          <img src="assets/img/clients/oto-vision.webp" width="80" height="12" alt="" loading="lazy" decoding="async">
           <h3>OTO Vision Co., Ltd. <span style="font-weight:400;color:#6e6e73">(OTO Shopping)</span></h3>
           <span class="exp-client-tag">TV Shopping CRM</span>
         </div>
@@ -4212,7 +4206,7 @@
 
       <div class="exp-client-section" data-client="nova">
         <div class="exp-client-section-header">
-          <img src="https://logo.clearbit.com/novaorganic.co.th" alt="" onerror="this.style.display='none'">
+          <img src="assets/img/clients/nova-organic.webp" width="54" height="18" alt="" loading="lazy" decoding="async">
           <h3>Nova Organic Public Company Limited</h3>
           <span class="exp-client-tag">Operations &amp; Reporting</span>
         </div>
@@ -4228,7 +4222,7 @@
 
       <div class="exp-client-section" data-client="isv">
         <div class="exp-client-section-header">
-          <img src="https://logo.clearbit.com/insurverse.com" alt="" onerror="this.style.display='none'">
+          <img src="assets/img/clients/insurverse.webp" width="74" height="13" alt="" loading="lazy" decoding="async">
           <h3>Insurverse Public Company Limited <span style="font-weight:400;color:#6e6e73">(ISV)</span></h3>
           <span class="exp-client-tag">Sales Pipeline CRM</span>
         </div>
@@ -4271,7 +4265,7 @@
 
       <div class="exp-client-section" data-client="qprime">
         <div class="exp-client-section-header">
-          <img src="https://logo.clearbit.com/qprime.co.th" alt="" onerror="this.style.display='none'">
+          <img src="assets/img/clients/qprime.webp" width="48" height="21" alt="" loading="lazy" decoding="async">
           <h3>Qprime Co., Ltd.</h3>
           <span class="exp-client-tag">Clinic Case CRM</span>
         </div>
@@ -4289,7 +4283,7 @@
 
       <div class="exp-client-section" data-client="rabbitcard">
         <div class="exp-client-section-header">
-          <img src="https://logo.clearbit.com/rabbit.co.th" alt="" onerror="this.style.display='none'">
+          <img src="assets/img/clients/rabbit-card.webp" width="74" height="14" alt="" loading="lazy" decoding="async">
           <h3>Bangkok Smart Card System Co., Ltd. <span style="font-weight:400;color:#6e6e73">(Rabbit Card)</span></h3>
           <span class="exp-client-tag">Fintech Customer Service</span>
         </div>
@@ -4305,7 +4299,7 @@
 
       <div class="exp-client-section" data-client="mvmall">
         <div class="exp-client-section-header">
-          <img src="https://logo.clearbit.com/mvmall.tv" alt="" onerror="this.style.display='none'">
+          <img src="assets/img/clients/mvmall.webp" width="56" height="17" alt="" loading="lazy" decoding="async">
           <h3>MV Shopping Mall Co., Ltd. <span style="font-weight:400;color:#6e6e73">(MVmall)</span></h3>
           <span class="exp-client-tag">E-Commerce CRM</span>
         </div>
@@ -4335,7 +4329,7 @@
 
       <div class="exp-client-section" data-client="3bissfix">
         <div class="exp-client-section-header">
-          <img src="https://logo.clearbit.com/3bissfix.com" alt="" onerror="this.style.display='none'">
+          <img src="assets/img/clients/treebisfix.webp" width="54" height="19" alt="" loading="lazy" decoding="async">
           <h3>Treebisfix Co., Ltd. <span style="font-weight:400;color:#6e6e73">(3Bissfix)</span></h3>
           <span class="exp-client-tag">Field Service CRM</span>
         </div>
@@ -4351,7 +4345,7 @@
 
       <div class="exp-client-section" data-client="mediviss">
         <div class="exp-client-section-header">
-          <img src="https://logo.clearbit.com/mediviss.com" alt="" onerror="this.style.display='none'">
+          <img src="assets/img/clients/mediviss.webp" width="49" height="19" alt="" loading="lazy" decoding="async">
           <h3>Mediviss Co., Ltd.</h3>
           <span class="exp-client-tag">Healthcare CRM</span>
         </div>
@@ -4367,7 +4361,7 @@
 
       <div class="exp-client-section" data-client="yunnomori">
         <div class="exp-client-section-header">
-          <img src="https://logo.clearbit.com/yunomori.com" alt="" onerror="this.style.display='none'">
+          <img src="assets/img/clients/yunomori.webp" width="72" height="14" alt="" loading="lazy" decoding="async">
           <h3>Onsen Retreat &amp; Spa Group Co., Ltd. <span style="font-weight:400;color:#6e6e73">(Yunomori)</span></h3>
           <span class="exp-client-tag">Hospitality CRM</span>
         </div>
@@ -4383,7 +4377,7 @@
 
       <div class="exp-client-section" data-client="kijsiri">
         <div class="exp-client-section-header">
-          <img src="https://logo.clearbit.com/kijsiriasset.com" alt="" onerror="this.style.display='none'">
+          <img src="assets/img/clients/ns-kijsiri.webp" width="41" height="24" alt="" loading="lazy" decoding="async">
           <h3>N&amp;S Number One Ltd. Partnership / Kijsiri Asset Co., Ltd. <span
               style="font-weight:400;color:#6e6e73">(N&amp;S / Kijsiri)</span></h3>
           <span class="exp-client-tag">Real Estate CRM</span>
@@ -4434,7 +4428,7 @@
 
       <div class="exp-client-section" data-client="sbl">
         <div class="exp-client-section-header">
-          <img src="https://logo.clearbit.com/sbl.co.th" alt="" onerror="this.style.display='none'">
+          <img src="assets/img/clients/sbl-leasing.webp" width="44" height="23" alt="" loading="lazy" decoding="async">
           <h3>S.B.L. Leasing Co., Ltd. <span style="font-weight:400;color:#6e6e73">(SBL)</span></h3>
           <span class="exp-client-tag">Financial Services CRM</span>
         </div>
@@ -4450,7 +4444,7 @@
 
       <div class="exp-client-section" data-client="genie">
         <div class="exp-client-section-header">
-          <img src="https://logo.clearbit.com/genieproperties.co.th" alt="" onerror="this.style.display='none'">
+          <img src="assets/img/clients/genie-properties.webp" width="33" height="24" alt="" loading="lazy" decoding="async">
           <h3>Genie Properties Co., Ltd. <span style="font-weight:400;color:#6e6e73">(Genie)</span></h3>
           <span class="exp-client-tag">CTI Integration</span>
         </div>
@@ -4475,7 +4469,7 @@
 
       <div class="exp-client-section" data-client="isuzu">
         <div class="exp-client-section-header">
-          <img src="https://logo.clearbit.com/isuzu-tis.com" alt="" onerror="this.style.display='none'">
+          <img src="assets/img/clients/isuzu.webp" width="76" height="13" alt="" loading="lazy" decoding="async">
           <h3>Isuzu Thailand <span style="font-weight:400;color:#6e6e73">(Isuzu)</span></h3>
           <span class="exp-client-tag">Call Analytics</span>
         </div>

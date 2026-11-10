@@ -102,16 +102,23 @@ a:hover {
 }
 
 
+/* The chevron is a link to the next section. It stays where it was, 80px
+   up: the 11px of padding only widens what a pointer can hit (44x50). */
 .hero-scroll-hint {
   position: absolute;
-  bottom: 80px;
+  bottom: 69px;
   left: 50%;
   transform: translateX(-50%);
+  padding: 11px;
+  z-index: 3;   /* above the copy grid, whose box reaches it in a short window */
   color: var(--color-text);
   opacity: 0.6;
   animation: hero-bounce 2.2s ease-in-out infinite;
-  pointer-events: none;
+  transition: opacity .2s ease;
 }
+/* two rules, not a list: a browser without :focus-visible drops a whole list */
+.hero-scroll-hint:hover { color: var(--color-text); opacity: 1; }
+.hero-scroll-hint:focus-visible { color: var(--color-text); opacity: 1; }
 @keyframes hero-bounce {
   0%, 100% { transform: translateX(-50%) translateY(0); }
   50% { transform: translateX(-50%) translateY(10px); }
@@ -699,10 +706,6 @@ button {
   #portfolio .rf-cards-scroller-item:active {
     transform: scale(0.97);
   }
-  #experience .data-box[data-exp]:active {
-    transform: scale(0.985);
-  }
-
   #images-list .cert-card:active {
     transform: scale(0.97);
   }
@@ -714,6 +717,11 @@ button {
   .data-box:hover {
     transform: none;
   }
+  /* the Experience cards carry an older, more specific lift in the page's
+     inline styles; a tap must not leave a card raised */
+  #experience .data-box[data-exp]:hover {
+    transform: none;
+  }
   #portfolio .rf-cards-scroller-item:hover,
   #skill .rf-cards-scroller-item:hover,
   .cert-card:hover,
@@ -722,7 +730,12 @@ button {
     box-shadow: none;
   }
   .cert-card:hover .cert-img img { transform: none; }
-  #experience .data-box[data-exp]:hover::after { transform: translateX(-160%); }
+}
+/* after the rule above, so the press still shows while the finger is down */
+@media (max-width: 768px) {
+  #experience .data-box[data-exp]:active {
+    transform: scale(0.985);
+  }
 }
 
 /*==============================================================
@@ -740,8 +753,7 @@ button {
 #certificates.bg-light { background-color: #F5F5F7 !important; }
 
 #experience .data-box { background: #fff; }
-#skill .boxWhyScg { background: #fff; color: var(--color-text); }
-#certificates .data-box, #certificates .boxWhyScg { background: #fff; color: var(--color-text); }
+#certificates .data-box { background: #fff; color: var(--color-text); }
 /* Eyebrow + stacked editorial name over the constellation.
    Three quiet elements only: who / the name / what he builds. */
 #hero .hero-eyebrow {
@@ -881,17 +893,6 @@ button {
 /*--------------------------------------------------------------
 # Card Improvements
 --------------------------------------------------------------*/
-.boxWhyScg {
-  background: #ffffff;
-  border-radius: var(--r-card);
-  padding: 48px;
-  height: 100%;
-  border: 1px solid rgba(0, 0, 0, .07);
-  transition: transform 0.3s ease-in-out;
-}
-.boxWhyScg:hover {
-  transform: translateY(-4px);
-}
 #portfolio .rf-cards-scroller-item h3 { font-weight: 600; color: var(--color-text); letter-spacing: -0.2px; padding: 24px 28px 8px; }
 .rf-cards-scroller-item p.fw-light { color: var(--color-text-secondary); font-size: 0.9412rem; padding: 0 28px 28px; }
 
@@ -1395,7 +1396,6 @@ h1, h2, h3, h4, h5, h6 { color: var(--color-text); }
 /* ── Transitions: swift ease-out, 300–350ms (buttons carry their own
    springy transform timing and are not grouped here) ── */
 .data-box,
-.boxWhyScg,
 .rf-cards-scroller-item {
   transition-timing-function: var(--ease-swift);
   transition-duration: 0.3s;
@@ -1423,8 +1423,19 @@ h1, h2, h3, h4, h5, h6 { color: var(--color-text); }
 :focus-visible {
   outline: 2px solid var(--color-link);
   outline-offset: 3px;
-  border-radius: 6px;
 }
+/* The ring follows each control's own shape: a radius forced here turned
+   the round close button, the "+", the paddles and the pills into rounded
+   squares while they held focus. A control with no shape of its own gets
+   the soft 6px corner: :where() carries no weight, so any radius a control
+   sets for itself wins. The reset gives every button square corners with
+   the weight of one tag; the second selector weighs the same and comes
+   later, so it rounds only the buttons that never chose a shape (text
+   buttons, the rows of the See-all list). */
+:where(:focus-visible),
+button:where(:focus-visible) { border-radius: 6px; }
+/* the round "+" on an Experience card is drawn by an inner element */
+.exp-card-cta:focus-visible { border-radius: 50%; }
 button:focus-visible,
 a:focus-visible,
 input:focus-visible,
@@ -2870,10 +2881,14 @@ a.info-item:hover .info-value { color: var(--color-link); }
 #experience { background: #F5F5F7; }
 #experience .data-box[data-exp] { background: #fff; border: 0; box-shadow: none; }
 #experience .data-box[data-exp]::after { display: none; }   /* the shimmer sweep */
+/* The lift and its shadow sit on the card itself, as on the Projects cards:
+   a shadow on ::before was cut off by the card's own overflow: hidden. The
+   entrance is the scroll scrub every other card uses; a second keyframe
+   entrance used to restart it from 0 and held the transform, so the card
+   blinked on the way in and never answered the pointer. */
 @media (hover: hover) and (pointer: fine) {
-  #experience .data-box[data-exp] { transition: transform .3s cubic-bezier(0, 0, .5, 1); }
-  #experience .data-box[data-exp]:hover { transform: scale(1.01); }
-  #experience .data-box[data-exp]::before { box-shadow: 2px 4px 16px rgba(0, 0, 0, .16); }
+  #experience .data-box[data-exp] { transition: transform .3s cubic-bezier(0, 0, .5, 1), box-shadow .3s cubic-bezier(0, 0, .5, 1); }
+  #experience .data-box[data-exp]:hover { transform: scale(1.01); box-shadow: 2px 4px 16px rgba(0, 0, 0, .16); }
 }
 .exp-card-cta { right: 22px; bottom: 22px; gap: 0; }
 .exp-card-cta-label { display: none; }   /* the button keeps its "Read more: …" name */
