@@ -192,6 +192,17 @@ test('every client logo in the Protollcall sheet is one of the site\'s own files
     assert.deepEqual(failed, [], 'no request may fail while the sheet is open');
     await page.close();
   }
+
+  // on a dark forced-colours canvas a multiplied picture is all black: the blend is switched off
+  const dark = await ctx.openPage({ forcedColors: 'active', colorScheme: 'dark', reducedMotion: 'reduce' });
+  await dark.page.$eval('#experience [data-exp="protollcall"] .exp-card-cta', (el) => el.click());
+  await dark.page.waitForSelector('.exp-lightbox.open');
+  const blends = await dark.page.$$eval('.exp-lightbox .exp-client-section-header img', (imgs) => ({
+    forced: matchMedia('(forced-colors: active)').matches, modes: [...new Set(imgs.map((im) => getComputedStyle(im).mixBlendMode))],
+  }));
+  assert.ok(blends.forced, 'this run should be in forced colours');
+  assert.deepEqual(blends.modes, ['normal'], 'in forced colours no sheet logo may be blended into the card');
+  await dark.page.close();
 });
 
 test('the self-hosted fonts draw weight 700, not 600 again', async () => {
@@ -289,10 +300,17 @@ test('the certificate grid draws small copies; the viewer opens at full size and
 test('a focused control keeps its own shape, and one without a shape gets the 6px corner', async () => {
   const { page } = await ctx.openPage({ reducedMotion: 'reduce' });
   await page.keyboard.press('Tab');   // keyboard modality: focus() then shows the ring
-  const probe = (sel) => page.$eval(sel, (el) => {
+  // A sheet and the viewer put focus on their close button as they open, so the resting shape
+  // is read after a blur; the focused one a frame or two after focus (a transition, however
+  // short, would otherwise still report the resting value).
+  const probe = (sel) => page.$eval(sel, async (el) => {
+    const frames = () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
     el.scrollIntoView({ block: 'center' });
+    el.blur();
+    await frames();
     const rest = getComputedStyle(el).borderRadius;
     el.focus({ preventScroll: true });
+    await frames();
     return { rest, focused: getComputedStyle(el).borderRadius, ring: el.matches(':focus-visible'), outline: getComputedStyle(el).outlineStyle };
   });
   // [selector, the ring's corner]: null = the control's own resting radius, which must not be 0
@@ -314,7 +332,16 @@ test('a focused control keeps its own shape, and one without a shape gets the 6p
     ['#back-to-top', null], ['a.btn-pill', null], ['.skip-link', null],
     // these draw no box of their own; the round "+" is drawn by an inner element
     ['#experience .exp-card-cta', '50%'], ['button.more.proj-all', '6px'], ['a.more', '6px'], ['.footer-contact-link', '6px'],
+    // neither a link nor a button: the Skills row is a scroll region the keyboard can stop on
+    ['#skill-scroller', '6px'],
   ], 'page:');
+
+  // the certificate viewer's round close button, where focus lands when it opens
+  await page.$eval('#images-list .cert-expand-btn', (el) => el.click());
+  await page.waitForSelector('.cert-lightbox.open');
+  await check([['.cert-lightbox.open .cert-lightbox-close', null]], 'viewer:');
+  await page.keyboard.press('Escape');
+  await page.waitForFunction(() => !document.querySelector('.cert-lightbox.open'));
 
   await page.$eval('#experience [data-exp="protollcall"] .exp-card-cta', (el) => el.click());
   await page.waitForSelector('.exp-lightbox.open');
