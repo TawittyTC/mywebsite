@@ -1429,6 +1429,10 @@ h1, h2, h3, h4, h5, h6 { color: var(--color-text); }
    they held focus. Plain text links keep the soft corner; :where() carries
    no weight, so a link with a radius of its own keeps it. */
 :where(a:focus-visible) { border-radius: 6px; }
+/* Two buttons draw no box of their own, and the reset gives every button
+   square corners (which outranks :where): the ring says what shape they are. */
+.exp-card-cta:focus-visible { border-radius: 50%; }
+button.more:focus-visible { border-radius: 6px; }
 button:focus-visible,
 a:focus-visible,
 input:focus-visible,
