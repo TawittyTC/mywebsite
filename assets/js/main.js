@@ -1611,16 +1611,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // A labelled node whose home lies in the chevron's fade zone would spend
   // its life as a ghost (in the compact layout "POS" is seeded right on the
-  // chevron). Move its home to the right of the zone, far enough that its
-  // drift never reaches the fade; the label hangs to the node's right, so
-  // it moves away from the chevron too. Plain nodes just fade there.
+  // chevron). Move its home to the right of the zone, far enough that
+  // neither its drift nor a pointer's push reaches the fade; the label hangs
+  // to the node's right, so it moves away from the chevron too. Plain nodes
+  // just fade there.
   function clearHint() {
     if (!hintRect || !layoutW || !layoutH) return;
     var amp = Math.max(1, Math.min(W / 1100, 2));
     for (var i = 0; i < nodes.length; i++) {
       var n = nodes[i];
       if (!n.special) continue;
-      var need = 42 + amp * (n.a1 + n.a2);
+      // the fade (42px), the node's own drift, and the 34px a pointer can push it
+      var need = 76 + amp * (n.a1 + n.a2);
       var hx = n.fx * layoutW, hy = n.fy * layoutH;
       var dx = Math.max(hintRect.x0 - hx, 0, hx - hintRect.x1);
       var dy = Math.max(hintRect.y0 - hy, 0, hy - hintRect.y1);
@@ -1767,8 +1769,11 @@ document.addEventListener('DOMContentLoaded', function () {
       // toolbar-sized height churn is deliberately ignored
       layoutW = W;
       layoutH = H;
-      clearHint();
     }
+    // The chevron appears at 993px and follows the hero's height, which
+    // settles after the width does: neither always re-anchors the graph,
+    // so look on every resize (a node already clear is left where it is).
+    clearHint();
     // (until the loop has drawn once there is no picture to keep)
     if (bitmapChanged && nodes.length && painted) drawFrame(lastDrawT);
   }
