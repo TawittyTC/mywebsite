@@ -1483,13 +1483,19 @@
     .exp-client-section-header img {
       flex: 0 0 100%;
       object-fit: contain;
-      object-position: left center
+      object-position: left center;
+      pointer-events: none   /* the box is the whole row: only the heading takes taps and drags */
     }
 
     /* two files have a white ground of their own: let the card show through */
     .exp-client-section-header img[src$="ns-kijsiri.webp"],
     .exp-client-section-header img[src$="mediviss.webp"] {
       mix-blend-mode: multiply
+    }
+
+    /* on a dark forced-colours canvas a multiplied picture is all black */
+    @media (forced-colors: active) {
+      .exp-client-section-header img { mix-blend-mode: normal !important }
     }
 
     .exp-client-section-header h3 {
