@@ -672,7 +672,8 @@ document.addEventListener('DOMContentLoaded', function () {
       entries.forEach(function (entry) {
         if (!entry.isIntersecting) return;
         var idx = expCards.indexOf(entry.target);
-        entry.target.style.animationDelay = (idx * 80) + 'ms';
+        // the class starts the count-up and the timeline pulse; the card's
+        // entrance itself is the scroll scrub below
         entry.target.classList.add('card-visible');
         var btn = entry.target.querySelector('.exp-card-btn');
         if (btn) setTimeout(function () { btn.classList.add('hint-loop'); }, idx * 80 + 400);

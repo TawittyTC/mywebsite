@@ -699,10 +699,6 @@ button {
   #portfolio .rf-cards-scroller-item:active {
     transform: scale(0.97);
   }
-  #experience .data-box[data-exp]:active {
-    transform: scale(0.985);
-  }
-
   #images-list .cert-card:active {
     transform: scale(0.97);
   }
@@ -714,6 +710,11 @@ button {
   .data-box:hover {
     transform: none;
   }
+  /* the Experience cards carry an older, more specific lift in the page's
+     inline styles; a tap must not leave a card raised */
+  #experience .data-box[data-exp]:hover {
+    transform: none;
+  }
   #portfolio .rf-cards-scroller-item:hover,
   #skill .rf-cards-scroller-item:hover,
   .cert-card:hover,
@@ -723,6 +724,12 @@ button {
   }
   .cert-card:hover .cert-img img { transform: none; }
   #experience .data-box[data-exp]:hover::after { transform: translateX(-160%); }
+}
+/* after the rule above, so the press still shows while the finger is down */
+@media (max-width: 768px) {
+  #experience .data-box[data-exp]:active {
+    transform: scale(0.985);
+  }
 }
 
 /*==============================================================
@@ -2870,10 +2877,14 @@ a.info-item:hover .info-value { color: var(--color-link); }
 #experience { background: #F5F5F7; }
 #experience .data-box[data-exp] { background: #fff; border: 0; box-shadow: none; }
 #experience .data-box[data-exp]::after { display: none; }   /* the shimmer sweep */
+/* The lift and its shadow sit on the card itself, as on the Projects cards:
+   a shadow on ::before was cut off by the card's own overflow: hidden. The
+   entrance is the scroll scrub every other card uses; a second keyframe
+   entrance used to restart it from 0 and held the transform, so the card
+   blinked on the way in and never answered the pointer. */
 @media (hover: hover) and (pointer: fine) {
-  #experience .data-box[data-exp] { transition: transform .3s cubic-bezier(0, 0, .5, 1); }
-  #experience .data-box[data-exp]:hover { transform: scale(1.01); }
-  #experience .data-box[data-exp]::before { box-shadow: 2px 4px 16px rgba(0, 0, 0, .16); }
+  #experience .data-box[data-exp] { transition: transform .3s cubic-bezier(0, 0, .5, 1), box-shadow .3s cubic-bezier(0, 0, .5, 1); }
+  #experience .data-box[data-exp]:hover { transform: scale(1.01); box-shadow: 2px 4px 16px rgba(0, 0, 0, .16); }
 }
 .exp-card-cta { right: 22px; bottom: 22px; gap: 0; }
 .exp-card-cta-label { display: none; }   /* the button keeps its "Read more: …" name */
