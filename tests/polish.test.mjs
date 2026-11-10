@@ -91,26 +91,55 @@ test('on a touch screen a tapped Experience card does not stay raised', async ()
   await page.close();
 });
 
-test('every client logo in the Protollcall sheet is one of the site\'s own files and loads', async () => {
+test('every client logo in the Protollcall sheet is one of the site\'s own files, loads, and sits above its client\'s name', async () => {
   assert.doesNotMatch(html, /logo\.clearbit\.com/, 'the retired Clearbit logo service must not be linked');
-  const { page, failed } = await ctx.openPage();
-  await page.$eval('#experience [data-exp="protollcall"]', (el) => el.scrollIntoView({ block: 'center' }));
-  await page.waitForTimeout(900);
-  await page.click('#experience [data-exp="protollcall"] .exp-card-btn');
-  await page.waitForSelector('.exp-lightbox.open');
-  const logos = await page.$$eval('.exp-lightbox .exp-client-section-header img', async (imgs) => {
-    for (const im of imgs) { im.loading = 'eager'; try { await im.decode(); } catch (e) { /* reported below */ } }
-    return imgs.map((im) => ({ src: im.getAttribute('src'), natural: im.naturalWidth, h: im.offsetHeight, w: im.offsetWidth }));
-  });
-  assert.equal(logos.length, 22, 'expected the 22 client logos');
-  for (const l of logos) {
-    assert.match(l.src, /^assets\/img\/clients\/[\w-]+\.webp$/, `logo is not a local file: ${l.src}`);
-    assert.ok(existsSync(join(ROOT, l.src)), `logo file missing: ${l.src}`);
-    assert.ok(l.natural > 0, `logo did not load: ${l.src}`);
-    assert.ok(l.h > 0 && l.h <= 24 && l.w <= 80, `logo ${l.src} is drawn ${l.w}x${l.h}, outside the 80x24 heading slot`);
+  for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 }]) {
+    const { page, failed } = await ctx.openPage({ viewport, reducedMotion: 'reduce' });
+    await page.$eval('#experience [data-exp="protollcall"] .exp-card-cta', (el) => el.click());
+    await page.waitForSelector('.exp-lightbox.open');
+    const rows = await page.$$eval('.exp-lightbox .exp-client-section-header', async (heads) => {
+      const out = [];
+      for (const head of heads) {
+        const im = head.querySelector('img');
+        if (!im) continue;
+        im.loading = 'eager';
+        try { await im.decode(); } catch (e) { /* reported below */ }
+        const name = head.querySelector('h3').getBoundingClientRect();
+        const tag = head.querySelector('.exp-client-tag').getBoundingClientRect();
+        const box = im.getBoundingClientRect();
+        // what the row would be without its logo: does the tag still share the name's row?
+        im.style.display = 'none';
+        const bare = head.querySelector('.exp-client-tag').getBoundingClientRect().top < head.querySelector('h3').getBoundingClientRect().bottom;
+        im.style.display = '';
+        out.push({
+          client: head.closest('.exp-client-section').dataset.client, src: im.getAttribute('src'),
+          attrs: [im.getAttribute('width'), im.getAttribute('height')], natural: im.naturalWidth,
+          h: box.height, w: im.naturalHeight ? box.height * im.naturalWidth / im.naturalHeight : 0,
+          above: box.bottom <= name.top + 0.5, nameAtEdge: Math.abs(name.left - box.left) < 1,
+          tagBesideName: tag.top < name.bottom, tagBesideNameWithoutLogo: bare,
+          blend: getComputedStyle(im).mixBlendMode,
+        });
+      }
+      return out;
+    });
+    assert.equal(rows.length, 22, 'expected the 22 client logos');
+    for (const l of rows) {
+      const at = `${l.client} at ${viewport.width}px`;
+      assert.match(l.src, /^assets\/img\/clients\/[\w-]+\.webp$/, `logo is not a local file: ${l.src}`);
+      assert.ok(existsSync(join(ROOT, l.src)), `logo file missing: ${l.src}`);
+      assert.ok(l.natural > 0, `logo did not load: ${l.src}`);
+      assert.ok(l.attrs.every((v) => /^\d+$/.test(v)), `${at}: width and height must be whole numbers, got ${l.attrs}`);
+      assert.ok(l.h > 0 && l.h <= 24 && l.w <= 81, `${at}: the logo is drawn ${l.w.toFixed(1)}x${l.h}, outside 80x24`);
+      assert.ok(l.above && l.nameAtEdge, `${at}: the logo must sit on its own row above the name, on the same left edge`);
+      assert.equal(l.tagBesideName, l.tagBesideNameWithoutLogo, `${at}: the logo moved the tag off (or onto) the name's row`);
+    }
+    // two files carry a white ground of their own; on the grey card it must not show as a box
+    for (const c of ['kijsiri', 'mediviss']) {
+      assert.equal(rows.find((l) => l.client === c).blend, 'multiply', `${c}: the logo's white ground shows on the grey card`);
+    }
+    assert.deepEqual(failed, [], 'no request may fail while the sheet is open');
+    await page.close();
   }
-  assert.deepEqual(failed, [], 'no request may fail while the sheet is open');
-  await page.close();
 });
 
 test('the self-hosted fonts draw weight 700, not 600 again', async () => {
@@ -149,7 +178,8 @@ test('the certificate grid draws small copies; the viewer opens at full size and
   for (let i = 1; i <= 33; i++) {
     assert.ok(existsSync(join(ROOT, `assets/img/certificate/thumb/img-${i}.avif`)), `small copy of certificate ${i} is missing`);
   }
-  const { page, failed } = await ctx.openPage();
+  // (no service worker here: it would answer the original from its cache and skip the delay below)
+  const { page, failed } = await ctx.openPage({ serviceWorkers: 'block' });
   await page.$eval('#images-list', (el) => el.scrollIntoView());
   const tiles = await page.$$eval('#images-list .cert-card img', async (imgs) => {
     for (const im of imgs) { im.loading = 'eager'; try { await im.decode(); } catch (e) { /* reported below */ } }
@@ -204,9 +234,15 @@ test('the certificate grid draws small copies; the viewer opens at full size and
   await page.close();
 });
 
-test('round controls stay round while they hold focus', async () => {
+test('every control keeps its own shape while it holds focus', async () => {
   const { page } = await ctx.openPage();
-  for (const sel of ['#portfolio [data-scroller-next]', '.filter-btn', '#portfolio .card-plus', '#images-list .cert-expand-btn']) {
+  // [selector, the ring's corner]: null = the control's own resting radius. The last two draw
+  // no box of their own (the reset leaves a button square), so the ring names their shape.
+  const controls = [
+    ['#portfolio [data-scroller-next]', null], ['.filter-btn', null], ['#images-list .cert-expand-btn', null],
+    ['#experience .exp-card-cta', '50%'], ['button.more.proj-all', '6px'], ['a.more', '6px'],
+  ];
+  for (const [sel, want] of controls) {
     const r = await page.$eval(sel, (el) => {
       el.scrollIntoView({ block: 'center' });
       const rest = getComputedStyle(el).borderRadius;
@@ -215,7 +251,12 @@ test('round controls stay round while they hold focus', async () => {
     });
     assert.ok(r.ring, `${sel} should show its focus ring when focused from the keyboard`);
     assert.notEqual(r.outline, 'none', `${sel} lost its focus ring`);
-    assert.equal(r.focused, r.rest, `${sel} changes shape while focused (${r.rest} -> ${r.focused})`);
+    if (want === null) {
+      assert.notEqual(r.rest, '0px', `${sel} was expected to have a shape of its own`);
+      assert.equal(r.focused, r.rest, `${sel} changes shape while focused (${r.rest} -> ${r.focused})`);
+    } else {
+      assert.equal(r.focused, want, `${sel}: the focus ring's corner is ${r.focused}, expected ${want}`);
+    }
   }
   await page.close();
 });
@@ -239,8 +280,9 @@ test('Resume sub-headings sit on the stylesheet\'s own margins', async () => {
   }
 });
 
-test('the hero chevron is a working link and the constellation never draws through it', async () => {
-  for (const [width, height] of [[1024, 768], [1440, 900]]) {
+test('the hero chevron is a working link; no node, line or label is drawn through it and every label stays readable', async () => {
+  // 993 and 1024 are the compact layout, where a labelled node ("POS") is seeded on the chevron's spot
+  for (const [width, height] of [[993, 700], [1024, 768], [1440, 900]]) {
     const { page } = await ctx.openPage({ viewport: { width, height } });
     await page.waitForTimeout(3000);   // the intro burst is over, the keep-out is in force
     const box = await page.$eval('.hero-scroll-hint', (el) => {
@@ -257,10 +299,11 @@ test('the hero chevron is a working link and the constellation never draws throu
     assert.ok(box.reaches, 'a click on the chevron must reach the link');
     assert.ok(box.w >= 44 && box.h >= 44, `the chevron's hit area is ${box.w}x${box.h}, under 44px`);
 
-    // no ink under the chevron (its own 22px box plus the 10px bounce) across 40 looks
-    let inked = 0;
+    // 40 looks: no ink under the chevron (its own 22px box plus the 10px bounce), no label on
+    // its hit area, and the label seeded nearest to it never fades
+    let inked = 0, covered = 0, posLow = 1, labels = 0;
     for (let i = 0; i < 40; i++) {
-      inked += await page.evaluate(({ x, y, sw, sh }) => {
+      const look = await page.evaluate(({ x, y, sw, sh }) => {
         const c = document.querySelector('#hero-net');
         const cr = c.getBoundingClientRect();
         const k = c.width / cr.width;
@@ -268,17 +311,42 @@ test('the hero chevron is a working link and the constellation never draws throu
           Math.ceil(sw * k), Math.ceil((sh + 20) * k)).data;
         let n = 0;
         for (let p = 3; p < d.length; p += 4) if (d[p] > 8) n++;
-        return n > 0 ? 1 : 0;
+        const hint = document.querySelector('.hero-scroll-hint').getBoundingClientRect();
+        let on = 0, pos = 1, count = 0;
+        document.querySelectorAll('.hero-net-label').forEach((l) => {
+          const op = +getComputedStyle(l).opacity, r = l.getBoundingClientRect();
+          count++;
+          if (l.textContent === 'POS') pos = op;
+          if (op > 0.05 && r.right > hint.left && r.left < hint.right && r.bottom > hint.top && r.top < hint.bottom) on++;
+        });
+        return { ink: n > 0 ? 1 : 0, on, pos, count };
       }, box);
+      inked += look.ink; covered += look.on; posLow = Math.min(posLow, look.pos); labels = look.count;
       await page.waitForTimeout(120);
     }
+    assert.equal(labels, 6, 'the constellation names six systems');
     assert.equal(inked, 0, `at ${width}px the constellation was drawn through the chevron in ${inked} of 40 looks`);
+    assert.equal(covered, 0, `at ${width}px a label sat on the chevron in ${covered} of 40 looks`);
+    assert.ok(posLow >= 0.9, `at ${width}px the "POS" label faded to ${posLow.toFixed(2)}; it must stay readable, clear of the chevron`);
 
     // and it takes the visitor to the next section
     await page.mouse.click(box.x + box.sw / 2, box.y + box.sh / 2);
     await page.waitForTimeout(1100);
     const at = await page.evaluate(() => ({ y: scrollY, resume: document.getElementById('resume').getBoundingClientRect().top + scrollY }));
     assert.ok(Math.abs(at.y - (at.resume - 60)) <= 2, `the chevron should scroll to Resume (${at.resume - 60}), stopped at ${at.y}`);
+    await page.close();
+  }
+});
+
+test('in a short window the copy grid does not cover the chevron link', async () => {
+  for (const [width, height] of [[1280, 500], [993, 440]]) {
+    const { page } = await ctx.openPage({ viewport: { width, height } });
+    const reach = await page.$eval('.hero-scroll-hint', (el) => {
+      const b = el.getBoundingClientRect();
+      return [[0.5, 0.5], [0.5, 0.2], [0.5, 0.8], [0.2, 0.5], [0.8, 0.5]]
+        .filter(([fx, fy]) => el.contains(document.elementFromPoint(b.left + b.width * fx, b.top + b.height * fy))).length;
+    });
+    assert.equal(reach, 5, `at ${width}x${height} only ${reach} of 5 points on the chevron reach the link`);
     await page.close();
   }
 });
