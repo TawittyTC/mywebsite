@@ -215,12 +215,17 @@ test('certificate lightbox shows the exact card clicked, replays, and unlocks sc
   await page.$eval('#images-list', (el) => el.scrollIntoView());
   await page.waitForSelector('#images-list .cert-card img');
   for (const idx of [3, 7]) {
-    const expected = await page.$$eval('#images-list .cert-card img', (imgs, i) => imgs[i].src, idx);
+    // the tile draws a small copy (certificate/thumb/); the viewer ends on
+    // the original of that same certificate
+    const expected = await page.$$eval('#images-list .cert-card img',
+      (imgs, i) => imgs[i].src.replace('/certificate/thumb/', '/certificate/'), idx);
     await page.$$eval('#images-list .cert-card', (cards, i) => {
       cards[i].scrollIntoView({ block: 'center' });
       cards[i].click();
     }, idx);
     await page.waitForSelector('.cert-lightbox.open');
+    await page.waitForFunction((src) => document.querySelector('.cert-lightbox img').src === src, expected)
+      .catch(() => {});
     const shown = await page.$eval('.cert-lightbox img', (i) => i.src);
     assert.equal(shown, expected, `lightbox shows wrong certificate for card ${idx}`);
     assert.equal(await page.evaluate(() => document.body.style.overflow), 'hidden',

@@ -728,7 +728,6 @@ button {
     box-shadow: none;
   }
   .cert-card:hover .cert-img img { transform: none; }
-  #experience .data-box[data-exp]:hover::after { transform: translateX(-160%); }
 }
 /* after the rule above, so the press still shows while the finger is down */
 @media (max-width: 768px) {
@@ -752,8 +751,7 @@ button {
 #certificates.bg-light { background-color: #F5F5F7 !important; }
 
 #experience .data-box { background: #fff; }
-#skill .boxWhyScg { background: #fff; color: var(--color-text); }
-#certificates .data-box, #certificates .boxWhyScg { background: #fff; color: var(--color-text); }
+#certificates .data-box { background: #fff; color: var(--color-text); }
 /* Eyebrow + stacked editorial name over the constellation.
    Three quiet elements only: who / the name / what he builds. */
 #hero .hero-eyebrow {
@@ -893,17 +891,6 @@ button {
 /*--------------------------------------------------------------
 # Card Improvements
 --------------------------------------------------------------*/
-.boxWhyScg {
-  background: #ffffff;
-  border-radius: var(--r-card);
-  padding: 48px;
-  height: 100%;
-  border: 1px solid rgba(0, 0, 0, .07);
-  transition: transform 0.3s ease-in-out;
-}
-.boxWhyScg:hover {
-  transform: translateY(-4px);
-}
 #portfolio .rf-cards-scroller-item h3 { font-weight: 600; color: var(--color-text); letter-spacing: -0.2px; padding: 24px 28px 8px; }
 .rf-cards-scroller-item p.fw-light { color: var(--color-text-secondary); font-size: 0.9412rem; padding: 0 28px 28px; }
 
@@ -1407,7 +1394,6 @@ h1, h2, h3, h4, h5, h6 { color: var(--color-text); }
 /* ── Transitions: swift ease-out, 300–350ms (buttons carry their own
    springy transform timing and are not grouped here) ── */
 .data-box,
-.boxWhyScg,
 .rf-cards-scroller-item {
   transition-timing-function: var(--ease-swift);
   transition-duration: 0.3s;
