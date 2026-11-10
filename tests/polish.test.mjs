@@ -28,6 +28,25 @@ test('the typed role line says "an" before a vowel and "a" before a consonant', 
   }
   assert.deepEqual(wrong, [], `wrong article in the typed line: ${wrong.join(' | ')}`);
   assert.ok(seen.vowel && seen.consonant, 'expected to see a role that starts with a vowel and one that does not');
+
+  // a formatter may wrap the line: the text before the typed word then ends in a newline and
+  // indentation, and the swap must still find the article and keep that whitespace
+  const pad = '\n      ';
+  await page.$eval('#hero .typed', (el, tail) => { el.previousSibling.nodeValue = "I'm a" + tail; }, pad);
+  // the article changes when a role starts: let the word on screen finish and be cleared
+  await page.waitForFunction(() => document.querySelector('#hero .typed').textContent === '', null, { timeout: 20000 });
+  await page.waitForTimeout(300);
+  const again = { vowel: false, consonant: false };
+  for (let i = 0; i < 260 && !(again.vowel && again.consonant); i++) {
+    const st = await page.$eval('#hero .typed', (el) => ({ lead: el.previousSibling.nodeValue, word: el.textContent }));
+    if (st.word.length > 3) {
+      const vowel = /^[aeiou]/i.test(st.word);
+      assert.equal(st.lead, (vowel ? "I'm an" : "I'm a") + pad, `after a reformat the line reads ${JSON.stringify(st.lead + st.word)}`);
+      again[vowel ? 'vowel' : 'consonant'] = true;
+    }
+    await page.waitForTimeout(100);
+  }
+  assert.ok(again.vowel && again.consonant, 'expected both kinds of role again after the reformat');
   await page.close();
 });
 
@@ -77,17 +96,42 @@ test('an Experience card enters once, without blinking, and lifts under the poin
 });
 
 test('on a touch screen a tapped Experience card does not stay raised', async () => {
-  const { page } = await ctx.openPage({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
   const sel = '#experience .data-box[data-exp]';
-  await page.$eval(sel, (el) => el.scrollIntoView({ block: 'center' }));
-  await page.waitForTimeout(900);
+  // Touch browsers leave :hover on the last tapped element. The emulation does not, so the state
+  // is forced; the pointer run shows that the forced state does lift the card where it should.
+  const hovered = async (page) => {
+    await page.$eval(sel, (el) => el.scrollIntoView({ block: 'center' }));
+    await page.waitForTimeout(900);
+    const cdp = await page.context().newCDPSession(page);
+    await cdp.send('DOM.enable');
+    await cdp.send('CSS.enable');
+    const { root } = await cdp.send('DOM.getDocument');
+    const { nodeId } = await cdp.send('DOM.querySelector', { nodeId: root.nodeId, selector: sel });
+    await cdp.send('CSS.forcePseudoState', { nodeId, forcedPseudoClasses: ['hover'] });
+    await page.waitForTimeout(600);
+    return page.$eval(sel, (el) => ({
+      t: getComputedStyle(el).transform, fine: matchMedia('(hover: hover) and (pointer: fine)').matches,
+    }));
+  };
+  const flat = (t) => t === 'none' || t === 'matrix(1, 0, 0, 1, 0, 0)';
+
+  const pointer = await ctx.openPage();
+  const lifted = await hovered(pointer.page);
+  assert.ok(lifted.fine && !flat(lifted.t), `with a pointer the hovered card should lift, got ${lifted.t}`);
+  await pointer.page.close();
+
+  const { page } = await ctx.openPage({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+  const stuck = await hovered(page);
+  assert.equal(stuck.fine, false, 'the phone run must not count as a fine pointer');
+  assert.ok(flat(stuck.t), `on touch a card left in :hover is transformed: ${stuck.t}`);
+  // and a real tap opens the sheet and leaves the card flat
   await page.tap(`${sel} h3`);
   await page.waitForSelector('.exp-lightbox.open');
   await page.keyboard.press('Escape');
   await page.waitForFunction(() => !document.querySelector('.exp-lightbox.open'));
   await page.waitForTimeout(500);
   const t = await page.$eval(sel, (el) => getComputedStyle(el).transform);
-  assert.ok(t === 'none' || t === 'matrix(1, 0, 0, 1, 0, 0)', `the card is left transformed after a tap: ${t}`);
+  assert.ok(flat(t), `the card is left transformed after a tap: ${t}`);
   await page.close();
 });
 
@@ -118,6 +162,10 @@ test('every client logo in the Protollcall sheet is one of the site\'s own files
           above: box.bottom <= name.top + 0.5, nameAtEdge: Math.abs(name.left - box.left) < 1,
           tagBesideName: tag.top < name.bottom, tagBesideNameWithoutLogo: bare,
           blend: getComputedStyle(im).mixBlendMode,
+          // the img box is the whole row: these two put the picture, unstretched, at its left end
+          fit: getComputedStyle(im).objectFit, at: getComputedStyle(im).objectPosition,
+          shape: (+im.getAttribute('width') / +im.getAttribute('height')) / (im.naturalWidth / im.naturalHeight),
+          taps: getComputedStyle(im).pointerEvents,
         });
       }
       return out;
@@ -131,6 +179,10 @@ test('every client logo in the Protollcall sheet is one of the site\'s own files
       assert.ok(l.attrs.every((v) => /^\d+$/.test(v)), `${at}: width and height must be whole numbers, got ${l.attrs}`);
       assert.ok(l.h > 0 && l.h <= 24 && l.w <= 81, `${at}: the logo is drawn ${l.w.toFixed(1)}x${l.h}, outside 80x24`);
       assert.ok(l.above && l.nameAtEdge, `${at}: the logo must sit on its own row above the name, on the same left edge`);
+      assert.equal(l.fit, 'contain', `${at}: the logo would be stretched across its row`);
+      assert.equal(l.at, '0% 50%', `${at}: the logo must be drawn at the left end of its row, not ${l.at}`);
+      assert.ok(Math.abs(l.shape - 1) < 0.04, `${at}: the size attributes give the logo the wrong shape (${l.shape.toFixed(3)} of the file's)`);
+      assert.equal(l.taps, 'none', `${at}: the blank part of the logo's row must not act as the picture`);
       assert.equal(l.tagBesideName, l.tagBesideNameWithoutLogo, `${at}: the logo moved the tag off (or onto) the name's row`);
     }
     // two files carry a white ground of their own; on the grey card it must not show as a box
@@ -234,30 +286,56 @@ test('the certificate grid draws small copies; the viewer opens at full size and
   await page.close();
 });
 
-test('every control keeps its own shape while it holds focus', async () => {
-  const { page } = await ctx.openPage();
-  // [selector, the ring's corner]: null = the control's own resting radius. The last two draw
-  // no box of their own (the reset leaves a button square), so the ring names their shape.
-  const controls = [
-    ['#portfolio [data-scroller-next]', null], ['.filter-btn', null], ['#images-list .cert-expand-btn', null],
-    ['#experience .exp-card-cta', '50%'], ['button.more.proj-all', '6px'], ['a.more', '6px'],
-  ];
-  for (const [sel, want] of controls) {
-    const r = await page.$eval(sel, (el) => {
-      el.scrollIntoView({ block: 'center' });
-      const rest = getComputedStyle(el).borderRadius;
-      el.focus({ preventScroll: true });
-      return { rest, focused: getComputedStyle(el).borderRadius, ring: el.matches(':focus-visible'), outline: getComputedStyle(el).outlineStyle };
-    });
-    assert.ok(r.ring, `${sel} should show its focus ring when focused from the keyboard`);
-    assert.notEqual(r.outline, 'none', `${sel} lost its focus ring`);
-    if (want === null) {
-      assert.notEqual(r.rest, '0px', `${sel} was expected to have a shape of its own`);
-      assert.equal(r.focused, r.rest, `${sel} changes shape while focused (${r.rest} -> ${r.focused})`);
-    } else {
-      assert.equal(r.focused, want, `${sel}: the focus ring's corner is ${r.focused}, expected ${want}`);
+test('a focused control keeps its own shape, and one without a shape gets the 6px corner', async () => {
+  const { page } = await ctx.openPage({ reducedMotion: 'reduce' });
+  await page.keyboard.press('Tab');   // keyboard modality: focus() then shows the ring
+  const probe = (sel) => page.$eval(sel, (el) => {
+    el.scrollIntoView({ block: 'center' });
+    const rest = getComputedStyle(el).borderRadius;
+    el.focus({ preventScroll: true });
+    return { rest, focused: getComputedStyle(el).borderRadius, ring: el.matches(':focus-visible'), outline: getComputedStyle(el).outlineStyle };
+  });
+  // [selector, the ring's corner]: null = the control's own resting radius, which must not be 0
+  const check = async (controls, where) => {
+    for (const [sel, want] of controls) {
+      const r = await probe(sel);
+      assert.ok(r.ring, `${where} ${sel} should show its focus ring when focused from the keyboard`);
+      assert.notEqual(r.outline, 'none', `${where} ${sel} lost its focus ring`);
+      if (want === null) {
+        assert.notEqual(r.rest, '0px', `${where} ${sel} was expected to have a shape of its own`);
+        assert.equal(r.focused, r.rest, `${where} ${sel} changes shape while focused (${r.rest} -> ${r.focused})`);
+      } else {
+        assert.equal(r.focused, want, `${where} ${sel}: the focus ring's corner is ${r.focused}, expected ${want}`);
+      }
     }
-  }
+  };
+  await check([
+    ['#portfolio [data-scroller-next]', null], ['.filter-btn', null], ['#images-list .cert-expand-btn', null],
+    ['#back-to-top', null], ['a.btn-pill', null], ['.skip-link', null],
+    // these draw no box of their own; the round "+" is drawn by an inner element
+    ['#experience .exp-card-cta', '50%'], ['button.more.proj-all', '6px'], ['a.more', '6px'], ['.footer-contact-link', '6px'],
+  ], 'page:');
+
+  await page.$eval('#experience [data-exp="protollcall"] .exp-card-cta', (el) => el.click());
+  await page.waitForSelector('.exp-lightbox.open');
+  await check([['.exp-lightbox.open .exp-lightbox-close', null], ['.exp-lightbox.open .exp-filter-chip', null]], 'sheet:');
+  await page.keyboard.press('Escape');
+  await page.waitForFunction(() => !document.querySelector('.exp-lightbox.open'));
+
+  // the See-all list, then a project opened from it with Enter: focus lands on the "All projects" pill
+  await page.$eval('[data-proj-all]', (el) => el.click());
+  await page.waitForSelector('.proj-row');
+  await check([['.proj-row', '6px']], 'See-all list:');
+  await page.keyboard.press('Enter');
+  await page.waitForSelector('.proj-back');
+  const pill = await page.$eval('.proj-back', (el) => {
+    const focused = getComputedStyle(el).borderRadius, ring = el.matches(':focus-visible');
+    el.blur();
+    return { focused, ring, rest: getComputedStyle(el).borderRadius };
+  });
+  assert.ok(pill.ring, 'the "All projects" pill should hold keyboard focus when a row is opened with Enter');
+  assert.notEqual(pill.rest, '0px');
+  assert.equal(pill.focused, pill.rest, `the "All projects" pill changes shape while focused (${pill.rest} -> ${pill.focused})`);
   await page.close();
 });
 
@@ -280,7 +358,7 @@ test('Resume sub-headings sit on the stylesheet\'s own margins', async () => {
   }
 });
 
-test('the hero chevron is a working link; no node, line or label is drawn through it and every label stays readable', async () => {
+test('the hero chevron is a working link; no node, line or label is drawn through it and the label seeded on it stays readable', async () => {
   // 993 and 1024 are the compact layout, where a labelled node ("POS") is seeded on the chevron's spot
   for (const [width, height] of [[993, 700], [1024, 768], [1440, 900]]) {
     const { page } = await ctx.openPage({ viewport: { width, height } });
@@ -334,6 +412,44 @@ test('the hero chevron is a working link; no node, line or label is drawn throug
     await page.waitForTimeout(1100);
     const at = await page.evaluate(() => ({ y: scrollY, resume: document.getElementById('resume').getBoundingClientRect().top + scrollY }));
     assert.ok(Math.abs(at.y - (at.resume - 60)) <= 2, `the chevron should scroll to Resume (${at.resume - 60}), stopped at ${at.y}`);
+    await page.close();
+  }
+});
+
+test('after a resize that makes the chevron appear or move, no label sits on it and "POS" stays readable', async () => {
+  // one resize per load: the chevron appears at 993px; the hero's height settles after its width
+  for (const [from, to] of [[[992, 700], [993, 700]], [[900, 800], [1024, 800]], [[1024, 1366], [1000, 1220]], [[1024, 768], [1000, 600]]]) {
+    const { page, errors } = await ctx.openPage({ viewport: { width: from[0], height: from[1] } });
+    await page.waitForTimeout(2500);
+    await page.setViewportSize({ width: to[0], height: to[1] });
+    await page.waitForTimeout(1500);
+    let inked = 0, covered = 0, posLow = 1;
+    for (let i = 0; i < 25; i++) {
+      const look = await page.evaluate(() => {
+        const el = document.querySelector('.hero-scroll-hint');
+        const hint = el.getBoundingClientRect(), g = el.querySelector('svg').getBoundingClientRect();
+        const c = document.querySelector('#hero-net'), cr = c.getBoundingClientRect(), k = c.width / cr.width;
+        const d = c.getContext('2d').getImageData(Math.floor((g.left - cr.left) * k), Math.floor((g.top - 10 - cr.top) * k),
+          Math.ceil(g.width * k), Math.ceil((g.height + 20) * k)).data;
+        let n = 0;
+        for (let p = 3; p < d.length; p += 4) if (d[p] > 8) n++;
+        let on = 0, pos = 1;
+        document.querySelectorAll('.hero-net-label').forEach((l) => {
+          const op = +getComputedStyle(l).opacity, r = l.getBoundingClientRect();
+          if (l.textContent === 'POS') pos = op;
+          if (op > 0.05 && r.right > hint.left && r.left < hint.right && r.bottom > hint.top && r.top < hint.bottom) on++;
+        });
+        return { shown: hint.width > 0, ink: n > 0 ? 1 : 0, on, pos };
+      });
+      assert.ok(look.shown, `the chevron should be on screen at ${to[0]}px`);
+      inked += look.ink; covered += look.on; posLow = Math.min(posLow, look.pos);
+      await page.waitForTimeout(120);
+    }
+    const step = `${from.join('x')} -> ${to.join('x')}`;
+    assert.equal(inked, 0, `${step}: the constellation was drawn through the chevron in ${inked} of 25 looks`);
+    assert.equal(covered, 0, `${step}: a label sat on the chevron in ${covered} of 25 looks`);
+    assert.ok(posLow >= 0.9, `${step}: the "POS" label faded to ${posLow.toFixed(2)}`);
+    assert.deepEqual(errors, [], `${step}: script errors`);
     await page.close();
   }
 });
