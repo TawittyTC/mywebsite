@@ -115,8 +115,12 @@
   if (typedEl) {
     const items = typedEl.getAttribute("data-typed-items").split(",").map(s => s.trim());
     let i = 0, j = 0, deleting = false;
+    // the words before the role: "I'm a " in the markup, "I'm an " before a vowel
+    const lead = typedEl.previousSibling && typedEl.previousSibling.nodeType === 3 ? typedEl.previousSibling : null;
     function typeTick() {
       const cur = items[i];
+      // the article follows the role, and changes while nothing is typed
+      if (lead && j === 0 && !deleting) lead.nodeValue = lead.nodeValue.replace(/\ban? $/, /^[aeiou]/i.test(cur) ? "an " : "a ");
       typedEl.textContent = cur.slice(0, j);
       if (!deleting) {
         j++;
