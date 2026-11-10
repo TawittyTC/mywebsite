@@ -41,6 +41,11 @@
     if (!element) return;
     let start = window.scrollY;
     let target = element.getBoundingClientRect().top + window.scrollY - 60;
+    // a visitor who asked for less motion is taken there without the glide
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      window.scrollTo(0, target);
+      return;
+    }
     let startTime = null;
     const ease = (t) => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
     const step = (timestamp) => {
@@ -1623,7 +1628,39 @@ document.addEventListener('DOMContentLoaded', function () {
   // block and vanish just before touching it.
   var copyEl = hero.querySelector('.hero-copy');
   var copyRect = null;
+  // The scroll chevron gets the same protection, so no node or line is
+  // drawn through it. Offset geometry again: `left` is the hero's centre
+  // line (the CSS centres the box with a transform) and the bounce carries
+  // it 10px down. No box while the chevron is hidden (992px and below).
+  var hintEl = hero.querySelector('.hero-scroll-hint');
+  var hintRect = null;
+  function updateHintRect() {
+    hintRect = null;
+    if (!hintEl || !hintEl.offsetWidth || hintEl.offsetParent !== hero) return;
+    var half = hintEl.offsetWidth / 2;
+    hintRect = {
+      x0: hintEl.offsetLeft - half, y0: hintEl.offsetTop,
+      x1: hintEl.offsetLeft + half, y1: hintEl.offsetTop + hintEl.offsetHeight + 10
+    };
+  }
+  // 1 = clear of the chevron, 0 = on it; the fade runs over the last 40px
+  function hintFade(x, y) {
+    if (!hintRect) return 1;
+    var dx = Math.max(hintRect.x0 - x, 0, x - hintRect.x1);
+    var dy = Math.max(hintRect.y0 - y, 0, y - hintRect.y1);
+    return Math.max(0, Math.min(1, (Math.sqrt(dx * dx + dy * dy) - 2) / 40));
+  }
+  // A line between two clear nodes can still cross the chevron: fade it by
+  // the point of the line that comes closest.
+  function lineFade(ax, ay, bx, by) {
+    if (!hintRect) return 1;
+    var cx = (hintRect.x0 + hintRect.x1) / 2, cy = (hintRect.y0 + hintRect.y1) / 2;
+    var vx = bx - ax, vy = by - ay, len2 = vx * vx + vy * vy;
+    var t = len2 ? Math.max(0, Math.min(1, ((cx - ax) * vx + (cy - ay) * vy) / len2)) : 0;
+    return hintFade(ax + vx * t, ay + vy * t);
+  }
   function updateCopyRect() {
+    updateHintRect();
     if (!copyEl) { copyRect = null; return; }
     // Use untransformed offset geometry. getBoundingClientRect bakes in
     // the scroll-parallax translate — when an in-app browser fires
@@ -1648,13 +1685,13 @@ document.addEventListener('DOMContentLoaded', function () {
   // use a shorter ramp — the strips above/beside the copy are narrow,
   // and the long desktop ramp would swallow them entirely.
   function fadeAt(x, y) {
-    if (!copyRect) return 1;
+    if (!copyRect) return hintFade(x, y);
     var dx = Math.max(copyRect.x0 - x, 0, x - copyRect.x1);
     var dy = Math.max(copyRect.y0 - y, 0, y - copyRect.y1);
     var d = Math.sqrt(dx * dx + dy * dy);
     var m = isMobile() ? 26 : 30;
     var ramp = isMobile() ? 84 : 130;
-    return Math.max(0, Math.min(1, (d - m) / ramp));
+    return Math.min(hintFade(x, y), Math.max(0, Math.min(1, (d - m) / ramp)));
   }
 
   function resize() {
@@ -1865,7 +1902,9 @@ document.addEventListener('DOMContentLoaded', function () {
         var d2 = dx * dx + dy * dy;
         if (d2 < CONNECT * CONNECT) {
           var d = Math.sqrt(d2);
-          ctx.strokeStyle = rgba(colorForX((ax + bx) / 2), (1 - d / CONNECT) * 0.3 * lf);
+          var lk = lineFade(ax, ay, bx, by);
+          if (lk <= 0.02) continue;
+          ctx.strokeStyle = rgba(colorForX((ax + bx) / 2), (1 - d / CONNECT) * 0.3 * lf * lk);
           ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by); ctx.stroke();
         }
       }
@@ -1873,7 +1912,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var dxc = ax - mouse.x, dyc = ay - mouse.y;
         var dc2 = dxc * dxc + dyc * dyc;
         if (dc2 < CONNECT * CONNECT) {
-          ctx.strokeStyle = rgba(colorForX(ax), (1 - Math.sqrt(dc2) / CONNECT) * 0.16 * na.f);
+          ctx.strokeStyle = rgba(colorForX(ax), (1 - Math.sqrt(dc2) / CONNECT) * 0.16 * na.f * lineFade(mouse.x, mouse.y, ax, ay));
           ctx.beginPath(); ctx.moveTo(mouse.x, mouse.y); ctx.lineTo(ax, ay); ctx.stroke();
         }
       }
@@ -1890,7 +1929,8 @@ document.addEventListener('DOMContentLoaded', function () {
       if (dd < best) { best = dd; nearest = nk; }
     }
     if (nearest) {
-      var breathe = 0.08 + 0.08 * (0.5 + 0.5 * Math.sin(time * 0.9));
+      var breathe = (0.08 + 0.08 * (0.5 + 0.5 * Math.sin(time * 0.9))) *
+        lineFade(anchor.x, anchor.y, nearest.x + nearest.px, nearest.y + nearest.py);
       var g = ctx.createLinearGradient(anchor.x, anchor.y, nearest.x + nearest.px, nearest.y + nearest.py);
       g.addColorStop(0, rgba(WARM2, breathe));
       g.addColorStop(1, rgba(COOL, breathe));

@@ -102,16 +102,21 @@ a:hover {
 }
 
 
+/* The chevron is a link to the next section. It stays where it was, 80px
+   up: the 11px of padding only widens what a pointer can hit (44x50). */
 .hero-scroll-hint {
   position: absolute;
-  bottom: 80px;
+  bottom: 69px;
   left: 50%;
   transform: translateX(-50%);
+  padding: 11px;
   color: var(--color-text);
   opacity: 0.6;
   animation: hero-bounce 2.2s ease-in-out infinite;
-  pointer-events: none;
+  transition: opacity .2s ease;
 }
+.hero-scroll-hint:hover,
+.hero-scroll-hint:focus-visible { color: var(--color-text); opacity: 1; }
 @keyframes hero-bounce {
   0%, 100% { transform: translateX(-50%) translateY(0); }
   50% { transform: translateX(-50%) translateY(10px); }
