@@ -110,12 +110,14 @@ a:hover {
   left: 50%;
   transform: translateX(-50%);
   padding: 11px;
+  z-index: 3;   /* above the copy grid, whose box reaches it in a short window */
   color: var(--color-text);
   opacity: 0.6;
   animation: hero-bounce 2.2s ease-in-out infinite;
   transition: opacity .2s ease;
 }
-.hero-scroll-hint:hover,
+/* two rules, not a list: a browser without :focus-visible drops a whole list */
+.hero-scroll-hint:hover { color: var(--color-text); opacity: 1; }
 .hero-scroll-hint:focus-visible { color: var(--color-text); opacity: 1; }
 @keyframes hero-bounce {
   0%, 100% { transform: translateX(-50%) translateY(0); }
