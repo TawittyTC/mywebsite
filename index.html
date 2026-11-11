@@ -383,8 +383,11 @@
         justify-content: flex-start !important
       }
 
+      /* (auto at the sides: "margin: 0" pinned the column to the left edge
+         wherever it is narrower than the screen, so from 576 to 992px the
+         centred copy sat up to 136px left of centre) */
       #hero .hero-grid {
-        margin: 0;
+        margin: 0 auto;
         padding-top: calc(48px + 9vh)
       }
 
