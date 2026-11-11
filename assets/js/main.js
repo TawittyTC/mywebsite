@@ -1053,8 +1053,12 @@ function createCardScroller(scroller, options) {
       if (rowVisible) hintInterval = setInterval(runHint, 3000);
     };
 
-    var onUserScroll = function () {
-      if (isAnimating) return;
+    var onUserScroll = function (e) {
+      // The nudge's own scroll events are not the visitor's. A finger or a
+      // wheel always is: it takes the row even while a nudge is under way,
+      // and the nudge stops where it is on its next frame (it used to run on
+      // and slide the row back under the finger).
+      if (isAnimating && (!e || e.type === 'scroll')) return;
       userScrolling = true;
       clearInterval(hintInterval);
       hintInterval = null;
@@ -1066,6 +1070,7 @@ function createCardScroller(scroller, options) {
     };
 
     scroller.addEventListener('touchstart', onUserScroll, { passive: true });
+    scroller.addEventListener('wheel', onUserScroll, { passive: true });
     scroller.addEventListener('scroll', onUserScroll, { passive: true });
     // a keyboard user moving through the row stops the hint at once
     scroller.addEventListener('focusin', function () { isAnimating = false; onUserScroll(); });
