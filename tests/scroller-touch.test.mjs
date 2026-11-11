@@ -95,11 +95,20 @@ test('a finger that lands during the nudge gets the row at once, and a drag move
 test('the nudge comes back after the visitor lets the row be, and a row at rest follows a drag', async () => {
   const { page } = await ctx.openPage(phone);
   const at = await rowInView(page, '#scroller');
-  // let the first nudge pass, then take the row while it rests
-  await page.waitForTimeout(800);
+  // let the first nudge pass: the row has not moved for 300ms
+  await page.$eval('#scroller', (el) => new Promise((resolve) => {
+    let last = el.scrollLeft, since = performance.now();
+    (function tick() {
+      if (el.scrollLeft !== last) { last = el.scrollLeft; since = performance.now(); }
+      if (performance.now() - since >= 300) return resolve();
+      requestAnimationFrame(tick);
+    })();
+  }));
   const f = await finger(page);
-  const from = await page.$eval('#scroller', (el) => el.scrollLeft);
   await f.down(at.x, at.y);
+  await page.waitForTimeout(100);
+  // measured from where the finger holds the row
+  const from = await page.$eval('#scroller', (el) => el.scrollLeft);
   await drag(page, f, at, 150);
   await f.up();
   await page.waitForTimeout(400);
