@@ -386,7 +386,8 @@ test('Resume sub-headings sit on the stylesheet\'s own margins', async () => {
 });
 
 test('the hero chevron is a working link; no node, line or label is drawn through it and the label seeded on it stays readable', async () => {
-  // 993 and 1024 are the compact layout, where a labelled node ("POS") is seeded on the chevron's spot
+  // 993 and 1024 are the narrowest screens that show the chevron. (Until v2.65 the compact graph
+  // stayed up to 1024px and seeded the labelled node "POS" on the chevron's spot.)
   for (const [width, height] of [[993, 700], [1024, 768], [1440, 900]]) {
     const { page } = await ctx.openPage({ viewport: { width, height } });
     await page.waitForTimeout(3000);   // the intro burst is over, the keep-out is in force

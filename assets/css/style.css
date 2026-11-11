@@ -863,7 +863,7 @@ button {
   content: "";
   position: absolute;
   left: -12%;
-  top: 50%;
+  top: calc(50% - 38px);   /* behind the name: the actions row added 76px below it */
   transform: translateY(-50%);
   width: 640px;
   height: 640px;

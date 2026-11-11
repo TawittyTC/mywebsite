@@ -342,6 +342,43 @@
       background: var(--color-link)
     }
 
+    /* The two actions under the role line: the closing section's pair
+       ("Get in touch" + "Download CV"), at the same size. Everything that
+       sets their box is here, because the constellation measures the copy
+       block before style.css applies; the pill's colour, the link's blue
+       and the chevron's shape come from .btn-pill and .more there. */
+    #hero .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 16px 32px;
+      margin-top: 32px
+    }
+
+    #hero .hero-actions .btn-pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      padding: 12px 22px;
+      font-size: 1rem;
+      font-weight: 400;
+      letter-spacing: -0.022em;
+      line-height: 1.17648
+    }
+
+    #hero .hero-actions .more {
+      padding: 8px 0;
+      font-size: 1rem;
+      font-weight: 400;
+      letter-spacing: -0.022em
+    }
+
+    #hero .hero-actions .chev {
+      display: inline-block;
+      width: .42em;
+      margin-left: .28em
+    }
+
     #hero-net,
     #hero-net-labels {
       position: absolute;
@@ -402,6 +439,12 @@
         margin-bottom: 14px
       }
 
+      #hero .hero-actions {
+        justify-content: center;
+        gap: 8px 28px;
+        margin-top: 24px
+      }
+
       #hero h1.hero-name {
         font-size: clamp(2.2353rem, 10.5vw, 2.8235rem);
         line-height: 1.12
@@ -423,6 +466,12 @@
     @media (max-width: 735px) {
       section {
         padding: 128px 0
+      }
+    }
+
+    @media (max-width: 340px) {
+      #hero .hero-actions {
+        gap: 8px 12px
       }
     }
 
@@ -569,6 +618,10 @@
 
     #hero p {
       animation: heroFadeIn 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
+    }
+
+    #hero .hero-actions {
+      animation: heroFadeIn 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.55s both;
     }
 
     /* Experience expand/collapse */
@@ -2030,6 +2083,11 @@
           <p class="hero-role">I'm a <span class="typed"
               data-typed-items="Full-Stack Developer, AI Engineer, Software Engineer"></span>
           </p>
+          <div class="hero-actions">
+            <a class="btn-pill scrollto" href="#portfolio">View projects</a>
+            <a class="more" href="assets/cv/Tanapol-Chamnanhan-CV.pdf" download>Download CV<span class="chev"
+                aria-hidden="true"></span></a>
+          </div>
         </div>
       </div>
 
