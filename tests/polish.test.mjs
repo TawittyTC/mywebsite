@@ -170,7 +170,11 @@ test('every client logo in the Protollcall sheet is one of the site\'s own files
       }
       return out;
     });
-    assert.equal(rows.length, 22, 'expected the 22 client logos');
+    assert.equal(rows.length, 31, 'expected the 31 client logos');
+    // every client whose logo the site has shows it; three have no file anywhere
+    const bare = await page.$$eval('.exp-lightbox .exp-client-section', (secs) => secs
+      .filter((sec) => !sec.querySelector('.exp-client-section-header img')).map((sec) => sec.dataset.client).sort());
+    assert.deepEqual(bare, ['ame', 'maneydaeng', 'merich24'], 'only the clients with no logo file go without one');
     for (const l of rows) {
       const at = `${l.client} at ${viewport.width}px`;
       assert.match(l.src, /^assets\/img\/clients\/[\w-]+\.webp$/, `logo is not a local file: ${l.src}`);
@@ -186,7 +190,7 @@ test('every client logo in the Protollcall sheet is one of the site\'s own files
       assert.equal(l.tagBesideName, l.tagBesideNameWithoutLogo, `${at}: the logo moved the tag off (or onto) the name's row`);
     }
     // two files carry a white ground of their own; on the grey card it must not show as a box
-    for (const c of ['kijsiri', 'mediviss']) {
+    for (const c of ['kijsiri', 'mediviss', 'ishopping']) {
       assert.equal(rows.find((l) => l.client === c).blend, 'multiply', `${c}: the logo's white ground shows on the grey card`);
     }
     assert.deepEqual(failed, [], 'no request may fail while the sheet is open');
