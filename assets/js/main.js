@@ -1029,6 +1029,21 @@ function createCardScroller(scroller, options) {
     var easeInOut = function (t) {
       return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
     };
+    // Where the nudge under way set out from, and the glide that takes the
+    // row home when a finger only passed over it (see release below).
+    var nudgeFrom = 0, settleRaf = 0, resume = null;
+    // The last write of a nudge fires its scroll event on the next frame.
+    // That event is still the nudge's, so the flag drops a frame later:
+    // read as the visitor's, it now and then paused the nudging for 13s.
+    var endNudge = function () {
+      requestAnimationFrame(function () { isAnimating = false; });
+    };
+    var stopSettle = function () {
+      if (!settleRaf) return;
+      cancelAnimationFrame(settleRaf);
+      settleRaf = 0;
+      isAnimating = false;
+    };
 
     var runHint = function () {
       if (userScrolling || isAnimating) return;
@@ -1037,6 +1052,7 @@ function createCardScroller(scroller, options) {
       var dir = atRightEnd ? -1 : 1;
       isAnimating = true;
       var baseScroll = scroller.scrollLeft;
+      nudgeFrom = baseScroll;
       var fwdStart = performance.now();
       function forward(ts) {
         if (userScrolling) { isAnimating = false; return; }
@@ -1049,7 +1065,7 @@ function createCardScroller(scroller, options) {
           var p2 = Math.min((ts2 - bkStart) / duration, 1);
           scroller.scrollLeft = baseScroll + dir * hintDistance * (1 - easeInOut(p2));
           if (p2 < 1) { requestAnimationFrame(back); return; }
-          isAnimating = false;
+          endNudge();
         }
         requestAnimationFrame(back);
       }
@@ -1080,11 +1096,38 @@ function createCardScroller(scroller, options) {
       }, 10000);
     };
 
-    scroller.addEventListener('touchstart', onUserScroll, { passive: true });
-    scroller.addEventListener('wheel', onUserScroll, { passive: true });
+    scroller.addEventListener('touchstart', function (e) {
+      stopSettle();
+      // a finger landing mid-nudge: remember where the nudge set out from
+      resume = isAnimating ? { to: nudgeFrom, left: scroller.scrollLeft } : null;
+      onUserScroll(e);
+    }, { passive: true });
+    // If that finger never moved the row (it was scrolling the page up or
+    // down), the row is not left part way: it finishes the nudge's way home.
+    var release = function () {
+      var r = resume;
+      resume = null;
+      if (!r || Math.abs(scroller.scrollLeft - r.left) > 2) return;
+      var from = scroller.scrollLeft, t0 = performance.now();
+      isAnimating = true;
+      settleRaf = requestAnimationFrame(function step(ts) {
+        var p = Math.max(0, Math.min((ts - t0) / duration, 1));
+        scroller.scrollLeft = from + (r.to - from) * easeInOut(p);
+        if (p < 1) { settleRaf = requestAnimationFrame(step); return; }
+        settleRaf = 0;
+        endNudge();
+      });
+    };
+    scroller.addEventListener('touchend', release, { passive: true });
+    scroller.addEventListener('touchcancel', release, { passive: true });
+    // a wheel counts when it moves the row sideways; one that scrolls the page
+    // up or down with the pointer over the row leaves the nudge to finish
+    scroller.addEventListener('wheel', function (e) {
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY) || e.shiftKey) { stopSettle(); onUserScroll(e); }
+    }, { passive: true });
     scroller.addEventListener('scroll', onUserScroll, { passive: true });
     // a keyboard user moving through the row stops the hint at once
-    scroller.addEventListener('focusin', function () { isAnimating = false; onUserScroll(); });
+    scroller.addEventListener('focusin', function () { stopSettle(); isAnimating = false; onUserScroll(); });
 
     var hintStarted = false;
     var firstCall = true;
@@ -1930,10 +1973,16 @@ document.addEventListener('DOMContentLoaded', function () {
     afterPaint(function () { updateCopyRect(); resize(); });
   }, { passive: true });
   // web fonts can reflow the copy block after first paint (asking for
-  // fonts.ready lays out the page, so that waits for the first paint too)
+  // fonts.ready lays out the page, so that waits for the first paint too);
+  // on a phone the labels' band starts under the copy, so they move with it
+  function refitCopy() {
+    var was = copyRect ? copyRect.y1 : null;
+    updateCopyRect();
+    if (nodes.length && copyRect && copyRect.y1 !== was) { placeSpecials(); clearHint(); }
+  }
   if (document.fonts && 'ready' in document.fonts) {
     afterPaint(function () {
-      document.fonts.ready.then(function () { afterPaint(updateCopyRect); });
+      document.fonts.ready.then(function () { afterPaint(refitCopy); });
     });
   }
   // iOS/WKWebView can purge a canvas backing store while the page is

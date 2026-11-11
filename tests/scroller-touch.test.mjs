@@ -64,11 +64,13 @@ test('a finger that lands during the nudge gets the row at once, and a drag move
         const now = el.scrollLeft;
         if (now !== last && now > 10 && now < 70) return resolve(now);
         last = now;
-        if (performance.now() - t0 > 8000) return resolve(null);
+        // the first nudge runs as the row comes into view; the next within 3s, or 13s after
+        // anything that counted as the visitor's
+        if (performance.now() - t0 > 17000) return resolve(null);
         requestAnimationFrame(tick);
       })();
     }));
-    assert.ok(caught !== null, `${sel}: no nudge seen within 8s`);
+    assert.ok(caught !== null, `${sel}: no nudge seen within 17s`);
 
     const f = await finger(page);
     await f.down(at.x, at.y);
@@ -88,6 +90,50 @@ test('a finger that lands during the nudge gets the row at once, and a drag move
     // the visitor has the row: no nudge for a good while (the next would be due in 3s)
     const quiet = await watch(page, sel, 4500);
     assert.ok(Math.max(...quiet) - Math.min(...quiet) <= 1, `${sel}: the row nudged again within 4.5s of a drag`);
+    await page.close();
+  }
+});
+
+// waits for a nudge on the row to be part way out; returns where the row was before it
+const midNudge = (page, sel) => page.$eval(sel, (el) => new Promise((resolve) => {
+  const t0 = performance.now(), start = el.scrollLeft;
+  let last = start;
+  (function tick() {
+    const now = el.scrollLeft;
+    if (now !== last && Math.abs(now - start) > 10 && Math.abs(now - start) < 70) return resolve(start);
+    last = now;
+    if (performance.now() - t0 > 17000) return resolve(null);
+    requestAnimationFrame(tick);
+  })();
+}));
+
+test('a page scrolled up or down over a row during the nudge does not leave the row part way', async () => {
+  // a finger that lands on the row to scroll the PAGE: the row finishes the nudge's way home
+  {
+    const { page } = await ctx.openPage(phone);
+    const at = await rowInView(page, '#scroller');
+    const start = await midNudge(page, '#scroller');
+    assert.ok(start !== null, 'no nudge seen within 17s');
+    const f = await finger(page);
+    await f.down(at.x, at.y);
+    for (let i = 1; i <= 10; i++) { await f.move(at.x, at.y - 20 * i); await page.waitForTimeout(16); }
+    await f.up();
+    await page.waitForTimeout(900);
+    const left = await page.$eval('#scroller', (el) => el.scrollLeft);
+    assert.ok(Math.abs(left - start) <= 1, `after a vertical swipe the row rests at ${left}px, ${left - start}px off where the nudge set out`);
+    await page.close();
+  }
+  // a mouse wheel scrolling the page with the pointer over the row (the rows nudge up to 1024px wide)
+  {
+    const { page } = await ctx.openPage({ viewport: { width: 1000, height: 800 }, serviceWorkers: 'block' });
+    const at = await rowInView(page, '#scroller');
+    await page.mouse.move(at.x, at.y);
+    const start = await midNudge(page, '#scroller');
+    assert.ok(start !== null, 'no nudge seen within 17s');
+    await page.mouse.wheel(0, 60);
+    await page.waitForTimeout(900);
+    const left = await page.$eval('#scroller', (el) => el.scrollLeft);
+    assert.ok(Math.abs(left - start) <= 1, `after a vertical wheel the row rests at ${left}px, ${left - start}px off where the nudge set out`);
     await page.close();
   }
 });
