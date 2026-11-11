@@ -863,7 +863,7 @@ button {
   content: "";
   position: absolute;
   left: -12%;
-  top: 50%;
+  top: calc(50% - 38px);   /* behind the name: the actions row added 76px below it */
   transform: translateY(-50%);
   width: 640px;
   height: 640px;
@@ -881,9 +881,9 @@ button {
      the constellation owns the lower half.
      !important needed to beat Bootstrap's .justify-content-center */
   #hero { justify-content: flex-start !important; }
-  #hero .hero-grid { margin: 0; padding-top: calc(48px + 9vh); }
+  #hero .hero-grid { margin: 0 auto; padding-top: calc(48px + 9vh); }
   #hero .hero-copy { text-align: center; margin: 0 auto; }
-  #hero .hero-copy::before { left: 50%; transform: translate(-50%, -50%); width: 480px; height: 480px; }
+  #hero .hero-copy::before { left: 50%; top: calc(50% - 34px); transform: translate(-50%, -50%); width: 480px; height: 480px; }
   #hero .hero-eyebrow { font-size: 0.6471rem; letter-spacing: 0.1em; margin-bottom: 14px; }
   #hero h1.hero-name { font-size: clamp(2.2353rem, 10.5vw, 2.8235rem); line-height: 1.12; }
   .hero-net-label { font-size: 0.5294rem; }

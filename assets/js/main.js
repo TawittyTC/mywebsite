@@ -160,6 +160,17 @@ function afterPaint(fn) {
 }
 
 /**
+ * Card text copied into the See-all list or the viewer's caption, as HTML:
+ * escaped first, then each hyphenated compound ("Covid-19") wrapped in .nw,
+ * so it keeps to one line there as it does on the card.
+ */
+function nwHtml(t) {
+  var d = document.createElement("div");
+  d.textContent = t;
+  return d.innerHTML.replace(/[^\W_]+(?:-[^\W_]+)+/g, '<span class="nw">$&</span>');
+}
+
+/**
  * Two-parameter spring, the way Apple frames it: `response` is roughly how
  * long the value takes to arrive, `damping` 1 lands it without overshoot.
  * It integrates from whatever is on screen at this instant, so re-aiming
@@ -342,7 +353,7 @@ var overlayHistory = (function () {
     const turn = ++showing;
     lbImg.style.width = lbImg.style.height = "";
     lbImg.alt = alt;
-    caption.textContent = title || "";
+    caption.innerHTML = nwHtml(title || "");
     caption.hidden = !title;
     // A wide screenshot on a portrait phone would shrink to a strip too
     // small to read: show it tall enough to read and let it pan sideways
@@ -360,7 +371,7 @@ var overlayHistory = (function () {
       frame.removeAttribute("tabindex");
       frame.removeAttribute("aria-label");
     }
-    if (pan) caption.textContent = (title ? title + " · " : "") + "Swipe to see the whole screen";
+    if (pan) caption.innerHTML = nwHtml((title ? title + " · " : "") + "Swipe to see the whole screen");
     if (pan) caption.hidden = false;
     // A tile that shows a small copy names the full picture's size: the
     // viewer opens on that copy, already at the final size, and the full
@@ -785,13 +796,13 @@ document.addEventListener("DOMContentLoaded", function () {
       if (!logos[g] && c.getAttribute("data-logo")) logos[g] = [c.getAttribute("data-logo"), (c.getAttribute("data-logo-size") || "").split("x")];
       groups[g].push('<li><button type="button" class="proj-row" data-i="' + i + '" aria-describedby="pg' + order.indexOf(g) + '"><span class="proj-well" aria-hidden="true">' +
         (icon ? icon.outerHTML : '<img src="' + esc(img.getAttribute("src")) + '" alt="">') +
-        '</span><span class="proj-text"><span class="proj-name">' + esc(k > 0 ? t.slice(0, k) : t) + "</span>" +
+        '</span><span class="proj-text"><span class="proj-name">' + nwHtml(k > 0 ? t.slice(0, k) : t) + "</span>" +
         (kind ? ' <span class="proj-kind"><span class="nw">' + esc(kind) + "</span></span>" : "") +
         '</span><span class="chev" aria-hidden="true"></span></button></li>');
     });
     return '<div class="exp-modal-header"><h2 class="exp-modal-title">All projects</h2><div class="exp-modal-company">' +
       cards.length + " projects</div></div>" + order.map(function (g, j) {
-        return '<div class="proj-group"><h3 id="pg' + j + '"><span>' + esc(g) + '</span>' +
+        return '<div class="proj-group"><h3 id="pg' + j + '"><span>' + nwHtml(g) + '</span>' +
           (logos[g] ? '<img class="proj-logo" srcset="' + esc(logos[g][0]) + ' 3x" width="' + esc(logos[g][1][0] || "") +
             '" height="' + esc(logos[g][1][1] || "") + '" alt="" loading="lazy" decoding="async">' : '') + '</h3><ul class="proj-rows">' + groups[g].join("") + "</ul></div>";
       }).join("");
@@ -1018,6 +1029,21 @@ function createCardScroller(scroller, options) {
     var easeInOut = function (t) {
       return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
     };
+    // Where the nudge under way set out from, and the glide that takes the
+    // row home when a finger only passed over it (see release below).
+    var nudgeFrom = 0, settleRaf = 0, resume = null;
+    // The last write of a nudge fires its scroll event on the next frame.
+    // That event is still the nudge's, so the flag drops a frame later:
+    // read as the visitor's, it now and then paused the nudging for 13s.
+    var endNudge = function () {
+      requestAnimationFrame(function () { isAnimating = false; });
+    };
+    var stopSettle = function () {
+      if (!settleRaf) return;
+      cancelAnimationFrame(settleRaf);
+      settleRaf = 0;
+      isAnimating = false;
+    };
 
     var runHint = function () {
       if (userScrolling || isAnimating) return;
@@ -1026,6 +1052,7 @@ function createCardScroller(scroller, options) {
       var dir = atRightEnd ? -1 : 1;
       isAnimating = true;
       var baseScroll = scroller.scrollLeft;
+      nudgeFrom = baseScroll;
       var fwdStart = performance.now();
       function forward(ts) {
         if (userScrolling) { isAnimating = false; return; }
@@ -1038,7 +1065,7 @@ function createCardScroller(scroller, options) {
           var p2 = Math.min((ts2 - bkStart) / duration, 1);
           scroller.scrollLeft = baseScroll + dir * hintDistance * (1 - easeInOut(p2));
           if (p2 < 1) { requestAnimationFrame(back); return; }
-          isAnimating = false;
+          endNudge();
         }
         requestAnimationFrame(back);
       }
@@ -1053,8 +1080,12 @@ function createCardScroller(scroller, options) {
       if (rowVisible) hintInterval = setInterval(runHint, 3000);
     };
 
-    var onUserScroll = function () {
-      if (isAnimating) return;
+    var onUserScroll = function (e) {
+      // The nudge's own scroll events are not the visitor's. A finger or a
+      // wheel always is: it takes the row even while a nudge is under way,
+      // and the nudge stops where it is on its next frame (it used to run on
+      // and slide the row back under the finger).
+      if (isAnimating && (!e || e.type === 'scroll')) return;
       userScrolling = true;
       clearInterval(hintInterval);
       hintInterval = null;
@@ -1065,10 +1096,38 @@ function createCardScroller(scroller, options) {
       }, 10000);
     };
 
-    scroller.addEventListener('touchstart', onUserScroll, { passive: true });
+    scroller.addEventListener('touchstart', function (e) {
+      stopSettle();
+      // a finger landing mid-nudge: remember where the nudge set out from
+      resume = isAnimating ? { to: nudgeFrom, left: scroller.scrollLeft } : null;
+      onUserScroll(e);
+    }, { passive: true });
+    // If that finger never moved the row (it was scrolling the page up or
+    // down), the row is not left part way: it finishes the nudge's way home.
+    var release = function () {
+      var r = resume;
+      resume = null;
+      if (!r || Math.abs(scroller.scrollLeft - r.left) > 2) return;
+      var from = scroller.scrollLeft, t0 = performance.now();
+      isAnimating = true;
+      settleRaf = requestAnimationFrame(function step(ts) {
+        var p = Math.max(0, Math.min((ts - t0) / duration, 1));
+        scroller.scrollLeft = from + (r.to - from) * easeInOut(p);
+        if (p < 1) { settleRaf = requestAnimationFrame(step); return; }
+        settleRaf = 0;
+        endNudge();
+      });
+    };
+    scroller.addEventListener('touchend', release, { passive: true });
+    scroller.addEventListener('touchcancel', release, { passive: true });
+    // a wheel counts when it moves the row sideways; one that scrolls the page
+    // up or down with the pointer over the row leaves the nudge to finish
+    scroller.addEventListener('wheel', function (e) {
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY) || e.shiftKey) { stopSettle(); onUserScroll(e); }
+    }, { passive: true });
     scroller.addEventListener('scroll', onUserScroll, { passive: true });
     // a keyboard user moving through the row stops the hint at once
-    scroller.addEventListener('focusin', function () { isAnimating = false; onUserScroll(); });
+    scroller.addEventListener('focusin', function () { stopSettle(); isAnimating = false; onUserScroll(); });
 
     var hintStarted = false;
     var firstCall = true;
@@ -1409,14 +1468,41 @@ document.addEventListener('DOMContentLoaded', function () {
   // scroll position here would lay out the whole page mid-script)
   var lastY = 0, upFrom = null;
   var ticking = false;
+  // ...and there it leaves again two seconds after the scrolling stops: it
+  // sits in the column of every round control (the row paddles, the "+" of a
+  // card or a question), and left over them it takes their taps. The count
+  // starts again with every scroll update, so momentum keeps it up.
+  var leaveT = 0, held = false;
+  function leave() {
+    leaveT = 0;
+    if (held) return; // a finger is on it: the release starts the count again
+    upFrom = null;    // only a new upward scroll brings it back, no resize
+    toTop.classList.remove('visible');
+  }
+  function count(on) {
+    clearTimeout(leaveT);
+    leaveT = on ? setTimeout(leave, 2000) : 0;
+  }
+  // A turned phone moves the page with no finger on it: the text reflows,
+  // then the hero is pinned again 150ms after the last resize. For a second
+  // after the layout width changes, that movement is nobody scrolling up.
+  var wide = 0, turned = 0;
   function update() {
     ticking = false;
     var y = window.scrollY || 0;
     var show = y > window.innerHeight * 0.9;
     if (touch) {
-      if (y < lastY - 2) { if (upFrom === null) upFrom = lastY; }
+      var w = document.documentElement.clientWidth, now = performance.now();
+      if (wide && w !== wide) turned = now;
+      wide = w;
+      if (turned && now - turned < 1000) {
+        // one already showing keeps its place; nothing new comes out
+        upFrom = toTop.classList.contains('visible') ? upFrom + y - lastY : null;
+      }
+      else if (y < lastY - 2) { if (upFrom === null) upFrom = lastY; }
       else if (y > lastY + 2) upFrom = null;
       show = show && upFrom !== null && upFrom - y > 30;
+      count(show);
     }
     lastY = y;
     toTop.classList.toggle('visible', show);
@@ -1428,6 +1514,19 @@ document.addEventListener('DOMContentLoaded', function () {
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', onScroll, { passive: true });
   afterPaint(update); // hidden at the top of the page; measured once painted
+
+  if (touch) {
+    // it never leaves from under a finger (a keyboard or switch user's focus
+    // keeps it in sight through the :focus-visible rule in the stylesheet)
+    toTop.addEventListener('pointerdown', function () { held = true; }, { passive: true });
+    ['pointerup', 'pointercancel'].forEach(function (type) {
+      window.addEventListener(type, function () {
+        if (!held) return;
+        held = false;
+        if (toTop.classList.contains('visible')) count(true);
+      }, { passive: true });
+    });
+  }
 
   toTop.addEventListener('click', function () {
     window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
@@ -1464,9 +1563,14 @@ document.addEventListener('DOMContentLoaded', function () {
     return { r: Math.round(lerp(c1.r, c2.r, t)), g: Math.round(lerp(c1.g, c2.g, t)), b: Math.round(lerp(c1.b, c2.b, t)) };
   }
   function rgba(c, a) { return 'rgba(' + c.r + ',' + c.g + ',' + c.b + ',' + a + ')'; }
-  // "compact" layout — phones AND iPads (≤1024px) get the graph
-  // surrounding the copy; past iPad it's the desktop right-side field
-  function isMobile() { return W < 1025; }
+  // "compact" layout: the graph surrounds a centred copy block. It follows
+  // the stylesheet's own breakpoint (the copy is centred at 992px and
+  // below). From 993px the copy sits on the left and the graph takes the
+  // field to its right; at 993 to 1024px the compact graph used to stay,
+  // with two of its labels hidden behind that left-hand copy.
+  var compactMq = window.matchMedia ? window.matchMedia('(max-width: 992px)') : null;
+  var compact = compactMq ? compactMq.matches : true;
+  function isMobile() { return compact; }
   // warm on one side of the cluster blending to cool on the other
   function colorForX(x) {
     var b = frameBounds || bounds();
@@ -1509,8 +1613,10 @@ document.addEventListener('DOMContentLoaded', function () {
   });
   function clusterPoint() {
     // the blob forms dead-center BEHIND the name, then detonates out
-    if (copyRect) {
-      return { x: (copyRect.x0 + copyRect.x1) / 2, y: (copyRect.y0 + copyRect.y1) / 2 };
+    // (the name's own box: the copy block also holds the role and actions)
+    var nr = nameRect || copyRect;
+    if (nr) {
+      return { x: (nr.x0 + nr.x1) / 2, y: (nr.y0 + nr.y1) / 2 };
     }
     return isMobile() ? { x: W * 0.5, y: H * 0.34 } : { x: W * 0.24, y: H * 0.46 };
   }
@@ -1535,23 +1641,79 @@ document.addEventListener('DOMContentLoaded', function () {
     return isMobile() ? { x: W * 0.5, y: H * 0.55 } : { x: W * 0.36, y: H * 0.46 };
   }
 
+  // On a compact screen the labelled nodes live in a band BELOW the copy:
+  // anywhere else the keep-out fade would swallow their labels. The band
+  // was 55% to 92% of the hero. The copy now ends in two buttons, so the
+  // band starts a little under them (40 to 70px, more on a tall screen)
+  // and takes back at the bottom what it lost at the top, down to 4% from
+  // the edge. `k` says how much of its usual height is left (1 = all of
+  // it): on a short phone the ring opens up towards the band's edges and
+  // the nodes sway less, so the lower labels stay clear while the upper
+  // ones thin out towards the buttons.
+  function labelBand() {
+    var bh = layoutH || H, b = bounds();
+    var top = bh * 0.55, bot = bh * 0.92, full = bot - top;
+    var under = copyRect ? copyRect.y1 + Math.max(40, Math.min(70, bh * 0.075)) : 0;
+    if (under > top) {
+      bot = Math.min(bh * 0.96, bot + under - top);
+      top = Math.min(under, bot - 60);
+    }
+    return { x0: b.x0, x1: b.x1, y0: top, y1: bot, k: Math.max(0, Math.min(1, (bot - top) / full)) };
+  }
+  // (Re)place the six labelled nodes from the jitter each drew when it was
+  // made. Compact screens only: the desktop field is a fixed share of the
+  // hero, so those homes scale with it by themselves.
+  function placeSpecials() {
+    if (!isMobile()) return;
+    var sb = labelBand(), lw = layoutW || W, lh = layoutH || H;
+    var cx = (sb.x0 + sb.x1) / 2, cy = (sb.y0 + sb.y1) / 2;
+    var ry = (sb.y1 - sb.y0) * (0.32 + (1 - sb.k) * 0.2);
+    // The two nodes at each end of the ring share a column, one ring radius
+    // apart. In a short band that radius is small, so they sway less up
+    // and down (never sideways less) and their labels keep clear.
+    var vy = Math.max(0.15, Math.min(1, (ry - 16) / 90));
+    // A phone on its side has almost no room under the copy and plenty
+    // beside it: there the six stand three to a side, clear of the fade
+    // (110px from the copy) and of the edge (a label is about 47px long).
+    // On the smallest of them the columns may sit up to 20px into the fade.
+    var roomL = copyRect ? copyRect.x0 - 110 - sb.x0 : -99;
+    var roomR = copyRect ? sb.x1 - 47 - copyRect.x1 - 110 : -99;
+    var beside = sb.y1 - sb.y0 < 100 && roomL >= -40 && roomR >= -40;
+    for (var i = 0; i < nodes.length; i++) {
+      var n = nodes[i];
+      if (!n.special) continue;
+      if (beside) {
+        var left = i > 1 && i < 5, row = left ? 4 - i : (i + 1) % 6;
+        var room = left ? roomL : roomR;
+        n.fx = ((left ? sb.x0 + room / 2 : copyRect.x1 + 110 + room / 2) + n.jx * Math.max(0, Math.min(40, room))) / lw;
+        n.fy = (0.2 + row * 0.3) + n.jy * 40 / lh;
+        n.vy = 1;
+        continue;
+      }
+      var ang = (i / LABELS.length) * Math.PI * 2 + 0.5;
+      n.fx = (cx + Math.cos(ang) * (sb.x1 - sb.x0) * 0.3 + n.jx * 40) / lw;
+      n.fy = (cy + Math.sin(ang) * ry + n.jy * 40 * vy) / lh;
+      n.vy = vy;
+    }
+  }
+
   function makeNodes() {
     nodes = [];
     var b = bounds();
     var total = isMobile() ? 50 : 55;
+    // the compact field below the copy starts where the labels' band does
+    var band = isMobile() ? labelBand() : null;
     for (var i = 0; i < total; i++) {
       var special = i < LABELS.length;
-      var x, y;
+      var x, y, jx = 0, jy = 0;
       if (special) { // seed specials on a loose ring so labels spread out
-        // On mobile the labeled nodes stay in the band BELOW the copy —
-        // anywhere else the keep-out fade would swallow their labels.
-        var sb = isMobile()
-          ? { x0: b.x0, x1: b.x1, y0: (layoutH || H) * 0.55, y1: (layoutH || H) * 0.92 }
-          : b;
         var ang = (i / LABELS.length) * Math.PI * 2 + 0.5;
-        var cx = (sb.x0 + sb.x1) / 2, cy = (sb.y0 + sb.y1) / 2;
-        x = cx + Math.cos(ang) * (sb.x1 - sb.x0) * 0.3 + (Math.random() - 0.5) * 40;
-        y = cy + Math.sin(ang) * (sb.y1 - sb.y0) * 0.32 + (Math.random() - 0.5) * 40;
+        var cx = (b.x0 + b.x1) / 2, cy = (b.y0 + b.y1) / 2;
+        jx = Math.random() - 0.5;
+        jy = Math.random() - 0.5;
+        // (the desktop ring; placeSpecials() below sets the compact one)
+        x = cx + Math.cos(ang) * (b.x1 - b.x0) * 0.3 + jx * 40;
+        y = cy + Math.sin(ang) * (b.y1 - b.y0) * 0.32 + jy * 40;
       } else if (isMobile()) {
         // ambient nodes RING the copy: top band, left/right strips, and
         // the main field below — instead of uniform scatter (which puts
@@ -1568,7 +1730,7 @@ document.addEventListener('DOMContentLoaded', function () {
           y = bh2 * (0.14 + Math.random() * 0.40);
         } else {                  // the field below
           x = bw2 * (0.06 + Math.random() * 0.88);
-          y = bh2 * (0.55 + Math.random() * 0.39);
+          y = band.y0 + Math.random() * (band.y1 + bh2 * 0.02 - band.y0);
         }
       } else {
         x = b.x0 + ((Math.random() + Math.random()) / 2) * (b.x1 - b.x0);
@@ -1588,6 +1750,9 @@ document.addEventListener('DOMContentLoaded', function () {
         x: x, y: y,
         a1: (special ? 10 : 16) + Math.random() * (special ? 8 : 16),
         a2: 5 + Math.random() * 7,
+        // for placeSpecials(): the jitter as drawn, and how much of the
+        // up-and-down sway this node keeps (1 = all of it)
+        jx: jx, jy: jy, vy: 1,
         f1: 0.5 + Math.random() * 0.3,
         f2: 0.95 + Math.random() * 0.55,
         p1: Math.random() * Math.PI * 2,
@@ -1603,6 +1768,7 @@ document.addEventListener('DOMContentLoaded', function () {
         special: special, label: special ? LABELS[i] : null
       });
     }
+    placeSpecials();
     clearHint();
     pulses = [];
     inkNode = null;
@@ -1649,7 +1815,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // Keep-out zone: nodes and lines shrink as they approach the copy
   // block and vanish just before touching it.
   var copyEl = hero.querySelector('.hero-copy');
-  var copyRect = null;
+  var copyRect = null, nameRect = null;
   // The scroll chevron gets the same protection, so no node or line is
   // drawn through it. Offset geometry again: `left` is the hero's centre
   // line (the CSS centres the box with a transform) and the bounce carries
@@ -1683,6 +1849,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   function updateCopyRect() {
     updateHintRect();
+    nameRect = null;
     if (!copyEl) { copyRect = null; return; }
     // Use untransformed offset geometry. getBoundingClientRect bakes in
     // the scroll-parallax translate — when an in-app browser fires
@@ -1696,6 +1863,13 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     if (el === hero) {
       copyRect = { x0: left, y0: top, x1: left + copyEl.offsetWidth, y1: top + copyEl.offsetHeight };
+      // the name is laid out inside the copy block (its offset parent)
+      if (nameEl && nameEl.offsetParent === copyEl) {
+        nameRect = {
+          x0: left + nameEl.offsetLeft, y0: top + nameEl.offsetTop,
+          x1: left + nameEl.offsetLeft + nameEl.offsetWidth, y1: top + nameEl.offsetTop + nameEl.offsetHeight
+        };
+      }
       return;
     }
     // fallback (unexpected DOM): old behaviour
@@ -1731,6 +1905,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     W = rect.width;
     H = rect.height;
+    if (compactMq) compact = compactMq.matches;
     DPR = Math.min(window.devicePixelRatio || 1, 2);
     var bw = Math.round(W * DPR), bh = Math.round(H * DPR);
     // Setting canvas.width WIPES the bitmap even when the value is
@@ -1769,6 +1944,7 @@ document.addEventListener('DOMContentLoaded', function () {
       // toolbar-sized height churn is deliberately ignored
       layoutW = W;
       layoutH = H;
+      placeSpecials(); // the copy's bottom edge does not scale with the hero
     }
     // The chevron appears at 993px and follows the hero's height, which
     // settles after the width does: neither always re-anchors the graph,
@@ -1797,10 +1973,16 @@ document.addEventListener('DOMContentLoaded', function () {
     afterPaint(function () { updateCopyRect(); resize(); });
   }, { passive: true });
   // web fonts can reflow the copy block after first paint (asking for
-  // fonts.ready lays out the page, so that waits for the first paint too)
+  // fonts.ready lays out the page, so that waits for the first paint too);
+  // on a phone the labels' band starts under the copy, so they move with it
+  function refitCopy() {
+    var was = copyRect ? copyRect.y1 : null;
+    updateCopyRect();
+    if (nodes.length && copyRect && copyRect.y1 !== was) { placeSpecials(); clearHint(); }
+  }
   if (document.fonts && 'ready' in document.fonts) {
     afterPaint(function () {
-      document.fonts.ready.then(function () { afterPaint(updateCopyRect); });
+      document.fonts.ready.then(function () { afterPaint(refitCopy); });
     });
   }
   // iOS/WKWebView can purge a canvas backing store while the page is
@@ -1832,7 +2014,7 @@ document.addEventListener('DOMContentLoaded', function () {
       // as phones (fixed px reads tiny on a wide canvas)
       var A = ampScale;
       n.x = n.fx * layoutW + A * (n.a1 * Math.sin(time * n.f1 + n.p1) + n.a2 * Math.sin(time * n.f2 + n.p2));
-      n.y = n.fy * layoutH + A * (n.a1 * Math.cos(time * n.f1 * 0.83 + n.p3) + n.a2 * Math.sin(time * n.f2 * 1.27 + n.p4));
+      n.y = n.fy * layoutH + A * n.vy * (n.a1 * Math.cos(time * n.f1 * 0.83 + n.p3) + n.a2 * Math.sin(time * n.f2 * 1.27 + n.p4));
 
       // entrance: cluster → violent shake → detonation (skipped under
       // reduced motion). Deterministic per-node phases keep it smooth.

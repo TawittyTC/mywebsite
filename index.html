@@ -342,6 +342,45 @@
       background: var(--color-link)
     }
 
+    /* The two actions under the role line: the closing section's pair
+       ("Get in touch" + "Download CV"), at the same size. Everything that
+       sets their box is here, because the constellation measures the copy
+       block before style.css applies; the pill's colour, the link's blue
+       and the chevron's shape come from .btn-pill and .more there. */
+    #hero .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 16px 32px;
+      margin-top: 32px
+    }
+
+    #hero .hero-actions .btn-pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      padding: 12px 22px;
+      font-size: 1rem;
+      font-weight: 400;
+      letter-spacing: -0.022em;
+      line-height: 1.17648
+    }
+
+    #hero .hero-actions .more {
+      padding: 8px 0;
+      font-size: 1rem;
+      font-weight: 400;
+      letter-spacing: -0.022em
+    }
+
+    #hero .hero-actions .chev {
+      display: inline-block;
+      width: .42em;
+      height: .72em;
+      margin-left: .28em;
+      vertical-align: -.02em
+    }
+
     #hero-net,
     #hero-net-labels {
       position: absolute;
@@ -383,8 +422,11 @@
         justify-content: flex-start !important
       }
 
+      /* (auto at the sides: "margin: 0" pinned the column to the left edge
+         wherever it is narrower than the screen, so from 576 to 992px the
+         centred copy sat up to 136px left of centre) */
       #hero .hero-grid {
-        margin: 0;
+        margin: 0 auto;
         padding-top: calc(48px + 9vh)
       }
 
@@ -397,6 +439,12 @@
         font-size: 0.6471rem;
         letter-spacing: 0.1em;
         margin-bottom: 14px
+      }
+
+      #hero .hero-actions {
+        justify-content: center;
+        gap: 8px 28px;
+        margin-top: 24px
       }
 
       #hero h1.hero-name {
@@ -420,6 +468,12 @@
     @media (max-width: 735px) {
       section {
         padding: 128px 0
+      }
+    }
+
+    @media (max-width: 340px) {
+      #hero .hero-actions {
+        gap: 8px 12px
       }
     }
 
@@ -566,6 +620,10 @@
 
     #hero p {
       animation: heroFadeIn 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
+    }
+
+    #hero .hero-actions {
+      animation: heroFadeIn 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.55s both;
     }
 
     /* Experience expand/collapse */
@@ -1681,10 +1739,10 @@
   </style>
 
   <!-- Full CSS loaded async: no render blocking (bootstrap merged in) -->
-  <link rel="preload" href="assets/css/style.min.css?v=2.64.0" as="style"
+  <link rel="preload" href="assets/css/style.min.css?v=2.65.0" as="style"
     onload="this.onload=null;this.rel='stylesheet'">
   <noscript>
-    <link href="assets/css/style.min.css?v=2.64.0" rel="stylesheet">
+    <link href="assets/css/style.min.css?v=2.65.0" rel="stylesheet">
     <style>.proj-all{visibility:hidden}</style>
   </noscript>
 
@@ -1961,7 +2019,7 @@
   </script>
 
   <!-- Preload deferred JS to start downloading before parser reaches script tags -->
-  <link rel="preload" href="assets/js/main.min.js?v=2.64.0" as="script">
+  <link rel="preload" href="assets/js/main.min.js?v=2.65.0" as="script">
 
   <!-- Google tag (gtag.js). The page view is queued here, stamped with the
        time the page opened; gtag.js sends it when it arrives. -->
@@ -2027,6 +2085,11 @@
           <p class="hero-role">I'm a <span class="typed"
               data-typed-items="Full-Stack Developer, AI Engineer, Software Engineer"></span>
           </p>
+          <div class="hero-actions">
+            <a class="btn-pill scrollto" href="#portfolio">View projects</a>
+            <a class="more" href="assets/cv/Tanapol-Chamnanhan-CV.pdf" download>Download CV<span class="chev"
+                aria-hidden="true"></span></a>
+          </div>
         </div>
       </div>
 
@@ -2080,14 +2143,14 @@
                   <div class="profile-featured-body">
                     <h4 class="h2" style="margin: 0 0 16px 0;">Tanapol Chamnanhan</h4>
                     <p class="fw-light profile-bio">I'm Tanapol
-                      Chamnanhan, a full-stack developer and computer engineer. Proficient in coding, web development,
+                      Chamnanhan, a <span class="nw">full-stack</span> developer and computer engineer. Proficient in coding, web development,
                       and
-                      building scalable applications with modern technologies — with hands-on experience in AI
+                      building scalable applications with modern technologies — with <span class="nw">hands-on</span> experience in AI
                       engineering:
-                      LLM integration, voice AI (ASR, TTS, speech-to-speech), and agentic AI systems for business
+                      LLM integration, voice AI (ASR, TTS, <span class="nw">speech-to-speech</span>), and agentic AI systems for business
                       automation.</p>
                     <div class="exp-card-highlights profile-bio-small" style="margin-top:16px">
-                      <span class="hl hl-blue">Full-Stack Developer</span>
+                      <span class="hl hl-blue"><span class="nw">Full-Stack</span> Developer</span>
                       <span class="hl">AI Engineer</span>
                       <span class="hl">Computer Engineer</span>
                     </div>
@@ -2201,7 +2264,7 @@
                         Digital Industry professional qualification standards (TPQI).</p>
                     </div>
                     <div class="exp-role">
-                      <h4 class="exp-role-title">Published Research — Word Similarity for a Diabetes Question-Answering System (TCI-1)</h4>
+                      <h4 class="exp-role-title">Published Research — Word Similarity for a Diabetes <span class="nw">Question-Answering</span> System (<span class="nw">TCI-1</span>)</h4>
                       <p class="fw-light profile-bio-small">Chamnanhan, T., Phetkrachang, K., Sathiwantana, S.,
                         Chalearnnetkul, P., Choosong, C. (2023). &ldquo;Measuring of Words Similarity for Question
                         Answering System for Diabetes&rdquo;. Journal of Applied Informatics and Technology, Vol. 5
@@ -2260,14 +2323,14 @@
                     <img src="assets/img/protollcall-logo.avif" alt="Protollcall Advance Service"
                       class="company-logo company-logo--lg" loading="lazy" decoding="async" width="320" height="211">
                   </div>
-                  <div class="fw-light profile-bio-small mt-3">Architected and shipped tailor-made
+                  <div class="fw-light profile-bio-small mt-3">Architected and shipped <span class="nw">tailor-made</span>
                     enterprise CRM systems for <span class="js-client-count-text">33</span> clients across Thailand —
-                    integrating Asterisk PBX telephony (AGI, AMI, Dialplan), AI-powered IVR (TTS/ASR/LLM), Predictive
-                    Dialers, real-time analytics dashboards, and multi-channel API integrations. Researched and
-                    prototyped agentic AI systems — multi-agent orchestration (orchestrator + sub-agents), LLM-powered
-                    voice pipelines, and real-time speech-to-speech (STS) — for business automation. Delivered 60+
+                    integrating Asterisk PBX telephony (AGI, AMI, Dialplan), <span class="nw">AI-powered</span> IVR (TTS/ASR/LLM), Predictive
+                    Dialers, <span class="nw">real-time</span> analytics dashboards, and <span class="nw">multi-channel</span> API integrations. Researched and
+                    prototyped agentic AI systems — <span class="nw">multi-agent</span> orchestration (orchestrator + <span class="nw">sub-agents</span>), <span class="nw">LLM-powered</span>
+                    voice pipelines, and <span class="nw">real-time</span> <span class="nw">speech-to-speech</span> (STS) — for business automation. Delivered 60+
                     customization tickets spanning sales pipeline, debt collection, healthcare, insurance, and financial
-                    services — solo end-to-end from requirements through production deployment.</div>
+                    services — solo <span class="nw">end-to-end</span> from requirements through production deployment.</div>
                     <div class="exp-card-stats">
                       <div class="exp-stat-item">
                         <div class="exp-stat-num"><span class="js-count exp-stat-clients" data-count="33">33</span>
@@ -2293,9 +2356,9 @@
                     <div class="exp-card-highlights profile-bio-small mt-4">
                       <span class="hl">Asterisk PBX / CTI</span>
                       <span class="hl">AI Voice Agent · IVR</span>
-                      <span class="hl">Agentic AI · Multi-Agent</span>
+                      <span class="hl">Agentic AI · <span class="nw">Multi-Agent</span></span>
                       <span class="hl">Voice AI · STS</span>
-                      <span class="hl">Full Stack · End-to-End</span>
+                      <span class="hl">Full Stack · <span class="nw">End-to-End</span></span>
                     </div>
                     <button type="button" class="exp-card-cta"
                       aria-label="Read more: Full Stack Developer at Protollcall Advance Service">
@@ -2329,14 +2392,14 @@
                       <div class="exp-role-period profile-bio-small">December 2023 - March 2024 &middot; 4 mos</div>
                       <p class="fw-light profile-bio-small">Delivered 4 production internal apps with the 'Center of
                         Excellence &amp; Data Driven' department — a smart reservation system, document reference
-                        tracker, area-based job dispatch platform, and an event e-commerce store with inventory
+                        tracker, <span class="nw">area-based</span> job dispatch platform, and an event <span class="nw">e-commerce</span> store with inventory
                         management.</p>
                     </div>
                     <div class="exp-role">
                       <span class="exp-role-spark" aria-hidden="true"></span>
                       <div class="exp-role-period profile-bio-small">April 2023 - July 2023 &middot; 4 mos</div>
-                      <p class="fw-light profile-bio-small">Built 2 enterprise platforms used group-wide — a software
-                        license procurement &amp; approval workflow and a company-wide IT asset tracking platform with
+                      <p class="fw-light profile-bio-small">Built 2 enterprise platforms used <span class="nw">group-wide</span> — a software
+                        license procurement &amp; approval workflow and a <span class="nw">company-wide</span> IT asset tracking platform with
                         full lifecycle management.</p>
                     </div>
                   </div>
@@ -2359,7 +2422,7 @@
                     <span class="hl">License &amp; Asset Management</span>
                     <span class="hl">Reservation System</span>
                     <span class="hl">Job Dispatch Platform</span>
-                    <span class="hl">E-Commerce</span>
+                    <span class="hl"><span class="nw">E-Commerce</span></span>
                     <span class="hl">Full SDLC</span>
                   </div>
                   <button type="button" class="exp-card-cta"
@@ -2388,10 +2451,10 @@
                     <img src="assets/img/advice-logo.avif" alt="Advice IT Infinite" class="company-logo" loading="lazy"
                       decoding="async" width="320" height="94">
                   </div>
-                  <p class="fw-light profile-bio-small  mt-3">Provided front-line hardware diagnostics, repair, and technical
+                  <p class="fw-light profile-bio-small  mt-3">Provided <span class="nw">front-line</span> hardware diagnostics, repair, and technical
                     support at one of Thailand's largest IT retail chains — servicing 5+ devices and 10+ customers daily
                     across laptops, desktops, and peripherals. Developed practical troubleshooting methodologies, parts
-                    sourcing, OS reinstallation, and direct customer communication skills in a fast-paced, high-volume
+                    sourcing, OS reinstallation, and direct customer communication skills in a <span class="nw">fast-paced</span>, <span class="nw">high-volume</span>
                     retail environment.</p>
                   <div class="exp-card-stats">
                     <div class="exp-stat-item">
@@ -2477,7 +2540,7 @@
               </svg>
               <span class="skill-tag">Web</span>
               <h3 class="title h3">Web Development</h3>
-              <p class="skill-desc fw-light">Full-stack from front-end to back-end APIs and databases</p>
+              <p class="skill-desc fw-light"><span class="nw">Full-stack</span> from <span class="nw">front-end</span> to <span class="nw">back-end</span> APIs and databases</p>
               <ul class="skill-tools" aria-label="Tools"><li>React</li><li>Flask</li><li>PHP</li><li>JavaScript</li><li>REST API</li></ul>
             </div>
 
@@ -2508,7 +2571,7 @@
               </svg>
               <span class="skill-tag">AI</span>
               <h3 class="title h3">Agentic AI</h3>
-              <p class="skill-desc fw-light">AI agents, sub-agents &amp; multi-agent orchestration with LLMs for
+              <p class="skill-desc fw-light">AI agents, <span class="nw">sub-agents</span> &amp; <span class="nw">multi-agent</span> orchestration with LLMs for
                 business automation</p>
               <ul class="skill-tools" aria-label="Tools"><li>Multi-Agent</li><li>Sub-Agents</li><li>GPT</li><li>Gemini</li><li>Claude</li></ul>
             </div>
@@ -2522,8 +2585,8 @@
               </svg>
               <span class="skill-tag">AI</span>
               <h3 class="title h3">Voice &amp; Conversational AI</h3>
-              <p class="skill-desc fw-light">ASR, TTS &amp; real-time speech-to-speech (STS) voice pipelines —
-                LLM-powered IVR &amp; chatbots</p>
+              <p class="skill-desc fw-light">ASR, TTS &amp; <span class="nw">real-time</span> <span class="nw">speech-to-speech</span> (STS) voice pipelines —
+                <span class="nw">LLM-powered</span> IVR &amp; chatbots</p>
               <ul class="skill-tools" aria-label="Tools"><li>ASR</li><li>TTS</li><li>Speech-to-Speech</li><li>AI IVR</li><li>Chatbot</li></ul>
             </div>
 
@@ -2550,7 +2613,7 @@
               </svg>
               <span class="skill-tag">Web · Engineering</span>
               <h3 class="title h3">Databases &amp; SQL</h3>
-              <p class="skill-desc fw-light">Schema design, MSSQL &amp; MySQL, query tuning &amp; ORM-backed APIs</p>
+              <p class="skill-desc fw-light">Schema design, MSSQL &amp; MySQL, query tuning &amp; <span class="nw">ORM-backed</span> APIs</p>
               <ul class="skill-tools" aria-label="Tools"><li>MySQL</li><li>MSSQL</li><li>Query tuning</li><li>ORM</li></ul>
             </div>
 
@@ -2607,7 +2670,7 @@
               </svg>
               <span class="skill-tag">Engineering</span>
               <h3 class="title h3">Project Management</h3>
-              <p class="skill-desc fw-light">End-to-end delivery from initiation through closure</p>
+              <p class="skill-desc fw-light"><span class="nw">End-to-end</span> delivery from initiation through closure</p>
               <ul class="skill-tools" aria-label="Tools"><li>SDLC</li><li>Requirements</li><li>Delivery</li></ul>
             </div>
 
@@ -2624,7 +2687,7 @@
               </svg>
               <span class="skill-tag">Engineering</span>
               <h3 class="title h3">Hardware &amp; IT Support</h3>
-              <p class="skill-desc fw-light">PC diagnostics, repair, assembly &amp; OS installation — front-line
+              <p class="skill-desc fw-light">PC diagnostics, repair, assembly &amp; OS installation — <span class="nw">front-line</span>
                 technician experience</p>
               <ul class="skill-tools" aria-label="Tools"><li>Diagnostics</li><li>Repair</li><li>Assembly</li><li>OS install</li></ul>
             </div>
@@ -2640,7 +2703,7 @@
               </svg>
               <span class="skill-tag">Engineering</span>
               <h3 class="title h3">IoT &amp; Embedded</h3>
-              <p class="skill-desc fw-light">Microcontrollers, sensor integration &amp; real-time monitoring systems</p>
+              <p class="skill-desc fw-light">Microcontrollers, sensor integration &amp; <span class="nw">real-time</span> monitoring systems</p>
               <ul class="skill-tools" aria-label="Tools"><li>ESP32</li><li>Sensors</li><li>ThingsBoard</li><li>AWS</li></ul>
             </div>
 
@@ -3130,7 +3193,7 @@
                 <svg viewBox="0 0 170 170" fill="none"><g stroke="#1264CE" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"> <path d="M88 118H36a12 12 0 0 1-12-12V44a12 12 0 0 1 12-12h86a12 12 0 0 1 12 12v16" /> <path d="M24 54h110M40 76h34M40 94h22" /> <rect x="102" y="72" width="46" height="72" rx="11" /> <path d="M119 84h12" /> </g> <circle cx="38" cy="43" r="3.5" fill="#1264CE" /> <circle cx="49" cy="43" r="3.5" fill="#1264CE" /> <circle cx="60" cy="43" r="3.5" fill="#1264CE" /> <circle cx="125" cy="131" r="3.5" fill="#1264CE" /></svg>
               </div>
               <div class="work-logo" aria-hidden="true"><img src="assets/img/clients/card/mvmall.webp" alt="" width="609" height="185" style="--lw: 0.761" loading="lazy" decoding="async"></div>
-              <span class="project-tag">Client work · E-commerce</span>
+              <span class="project-tag">Client work · <span class="nw">E-commerce</span></span>
               <h3 class="h4">Order support CRM, MVmall</h3>
               <p class="fw-light">Order inquiries, returns and delivery disputes with SLA tracking and LINE&nbsp;OA order updates.</p>
               <button type="button" class="card-plus" aria-label="Read more: Order support CRM, MVmall">
@@ -3658,11 +3721,11 @@
           <div class="faq-list">
             <details>
               <summary>ธนพล ชำนาญหาญ คือใคร?</summary>
-              <p>ธนพล ชำนาญหาญ (Tanapol Chamnanhan) คือ Full-Stack Developer และ Software Engineer จากกรุงเทพมหานคร มีประสบการณ์กว่า 2 ปีในการพัฒนาระบบ CRM, เว็บแอปพลิเคชัน และระบบ AI สำหรับองค์กรชั้นนำในไทย 33 แห่ง</p>
+              <p>ธนพล ชำนาญหาญ (Tanapol Chamnanhan) คือ <span class="nw">Full-Stack</span> Developer และ Software Engineer จากกรุงเทพมหานคร มีประสบการณ์กว่า 2 ปีในการพัฒนาระบบ CRM, เว็บแอปพลิเคชัน และระบบ AI สำหรับองค์กรชั้นนำในไทย 33 แห่ง</p>
             </details>
             <details>
               <summary>ธนพล ชำนาญหาญ รับทำเว็บไซต์กรุงเทพหรือไม่?</summary>
-              <p>รับครับ ธนพล ชำนาญหาญ รับทำเว็บไซต์ทุกประเภท ทั้ง Corporate Website, Landing Page, E-Commerce และ Web Application พร้อมให้บริการในกรุงเทพและทั่วประเทศไทย ติดต่อได้ที่ <a href="mailto:tanapol.ch@rmutsvmail.com">tanapol.ch@rmutsvmail.com</a></p>
+              <p>รับครับ ธนพล ชำนาญหาญ รับทำเว็บไซต์ทุกประเภท ทั้ง Corporate Website, Landing Page, <span class="nw">E-Commerce</span> และ Web Application พร้อมให้บริการในกรุงเทพและทั่วประเทศไทย ติดต่อได้ที่ <a href="mailto:tanapol.ch@rmutsvmail.com">tanapol.ch@rmutsvmail.com</a></p>
             </details>
             <details>
               <summary>รับทำระบบ CRM กรุงเทพ ติดต่อได้อย่างไร?</summary>
@@ -3674,11 +3737,11 @@
             </details>
             <details>
               <summary>ธนพล ชำนาญหาญ กำลังหางานอยู่ไหม?</summary>
-              <p>ใช่ครับ ธนพล ชำนาญหาญ เปิดรับโอกาสงานใหม่ ทั้งตำแหน่ง Software Engineer, Full-Stack Developer, Web Developer และ Programmer ในกรุงเทพหรือรูปแบบ Remote ติดต่อ HR ได้ที่ <a href="mailto:tanapol.ch@rmutsvmail.com">tanapol.ch@rmutsvmail.com</a> หรือ LinkedIn: <a href="https://www.linkedin.com/in/tanapol-chamnanhan/">linkedin.com/in/tanapol-chamnanhan/</a></p>
+              <p>ใช่ครับ ธนพล ชำนาญหาญ เปิดรับโอกาสงานใหม่ ทั้งตำแหน่ง Software Engineer, <span class="nw">Full-Stack</span> Developer, Web Developer และ Programmer ในกรุงเทพหรือรูปแบบ Remote ติดต่อ HR ได้ที่ <a href="mailto:tanapol.ch@rmutsvmail.com">tanapol.ch@rmutsvmail.com</a> หรือ LinkedIn: <a href="https://www.linkedin.com/in/tanapol-chamnanhan/">linkedin.com/in/tanapol-chamnanhan/</a></p>
             </details>
             <details lang="en">
               <summary>How to hire Tanapol Chamnanhan (ธนพล ชำนาญหาญ) as Software Engineer or Web Developer?</summary>
-              <p>Contact Tanapol Chamnanhan via email <a href="mailto:tanapol.ch@rmutsvmail.com">tanapol.ch@rmutsvmail.com</a> or LinkedIn <a href="https://www.linkedin.com/in/tanapol-chamnanhan/">linkedin.com/in/tanapol-chamnanhan/</a>. Bangkok-based Full-Stack Developer open to full-time, contract, and freelance opportunities in Software Engineering, Web Development, CRM/POS system development.</p>
+              <p>Contact Tanapol Chamnanhan via email <a href="mailto:tanapol.ch@rmutsvmail.com">tanapol.ch@rmutsvmail.com</a> or LinkedIn <a href="https://www.linkedin.com/in/tanapol-chamnanhan/">linkedin.com/in/tanapol-chamnanhan/</a>. <span class="nw">Bangkok-based</span> <span class="nw">Full-Stack</span> Developer open to <span class="nw">full-time</span>, contract, and freelance opportunities in Software Engineering, Web Development, CRM/POS system development.</p>
             </details>
             <details>
               <summary>โปรแกรมเมอร์รับทำเว็บไซต์กรุงเทพ ราคาเท่าไหร่?</summary>
@@ -3698,11 +3761,11 @@
             </details>
             <details>
               <summary>ธนพล ชำนาญหาญ รับพัฒนา AI Agent และระบบ AI สำหรับธุรกิจไหม?</summary>
-              <p>รับครับ ธนพล ชำนาญหาญ รับพัฒนา AI Agent และระบบ AI สำหรับธุรกิจครบวงจร — Agentic AI (Multi-Agent Orchestration, Sub-Agents), LLM Integration (GPT, Gemini, Claude), Voice AI (ASR, TTS, Speech-to-Speech แบบ Realtime), AI Chatbot และ AI IVR สำหรับ Contact Center ติดต่อ <a href="mailto:tanapol.ch@rmutsvmail.com">tanapol.ch@rmutsvmail.com</a></p>
+              <p>รับครับ ธนพล ชำนาญหาญ รับพัฒนา AI Agent และระบบ AI สำหรับธุรกิจครบวงจร — Agentic AI (<span class="nw">Multi-Agent</span> Orchestration, <span class="nw">Sub-Agents</span>), LLM Integration (GPT, Gemini, Claude), Voice AI (ASR, TTS, <span class="nw">Speech-to-Speech</span> แบบ Realtime), AI Chatbot และ AI IVR สำหรับ Contact Center ติดต่อ <a href="mailto:tanapol.ch@rmutsvmail.com">tanapol.ch@rmutsvmail.com</a></p>
             </details>
             <details lang="en">
               <summary>Does Tanapol Chamnanhan build AI agents and voice AI systems?</summary>
-              <p>Yes. Tanapol Chamnanhan designs and builds agentic AI systems (orchestrator + sub-agent architectures, multi-agent orchestration), LLM integrations (GPT, Gemini, Claude), and voice AI pipelines (ASR, TTS, realtime speech-to-speech) for business automation and contact centers. Based in Bangkok, Thailand — contact <a href="mailto:tanapol.ch@rmutsvmail.com">tanapol.ch@rmutsvmail.com</a></p>
+              <p>Yes. Tanapol Chamnanhan designs and builds agentic AI systems (orchestrator + <span class="nw">sub-agent</span> architectures, <span class="nw">multi-agent</span> orchestration), LLM integrations (GPT, Gemini, Claude), and voice AI pipelines (ASR, TTS, realtime <span class="nw">speech-to-speech</span>) for business automation and contact centers. Based in Bangkok, Thailand — contact <a href="mailto:tanapol.ch@rmutsvmail.com">tanapol.ch@rmutsvmail.com</a></p>
             </details>
             <details lang="en">
               <summary>What technologies does Tanapol Chamnanhan use for CRM and POS development?</summary>
@@ -3718,7 +3781,7 @@
       <div class="container">
         <div class="cta-inner">
           <h2 class="cta-headline">Let's build<br>what's next.</h2>
-          <p class="cta-sub">Open to full-time roles and freelance projects — web apps, CRM &amp; POS systems, and AI
+          <p class="cta-sub">Open to <span class="nw">full-time</span> roles and freelance projects — web apps, CRM &amp; POS systems, and AI
             voice agents.</p>
           <div class="cta-row">
             <a class="btn-pill cta-pill" href="mailto:tanapol.ch@rmutsvmail.com">Get in touch</a>
@@ -3740,7 +3803,7 @@
                 </div>
                 <div>
                   <div class="biz-name">Tanapol Chamnanhan</div>
-                  <div class="biz-role">Full-Stack Developer · CRM, POS &amp; AI Voice Agents</div>
+                  <div class="biz-role"><span class="nw">Full-Stack</span> Developer · CRM, POS &amp; AI Voice Agents</div>
                 </div>
                 <div class="biz-row biz-contacts">
                   <a href="mailto:tanapol.ch@rmutsvmail.com">tanapol.ch@rmutsvmail.com</a>
@@ -3768,7 +3831,7 @@
           <div class="col-12 col-md-4 mt-3">
             <div style="font-size: 1rem;font-weight:600;color:#1d1d1f;margin-bottom:8px;letter-spacing:-0.2px;">Tanapol
               Chamnanhan</div>
-            <div class="fw-light" style="font-size: 0.8235rem;color:#6e6e73;line-height:1.6;">Full-Stack Developer &amp;
+            <div class="fw-light" style="font-size: 0.8235rem;color:#6e6e73;line-height:1.6;"><span class="nw">Full-Stack</span> Developer &amp;
               Software Engineer based in Bangkok, Thailand.</div>
           </div>
 
@@ -3836,7 +3899,7 @@
   </button>
 
   <!-- Main JS -->
-  <script defer src="assets/js/main.min.js?v=2.64.0"></script>
+  <script defer src="assets/js/main.min.js?v=2.65.0"></script>
   <!-- Service Worker: cache assets for repeat visits -->
   <script>if ('serviceWorker' in navigator) { var _sw = function () { navigator.serviceWorker.register('sw.js') }; 'requestIdleCallback' in window ? requestIdleCallback(_sw) : window.addEventListener('load', _sw) }</script>
 
@@ -3874,7 +3937,7 @@
     <div class="exp-modal-section">
       <h3>Role Overview</h3>
       <p class="exp-modal-overview">Architected and deployed customized CRM solutions for <span class="js-client-count-text">33</span> enterprise clients across
-        Healthcare, Finance, Insurance, and E-Commerce industries. Served as sole full-stack developer managing the
+        Healthcare, Finance, Insurance, and <span class="nw">E-Commerce</span> industries. Served as sole <span class="nw">full-stack</span> developer managing the
         complete SDLC — from requirements through deployment and ongoing maintenance — across multiple concurrent client
         engagements.</p>
     </div>
@@ -3882,26 +3945,26 @@
     <div class="exp-modal-section">
       <h3>Responsibilities</h3>
       <ul>
-        <li><strong>End-to-End Development:</strong> Architected and deployed customized CRM solutions for <span
+        <li><strong><span class="nw">End-to-End</span> Development:</strong> Architected and deployed customized CRM solutions for <span
             class="js-client-count-text">33</span> enterprise clients (Healthcare, Finance, Insurance), handling the full lifecycle from requirements gathering
           to production deployment.</li>
-        <li><strong>High-Volume Delivery:</strong> Successfully delivered and maintained 60+ customization tickets,
+        <li><strong><span class="nw">High-Volume</span> Delivery:</strong> Successfully delivered and maintained 60+ customization tickets,
           ranging from UI/UX enhancements to complex backend logic and database optimization.</li>
         <li><strong>Security &amp; OWASP:</strong> Hardened system security per OWASP guidelines — patched XSS
           vulnerabilities, enforced HSTS, disabled HTTP TRACE, secured session management, and implemented strong
           password policies with account lockout for public company clients.</li>
-        <li><strong>API Integration:</strong> Engineered RESTful APIs and Webhooks for real-time data synchronization
-          between CRM systems, warehouse platforms, and 3rd-party services (LINE Notify, Telegram, KBAOBOT).</li>
+        <li><strong>API Integration:</strong> Engineered RESTful APIs and Webhooks for <span class="nw">real-time</span> data synchronization
+          between CRM systems, warehouse platforms, and <span class="nw">3rd-party</span> services (LINE Notify, Telegram, KBAOBOT).</li>
         <li><strong>Monitoring &amp; Observability:</strong> Monitored server health, resource usage, and network
           traffic using <strong>Zabbix</strong>; tracked query performance and database activity via <strong>Navicat
-            Server Monitor</strong>; performed cross-browser compatibility testing and UI verification on web browsers.
+            Server Monitor</strong>; performed <span class="nw">cross-browser</span> compatibility testing and UI verification on web browsers.
         </li>
         <li><strong>Audit Log:</strong> Designed and implemented audit log systems across CRM platforms — capturing
           create, edit, delete, and update events across all admin menus for compliance, traceability, and security
           review.</li>
-        <li><strong>AI &amp; Agentic Systems R&amp;D:</strong> Researched and prototyped LLM-powered voice automation
-          (ASR → LLM → TTS) and real-time speech-to-speech (STS) pipelines; designed agentic AI architectures with an
-          orchestrator coordinating specialized sub-agents for contact-center and business-automation use cases.</li>
+        <li><strong>AI &amp; Agentic Systems R&amp;D:</strong> Researched and prototyped <span class="nw">LLM-powered</span> voice automation
+          (ASR → LLM → TTS) and <span class="nw">real-time</span> <span class="nw">speech-to-speech</span> (STS) pipelines; designed agentic AI architectures with an
+          orchestrator coordinating specialized <span class="nw">sub-agents</span> for <span class="nw">contact-center</span> and <span class="nw">business-automation</span> use cases.</li>
       </ul>
     </div>
 
@@ -3952,12 +4015,12 @@
           <span class="exp-client-tag">Healthcare CRM</span>
         </div>
         <ul>
-          <li>Built a full-stack patient relationship CRM — patient database, <strong>appointment scheduling</strong>
-            with conflict detection (creation, editing, cancellation), and automated follow-up reminder sequences via
+          <li>Built a <span class="nw">full-stack</span> patient relationship CRM — patient database, <strong>appointment scheduling</strong>
+            with conflict detection (creation, editing, cancellation), and automated <span class="nw">follow-up</span> reminder sequences via
             LINE Notify.</li>
           <li>Developed <strong>IV Team Request System</strong> — operational dispatch workflow for IV nursing teams:
-            real-time team assignment, job status tracking (pending → dispatched → completed), with instant push
-            notifications via LINE Notify and Telegram API to on-duty nursing staff.</li>
+            <span class="nw">real-time</span> team assignment, job status tracking (pending → dispatched → completed), with instant push
+            notifications via LINE Notify and Telegram API to <span class="nw">on-duty</span> nursing staff.</li>
           <li>Integrated Asterisk CDR linking all patient call interactions to their CRM profile for complete care
             history visibility.</li>
         </ul>
@@ -3970,8 +4033,8 @@
           <span class="exp-client-tag">Sales Campaign CRM</span>
         </div>
         <ul>
-          <li><strong>Core Modules built end-to-end:</strong> Social management, Predictive Dialer List (auto-dial),
-            Manual Call List (agent-initiated), Outstanding tracking, Call-to-Visit workflow, FCR Management, Repayment
+          <li><strong>Core Modules built <span class="nw">end-to-end</span>:</strong> Social management, Predictive Dialer List (<span class="nw">auto-dial</span>),
+            Manual Call List (<span class="nw">agent-initiated</span>), Outstanding tracking, <span class="nw">Call-to-Visit</span> workflow, FCR Management, Repayment
             management, Lock/Unlock case controls, Letter management, Analytics, Template management, Import pipeline,
             and Status management.</li>
           <li><strong>Dashboards &amp; Reporting (heavy emphasis):</strong> Built Predictive Dashboard, FCR Dashboard,
@@ -3980,11 +4043,11 @@
           <li><strong>OBS Config &amp; LINE Image Sending:</strong> Developed UI for Huawei OBS configuration (bucket,
             endpoint, AKSK key management) and integrated image sending from Collection module — agents send images
             directly to customers via LINE from within the CRM.</li>
-          <li>Integrated <strong>KBAOBOT</strong>: real-time chat history sync, ticket-status API, agent-transfer
-            notifications, and UID-based customer lookup in Social menu.</li>
+          <li>Integrated <strong>KBAOBOT</strong>: <span class="nw">real-time</span> chat history sync, <span class="nw">ticket-status</span> API, <span class="nw">agent-transfer</span>
+            notifications, and <span class="nw">UID-based</span> customer lookup in Social menu.</li>
           <li>Implemented scheduled crontab for monthly data import with corrected date logic; fixed import conditions
             and deployed to production overnight to meet billing deadlines.</li>
-          <li>Generated secure access link for Report Agent Login-Logout (billing use only), with a log of every login.</li>
+          <li>Generated secure access link for Report Agent <span class="nw">Login-Logout</span> (billing use only), with a log of every login.</li>
           <li><strong>Privacy:</strong> Personal data is now blanked or hashed in exported PTP, Call Result, FCR Action
             Code Detail and Service Detail reports.</li>
           <li><strong>Predictive Dialer:</strong> Added a duration column to the Call Monitor report and a screen where
@@ -4003,19 +4066,19 @@
           <img src="assets/img/clients/happy-products.webp" width="57" height="18" alt="" loading="lazy" decoding="async">
           <h3>Happy Products &amp; Services Co., Ltd. <span style="font-weight:400;color:#6e6e73">(Tnews, Happy
               Shopping)</span></h3>
-          <span class="exp-client-tag">End-to-End CRM</span>
+          <span class="exp-client-tag"><span class="nw">End-to-End</span> CRM</span>
         </div>
         <ul>
-          <li>Built full end-to-end CRM for TV shopping operations — managing airtime scheduling, purchase orders,
+          <li>Built full <span class="nw">end-to-end</span> CRM for TV shopping operations — managing airtime scheduling, purchase orders,
             product catalog, and telesales agent workflows.</li>
-          <li>Developed "Warehouse API Integration" — real-time stock quantity sync with warehouse system; Out-of-Stock
+          <li>Developed "Warehouse API Integration" — <span class="nw">real-time</span> stock quantity sync with warehouse system; <span class="nw">Out-of-Stock</span>
             popup alerts during order placement with configurable override option.</li>
           <li>Built "Product Lock" system — prevents incompatible products from being sold together; configurable
             lock/unlock rules with item code mapping and bulk management UI.</li>
           <li>Implemented Abandon Call management, Lead Filter workflows, and Auto Report Email delivery for
             daily/weekly operations summaries.</li>
-          <li>Built agent group management: Supervisor assigns agents by group (Telesales1/Telesales2) with auto-prefix
-            routing and multi-group campaign support.</li>
+          <li>Built agent group management: Supervisor assigns agents by group (Telesales1/Telesales2) with <span class="nw">auto-prefix</span>
+            routing and <span class="nw">multi-group</span> campaign support.</li>
           <li>Developed audit log system for all admin menu actions (create/edit/delete/update) for compliance tracking.
           </li>
           <li><strong>New Reports:</strong> Sales by media slot, where each user sees only their own slots; and products by
@@ -4036,20 +4099,20 @@
           <span class="exp-client-tag">Multilingual IVR System</span>
         </div>
         <ul>
-          <li>Built an <strong>outbound IVR call-out API</strong> connected to VietJet Thailand's back end, so their team
+          <li>Built an <strong>outbound IVR <span class="nw">call-out</span> API</strong> connected to VietJet Thailand's back end, so their team
             creates and runs call campaigns from their own platform. Passengers hear the prompts (route, date and time) in
             Thai, English, Chinese, Japanese or Vietnamese, chosen from the phone number's country code.</li>
           <li>Passengers press 1 to accept a new flight or 2 to decline; call status, whether they answered and their reply
             all show in the reports.</li>
           <li>Designed and built the production <strong>inbound IVR</strong> (Thai and English) — callers select
             their preferred language at entry, and all subsequent prompts adapt accordingly.</li>
-          <li>Live API-integrated call flows: callers input booking references or flight numbers via DTMF to receive
-            real-time flight status, baggage allowance, and refund policy — spoken via dynamic <strong>TTS
+          <li>Live <span class="nw">API-integrated</span> call flows: callers input booking references or flight numbers via DTMF to receive
+            <span class="nw">real-time</span> flight status, baggage allowance, and refund policy — spoken via dynamic <strong>TTS
               synthesis</strong>.</li>
-          <li>Intent-based agent escalation: transfers include full context (language preference, menu path, inputs)
-            pre-populated for the receiving agent.</li>
-          <li>Optimized Asterisk AGI/ARI dialplan for concurrent multi-call handling; graceful fallback for API timeouts
-            and no-input scenarios.</li>
+          <li><span class="nw">Intent-based</span> agent escalation: transfers include full context (language preference, menu path, inputs)
+            <span class="nw">pre-populated</span> for the receiving agent.</li>
+          <li>Optimized Asterisk AGI/ARI dialplan for concurrent <span class="nw">multi-call</span> handling; graceful fallback for API timeouts
+            and <span class="nw">no-input</span> scenarios.</li>
         </ul>
       </div>
 
@@ -4062,7 +4125,7 @@
           <li>Built the <strong>IVR Outbound Management</strong> module for payment reminder calls, which plays announcements voiced by an AI voice bot.</li>
           <li>Developed an <strong>API</strong> that pulls customer lists from TSR's system to create outbound campaigns, and an auto dialer that works through them, capped at 30 concurrent lines.</li>
           <li>Designed the outbound dashboard and two reports: Auto IVR Summary and Auto IVR Detail.</li>
-          <li>Final tuning: new scripts and voice prompts for the pre-due and overdue call sets, and separate weekday and weekend rounds for pulling data and calling.</li>
+          <li>Final tuning: new scripts and voice prompts for the <span class="nw">pre-due</span> and overdue call sets, and separate weekday and weekend rounds for pulling data and calling.</li>
         </ul>
       </div>
 
@@ -4073,10 +4136,10 @@
           <span class="exp-client-tag">Operations Dashboard</span>
         </div>
         <ul>
-          <li>Built real-time contact center dashboard with live queue depth, agent status, and SLA adherence counters;
+          <li>Built <span class="nw">real-time</span> contact center dashboard with live queue depth, agent status, and SLA adherence counters;
             configurable alerts via LINE and email for queue spikes and SLA breaches.</li>
-          <li>Developed 4 Historical Reports: Call Center Performance (In-Out hrs, YTD), Performance per Agent, and
-            Agent Performance — with queue/agent filters and time-range selection.</li>
+          <li>Developed 4 Historical Reports: Call Center Performance (<span class="nw">In-Out</span> hrs, YTD), Performance per Agent, and
+            Agent Performance — with queue/agent filters and <span class="nw">time-range</span> selection.</li>
           <li>Built KPI target comparison dashboard: configurable targets for Answer &lt;30s %, Abandoned Calls %, and
             Call Answered %; displayed as visual comparison against actuals.</li>
           <li>Monthly/YTD overview tables (Call Offered, Answered, Abandoned, Avg Wait/Talk times), queue statistics,
@@ -4095,10 +4158,10 @@
           <li>Operations dashboard with call center KPI tracking across multiple queues and agent groups.</li>
           <li>Automated scheduled report generation — daily and weekly summaries (volume, AHT, abandon rate, SLA %)
             exported to PDF and Excel.</li>
-          <li>Email distribution list management — reports auto-delivered to configured recipients (operations managers,
+          <li>Email distribution list management — reports <span class="nw">auto-delivered</span> to configured recipients (operations managers,
             QA, executives) on schedule.</li>
           <li>Powered by <strong>queuelog</strong> and <strong>asteriskcdrdb</strong> queries with SQL optimization to
-            handle millions of CDR records at sub-second response time.</li>
+            handle millions of CDR records at <span class="nw">sub-second</span> response time.</li>
         </ul>
       </div>
 
@@ -4109,13 +4172,13 @@
           <span class="exp-client-tag">Customer Analytics</span>
         </div>
         <ul>
-          <li>Customer analytics dashboard aggregating multi-channel data (calls, LINE messages, email) into a unified
+          <li>Customer analytics dashboard aggregating <span class="nw">multi-channel</span> data (calls, LINE messages, email) into a unified
             view.</li>
-          <li>Interactive date-range filtering, dimension drill-down by channel/agent/time-of-day, and
-            period-over-period comparison.</li>
+          <li>Interactive <span class="nw">date-range</span> filtering, dimension <span class="nw">drill-down</span> by channel/agent/<span class="nw">time-of-day</span>, and
+            <span class="nw">period-over-period</span> comparison.</li>
           <li>Full export capability: CSV, Excel, and PDF report downloads for all dashboard views.</li>
           <li>Data pipeline: raw CDR + CRM event ingestion → aggregation layer → dashboard, with scheduled
-            pre-aggregation for fast load times.</li>
+            <span class="nw">pre-aggregation</span> for fast load times.</li>
           <li>Built a working <strong>AI voice demo</strong> for Digiserve's bid to KBJ Capital (October 2026): it answers
             the call, asks what the caller needs and answers common payment questions.</li>
         </ul>
@@ -4140,10 +4203,10 @@
         </div>
         <ul>
           <li>Built contact center performance analytics platform integrating Asterisk CDR and queuelog data sources
-            with real-time agent monitoring and SLA tracking.</li>
+            with <span class="nw">real-time</span> agent monitoring and SLA tracking.</li>
           <li>Added configurable Dropdown Lists (Problem Summary Category, Solution Summary Category) to ticket case
             recording form.</li>
-          <li>Added ticket type/category field; relabeled customer profile fields to merchant-specific terminology
+          <li>Added ticket type/category field; relabeled customer profile fields to <span class="nw">merchant-specific</span> terminology
             (Merchant Name, TID, EDC S/N, Merchant Province) for payment terminal support use case.</li>
         </ul>
       </div>
@@ -4156,7 +4219,7 @@
         </div>
         <ul>
           <li>Developed service request and ticket management CRM — logging, categorizing, and tracking all customer
-            support requests from intake to resolution with SLA-based escalation.</li>
+            support requests from intake to resolution with <span class="nw">SLA-based</span> escalation.</li>
           <li>Built <strong>Abandoned Call</strong> page — dedicated queue for agents to identify and call back
             customers who abandoned before being answered; built <strong>Callback</strong> tracking page — supervisors
             can verify whether each callback was completed, with timestamps and agent ID.</li>
@@ -4164,7 +4227,7 @@
             Report Summary Ticket, plus call volume and agent performance reports — with enhanced filtering and graph
             display per client specifications.</li>
           <li>Hardened security: implemented Password Policy (8+ chars, complexity rules, no username match), Account
-            Lockout after 3 failed attempts, force-change on first login; patched HSTS, HTTP TRACE, PHP exposure, and
+            Lockout after 3 failed attempts, <span class="nw">force-change</span> on first login; patched HSTS, HTTP TRACE, PHP exposure, and
             jQuery XSS vulnerabilities. Added a log of password changes.</li>
           <li>Built Emergency Announcement toggle — allows client to independently enable/disable emergency broadcast
             audio without developer intervention.</li>
@@ -4179,7 +4242,7 @@
         </div>
         <ul>
           <li>Built vehicle sales CRM covering the full buyer journey: lead capture → test drive scheduling →
-            negotiation → purchase → after-sales follow-up with LINE OA automation.</li>
+            negotiation → purchase → <span class="nw">after-sales</span> <span class="nw">follow-up</span> with LINE OA automation.</li>
           <li>Added calllist_status field to tbl_project_result; extended Status and Calling Status details on CRM for
             richer call disposition tracking.</li>
           <li>Added filter for status types (Close, In Progress, etc.) in Case Detail report for improved operations
@@ -4196,8 +4259,8 @@
         <ul>
           <li>Customized the sales CRM for a TV shopping business — sales orders, products and outbound call lists.</li>
           <li>Built lead redistribution logic: new agents can be added to active projects and assigned uncalled numbers,
-            while already-recorded entries remain fixed to original agents.</li>
-          <li>Added bulk view-list selection (multi-agent), owner change functionality, and export button for outbound
+            while <span class="nw">already-recorded</span> entries remain fixed to original agents.</li>
+          <li>Added bulk <span class="nw">view-list</span> selection (<span class="nw">multi-agent</span>), owner change functionality, and export button for outbound
             call management.</li>
           <li>Added product codes to the sales order view and to the SO Detail (#22) and Product Date Summary (#23)
             reports.</li>
@@ -4211,7 +4274,7 @@
           <span class="exp-client-tag">Operations &amp; Reporting</span>
         </div>
         <ul>
-          <li>Contact center operations dashboard with real-time queue monitoring, agent availability tracking, and SLA
+          <li>Contact center operations dashboard with <span class="nw">real-time</span> queue monitoring, agent availability tracking, and SLA
             compliance metrics.</li>
           <li>Added employee code and position columns to Sales Performance by Employee report; restricted SuperAgent
             role from editing their own permissions.</li>
@@ -4227,20 +4290,20 @@
           <span class="exp-client-tag">Sales Pipeline CRM</span>
         </div>
         <ul>
-          <li>Delivered full insurance CRM customization — sales pipeline with multi-stage lead management, assignment
-            rules, and follow-up task automation.</li>
+          <li>Delivered full insurance CRM customization — sales pipeline with <span class="nw">multi-stage</span> lead management, assignment
+            rules, and <span class="nw">follow-up</span> task automation.</li>
           <li>Built <strong>Policy Tracking System</strong> — full lifecycle management of insurance policies: status
             tracking, renewal monitoring, policy detail view, and history log per customer.</li>
           <li>Built <strong>Policy Appointment System</strong> — agents schedule, manage, and follow up on policy
-            appointments; automated reminders and calendar-based conflict detection.</li>
+            appointments; automated reminders and <span class="nw">calendar-based</span> conflict detection.</li>
           <li>Developed duplicate lead detection system for agents; built policy expiry alert automation and outbound
-            follow-up call scheduling for new customer acquisition.</li>
-          <li>Implemented CTI popup integration with PhonerLite softphone — agents receive screen-pop with caller context
+            <span class="nw">follow-up</span> call scheduling for new customer acquisition.</li>
+          <li>Implemented CTI popup integration with PhonerLite softphone — agents receive <span class="nw">screen-pop</span> with caller context
             on incoming/outgoing calls; extension status control via Webphone for break/ACW reporting.</li>
-          <li>Built configurable lead distribution with count-based allocation rules; added bulk policy assignment
-            checkboxes, Call Status column on policy page, and Created-by tracking for supervisor oversight.</li>
+          <li>Built configurable lead distribution with <span class="nw">count-based</span> allocation rules; added bulk policy assignment
+            checkboxes, Call Status column on policy page, and <span class="nw">Created-by</span> tracking for supervisor oversight.</li>
           <li><strong>Lead Status &amp; Data API:</strong> New/Follow lead status on the outbound list, filters by
-            call result, a required expiry date, filters on appointments, a reminder pop-up that tucks into the corner,
+            call result, a required expiry date, filters on appointments, a reminder <span class="nw">pop-up</span> that tucks into the corner,
             LINE OA links on lists, contacts and reports, a fuller report&nbsp;7 with Excel export, and an API so ISV can pull
             report&nbsp;7 into their own dashboard.</li>
           <li>Appointment dates now show as soon as they are saved, without a page refresh.</li>
@@ -4274,9 +4337,9 @@
             order status.</li>
           <li>Customized case management view: removed unused columns (popup phone, contact channel, created date),
             added surgery date, SO status, consultation date, and customer name columns with sort controls.</li>
-          <li>Implemented case notification page with assignment-date-based sort, newest-first default ordering, and
+          <li>Implemented case notification page with <span class="nw">assignment-date-based</span> sort, <span class="nw">newest-first</span> default ordering, and
             column parity with the main case list.</li>
-          <li>Updated field type for surgery date from Datetime to Date-only; restricted phone number visibility in all
+          <li>Updated field type for surgery date from Datetime to <span class="nw">Date-only</span>; restricted phone number visibility in all
             reports for DATA permission level (id 7).</li>
         </ul>
       </div>
@@ -4288,11 +4351,11 @@
           <span class="exp-client-tag">Fintech Customer Service</span>
         </div>
         <ul>
-          <li>Built IVR for self-service card operations: balance inquiry, transaction history, and card activation via
+          <li>Built IVR for <span class="nw">self-service</span> card operations: balance inquiry, transaction history, and card activation via
             DTMF with live backend API integration.</li>
           <li>Customized Report Blacklist/Unblacklist (Report #8) to include customer ID Card data alongside phone
             number for compliance tracking.</li>
-          <li>Contact center analytics dashboard tracking call volumes, IVR self-service completion rates, and agent
+          <li>Contact center analytics dashboard tracking call volumes, IVR <span class="nw">self-service</span> completion rates, and agent
             escalation breakdowns with SLA tracking.</li>
         </ul>
       </div>
@@ -4301,27 +4364,27 @@
         <div class="exp-client-section-header">
           <img src="assets/img/clients/mvmall.webp" width="56" height="17" alt="" loading="lazy" decoding="async">
           <h3>MV Shopping Mall Co., Ltd. <span style="font-weight:400;color:#6e6e73">(MVmall)</span></h3>
-          <span class="exp-client-tag">E-Commerce CRM</span>
+          <span class="exp-client-tag"><span class="nw">E-Commerce</span> CRM</span>
         </div>
         <ul>
-          <li>Developed customer service CRM for e-commerce operations — managing order inquiries, complaints, returns,
+          <li>Developed customer service CRM for <span class="nw">e-commerce</span> operations — managing order inquiries, complaints, returns,
             and delivery dispute resolution with SLA tracking.</li>
           <li>Fixed Outbound Project Detail report filter for project name — now shows only projects active within the
-            selected date-time range instead of showing all projects regardless of period.</li>
-          <li>Integrated LINE OA for proactive order status updates and post-purchase satisfaction surveys.</li>
+            selected <span class="nw">date-time</span> range instead of showing all projects regardless of period.</li>
+          <li>Integrated LINE OA for proactive order status updates and <span class="nw">post-purchase</span> satisfaction surveys.</li>
         </ul>
       </div>
 
       <div class="exp-client-section" data-client="ishopping">
         <div class="exp-client-section-header">
           <h3>iShopping <span style="font-weight:400;color:#6e6e73">(ISP)</span></h3>
-          <span class="exp-client-tag">E-Commerce Support CRM</span>
+          <span class="exp-client-tag"><span class="nw">E-Commerce</span> Support CRM</span>
         </div>
         <ul>
           <li>Built customer support CRM for a TV shopping platform — handling inbound order inquiries, return requests,
             and product complaint logging.</li>
           <li>Fixed export SO / import SO page table alignment; added Payment Date column to UI after Payment Status;
-            sorted On-Air schedule page by date ascending (oldest to newest).</li>
+            sorted <span class="nw">On-Air</span> schedule page by date ascending (oldest to newest).</li>
           <li>Agent productivity dashboard: tickets per agent, average resolution time, and SLA compliance rate.</li>
           <li>Queue reports and PBX dashboards now show queue names instead of queue numbers.</li>
         </ul>
@@ -4335,9 +4398,9 @@
         </div>
         <ul>
           <li>Developed a field service management CRM for property repair and maintenance operations — job intake,
-            technician dispatch, progress tracking, and completion sign-off.</li>
-          <li>Customer notification workflow via LINE OA: job confirmation, technician dispatch alerts, and post-service
-            satisfaction follow-up.</li>
+            technician dispatch, progress tracking, and completion <span class="nw">sign-off</span>.</li>
+          <li>Customer notification workflow via LINE OA: job confirmation, technician dispatch alerts, and <span class="nw">post-service</span>
+            satisfaction <span class="nw">follow-up</span>.</li>
           <li>Operations dashboard with job queue status, technician utilization rates, and SLA compliance for service
             completion windows.</li>
         </ul>
@@ -4350,9 +4413,9 @@
           <span class="exp-client-tag">Healthcare CRM</span>
         </div>
         <ul>
-          <li>Developed a patient CRM for medical services — managing appointment bookings, doctor-patient assignments,
-            and follow-up care scheduling.</li>
-          <li>Automated appointment reminders and health check-up recall notifications via LINE OA, reducing missed
+          <li>Developed a patient CRM for medical services — managing appointment bookings, <span class="nw">doctor-patient</span> assignments,
+            and <span class="nw">follow-up</span> care scheduling.</li>
+          <li>Automated appointment reminders and health <span class="nw">check-up</span> recall notifications via LINE OA, reducing missed
             appointments.</li>
           <li>Integrated Asterisk CDR linking all patient call interactions to their CRM profile for complete care
             history visibility.</li>
@@ -4367,9 +4430,9 @@
         </div>
         <ul>
           <li>Built reservation and guest inquiry management CRM for a Japanese hot spring resort brand with LINE OA
-            booking confirmations, pre-arrival instructions, and post-stay surveys.</li>
+            booking confirmations, <span class="nw">pre-arrival</span> instructions, and <span class="nw">post-stay</span> surveys.</li>
           <li>Added Queue Name and Call Status search filters to the orange analytics report page for improved data
-            drill-down.</li>
+            <span class="nw">drill-down</span>.</li>
           <li>Centralized guest interaction history across channels enabling personalized service and targeted
             promotional outreach.</li>
         </ul>
@@ -4399,11 +4462,11 @@
         </div>
         <ul>
           <li>Built CRM for accident &amp; health insurance sales — managing policy inquiries, quotation workflows, and
-            agent-assigned follow-up tasks.</li>
+            <span class="nw">agent-assigned</span> <span class="nw">follow-up</span> tasks.</li>
           <li>Developed agent break status system with 6 configurable statuses (Ready, Busy, Toilet, Meal, Consult, Mini
             Break) and generated associated status activity reports.</li>
-          <li>Automated policy renewal reminders and lapse-prevention campaigns via LINE OA; claim inquiry IVR for
-            self-service status checks before agent escalation.</li>
+          <li>Automated policy renewal reminders and <span class="nw">lapse-prevention</span> campaigns via LINE OA; claim inquiry IVR for
+            <span class="nw">self-service</span> status checks before agent escalation.</li>
           <li>Reworked the case form to the client's field list and built an <strong>API</strong> that sends each case on to
             an external system; restored the caller popup search, with case history and a button to add a customer.</li>
           <li>Set up a separate team for a new insurance project: 8 agent accounts in their own group, a policy form only
@@ -4418,8 +4481,8 @@
         </div>
         <ul>
           <li>Developed a patient appointment management CRM for a medical clinic — scheduling, doctor assignment, and
-            follow-up care coordination.</li>
-          <li>Automated appointment reminders and post-consultation follow-up via LINE OA, reducing no-show rates and
+            <span class="nw">follow-up</span> care coordination.</li>
+          <li>Automated appointment reminders and <span class="nw">post-consultation</span> <span class="nw">follow-up</span> via LINE OA, reducing <span class="nw">no-show</span> rates and
             improving patient experience.</li>
           <li>Asterisk CDR integration linking patient call history to profiles, giving clinic staff full context before
             each interaction.</li>
@@ -4434,7 +4497,7 @@
         </div>
         <ul>
           <li>Set up and configured full CRM system for S.B.L. Leasing — initial system setup, user provisioning, queue
-            configuration, and go-live support.</li>
+            configuration, and <span class="nw">go-live</span> support.</li>
           <li>Built customer service CRM for financial operations — managing inbound inquiries, case tracking, and
             resolution workflows with audit trail.</li>
           <li>Contact center analytics dashboard with call volume trends, agent handling time, and SLA compliance
@@ -4450,8 +4513,8 @@
         </div>
         <ul>
           <li>Integrated <strong>Phonerlite softphone</strong> with the client's existing CRM — provisioned PBX
-            extensions for agents (outbound via SIM) and supervisor (SpyCall-enabled) on Asterisk.</li>
-          <li>Built a <strong>Click-to-Call API endpoint</strong> — client's CRM triggers an outbound call on the
+            extensions for agents (outbound via SIM) and supervisor (<span class="nw">SpyCall-enabled</span>) on Asterisk.</li>
+          <li>Built a <strong><span class="nw">Click-to-Call</span> API endpoint</strong> — client's CRM triggers an outbound call on the
             agent's Phonerlite with a single button press, no manual dialing required.</li>
           <li>Developed API to <strong>search and retrieve call history</strong> from
             <code>queuemetrics.queue_log</code> — enabling the client's platform to query inbound/outbound call records
@@ -4460,7 +4523,7 @@
             into the client's own reporting system.</li>
           <li>Built API to <strong>deliver call recording files</strong> (audio) directly to the client's report storage
             for playback within their platform.</li>
-          <li>Implemented <strong>agent status API</strong> — syncs real-time extension status (available, busy, break)
+          <li>Implemented <strong>agent status API</strong> — syncs <span class="nw">real-time</span> extension status (available, busy, break)
             from Asterisk AMI to the client's CRM dashboard.</li>
           <li>Delivered full <strong>API documentation</strong> for every endpoint — request/response specs,
             authentication, and example payloads.</li>
@@ -4475,8 +4538,8 @@
         </div>
         <ul>
           <li>Customized call center analytics reports — localized ANSWER/UNANSWER labels to Thai (รับสาย/ไม่รับสาย) for
-            agent-facing reporting.</li>
-          <li>Updated queue display logic in all reports from queue number identifiers to human-readable queue names,
+            <span class="nw">agent-facing</span> reporting.</li>
+          <li>Updated queue display logic in all reports from queue number identifiers to <span class="nw">human-readable</span> queue names,
             improving report readability for operations supervisors.</li>
         </ul>
       </div>
@@ -4530,23 +4593,23 @@
           <span class="exp-client-tag">R&amp;D</span>
         </div>
         <ul>
-          <li>Researched and prototyped an end-to-end intelligent voice automation pipeline: <strong>ASR → LLM →
+          <li>Researched and prototyped an <span class="nw">end-to-end</span> intelligent voice automation pipeline: <strong>ASR → LLM →
               TTS</strong> targeting automated call handling for Thai and English contact center use cases.</li>
-          <li>Evaluated and benchmarked multiple ASR engines for real-time Thai/English transcription — assessing
+          <li>Evaluated and benchmarked multiple ASR engines for <span class="nw">real-time</span> Thai/English transcription — assessing
             accuracy, streaming latency, and noise tolerance under realistic call conditions.</li>
           <li>Used <strong>GPT (OpenAI)</strong> and <strong>Gemini (Google)</strong> as the core LLM reasoning layer
             for intent classification, dialogue management, and response generation.</li>
-          <li>Explored real-time <strong>speech-to-speech (STS)</strong> conversational AI (Gemini Live-style realtime
-            APIs) — studying end-to-end latency, barge-in handling, and naturalness against the classic ASR → LLM → TTS
+          <li>Explored <span class="nw">real-time</span> <strong><span class="nw">speech-to-speech</span> (STS)</strong> conversational AI (Gemini <span class="nw">Live-style</span> realtime
+            APIs) — studying <span class="nw">end-to-end</span> latency, <span class="nw">barge-in</span> handling, and naturalness against the classic ASR → LLM → TTS
             chain for live phone conversations.</li>
           <li>Designed and prototyped <strong>agentic AI architectures</strong>: an orchestrator agent coordinating
-            specialized sub-agents (intent routing, data lookup, action execution) with tool calling — applying the
-            pattern to business workflows like lead qualification and after-call work automation.</li>
+            specialized <span class="nw">sub-agents</span> (intent routing, data lookup, action execution) with tool calling — applying the
+            pattern to business workflows like lead qualification and <span class="nw">after-call</span> work automation.</li>
           <li>Leveraged <strong>Claude</strong> throughout R&amp;D: synthesizing technical papers, evaluating tradeoffs,
             designing prompt strategies, and accelerating product decisions.</li>
-          <li>Post-call AI features: smart summarization, sentiment tagging, and automated follow-up action suggestions
+          <li><span class="nw">Post-call</span> AI features: smart summarization, sentiment tagging, and automated <span class="nw">follow-up</span> action suggestions
             surfaced to agents after each call.</li>
-          <li>All production systems on <strong>AWS</strong> (EC2, S3, RDS) with auto-scaling, deployment automation,
+          <li>All production systems on <strong>AWS</strong> (EC2, S3, RDS) with <span class="nw">auto-scaling</span>, deployment automation,
             OWASP security practices, and SQL optimization across all client platforms.</li>
         </ul>
       </div>
@@ -4579,10 +4642,10 @@
 
     <div class="exp-modal-section">
       <h3>Role Overview</h3>
-      <p class="exp-modal-overview">Two internships at SCG, 6 internal platforms delivered end-to-end. The first
-        focused on enterprise workflows — software license lifecycle management and company-wide asset tracking. The
+      <p class="exp-modal-overview">Two internships at SCG, 6 internal platforms delivered <span class="nw">end-to-end</span>. The first
+        focused on enterprise workflows — software license lifecycle management and <span class="nw">company-wide</span> asset tracking. The
         second, with the 'Center of Excellence &amp; Data Driven' department, digitized manual workflows across
-        reservations, reference tracking, regional job management, and an event e-commerce platform.</p>
+        reservations, reference tracking, regional job management, and an event <span class="nw">e-commerce</span> platform.</p>
     </div>
 
     <div class="exp-modal-section">
@@ -4594,7 +4657,7 @@
         </li>
         <li>Applied MVC architecture, form validation, CSRF protection, and user authentication across all systems.</li>
         <li>Implemented approval workflow logic, automated email notifications, and audit trail logging.</li>
-        <li>Practiced Git-based version control, code review participation, and Agile sprint methodology, delivering
+        <li>Practiced <span class="nw">Git-based</span> version control, code review participation, and Agile sprint methodology, delivering
           every project within the internship period with full handover documentation.</li>
       </ul>
     </div>
@@ -4608,7 +4671,7 @@
         <ul>
           <li>Internal booking and reservation management for meeting rooms, company vehicles, equipment, and shared
             facilities.</li>
-          <li>Calendar views, time-slot conflict detection, approval workflows, and automated confirmation notifications
+          <li>Calendar views, <span class="nw">time-slot</span> conflict detection, approval workflows, and automated confirmation notifications
             via email.</li>
           <li>Admin panel for managing resource inventory, configuring booking rules (max duration, advance windows),
             and reviewing approval queues.</li>
@@ -4621,7 +4684,7 @@
         <ul>
           <li>Reference code generation and tracking system for managing document reference numbers across SCG business
             units.</li>
-          <li>Configurable prefix/suffix rules, sequential numbering with padding, and category-based series for
+          <li>Configurable prefix/suffix rules, sequential numbering with padding, and <span class="nw">category-based</span> series for
             multiple document types.</li>
           <li>Search and audit history — trace the lifecycle and usage of any reference code.</li>
         </ul>
@@ -4633,7 +4696,7 @@
         <ul>
           <li>Job tracking and management for SCG's southern region operations — create, assign, monitor, and close
             field jobs.</li>
-          <li>Job status workflows (open → assigned → in-progress → completed/cancelled) with history logging.</li>
+          <li>Job status workflows (open → assigned → <span class="nw">in-progress</span> → completed/cancelled) with history logging.</li>
           <li>Regional summaries reporting job completion rates and workload distribution across teams.</li>
         </ul>
       </div>
@@ -4657,12 +4720,12 @@
           <h3>Project License — Software License Management System</h3>
         </div>
         <ul>
-          <li>Multi-step license request and approval workflow: employee submission → IT manager review → procurement
+          <li><span class="nw">Multi-step</span> license request and approval workflow: employee submission → IT manager review → procurement
             purchasing → license assignment back to requester.</li>
           <li>Software catalog management: available licenses, vendor details, renewal dates, seat counts, and active
             utilization tracking.</li>
           <li>Automated email notifications at each workflow stage; reporting views for usage rates, upcoming renewals,
-            and department-level cost allocation.</li>
+            and <span class="nw">department-level</span> cost allocation.</li>
         </ul>
       </div>
       <div class="exp-client-section" data-client="scg-assets">
@@ -4670,13 +4733,13 @@
           <h3>Project Assets — Enterprise Asset Management Platform</h3>
         </div>
         <ul>
-          <li>Company-wide IT and physical asset tracking: register, assign, transfer, and retire assets with full audit
+          <li><span class="nw">Company-wide</span> IT and physical asset tracking: register, assign, transfer, and retire assets with full audit
             trail (procurement → assignment → transfer → maintenance → disposal).</li>
-          <li>Barcode/QR-code asset lookup — scan any asset to retrieve full ownership and maintenance history
+          <li>Barcode/<span class="nw">QR-code</span> asset lookup — scan any asset to retrieve full ownership and maintenance history
             instantly.</li>
           <li>Inventory reports: asset counts by department, condition status, age distribution, and depreciation
             tracking.</li>
-          <li>Check-out/check-in workflows for shared assets (projectors, cameras) with availability calendars and
+          <li><span class="nw">Check-out</span>/<span class="nw">check-in</span> workflows for shared assets (projectors, cameras) with availability calendars and
             reservation queues.</li>
         </ul>
       </div>
@@ -4761,7 +4824,7 @@
         <li>A screen to manage the storage access keys, which are encrypted before they are saved.</li>
         <li>Chats from KBAOBOT arrive with their history and status and are passed to an agent, who can look up the customer by user ID on the Social menu and reply from the CRM.</li>
         <li>An API sends the chat history, status and ticket number back to KBAOBOT, and an alert goes out when an agent passes a case on.</li>
-        <li>Deployed to test and production, with a step-by-step deployment guide.</li>
+        <li>Deployed to test and production, with a <span class="nw">step-by-step</span> deployment guide.</li>
       </ul>
     </div>
     <p class="exp-sheet-cta">Interested in working together? <a href="#contact" class="more exp-sheet-link">Get in
@@ -4786,7 +4849,7 @@
     <div class="exp-modal-section">
       <h3>What it does</h3>
       <ul>
-        <li>An API links the IVR call-outs to VietJet Thailand's back end, so their team creates and runs call campaigns directly.</li>
+        <li>An API links the IVR <span class="nw">call-outs</span> to VietJet Thailand's back end, so their team creates and runs call campaigns directly.</li>
         <li>All prompts were recorded anew: the call itself, the route, the date and time, and extra details.</li>
         <li>Passengers hear Thai, English, Chinese, Japanese or Vietnamese, chosen from the country code of their phone number.</li>
         <li>They press 1 to accept the new flight or 2 to decline; reports show call status, whether they answered and how they replied.</li>
@@ -4816,7 +4879,7 @@
       <ul>
         <li>Each lead shows New until the day after its first call from the project, then Follow.</li>
         <li>Agents filter the outbound list by call result, and must enter an expiry date before a lead can be saved.</li>
-        <li>Appointments filter by date and time, call status and call result, and reminder pop-ups can be minimized to the bottom right corner.</li>
+        <li>Appointments filter by date and time, call status and call result, and reminder <span class="nw">pop-ups</span> can be minimized to the bottom right corner.</li>
         <li>A LINE OA link for each lead, clickable on the outbound list and report&nbsp;6, and shown on the contact page.</li>
         <li>Report&nbsp;7 gains report&nbsp;6's columns, lead status, the LINE OA link, total dial attempts, the date the lead was added and Excel export, and an API lets ISV pull the same data.</li>
       </ul>
@@ -4929,7 +4992,7 @@
       <h3>What it does</h3>
       <ul>
         <li>The case form follows the client's field list, and an API sends each saved case on to an external system.</li>
-        <li>The caller pop-up search is back, with case history and a button to add a customer.</li>
+        <li>The caller <span class="nw">pop-up</span> search is back, with case history and a button to add a customer.</li>
         <li>New policy fields for details the team copies in from another system.</li>
         <li>A new group of 8 agents, with a policy form only they can see and their own queue.</li>
         <li>A callback box on the dashboard, counted from the project's abandoned calls.</li>
@@ -4958,7 +5021,7 @@
     <div class="exp-modal-section">
       <h3>What it does</h3>
       <ul>
-        <li>A CTI pop-up in the CRM for calls on the softphone.</li>
+        <li>A CTI <span class="nw">pop-up</span> in the CRM for calls on the softphone.</li>
         <li>Agents change their extension status, such as breaks, from the web phone, so the agent activity report stays right.</li>
         <li>Call reports and recordings stay available in the CRM, as before.</li>
       </ul>
@@ -5044,7 +5107,7 @@
       <ul>
         <li>Four queue reports and two PBX dashboards show queue names instead of queue numbers.</li>
         <li>The sales order export and import pages use the same table layout.</li>
-        <li>A payment date column after payment status, and the on-air schedule sorted from oldest to newest.</li>
+        <li>A payment date column after payment status, and the <span class="nw">on-air</span> schedule sorted from oldest to newest.</li>
       </ul>
     </div>
     <p class="exp-sheet-cta">Interested in working together? <a href="#contact" class="more exp-sheet-link">Get in
@@ -5082,7 +5145,7 @@
       <div class="exp-modal-role-header">
         <div>
           <h2 class="exp-modal-title">Measuring of Words Similarity for Question Answering System for Diabetes</h2>
-          <div class="exp-modal-company">Journal of Applied Informatics and Technology (TCI-1)</div>
+          <div class="exp-modal-company">Journal of Applied Informatics and Technology (<span class="nw">TCI-1</span>)</div>
         </div>
       </div>
       <div class="exp-modal-period">2023 &middot; Vol. 5 No. 2, July&ndash;December</div>
@@ -5120,7 +5183,7 @@
       <h3>Role Overview</h3>
       <p class="exp-modal-overview">Diagnosed, repaired, and maintained hardware for 5+ devices daily while providing
         technical consultation to over 10 customers per day at one of Thailand's largest IT retail chains — ensuring
-        high service satisfaction in a high-volume technical support environment.</p>
+        high service satisfaction in a <span class="nw">high-volume</span> technical support environment.</p>
     </div>
 
     <div class="exp-modal-section">
@@ -5128,13 +5191,13 @@
       <ul>
         <li>Diagnosed and repaired 5+ laptops and 2+ desktop computers daily — HDD/SSD replacements, RAM failures,
           overheating, display panel faults, and keyboard/trackpad replacements.</li>
-        <li>Performed OS installations, driver updates, BIOS configuration, malware removal, and post-repair hardware
+        <li>Performed OS installations, driver updates, BIOS configuration, malware removal, and <span class="nw">post-repair</span> hardware
           testing before device return.</li>
         <li>Data backup and recovery from failing storage devices; repair job ticketing from intake through to
           completion.</li>
         <li>Provided direct technical consultation to 10+ customers daily — diagnosing symptoms, explaining repair
           options and costs, and recommending upgrade or replacement solutions.</li>
-        <li>Advised on product selection (laptops, desktops, peripherals) matched to customer use-case and budget;
+        <li>Advised on product selection (laptops, desktops, peripherals) matched to customer <span class="nw">use-case</span> and budget;
           handled warranty claims and data recovery risk communication.</li>
       </ul>
     </div>
