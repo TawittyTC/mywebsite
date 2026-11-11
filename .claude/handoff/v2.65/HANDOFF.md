@@ -272,8 +272,23 @@ Still to do:
 ## 7. Releasing v2.65.0
 
 1. `./build.sh`, then the whole suite. State of the branch when this was written:
-   the eight hero tests pass; the whole-suite run had not finished (see the next commit on the
-   branch, or run it).
+   106 tests, 105 pass, 1 fails, in 8 min 53 s (the hero file adds about 4 minutes).
+   The failure is `the hero is laid out the same before the stylesheet arrives`
+   (tests/responsive.test.mjs:300) at 1440x900: the name line read y 334 without the
+   stylesheet and 304 with it. Run alone it passes 4 of 4, and measured by hand the hero's
+   boxes, the new row included, are identical with and without the stylesheet at 1440x900
+   and 390x844. Cause: the test reads the boxes at whatever moment the page finished
+   loading, while each line is still held back by its entrance delay (0.1 s for the name,
+   0.4 s for eyebrow and role, 0.55 s for the row) and sits 30px low until then; reduced
+   motion shortens the animation, not the delay. Two loads can land on either side of a
+   delay. The race was there before; a loaded machine makes it show.
+   Fix in the test, on both loads: after `document.fonts.ready` wait until the entrance is
+   over (`await page.waitForTimeout(900)`, or until `document.getAnimations()` is empty),
+   then read. Do not loosen the comparison. Add `#hero .hero-actions` and its two children
+   to the test's `parts` while you are there.
+   One small gap in the inline copy of the row's CSS: `.chev` has no height before the
+   stylesheet (0 against 12px). It moves nothing (the link's box is 117x44 both ways);
+   adding `height: .72em` to `#hero .hero-actions .chev` in index.html closes it.
 2. Bump `?v=2.64.0` to `?v=2.65.0` (4 places in index.html, 2 in sw.js) and
    `const CACHE = 'v159'` to `'v160'` in sw.js. `./build.sh` again. Delete `.claude/handoff/`.
 3. Merge without fast-forward in a separate worktree, never on the branch checkout:
