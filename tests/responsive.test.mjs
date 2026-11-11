@@ -303,7 +303,8 @@ test('the hero is laid out the same before the stylesheet arrives', async () => 
   // main.js sizes the constellation from that first layout — so the
   // inline critical CSS must already give the hero its final geometry.
   const parts = ['#hero', '#hero .hero-grid', '#hero .hero-eyebrow', '#hero .hero-name-line:nth-child(1)',
-    '#hero .hero-name-line:nth-child(2)', '#hero .hero-role', '#hero-net', '#hero-net-labels'];
+    '#hero .hero-name-line:nth-child(2)', '#hero .hero-role', '#hero .hero-actions', '#hero .hero-actions .btn-pill',
+    '#hero .hero-actions .more', '#hero .hero-actions .chev', '#hero-net', '#hero-net-labels'];
   for (const [width, height, mobile] of [[390, 844, true], [844, 390, true], [1440, 900, false]]) {
     const boxes = [];
     for (const withStylesheet of [false, true]) {
@@ -313,6 +314,10 @@ test('the hero is laid out the same before the stylesheet arrives', async () => 
       if (!withStylesheet) await page.route(/style\.min\.css/, (r) => r.abort());
       await page.goto(ctx.srv.url + '/index.html', { waitUntil: 'load' });
       await page.evaluate(() => document.fonts.ready);
+      // Reduced motion shortens the entrance, not its delays: each line waits up to 0.55s
+      // 30px below its place. Read the boxes once every animation is over, or two loads can
+      // land on either side of a delay.
+      await page.waitForFunction(() => document.getAnimations().every((a) => a.playState === 'finished'), null, { timeout: 5000 });
       boxes.push(await page.evaluate((sels) => [window.innerWidth, ...sels.map((s) => {
         const r = document.querySelector(s).getBoundingClientRect();
         return [s, Math.round(r.x), Math.round(r.y), Math.round(r.width), Math.round(r.height)];
