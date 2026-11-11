@@ -160,6 +160,17 @@ function afterPaint(fn) {
 }
 
 /**
+ * Card text copied into the See-all list or the viewer's caption, as HTML:
+ * escaped first, then each hyphenated compound ("Covid-19") wrapped in .nw,
+ * so it keeps to one line there as it does on the card.
+ */
+function nwHtml(t) {
+  var d = document.createElement("div");
+  d.textContent = t;
+  return d.innerHTML.replace(/[^\W_]+(?:-[^\W_]+)+/g, '<span class="nw">$&</span>');
+}
+
+/**
  * Two-parameter spring, the way Apple frames it: `response` is roughly how
  * long the value takes to arrive, `damping` 1 lands it without overshoot.
  * It integrates from whatever is on screen at this instant, so re-aiming
@@ -342,7 +353,7 @@ var overlayHistory = (function () {
     const turn = ++showing;
     lbImg.style.width = lbImg.style.height = "";
     lbImg.alt = alt;
-    caption.textContent = title || "";
+    caption.innerHTML = nwHtml(title || "");
     caption.hidden = !title;
     // A wide screenshot on a portrait phone would shrink to a strip too
     // small to read: show it tall enough to read and let it pan sideways
@@ -360,7 +371,7 @@ var overlayHistory = (function () {
       frame.removeAttribute("tabindex");
       frame.removeAttribute("aria-label");
     }
-    if (pan) caption.textContent = (title ? title + " · " : "") + "Swipe to see the whole screen";
+    if (pan) caption.innerHTML = nwHtml((title ? title + " · " : "") + "Swipe to see the whole screen");
     if (pan) caption.hidden = false;
     // A tile that shows a small copy names the full picture's size: the
     // viewer opens on that copy, already at the final size, and the full
@@ -785,13 +796,13 @@ document.addEventListener("DOMContentLoaded", function () {
       if (!logos[g] && c.getAttribute("data-logo")) logos[g] = [c.getAttribute("data-logo"), (c.getAttribute("data-logo-size") || "").split("x")];
       groups[g].push('<li><button type="button" class="proj-row" data-i="' + i + '" aria-describedby="pg' + order.indexOf(g) + '"><span class="proj-well" aria-hidden="true">' +
         (icon ? icon.outerHTML : '<img src="' + esc(img.getAttribute("src")) + '" alt="">') +
-        '</span><span class="proj-text"><span class="proj-name">' + esc(k > 0 ? t.slice(0, k) : t) + "</span>" +
+        '</span><span class="proj-text"><span class="proj-name">' + nwHtml(k > 0 ? t.slice(0, k) : t) + "</span>" +
         (kind ? ' <span class="proj-kind"><span class="nw">' + esc(kind) + "</span></span>" : "") +
         '</span><span class="chev" aria-hidden="true"></span></button></li>');
     });
     return '<div class="exp-modal-header"><h2 class="exp-modal-title">All projects</h2><div class="exp-modal-company">' +
       cards.length + " projects</div></div>" + order.map(function (g, j) {
-        return '<div class="proj-group"><h3 id="pg' + j + '"><span>' + esc(g) + '</span>' +
+        return '<div class="proj-group"><h3 id="pg' + j + '"><span>' + nwHtml(g) + '</span>' +
           (logos[g] ? '<img class="proj-logo" srcset="' + esc(logos[g][0]) + ' 3x" width="' + esc(logos[g][1][0] || "") +
             '" height="' + esc(logos[g][1][1] || "") + '" alt="" loading="lazy" decoding="async">' : '') + '</h3><ul class="proj-rows">' + groups[g].join("") + "</ul></div>";
       }).join("");
