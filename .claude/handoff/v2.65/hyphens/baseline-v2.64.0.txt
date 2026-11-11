@@ -1,0 +1,51 @@
+=== 320px: page breaks 11; overlay breaks 106; hyphens measured 1061; doc 320/320; .nw rendered 94, not fitting 0; panels overflowing 0; text poking out 0; errors 0; hero "I'm a Full-Stack Developer" 
+=== 344px: page breaks 13; overlay breaks 102; hyphens measured 1061; doc 344/344; .nw rendered 94, not fitting 0; panels overflowing 0; text poking out 0; errors 0; hero "I'm a Full-Stack Developer" 
+=== 360px: page breaks 9; overlay breaks 77; hyphens measured 1061; doc 360/360; .nw rendered 94, not fitting 0; panels overflowing 0; text poking out 0; errors 0; hero "I'm a Full-Stack Developer" li
+=== 375px: page breaks 9; overlay breaks 104; hyphens measured 1061; doc 375/375; .nw rendered 94, not fitting 0; panels overflowing 0; text poking out 0; errors 0; hero "I'm a Full-Stack Developer" l
+=== 390px: page breaks 9; overlay breaks 43; hyphens measured 1061; doc 390/390; .nw rendered 94, not fitting 0; panels overflowing 0; text poking out 0; errors 0; hero "I'm a Full-Stack Developer" li
+=== 412px: page breaks 8; overlay breaks 68; hyphens measured 1061; doc 412/412; .nw rendered 94, not fitting 0; panels overflowing 0; text poking out 0; errors 0; hero "I'm a Full-Stack Developer" li
+=== 430px: page breaks 11; overlay breaks 115; hyphens measured 1061; doc 430/430; .nw rendered 94, not fitting 0; panels overflowing 0; text poking out 0; errors 0; hero "I'm a Full-Stack Developer" 
+=== 600px: page breaks 4; overlay breaks 50; hyphens measured 1061; doc 600/600; .nw rendered 94, not fitting 0; panels overflowing 0; text poking out 0; errors 0; hero "I'm a Full-Stack Developer" li
+=== 744px: page breaks 5; overlay breaks 17; hyphens measured 1061; doc 744/744; .nw rendered 94, not fitting 0; panels overflowing 0; text poking out 0; errors 0; hero "I'm a Full-Stack Developer" li
+=== 768px: page breaks 0; overlay breaks 19; hyphens measured 1061; doc 768/768; .nw rendered 94, not fitting 0; panels overflowing 0; text poking out 0; errors 0; hero "I'm a Full-Stack Developer" li
+=== 820px: page breaks 2; overlay breaks 48; hyphens measured 1061; doc 820/820; .nw rendered 94, not fitting 0; panels overflowing 0; text poking out 0; errors 0; hero "I'm a Full-Stack Developer" li
+=== 1024px: page breaks 2; overlay breaks 48; hyphens measured 1061; doc 1024/1024; .nw rendered 94, not fitting 0; panels overflowing 0; text poking out 0; errors 0; hero "I'm a Full-Stack Developer"
+=== 1280px: page breaks 1; overlay breaks 48; hyphens measured 1061; doc 1280/1280; .nw rendered 94, not fitting 0; panels overflowing 0; text poking out 0; errors 0; hero "I'm a Full-Stack Developer"
+=== 1440px: page breaks 2; overlay breaks 48; hyphens measured 1061; doc 1440/1440; .nw rendered 94, not fitting 0; panels overflowing 0; text poking out 0; errors 0; hero "I'm a Full-Stack Developer"
+=== 1920px: page breaks 2; overlay breaks 9; hyphens measured 1061; doc 1920/1920; .nw rendered 94, not fitting 0; panels overflowing 0; text poking out 0; errors 0; hero "I'm a Full-Stack Developer" 
+=== 2560px: page breaks 2; overlay breaks 8; hyphens measured 1061; doc 2560/2560; .nw rendered 94, not fitting 0; panels overflowing 0; text poking out 0; errors 0; hero "I'm a Full-Stack Developer" 
+
+--- every break at 390px
+   BREAK Question-Answering @ div.data-box > div.exp-roles > div.exp-role > h4.exp-role-title   [page]
+   BREAK LLM-powered @ div.row > div.col-md-12 > div.data-box > div.fw-light.profile-bio-small.mt-3   [page]
+   BREAK speech-to-speech @ div.row > div.col-md-12 > div.data-box > div.fw-light.profile-bio-small.mt-3   [page]
+   BREAK end-to-end @ div.row > div.col-md-12 > div.data-box > div.fw-light.profile-bio-small.mt-3   [page]
+   BREAK fast-paced, @ div.row > div.col-md-12 > div.data-box > p.fw-light.profile-bio-small.mt-3   [page]
+   BREAK multi-agent @ div#skill-scroller > div.rf-cards-scroller-item > p.skill-desc.fw-light   [page]
+   BREAK speech-to-speech @ div#skill-scroller > div.rf-cards-scroller-item > p.skill-desc.fw-light   [page]
+   BREAK ORM-backed @ div#skill-scroller > div.rf-cards-scroller-item > p.skill-desc.fw-light   [page]
+   BREAK E-Commerce @ div.faq > div.faq-list > details > p   [page]
+   BREAK (auto-dial), @ div.exp-modal-section.exp-clients-folded > div.exp-client-section > ul > li   [exp:protollcall, card:protollcall/kasikorn]
+   BREAK follow-up @ div.exp-modal-section.exp-clients-folded > div.exp-client-section > ul > li   [exp:protollcall, card:protollcall/isv, card:protollcall/drorn]
+   BREAK e-commerce @ div.exp-modal-section.exp-clients-folded > div.exp-client-section > ul > li   [exp:protollcall, card:protollcall/mvmall]
+   BREAK post-consultation @ div.exp-modal-section.exp-clients-folded > div.exp-client-section > ul > li   [exp:protollcall, card:protollcall/drorn]
+   BREAK go-live @ div.exp-modal-section.exp-clients-folded > div.exp-client-section > ul > li   [exp:protollcall, card:protollcall/sbl]
+   BREAK real-time @ div.exp-modal-section.exp-clients-folded > div.exp-client-section > ul > li   [exp:protollcall, card:protollcall/genie]
+   BREAK human-readable @ div.exp-modal-section.exp-clients-folded > div.exp-client-section > ul > li   [exp:protollcall, card:protollcall/isuzu]
+   BREAK barge-in @ div.exp-modal-section.exp-clients-folded > div.exp-client-section > ul > li   [exp:protollcall, card:protollcall/general]
+   BREAK company-wide @ div.exp-lightbox-inner > div > div.exp-modal-section > p.exp-modal-overview   [exp:scg, card:scg/scg-license, card:scg/scg-booking, card:scg/scg-jobsouth, +2]
+   BREAK e-commerce @ div.exp-lightbox-inner > div > div.exp-modal-section > p.exp-modal-overview   [exp:scg, card:scg/scg-license, card:scg/scg-booking, card:scg/scg-jobsouth, +2]
+   BREAK category-based @ div.exp-modal-section > div.exp-client-section > ul > li   [exp:scg, card:scg/scg-license, card:scg/scg-booking, card:scg/scg-jobsouth, +2]
+   BREAK department-level @ div.exp-modal-section > div.exp-client-section > ul > li   [exp:scg, card:scg/scg-license, card:scg/scg-booking, card:scg/scg-jobsouth, +2]
+
+--- every break at 1440px
+   BREAK speech-to-speech @ div.row > div.col-md-12 > div.data-box > div.fw-light.profile-bio-small.mt-3   [page]
+   BREAK (Multi-Agent @ div.faq > div.faq-list > details > p   [page]
+   BREAK contact-center @ div > div.exp-modal-section > ul > li   [exp:protollcall, card:protollcall/kasikorn, card:protollcall/happy, card:protollcall/bkk-hosp, +30]
+   BREAK (auto-dial), @ div.exp-modal-section > div.exp-client-section > ul > li   [exp:protollcall, card:protollcall/kasikorn]
+   BREAK channel/agent/time-of-day, @ div.exp-modal-section > div.exp-client-section > ul > li   [exp:protollcall, card:protollcall/digiserve]
+   BREAK merchant-specific @ div.exp-modal-section > div.exp-client-section > ul > li   [exp:protollcall, card:protollcall/thaivan]
+   BREAK SLA-based @ div.exp-modal-section > div.exp-client-section > ul > li   [exp:protollcall, card:protollcall/netbay]
+   BREAK Created-by @ div.exp-modal-section > div.exp-client-section > ul > li   [exp:protollcall, card:protollcall/isv]
+   BREAK newest-first @ div.exp-modal-section > div.exp-client-section > ul > li   [exp:protollcall, card:protollcall/qprime]
+   BREAK use-case @ div > div.exp-modal-section > ul > li   [exp:advice]

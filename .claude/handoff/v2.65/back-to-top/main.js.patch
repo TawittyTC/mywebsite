@@ -1,0 +1,67 @@
+diff --git a/assets/js/main.js b/assets/js/main.js
+index 99c35b1..97a484a 100644
+--- a/assets/js/main.js
++++ b/assets/js/main.js
+@@ -1409,14 +1409,41 @@ document.addEventListener('DOMContentLoaded', function () {
+   // scroll position here would lay out the whole page mid-script)
+   var lastY = 0, upFrom = null;
+   var ticking = false;
++  // ...and there it leaves again two seconds after the scrolling stops: it
++  // sits in the column of every round control (the row paddles, the "+" of a
++  // card or a question), and left over them it takes their taps. The count
++  // starts again with every scroll update, so momentum keeps it up.
++  var leaveT = 0, held = false;
++  function leave() {
++    leaveT = 0;
++    if (held) return; // a finger is on it: the release starts the count again
++    upFrom = null;    // only a new upward scroll brings it back, no resize
++    toTop.classList.remove('visible');
++  }
++  function count(on) {
++    clearTimeout(leaveT);
++    leaveT = on ? setTimeout(leave, 2000) : 0;
++  }
++  // A turned phone moves the page with no finger on it: the text reflows,
++  // then the hero is pinned again 150ms after the last resize. For a second
++  // after the layout width changes, that movement is nobody scrolling up.
++  var wide = 0, turned = 0;
+   function update() {
+     ticking = false;
+     var y = window.scrollY || 0;
+     var show = y > window.innerHeight * 0.9;
+     if (touch) {
+-      if (y < lastY - 2) { if (upFrom === null) upFrom = lastY; }
++      var w = document.documentElement.clientWidth, now = performance.now();
++      if (wide && w !== wide) turned = now;
++      wide = w;
++      if (turned && now - turned < 1000) {
++        // one already showing keeps its place; nothing new comes out
++        upFrom = toTop.classList.contains('visible') ? upFrom + y - lastY : null;
++      }
++      else if (y < lastY - 2) { if (upFrom === null) upFrom = lastY; }
+       else if (y > lastY + 2) upFrom = null;
+       show = show && upFrom !== null && upFrom - y > 30;
++      count(show);
+     }
+     lastY = y;
+     toTop.classList.toggle('visible', show);
+@@ -1429,6 +1456,19 @@ document.addEventListener('DOMContentLoaded', function () {
+   window.addEventListener('resize', onScroll, { passive: true });
+   afterPaint(update); // hidden at the top of the page; measured once painted
+ 
++  if (touch) {
++    // it never leaves from under a finger (a keyboard or switch user's focus
++    // keeps it in sight through the :focus-visible rule in the stylesheet)
++    toTop.addEventListener('pointerdown', function () { held = true; }, { passive: true });
++    ['pointerup', 'pointercancel'].forEach(function (type) {
++      window.addEventListener(type, function () {
++        if (!held) return;
++        held = false;
++        if (toTop.classList.contains('visible')) count(true);
++      }, { passive: true });
++    });
++  }
++
+   toTop.addEventListener('click', function () {
+     window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+   });
