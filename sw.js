@@ -1,10 +1,10 @@
-const CACHE = 'v161';
+const CACHE = 'v162';
 const PRECACHE = [
-  'assets/css/style.min.css?v=2.66.0',
+  'assets/css/style.min.css?v=2.67.0',
   'assets/fonts/inter-latin.woff2',
   'assets/fonts/notosansthai-thai.woff2',
   'assets/fonts/notosansthai-latin.woff2',
-  'assets/js/main.min.js?v=2.66.0',
+  'assets/js/main.min.js?v=2.67.0',
 ];
 
 self.addEventListener('install', e => {
@@ -22,10 +22,15 @@ self.addEventListener('fetch', e => {
   if (url.origin !== location.origin) return;
 
   // HTML/navigations: network-first so deploys reach returning visitors
-  // immediately; fall back to cache when offline.
+  // immediately; fall back to cache when offline. GitHub Pages lets the
+  // browser keep a page for 10 minutes, so a plain visit right after a
+  // deploy still got the old page from the browser's own cache: ask the
+  // server every time instead (an unchanged page is a small 304).
   if (e.request.mode === 'navigate' || url.pathname.endsWith('.html') || url.pathname.endsWith('/')) {
+    let fresh = e.request;
+    try { fresh = new Request(e.request, { cache: 'no-cache' }); } catch (err) { /* an engine that refuses: as before */ }
     e.respondWith(
-      fetch(e.request).then(res => {
+      fetch(fresh).then(res => {
         if (res && res.status === 200) {
           const clone = res.clone();
           caches.open(CACHE).then(c => c.put(e.request, clone));
