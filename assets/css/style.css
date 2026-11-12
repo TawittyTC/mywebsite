@@ -928,6 +928,185 @@ button {
 }
 
 
+/*--------------------------------------------------------------
+# Section Waves — cute themed motion per section
+--------------------------------------------------------------*/
+.section-wave {
+  width: 220px;
+  height: 24px;
+  margin: 22px auto 0;
+  color: var(--color-link);
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.section-wave svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Soft fade at both ends so drifting lines never hard-stop at an edge */
+.section-wave-fade {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 20%, #000 80%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 20%, #000 80%, transparent);
+}
+
+/* Resume — solid wave gliding sideways, faint echo drifting the other way.
+   Paths are periodic (56px), so a one-period translate loops seamlessly. */
+.wave-flow {
+  animation: wave-slide 7s linear infinite;
+}
+
+.wave-flow-echo {
+  animation: wave-slide-back 11s linear infinite;
+}
+
+@keyframes wave-slide {
+  to {
+    transform: translateX(-56px);
+  }
+}
+
+@keyframes wave-slide-back {
+  to {
+    transform: translateX(56px);
+  }
+}
+
+/* Projects — same glide, higher frequency (28px period) and faster */
+.wave-signal {
+  animation: wave-slide-fast 1.9s linear infinite;
+}
+
+.wave-signal-echo {
+  animation: wave-slide-back 9s linear infinite;
+}
+
+@keyframes wave-slide-fast {
+  to {
+    transform: translateX(-28px);
+  }
+}
+
+/* Experience — spark travels the journey; milestone dots breathe in turn */
+.wave-dot {
+  animation: wave-pulse 2.4s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.wave-dot-2 {
+  animation-delay: .4s;
+}
+
+.wave-dot-3 {
+  animation-delay: .8s;
+}
+
+@keyframes wave-pulse {
+
+  0%,
+  100% {
+    opacity: .35;
+    transform: scale(.8);
+  }
+
+  35% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+}
+
+/* Skills — equalizer bars dancing, slightly desynced so it feels alive */
+.wave-bar {
+  animation: wave-eq 1.15s ease-in-out infinite alternate;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+
+.wave-bar-2 {
+  animation-delay: .12s;
+  animation-duration: 1s;
+}
+
+.wave-bar-3 {
+  animation-delay: .24s;
+  animation-duration: 1.3s;
+}
+
+.wave-bar-4 {
+  animation-delay: .36s;
+  animation-duration: .95s;
+}
+
+.wave-bar-5 {
+  animation-delay: .48s;
+  animation-duration: 1.2s;
+}
+
+.wave-bar-6 {
+  animation-delay: .6s;
+  animation-duration: 1.05s;
+}
+
+@keyframes wave-eq {
+  from {
+    transform: scaleY(.3);
+  }
+
+  to {
+    transform: scaleY(1);
+  }
+}
+
+/* Certificates — twin ribbons drifting past each other */
+.wave-ribbon {
+  animation: wave-drift 6.5s linear infinite;
+}
+
+.wave-ribbon-2 {
+  animation: wave-drift-back 9s linear infinite;
+}
+
+@keyframes wave-drift {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(56px);
+  }
+}
+
+@keyframes wave-drift-back {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-56px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .wave-flow,
+  .wave-flow-echo,
+  .wave-signal,
+  .wave-signal-echo,
+  .wave-dot,
+  .wave-bar,
+  .wave-ribbon,
+  .wave-ribbon-2 {
+    animation: none;
+  }
+
+  /* SMIL ignores media queries — hide the traveling spark outright */
+  .wave-spark {
+    display: none;
+  }
+}
 
 
 /*--------------------------------------------------------------
