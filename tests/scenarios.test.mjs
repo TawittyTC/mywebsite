@@ -355,36 +355,40 @@ test('violent jump-scrolling then landing anywhere leaves nothing half-faded', a
   await page.close();
 });
 
-test('section headings are a headline and a line of text, with nothing moving under them', async () => {
-  // the animated drawings under each heading (waves, equalizer bars, a travelling spark) were
-  // removed at the owner's request: they did not read as an Apple product page
-  for (const opts of [{}, { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true }]) {
-    const { page } = await ctx.openPage({ ...opts, reducedMotion: 'no-preference' });
-    const heads = await page.$$eval('section .section-title', (els) => els.map((t) => {
-      const sub = t.querySelector('p'), r = t.getBoundingClientRect();
-      let next = t.nextElementSibling;
-      while (next && !next.getClientRects().length) next = next.nextElementSibling;
-      return {
-        id: t.closest('section').id,
-        kids: [...t.children].map((k) => k.tagName.toLowerCase()).join(','),
-        drawings: t.querySelectorAll('svg, canvas, img').length,
-        moving: t.getAnimations({ subtree: true }).length,
-        // the content starts where the heading's own bottom spacing ends
-        gap: next ? Math.round(next.getBoundingClientRect().top - sub.getBoundingClientRect().bottom) : null,
-        pad: parseFloat(getComputedStyle(t).paddingBottom),
-        bottom: Math.round(r.bottom - sub.getBoundingClientRect().bottom),
-      };
-    }));
-    const at = opts.viewport ? '390px' : '1440px';
-    assert.deepEqual(heads.map((h) => h.id), ['resume', 'experience', 'skill', 'portfolio', 'certificates', 'services']);
-    for (const h of heads) {
-      assert.equal(h.kids, 'h2,p', `${at} #${h.id}: the heading holds ${h.kids}`);
-      assert.equal(h.drawings, 0, `${at} #${h.id}: a drawing is back under the heading`);
-      assert.equal(h.moving, 0, `${at} #${h.id}: something under the heading is animated`);
-      assert.equal(h.bottom, h.pad, `${at} #${h.id}: the heading ends ${h.bottom}px under its text, expected its ${h.pad}px spacing`);
-    }
-    await page.close();
+test('every section carries its themed wave and the waves actually animate', async () => {
+  const { page } = await ctx.openPage();
+  // one wave per section: resume, experience, skill, portfolio, certificates, services
+  // (the closing CTA deliberately has none)
+  const homes = await page.$$eval('.section-wave', (els) =>
+    els.map((el) => el.closest('section')?.id || ''));
+  assert.deepEqual(homes, ['resume', 'experience', 'skill', 'portfolio', 'certificates', 'services'],
+    'expected exactly one wave in each content section, in page order');
+  // each themed part is animated (computed style, not just class names)
+  const anims = await page.evaluate(() => {
+    const name = (sel) => getComputedStyle(document.querySelector(sel)).animationName;
+    return {
+      flow: name('#resume .wave-flow'),
+      dot: name('#experience .wave-dot'),
+      bar: name('#skill .wave-bar'),
+      signal: name('#portfolio .wave-signal'),
+      ribbon: name('#certificates .wave-ribbon'),
+      servicesRibbon: name('#services .wave-ribbon'),
+    };
+  });
+  for (const [part, anim] of Object.entries(anims)) {
+    assert.notEqual(anim, 'none', `${part} wave is not animated`);
   }
+  // solid strokes only — dashed lines were rejected as visually noisy
+  const dashed = await page.$$eval('.section-wave path', (els) =>
+    els.filter((el) => getComputedStyle(el).strokeDasharray !== 'none').length);
+  assert.equal(dashed, 0, `${dashed} wave paths still use dashed strokes`);
+  // the Experience spark exists for the SMIL journey animation
+  assert.ok(await page.$('#experience .wave-spark'), 'experience spark missing');
+  // decorative only: hidden from assistive tech and never intercepts input
+  const decorative = await page.$$eval('.section-wave', (els) =>
+    els.every((el) => el.getAttribute('aria-hidden') === 'true'));
+  assert.ok(decorative, 'waves must be aria-hidden');
+  await page.close();
 });
 
 test('the SCG timeline pulse rides the connector from the oldest entry to the newest', async () => {
