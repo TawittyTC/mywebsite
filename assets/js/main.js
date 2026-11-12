@@ -2371,16 +2371,16 @@ document.addEventListener('DOMContentLoaded', function () {
 })();
 
 /**
- * Decorations that loop forever — the section waves and the spark that
- * travels the Experience line, the "Active" pulse, the card's drifting
- * light — ask for a new frame on every screen refresh wherever they are on
- * the page, and the waves, the spark and the pulse are painted by the main
- * thread. Off screen nobody sees them, so there they wait, and they carry
- * on from the same spot as they come back into view.
+ * Decorations that loop forever — the "Active" pulse, the spark that runs
+ * down an Experience role line and the card's drifting light — ask for a new
+ * frame on every screen refresh wherever they are on the page, and the pulse
+ * and the spark are painted by the main thread (the spark moves by its top,
+ * a new layout each frame). Off screen nobody sees them, so there they wait,
+ * and they carry on from the same spot as they come back into view.
  */
 (function () {
   if (!('IntersectionObserver' in window) || !document.documentElement.getAnimations) return;
-  var hosts = document.querySelectorAll('.section-wave, .exp-status-active, .biz-scene');
+  var hosts = document.querySelectorAll('.exp-status-active, .exp-role-spark, .biz-scene');
   if (!hosts.length) return;
   var held = new Map(); // host -> the animations this paused
   var io = new IntersectionObserver(function (entries) {
