@@ -35,7 +35,7 @@ test('experience modal: opens from a card, filters by client, closes with Escape
   await page.close();
 });
 
-test('client work leads My Projects, and every card shows without a filter row', async () => {
+test('client work leads Projects, and every card shows without a filter row', async () => {
   const { page } = await ctx.openPage();
   const state = await page.evaluate(() => {
     const items = [...document.querySelectorAll('#portfolio .rf-cards-scroller-item')];

@@ -170,7 +170,7 @@ test('typography > minimum size: the graph labels are 11px everywhere and hold f
   }
 });
 
-test('color > contrast: the lightest blue in the name and in "Let\'s build what\'s next." keeps 3:1 (gradient-text-contrast)', async () => {
+test('color > contrast: the lightest blue in the name and in the Contact headline keeps 3:1 (gradient-text-contrast)', async () => {
   const { page } = await open({ viewport: { width: 1440, height: 900 } });
   const stops = await page.$eval('.cta-headline', (el) => getComputedStyle(el).backgroundImage);
   const bg = rgbOf(await page.evaluate(() => {
@@ -476,4 +476,163 @@ test('color > not by colour alone: the name in the copyright line is underlined 
     }
     await page.close();
   }
+});
+
+/** Computed size and line height of every match, with a little of its text to name it. */
+const sizes = (page, sel) => page.$$eval(sel, (els) => els.map((el) => {
+  const cs = getComputedStyle(el);
+  return { t: el.textContent.trim().replace(/\s+/g, ' ').slice(0, 24), size: Math.round(parseFloat(cs.fontSize) * 10) / 10, lh: Math.round(parseFloat(cs.lineHeight)) };
+}));
+
+test('typography > legibility: on phones the reading paragraphs step up from 13px to the 15/20 Subhead size; dates stay 13px, the FAQ 15px (phone-body-17, closest)', async () => {
+  const reading = '#resume .profile-bio, #resume p.profile-bio-small, ' +
+    '#experience .data-box[data-exp] > .profile-bio-small:not(.exp-card-highlights), #experience .data-box[data-exp] .exp-role > p.profile-bio-small';
+  const dates = '#resume div.profile-bio-small:not(.exp-card-highlights), #experience .exp-role-period, ' +
+    '#experience .data-box[data-exp] .d-flex .profile-bio-small';
+  for (const [where, opts] of [['small phone', SMALL], ['iPhone', PHONE]]) {
+    const { page } = await open(opts);
+    const r = await sizes(page, reading);
+    // the bio, 4 Education and Achievement lines, 2 experience descriptions, 2 SCG role paragraphs
+    assert.equal(r.length, 9, `${where}: ${r.length} reading paragraphs`);
+    for (const x of r) assert.deepEqual([x.size, x.lh], [15, 20], `${where}: "${x.t}" is ${x.size}/${x.lh}`);
+    const d = await sizes(page, dates);
+    assert.ok(d.length >= 7, `${where}: only ${d.length} date lines found`);
+    for (const x of d) assert.equal(x.size, 13, `${where}: the date line "${x.t}" is ${x.size}px`);
+    for (const x of await sizes(page, '#services .faq details > p')) assert.equal(x.size, 15, `${where}: an FAQ answer is ${x.size}px`);
+    // the experience descriptions keep their three-line teaser
+    assert.deepEqual(await page.$$eval('#experience .data-box[data-exp] .exp-role > p.profile-bio-small',
+      (els) => els.map((el) => getComputedStyle(el).webkitLineClamp)), ['3', '3']);
+    // the sheet behind a card's "+" reads at the same size
+    await page.$eval('#experience [data-exp="protollcall"] .exp-card-cta', (el) => el.click());
+    await page.waitForSelector('.exp-lightbox.open .exp-modal-overview');   // (the client lists start folded on phones)
+    for (const sel of ['.exp-lightbox.open .exp-modal-overview', '.exp-lightbox.open .exp-client-section ul']) {
+      const [x] = await sizes(page, sel);
+      assert.deepEqual([x.size, x.lh], [15, 20], `${where}: ${sel} is ${x.size}/${x.lh}`);
+    }
+    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth), 0, `${where}: the page scrolls sideways`);
+    await page.close();
+  }
+  // the Mac keeps its sizes
+  const { page } = await open(MAC);
+  assert.deepEqual((await sizes(page, '#resume .profile-bio')).map((x) => x.size), [17]);
+  assert.deepEqual([...new Set((await sizes(page, '#experience .data-box[data-exp] .exp-role > p.profile-bio-small')).map((x) => x.size))], [17]);
+  await page.close();
+});
+
+test('typography > hierarchy: on phones the Resume subsection titles are 28/34 under the 34px section title (resume-subhead-28)', async () => {
+  for (const [where, opts, sub] of [['small phone', SMALL, [28, 34]], ['iPhone', PHONE, [28, 34]], ['Mac', MAC, [32, 38]]]) {
+    const { page } = await open(opts);
+    const r = await sizes(page, '#resume .resume-title');
+    assert.deepEqual(r.map((x) => x.t), ['Profile', 'Education', 'Achievement']);
+    for (const x of r) assert.deepEqual([x.size, x.lh], sub, `${where}: ${x.t} is ${x.size}/${x.lh}`);
+    assert.equal(await page.$eval('#resume .resume-title', (el) => getComputedStyle(el).fontWeight), '700', `${where}: weight`);
+    if (where !== 'Mac') assert.equal((await sizes(page, '#resume .section-title h2'))[0].size, 34, `${where}: the Resume title moved`);
+    await page.close();
+  }
+});
+
+test('typography > minimum size: below 360px the Experience stat labels keep 11px and stay inside their cells (stat-labels-11px-small-phones)', async () => {
+  const { page } = await open(SMALL);
+  const r = await page.$$eval('.exp-stat-label', (els) => els.map((el) => {
+    const cell = el.closest('.exp-stat-item').getBoundingClientRect(), range = document.createRange();
+    range.selectNodeContents(el);
+    const ink = range.getBoundingClientRect();
+    return { t: el.textContent.trim(), size: parseFloat(getComputedStyle(el).fontSize), inside: ink.left >= cell.left - 0.5 && ink.right <= cell.right + 0.5 };
+  }));
+  assert.equal(r.length, 9);
+  for (const x of r) {
+    assert.ok(Math.abs(x.size - 11) < 0.05, `"${x.t}" is ${x.size}px`);
+    assert.ok(x.inside, `"${x.t}" runs out of its cell`);
+  }
+  // every card's stats stay on one row
+  const rows = await page.$$eval('.exp-card-stats', (bars) => bars.map((b) => new Set([...b.querySelectorAll('.exp-stat-item')].map((i) => Math.round(i.getBoundingClientRect().top))).size));
+  assert.deepEqual(rows, [1, 1, 1]);
+  await page.close();
+});
+
+test('writing > capitalization: the four university project cards use sentence case like the other 54 (project-title-case)', async () => {
+  const { page } = await open(PHONE);
+  const titles = ['Real time pulse & temperature monitoring', 'Covid-19 spread analysis website', "Student's project management system", 'Classroom booking record system'];
+  const r = await page.$$eval('#scroller > .rf-cards-scroller-item', (cards) => cards.map((c) => ({
+    t: c.querySelector('h3').textContent.trim(), plus: c.querySelector('.card-plus') && c.querySelector('.card-plus').getAttribute('aria-label'),
+  })));
+  assert.equal(r.length, 58);
+  for (const t of titles) {
+    const card = r.find((x) => x.t === t);
+    assert.ok(card, `no card titled "${t}"`);
+    assert.equal(card.plus, 'View screenshot: ' + t);
+  }
+  // no card title capitalises every word any more
+  const shouting = r.map((x) => x.t.split(',')[0]).filter((t) => t.split(/\s+/).filter((w) => /^[a-z]/i.test(w) && w.length > 3).length > 2 &&
+    t.split(/\s+/).filter((w) => /^[a-z]/i.test(w) && w.length > 3).every((w) => /^[A-Z]/.test(w)));
+  assert.deepEqual(shouting, []);
+  // the See all list copies them
+  await page.$eval('[data-proj-all]', (b) => b.click());
+  await page.waitForSelector('.exp-lightbox.open .proj-row');
+  const names = await page.$$eval('.exp-lightbox.open .proj-name', (els) => els.map((el) => el.textContent.trim()));
+  for (const t of titles) assert.ok(names.includes(t), `"${t}" is not in the See all list`);
+  await page.close();
+});
+
+test('writing > titles: the section is "Projects", like Resume, Experience, Skills and Certificates (projects-heading)', async () => {
+  const { page } = await open(MAC);
+  assert.equal(await page.$eval('#portfolio-title h2', (el) => el.textContent.trim()), 'Projects');
+  assert.equal(await page.$eval('#portfolio', (el) => el.getAttribute('aria-labelledby')), 'portfolio-title');
+  await page.close();
+});
+
+test('writing > voice: the Contact headline speaks as the owner, "Build what\'s / next with me.", on two lines everywhere (contact-headline-we)', async () => {
+  for (const [where, opts] of [['small phone', SMALL], ['iPhone', PHONE], ['iPad', { viewport: { width: 820, height: 1180 }, isMobile: true, hasTouch: true }], ['Mac', MAC]]) {
+    const { page } = await open(opts);
+    const r = await page.$eval('.cta-headline', (h) => {
+      const range = document.createRange();
+      range.selectNodeContents(h);
+      const lines = new Set([...range.getClientRects()].map((x) => Math.round(x.top))).size;
+      const box = h.getBoundingClientRect(), ink = range.getBoundingClientRect();
+      return { html: h.innerHTML.trim(), lines, inside: ink.left >= box.left - 0.5 && ink.right <= box.right + 0.5, sideways: document.documentElement.scrollWidth - innerWidth };
+    });
+    assert.equal(r.html, "Build what's<br>next with me.", where);
+    assert.equal(r.lines, 2, `${where}: the headline takes ${r.lines} lines`);
+    assert.ok(r.inside, `${where}: the headline runs out of its box`);
+    assert.equal(r.sideways, 0, `${where}: the page scrolls sideways`);
+    await page.close();
+  }
+});
+
+test('writing > plain words: the Certificates subtitle is "Certificates I\'ve earned.", one line on every screen (certificates-subtitle-plain)', async () => {
+  for (const [where, opts] of [['small phone', SMALL], ['iPhone', PHONE], ['Mac', MAC]]) {
+    const { page } = await open(opts);
+    const r = await page.$eval('#certificates .section-title p', (p) => {
+      const range = document.createRange();
+      range.selectNodeContents(p);
+      return { t: p.textContent.trim(), lines: new Set([...range.getClientRects()].map((x) => Math.round(x.top))).size };
+    });
+    assert.deepEqual(r, { t: "Certificates I've earned.", lines: 1 }, where);
+    await page.close();
+  }
+});
+
+test('content: the second scan of the Computer Repair Service certificate (No 10, 16 June 2017) is gone; 32 certificates, each its own (q-cert24)', async () => {
+  const { page } = await open(MAC);
+  const requested = [];
+  page.on('request', (q) => { if (/certificate\//.test(q.url())) requested.push(q.url()); });
+  const r = await page.$$eval('#images-list .cert-card', (cards) => cards.map((c) => ({
+    label: c.querySelector('button.cert-img').getAttribute('aria-label'), src: c.querySelector('img').getAttribute('src'),
+  })));
+  assert.equal(r.length, 32);
+  assert.equal(new Set(r.map((x) => x.src)).size, 32, 'two tiles draw the same file');
+  assert.equal(new Set(r.map((x) => x.label)).size, 32, 'two tiles have the same name');
+  assert.equal(r.filter((x) => /Computer Repair Service/.test(x.label)).length, 1, 'the Computer Repair Service certificate is shown twice');
+  assert.match(r[20].label, /Computer Repair Service/);
+  assert.equal(r[20].src, 'assets/img/certificate/thumb/img-21.avif');
+  assert.match(r[23].label, /Introduction to JavaScript/);
+  assert.equal(r[23].src, 'assets/img/certificate/thumb/img-25.avif');
+  // every tile's file is there; nothing asks for the removed one
+  await page.$eval('#images-list', (el) => el.scrollIntoView());
+  await page.$$eval('#images-list img', async (imgs) => {
+    for (const im of imgs) { im.loading = 'eager'; try { await im.decode(); } catch (e) { /* counted below */ } }
+  });
+  assert.deepEqual(await page.$$eval('#images-list img', (imgs) => imgs.filter((im) => !(im.naturalWidth > 0)).map((im) => im.getAttribute('src'))), []);
+  assert.deepEqual(requested.filter((u) => /img-24\.avif/.test(u)), []);
+  await page.close();
 });

@@ -4,7 +4,7 @@
 // missing assets, cert grid count, parallax, reveals, reduced motion.
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { chromium } from 'playwright';
@@ -68,13 +68,23 @@ test('main.js and main.min.js agree on certificate count, and every cert file ex
   const min = readFileSync(join(ROOT, 'assets/js/main.min.js'), 'utf8');
   const srcCount = Number(src.match(/i <= (\d+); i\+\+/)?.[1]);
   const minCount = Number(min.match(/<=(\d+);/)?.[1]);
-  assert.ok(srcCount >= 33, `cert loop in main.js should be >= 33, got ${srcCount}`);
+  assert.equal(srcCount, 32, `cert loop in main.js should build 32 tiles, got ${srcCount}`);
   assert.equal(srcCount, minCount, 'main.min.js is out of sync with main.js — run ./build.sh');
+  // img-24 was a second scan of img-21 and is gone; the loop skips its number
+  const file = (n) => (n < 24 ? n : n + 1);
   for (let i = 1; i <= srcCount; i++) {
-    assert.doesNotThrow(
-      () => readFileSync(join(ROOT, `assets/img/certificate/img-${i}.avif`)),
-      `certificate img-${i}.avif referenced by the loop but missing on disk`
-    );
+    for (const dir of ['', 'thumb/']) {
+      assert.doesNotThrow(
+        () => readFileSync(join(ROOT, `assets/img/certificate/${dir}img-${file(i)}.avif`)),
+        `certificate ${dir}img-${file(i)}.avif referenced by the loop but missing on disk`
+      );
+    }
+  }
+  // one file per tile, and no stray copy of the duplicate left behind
+  for (const dir of ['', 'thumb']) {
+    const files = readdirSync(join(ROOT, 'assets/img/certificate', dir)).filter((f) => /^img-\d+\.avif$/.test(f));
+    assert.equal(files.length, srcCount, `assets/img/certificate/${dir} holds ${files.length} certificates`);
+    assert.ok(!files.includes('img-24.avif'), `the duplicate certificate is still in assets/img/certificate/${dir}`);
   }
 });
 

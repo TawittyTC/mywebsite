@@ -9,7 +9,7 @@
 
 ## 1. Card Scroller (แถวการ์ดเลื่อนแนวนอน + ลูกศร + hint บนมือถือ)
 
-ใช้อยู่ที่: Skills, My Projects
+ใช้อยู่ที่: Skills, Projects
 
 ```html
 <section id="my-section">
@@ -38,7 +38,7 @@
 
 ## 2. Filter Chips (ปุ่มกรองการ์ดใน scroller — ใช้กับ section ไหนก็ได้)
 
-ใช้อยู่ที่: My Projects — แต่เป็น component คู่กับ Card Scroller: วางกลุ่ม
+ใช้อยู่ที่: Projects — แต่เป็น component คู่กับ Card Scroller: วางกลุ่ม
 `.project-filters` ใน section ไหน มันจะกรอง **การ์ดของ section นั้นเท่านั้น**
 และ rewind scroller ของ section นั้นให้เอง (ไม่ผูกกับ id ใดๆ อยาก
 ให้ Skills กรองได้ก็แค่เพิ่มกลุ่มปุ่ม + data-tech ที่การ์ด)
@@ -147,7 +147,7 @@ Escape/แตะพื้นหลังได้ อยู่ในระบบ
 <section id="contact" class="closing-cta">
   <div class="container">
     <div class="cta-inner">
-      <h2 class="cta-headline">Let's build<br>what's next.</h2>
+      <h2 class="cta-headline">Build what's<br>next with me.</h2>
       <p class="cta-sub">ข้อความรอง…</p>
       <div class="cta-actions">
         <a class="cta-mail" href="mailto:you@mail.com">you@mail.com</a>

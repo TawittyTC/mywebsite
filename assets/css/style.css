@@ -191,6 +191,10 @@ section {
   margin-bottom: 8px;
   color: var(--color-text);
 }
+/* phones: the subsection titles step down to 28/34 under the 34px section title */
+@media (max-width: 768px) {
+  .resume .resume-title { font-size: 1.6471rem; line-height: 1.2143; }
+}
 
 /*--------------------------------------------------------------
 # Footer
@@ -1154,9 +1158,10 @@ a.info-item:hover .info-value {
   }
 
 
-  /* phones keep the compact reading sizes — desktop-only bumps above
+  /* phones keep the compact sizes — desktop-only bumps above
      (.profile-bio/.profile-bio-small are overridden next to their base
-     rules further down: source order decides ties in specificity) */
+     rules further down, where the reading paragraphs step up to 15px:
+     source order decides ties in specificity) */
   #skill .rf-cards-scroller-item .skill-desc { font-size: 0.7647rem; }
   .rf-cards-scroller-item p.fw-light { font-size: 0.8235rem; }
   .fw-light { font-size: 0.8824rem; }
@@ -1183,12 +1188,24 @@ a.info-item:hover .info-value {
 .profile-bio { font-size: 1rem; color: var(--color-text-secondary); margin: 0; line-height: 1.7; }
 .profile-bio-small { font-size: 0.9412rem; color: var(--color-text-secondary); margin: 0; line-height: 1.7; }
 
-/* Phones read both bio tiers at the same compact 13px (these overrides
-   MUST come after the base rules above — equal specificity, last wins) */
+/* Phones set both bio tiers at a compact 13px, with the reading paragraphs
+   one step up at 15px (these overrides MUST come after the base rules
+   above — equal specificity, last wins) */
 @media (max-width: 768px) {
   .profile-bio { font-size: 0.7647rem; }
   /* 13px here, so grey lines take the darker small-text grey */
   .profile-bio-small { font-size: 0.7647rem; color: var(--color-text-secondary-small); }
+  /* reading paragraphs one step up, at the 15/20 Subhead size: the bio, the
+     Education and Achievement lines, the experience descriptions and the SCG
+     role paragraphs; date and period lines keep the compact 13px */
+  #resume .profile-bio,
+  #resume p.profile-bio-small,
+  #resume .data-box > .profile-bio-small:not(.exp-card-highlights),
+  #experience .data-box[data-exp] > .profile-bio-small:not(.exp-card-highlights),
+  #experience .data-box[data-exp] .exp-role > p.profile-bio-small { font-size: 0.8824rem; line-height: 1.33334; }
+  /* at 15px the grey Education and Achievement lines are no longer small
+     text, so they keep the regular grey rather than the darker small one */
+  #resume p.profile-bio-small { color: var(--color-text-secondary); }
 }
 
 @media (max-width: 576px) {
@@ -2473,7 +2490,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
   .exp-clients-line { font-size: 0.7647rem; }
 }
 
-/* My Projects, the apple.com gallery card: eyebrow, headline and one
+/* Projects, the apple.com gallery card: eyebrow, headline and one
    line on top, the project's own line drawing large at the foot on every
    screen (phones too), the round "+" beside it. The tools live in the
    sheet the card opens. */
@@ -2693,12 +2710,13 @@ a.info-item:hover .info-value { color: var(--color-link); }
 #back-to-top { bottom: calc(22px + env(safe-area-inset-bottom, 0px)); }
 
 /* Small phones: a one-word stat label ("Customizations") is wider than a
-   third of the card, so each cell takes at least its label's width */
+   third of the card, so each cell takes at least its label's width. Below
+   360px the cells pad less, and the labels keep the 11px phone size (the
+   iOS minimum) rather than dropping to 10px */
 @media (max-width: 400px) {
   .exp-stat-item { flex: 1 1 0; min-width: min-content; padding: 0 4px; }
 }
 @media (max-width: 359px) {
-  .exp-stat-label { font-size: 0.5882rem; }
   .exp-stat-item { padding: 0 2px; }
 }
 

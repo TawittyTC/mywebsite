@@ -162,11 +162,11 @@ test('images > alt text: each certificate is named by what is printed on it', as
     label: b.getAttribute('aria-label'), alt: b.querySelector('img').alt, lang: b.lang,
     mark: b.querySelector('.cert-expand-btn').getAttribute('aria-hidden'),
   })));
-  assert.equal(r.length, 33, 'expected 33 certificate buttons');
+  assert.equal(r.length, 32, 'expected 32 certificate buttons');
   assert.ok(r.every((x) => x.mark === 'true'), "the corner '+' is only a picture of the tile's action");
   assert.ok(r.every((x) => x.alt && !/^Tanapol Certificate \d+$/.test(x.alt)), 'a certificate still has a numbered alt');
-  // #21 and #24 are two scans of one certificate, so 32 different names
-  assert.ok(new Set(r.map((x) => x.label)).size >= 32, 'certificate buttons share names');
+  // the second scan of #21 is gone, so every certificate has a name of its own
+  assert.equal(new Set(r.map((x) => x.label)).size, 32, 'certificate buttons share names');
   assert.ok(r.filter((x) => /[฀-๿]/.test(x.label)).every((x) => x.lang === 'th'), 'a Thai name is not marked as Thai');
   await page.$eval('#images-list .cert-card', (el) => el.click());
   await page.waitForSelector('.cert-lightbox.open');
@@ -192,7 +192,7 @@ test('collections: one Tab stop per collection, and the arrow keys move inside i
   assert.equal(down, 3, 'ArrowDown did not move one row down the grid');
   await page.keyboard.press('End');
   const end = await page.evaluate(() => [...document.querySelectorAll('#images-list button.cert-img')].indexOf(document.activeElement));
-  assert.equal(end, 32);
+  assert.equal(end, 31, 'End did not move to the last of the 32 certificates');
   // the See-all list
   await page.$eval('[data-proj-all]', (el) => el.click());
   await page.waitForSelector('.proj-row');

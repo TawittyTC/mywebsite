@@ -1454,7 +1454,7 @@
       border: none
     }
 
-    /* My Projects: a client's own logo takes the drawing's place at the foot
+    /* Projects: a client's own logo takes the drawing's place at the foot
        of its card, in the same box (the drawing stays for the See all list),
        at an optically even share of the card's width (--lw) */
     #portfolio .has-logo .work-icon {
@@ -1772,15 +1772,16 @@
       font-weight: 600
     }
 
-    /* Phones keep the compact sizes the user signed off on;
+    /* Phones keep the compact sizes the user signed off on, but for the
+       sheet's reading text (overview and lists), one step up at 15/20;
        the bumps above are desktop-only. */
     @media (max-width: 768px) {
       .exp-card-highlights .hl { font-size: 0.6471rem; }
       .exp-duration { font-size: 0.6471rem; }
       .exp-stat-label { font-size: 0.6471rem; }
-      .exp-modal-overview { font-size: 0.7647rem; }
-      .exp-client-section ul { font-size: 0.7647rem; }
-      .exp-modal-section ul { font-size: 0.7647rem; }
+      .exp-modal-overview { font-size: 0.8824rem; line-height: 1.33334; }
+      .exp-client-section ul { font-size: 0.8824rem; line-height: 1.33334; }
+      .exp-modal-section ul { font-size: 0.8824rem; line-height: 1.33334; }
       .exp-modal-tech span { font-size: 0.6471rem; }
       .exp-modal-period { font-size: 0.7059rem; }
       .exp-card-cta-label { font-size: 0.8235rem; }
@@ -2796,7 +2797,7 @@
     <section id="portfolio" class="portfolio section-bg mb-5" aria-labelledby="portfolio-title">
       <div class="container mb-5" data-aos="fade-up">
         <div class="section-title" id="portfolio-title" tabindex="-1">
-          <h2>My Projects</h2>
+          <h2>Projects</h2>
           <p>Every project, highlights first.</p>
         </div>
 
@@ -3531,9 +3532,9 @@
                   loading="lazy" decoding="async" width="1916" height="809" />
               </div>
               <span class="project-tag">IoT / AWS</span>
-              <h3 class="h4" id="project1-title">Real Time Pulse & Temperature Monitoring</h3>
+              <h3 class="h4" id="project1-title">Real time pulse & temperature monitoring</h3>
               <p class="fw-light">ThingsBoard, AWS, Sensors</p>
-              <button type="button" class="card-plus" aria-label="View screenshot: Real Time Pulse & Temperature Monitoring">
+              <button type="button" class="card-plus" aria-label="View screenshot: Real time pulse & temperature monitoring">
                 <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
               </button>
             </div>
@@ -3545,9 +3546,9 @@
                   decoding="async" width="1354" height="678" />
               </div>
               <span class="project-tag">Python / Flask</span>
-              <h3 class="h4" id="project3-title"><span class="nw">Covid-19</span> Spread Analysis Website</h3>
+              <h3 class="h4" id="project3-title"><span class="nw">Covid-19</span> spread analysis website</h3>
               <p class="fw-light">Flask, HTML, CSS, Python libraries</p>
-              <button type="button" class="card-plus" aria-label="View screenshot: Covid-19 Spread Analysis Website">
+              <button type="button" class="card-plus" aria-label="View screenshot: Covid-19 spread analysis website">
                 <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
               </button>
             </div>
@@ -3559,9 +3560,9 @@
                   decoding="async" width="1888" height="721" />
               </div>
               <span class="project-tag">PHP / MySQL</span>
-              <h3 class="h4" id="project2-title">Student's Project Management System</h3>
+              <h3 class="h4" id="project2-title">Student's project management system</h3>
               <p class="fw-light">PHP, HTML, CSS, MySQL</p>
-              <button type="button" class="card-plus" aria-label="View screenshot: Student's Project Management System">
+              <button type="button" class="card-plus" aria-label="View screenshot: Student's project management system">
                 <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
               </button>
             </div>
@@ -3573,9 +3574,9 @@
                   decoding="async" width="980" height="476" />
               </div>
               <span class="project-tag">Java</span>
-              <h3 class="h4" id="project4-title">Classroom Booking Record System</h3>
+              <h3 class="h4" id="project4-title">Classroom booking record system</h3>
               <p class="fw-light">Java, NetBeans</p>
-              <button type="button" class="card-plus" aria-label="View screenshot: Classroom Booking Record System">
+              <button type="button" class="card-plus" aria-label="View screenshot: Classroom booking record system">
                 <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
               </button>
             </div>
@@ -3620,12 +3621,12 @@
       <div class="container">
         <div class="section-title">
           <h2>Certificates</h2>
-          <p>Credentials that speak for themselves.</p>
+          <p>Certificates I've earned.</p>
         </div>
 
         <!-- Content for larger screens -->
         <div class="row images-list" id="images-list"
-          data-titles="Internship letter (Apr–Jul 2023), The Siam Cement (Thung Song) Co., Ltd.|Internship programme letter (Dec 2023–Mar 2024), The Siam Cement (Thung Song) Co., Ltd.|Statement of Attainment: Systems Tester, Professional Qualification Level 4, TPQI|โครงการยกระดับสมรรถนะบุคคลตามมาตรฐานอาชีพและคุณวุฒิวิชาชีพ, สถาบันคุณวุฒิวิชาชีพ และ ARIT|รางวัลรองชนะเลิศ อันดับ ๑ โครงการตอบปัญหาทางวิชาการ ปีการศึกษา ๒๕๖๒, วิทยาลัยสารพัดช่างสงขลา|รางวัลจากการนำเสนอบทความวิจัยแบบบรรยาย ระดับดีมาก, AUC² 2023|Command Prompt 101, BorntoDev|Essential SQL for Everyone, BorntoDev|Fundamentals of Graphic Design, BorntoDev|Introduction to Computer Science, BorntoDev|ใช้งานแชทบอทร้านค้ายุคใหม่ ด้วย Kaojao, BorntoDev|Notebook Repair Service, vocational short course (75 hours), Songkhla Polytechnic College|การใช้โปรแกรม Microsoft Excel เบื้องต้น, Starfish Academy และ Starfish Labz|วิทยาการคำนวณและโค้ดดิ้ง, Starfish Academy และ Starfish Labz|Online Coaching Startup Thailand League 2021 Mega Hackathon, NIA|Hour of Code (Minecraft), Code.org|The Hour of Code, Code.org|English for Communication, vocational short course (150 hours), Songkhla Polytechnic College|English Public Speaking Contest, อาชีวศึกษาจังหวัดสงขลา|GitHub for Developer, BorntoDev|Computer Repair Service, vocational short course (75 hours), Songkhla Polytechnic College|งานซ่อมเครื่องคอมพิวเตอร์โน๊ตบุ๊ค หลักสูตรระยะสั้น (๗๕ ชั่วโมง), วิทยาลัยสารพัดช่างสงขลา|งานซ่อมเครื่องคอมพิวเตอร์ หลักสูตรระยะสั้น (๗๕ ชั่วโมง), วิทยาลัยสารพัดช่างสงขลา|Computer Repair Service, vocational short course (75 hours), Songkhla Polytechnic College|Introduction to JavaScript, BorntoDev|Lite: Fundamental Web Dev with HTML5 &amp; CSS3, BorntoDev|Coding ทักษะแห่งโลกอนาคต, Starfish Academy และ Starfish Labz|การเขียนโปรแกรมภาษา Python สำหรับผู้เริ่มต้น, Starfish Academy และ Starfish Labz|Basic Software Testing, BorntoDev|NDG Linux Essentials, Cisco Networking Academy|การเพิ่มประสิทธิภาพการทำงานด้วยปัญญาประดิษฐ์, Thai MOOC|Claude 101, Anthropic|Claude Code 101, Anthropic">
+          data-titles="Internship letter (Apr–Jul 2023), The Siam Cement (Thung Song) Co., Ltd.|Internship programme letter (Dec 2023–Mar 2024), The Siam Cement (Thung Song) Co., Ltd.|Statement of Attainment: Systems Tester, Professional Qualification Level 4, TPQI|โครงการยกระดับสมรรถนะบุคคลตามมาตรฐานอาชีพและคุณวุฒิวิชาชีพ, สถาบันคุณวุฒิวิชาชีพ และ ARIT|รางวัลรองชนะเลิศ อันดับ ๑ โครงการตอบปัญหาทางวิชาการ ปีการศึกษา ๒๕๖๒, วิทยาลัยสารพัดช่างสงขลา|รางวัลจากการนำเสนอบทความวิจัยแบบบรรยาย ระดับดีมาก, AUC² 2023|Command Prompt 101, BorntoDev|Essential SQL for Everyone, BorntoDev|Fundamentals of Graphic Design, BorntoDev|Introduction to Computer Science, BorntoDev|ใช้งานแชทบอทร้านค้ายุคใหม่ ด้วย Kaojao, BorntoDev|Notebook Repair Service, vocational short course (75 hours), Songkhla Polytechnic College|การใช้โปรแกรม Microsoft Excel เบื้องต้น, Starfish Academy และ Starfish Labz|วิทยาการคำนวณและโค้ดดิ้ง, Starfish Academy และ Starfish Labz|Online Coaching Startup Thailand League 2021 Mega Hackathon, NIA|Hour of Code (Minecraft), Code.org|The Hour of Code, Code.org|English for Communication, vocational short course (150 hours), Songkhla Polytechnic College|English Public Speaking Contest, อาชีวศึกษาจังหวัดสงขลา|GitHub for Developer, BorntoDev|Computer Repair Service, vocational short course (75 hours), Songkhla Polytechnic College|งานซ่อมเครื่องคอมพิวเตอร์โน๊ตบุ๊ค หลักสูตรระยะสั้น (๗๕ ชั่วโมง), วิทยาลัยสารพัดช่างสงขลา|งานซ่อมเครื่องคอมพิวเตอร์ หลักสูตรระยะสั้น (๗๕ ชั่วโมง), วิทยาลัยสารพัดช่างสงขลา|Introduction to JavaScript, BorntoDev|Lite: Fundamental Web Dev with HTML5 &amp; CSS3, BorntoDev|Coding ทักษะแห่งโลกอนาคต, Starfish Academy และ Starfish Labz|การเขียนโปรแกรมภาษา Python สำหรับผู้เริ่มต้น, Starfish Academy และ Starfish Labz|Basic Software Testing, BorntoDev|NDG Linux Essentials, Cisco Networking Academy|การเพิ่มประสิทธิภาพการทำงานด้วยปัญญาประดิษฐ์, Thai MOOC|Claude 101, Anthropic|Claude Code 101, Anthropic">
           <!-- Images will be added here by JavaScript -->
         </div>
 
@@ -3783,7 +3784,7 @@
     <section id="contact" class="closing-cta">
       <div class="container">
         <div class="cta-inner">
-          <h2 class="cta-headline">Let's build<br>what's next.</h2>
+          <h2 class="cta-headline">Build what's<br>next with me.</h2>
           <p class="cta-sub">Open to <span class="nw">full-time</span> roles and freelance projects — web apps, CRM &amp; POS systems, and AI
             voice agents.</p>
           <div class="cta-row">

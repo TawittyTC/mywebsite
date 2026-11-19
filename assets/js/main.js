@@ -925,17 +925,24 @@ document.addEventListener("DOMContentLoaded", function () {
   const imagesList = document.getElementById("images-list");
   if (!imagesList) return;
 
-  // Each certificate's own pixel size, in file order. The grid shows a small
+  // There is no img-24: it was a second scan of img-21 (the same Computer
+  // Repair Service certificate, No 10, 16 June 2017) and was taken out.
+  // The other files keep their names, so a cached copy never shows under
+  // another certificate's title; from the 24th tile on, the grid draws the
+  // next file up.
+  const certFile = (i) => (i < 24 ? i : i + 1);
+
+  // Each certificate's own pixel size, in grid order. The grid shows a small
   // copy (assets/img/certificate/thumb, 840px at most): the originals run to
   // 9333x6600, and decoding those for a 360px tile made the grid stutter.
   // The viewer opens on the small copy at the original's size, then trades up.
   const CERT_SIZES = ("1700x2200 1656x2339 2480x3509 2480x3509 2338x1654 1754x1241 4096x2628 4096x2900 " +
     "4096x2628 4096x2628 4096x2900 1611x1049 9333x6600 9333x6600 3509x2480 1754x1235 1754x1235 1619x1170 " +
-    "1649x1185 1684x1190 1623x1040 1584x1017 1570x1011 1617x1041 1261x884 1684x1190 9333x6600 9333x6600 " +
+    "1649x1185 1684x1190 1623x1040 1584x1017 1570x1011 1261x884 1684x1190 9333x6600 9333x6600 " +
     "1684x1200 1200x848 1200x738 3300x2550 2000x1545").split(" ");
 
   // What each certificate is, as printed on it (data-titles on the grid,
-  // in file order, "|" between them): its name for VoiceOver, for the
+  // in grid order, "|" between them): its name for VoiceOver, for the
   // button that opens it and for the full-screen viewer. A missing entry
   // falls back to its place in the grid.
   const CERT_TITLES = (imagesList.getAttribute("data-titles") || "").split("|");
@@ -943,7 +950,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function buildCerts() {
     if (imagesList.dataset.loaded) return;
     imagesList.dataset.loaded = "1";
-    for (let i = 1; i <= 33; i++) {
+    for (let i = 1; i <= 32; i++) {
       const colDiv = document.createElement("div");
       colDiv.classList.add("col-6", "col-md-4", "mb-5");
       const card = document.createElement("div");
@@ -954,16 +961,16 @@ document.addEventListener("DOMContentLoaded", function () {
       wrapper.type = "button";
       wrapper.classList.add("cert-img");
       const imgElement = document.createElement("img");
-      const src = `assets/img/certificate/img-${i}.avif`;
+      const src = `assets/img/certificate/img-${certFile(i)}.avif`;
       const title = CERT_TITLES[i - 1] || "";
-      const alt = title || "Certificate " + i + " of 33";
+      const alt = title || "Certificate " + i + " of 32";
       // a certificate printed in Thai is named in Thai, and read with a Thai voice
       const thai = /[\u0E00-\u0E7F]/.test(title);
       if (thai) wrapper.lang = "th";
       wrapper.setAttribute("aria-label", title ? (thai ? "ดูใบรับรอง " : "View certificate: ") + title :
-        "View certificate " + i + " of 33, full screen");
+        "View certificate " + i + " of 32, full screen");
       const size = (CERT_SIZES[i - 1] || "").split("x");
-      imgElement.src = `assets/img/certificate/thumb/img-${i}.avif`;
+      imgElement.src = `assets/img/certificate/thumb/img-${certFile(i)}.avif`;
       if (size.length === 2) {
         imgElement.setAttribute("data-full-w", size[0]);
         imgElement.setAttribute("data-full-h", size[1]);

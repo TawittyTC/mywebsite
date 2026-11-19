@@ -242,8 +242,11 @@ test('the self-hosted fonts draw weight 700, not 600 again', async () => {
 });
 
 test('the certificate grid draws small copies; the viewer opens at full size and settles on the original', async () => {
-  for (let i = 1; i <= 33; i++) {
-    assert.ok(existsSync(join(ROOT, `assets/img/certificate/thumb/img-${i}.avif`)), `small copy of certificate ${i} is missing`);
+  // there is no img-24 (it was a second scan of img-21); the 32 tiles draw
+  // files 1-23 and 25-33
+  const file = (n) => (n < 24 ? n : n + 1);
+  for (let i = 1; i <= 32; i++) {
+    assert.ok(existsSync(join(ROOT, `assets/img/certificate/thumb/img-${file(i)}.avif`)), `small copy of certificate ${i} is missing`);
   }
   // (no service worker here: it would answer the original from its cache and skip the delay below)
   const { page, failed } = await ctx.openPage({ serviceWorkers: 'block' });
@@ -255,9 +258,9 @@ test('the certificate grid draws small copies; the viewer opens at full size and
       fw: +im.getAttribute('data-full-w'), fh: +im.getAttribute('data-full-h'),
     }));
   });
-  assert.equal(tiles.length, 33);
+  assert.equal(tiles.length, 32);
   tiles.forEach((t, i) => {
-    assert.equal(t.src, `assets/img/certificate/thumb/img-${i + 1}.avif`, 'the grid must draw the small copy');
+    assert.equal(t.src, `assets/img/certificate/thumb/img-${file(i + 1)}.avif`, 'the grid must draw the small copy');
     assert.ok(t.w > 0 && t.w <= 840 && t.h <= 630, `small copy ${i + 1} is ${t.w}x${t.h}; it must fit 840x630`);
     assert.ok(t.fw > 0 && t.fh > 0, `certificate ${i + 1} does not name its original's size`);
     assert.ok(Math.abs(t.w / t.h - t.fw / t.fh) < 0.01, `small copy ${i + 1} has a different shape from its original`);
