@@ -47,10 +47,13 @@
   <meta name="twitter:image" content="https://tawittytc.github.io/mywebsite/assets/img/og-card.jpg">
   <meta name="twitter:image:alt" content="Tanapol Chamnanhan (ธนพล ชำนาญหาญ) — Full-Stack &amp; AI Developer, Bangkok">
 
-  <!-- Favicons -->
-  <link href="assets/img/favicon.ico" rel="icon" sizes="32x32">
-  <link href="assets/img/icon-192.png" rel="icon" type="image/png" sizes="192x192">
-  <link href="assets/img/icon-180.png" rel="apple-touch-icon" sizes="180x180">
+  <!-- Favicons: the card's three-node mark, white on the accent blue, the
+       same at every size. New file names (not the old photo icons' names),
+       so no browser or service-worker cache can serve the photo again. -->
+  <link href="assets/img/icon-mark.svg" rel="icon" type="image/svg+xml">
+  <link href="assets/img/favicon-mark.ico" rel="icon" sizes="32x32">
+  <link href="assets/img/icon-mark-192.png" rel="icon" type="image/png" sizes="192x192">
+  <link href="assets/img/icon-mark-180.png" rel="apple-touch-icon" sizes="180x180">
 
   <!-- Preconnect for third-party CDNs (DNS + TCP + TLS negotiation upfront) -->
   <link rel="preconnect" href="https://consent.cookiebot.com">
@@ -165,7 +168,7 @@
     }
 
     a {
-      color: #1264CE;
+      color: var(--color-link);
       text-decoration: underline
     }
 
@@ -191,7 +194,7 @@
     }
 
     a {
-      color: #1264CE;
+      color: var(--color-link);
       text-decoration: none
     }
 
@@ -227,13 +230,13 @@
     }
 
     #hero p {
-      color: #6e6e73;
+      color: var(--color-text-secondary);
       margin: 24px 0 0 0;
       font-size: clamp(1.1765rem, 2.5vw, 1.6471rem);
     }
 
     #hero p span {
-      color: #1264CE;
+      color: var(--color-link);
       letter-spacing: normal
     }
 
@@ -251,20 +254,28 @@
     }
 
     /* ── Hero geometry, mirrored from style.css ──
-       The loader hides the page until style.css applies, but the page is
-       laid out (and measured by main.js) before that whenever the
-       stylesheet arrives after the first frame, as it usually does on a
-       phone network. These copies give that first layout the hero's real
-       geometry, so nothing under the loader jumps when style.css lands
-       (CLS was up to 1.0 on mobile, 0.22 on desktop). Layout only: the
-       entrance animations and the loader fade stay in style.css, so they
-       still start when it applies. Keep in sync with style.css (a test
+       The hero is painted from this block before style.css applies
+       whenever the stylesheet arrives after the first frame, as it usually
+       does on a phone network. These copies give that first layout the
+       hero's real geometry, so nothing in it jumps when style.css lands
+       (CLS was up to 1.0 on mobile, 0.22 on desktop). Its first look (the
+       name's ink and rise, the pill, the chevron, the glow) is copied
+       further down, next to the rule that holds back the rest of the page. Keep in sync with style.css (a test
        compares the hero with and without the stylesheet). */
     :root {
       --color-text: #1D1D1F;
       --color-text-secondary: #6E6E73;
+      --color-text-secondary-small: #515154;
       --color-link: #1264CE;
       --r-capsule: 980px
+    }
+
+    @media (prefers-contrast: more) {
+      :root {
+        --color-text-secondary: #3A3A3C;
+        --color-text-secondary-small: #3A3A3C;
+        --color-link: #0A4DA3
+      }
     }
 
     html {
@@ -316,7 +327,7 @@
       font-weight: 600;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: var(--color-text-secondary)
+      color: var(--color-text-secondary-small)
     }
 
     #hero h1.hero-name {
@@ -362,6 +373,14 @@
       margin-left: 3px;
       vertical-align: text-bottom;
       background: var(--color-link)
+    }
+
+    /* Reduce Motion: the role changes a whole word at a time (main.js), so
+       there is no typing caret (as in style.css) */
+    @media (prefers-reduced-motion: reduce) {
+      #hero .typed::after {
+        display: none
+      }
     }
 
     /* The two actions under the role line: the closing section's pair
@@ -425,7 +444,7 @@
       font-size: 0.6471rem;
       font-weight: 600;
       letter-spacing: 0.14em;
-      color: var(--color-text-secondary);
+      color: var(--color-text-secondary-small);
       background: rgba(252, 252, 253, 0.72);
       padding: 2px 7px;
       border-radius: var(--r-capsule);
@@ -475,7 +494,7 @@
       }
 
       .hero-net-label {
-        font-size: 0.5294rem
+        letter-spacing: 0.08em
       }
 
       .hero-scroll-hint {
@@ -540,6 +559,12 @@
       }
     }
 
+    @media (max-height: 500px) {
+      section {
+        padding: 128px 0
+      }
+    }
+
     /* Images fit their column before the stylesheet applies: at natural
        width (project shots ~1900px, the 520px profile photo) a phone lays
        the page out zoomed out, then snaps back when the stylesheet lands.
@@ -578,49 +603,118 @@
       }
     }
 
-    /* Loader: covers the page only until the full stylesheet applies, which
-       fades it at once (style.css). If that never happens it still goes
-       after 3s, with or without scripts. */
-    .loader {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: #fff;
-      z-index: 99999;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      animation: loader-out .3s ease 3s forwards;
+    /* No loader curtain: the hero above is painted from this block at once.
+       Only what lies below the hero waits for style.css (which shows it);
+       if the stylesheet never arrives it still appears after 3s, with or
+       without scripts. */
+    main > section:not(#hero),
+    footer {
+      visibility: hidden;
+      animation: show-late 0s 3s forwards
     }
 
-    @keyframes loader-out {
+    @keyframes show-late {
       to {
-        opacity: 0;
-        visibility: hidden;
+        visibility: visible
       }
     }
 
-    .loader::before {
-      content: '';
-      width: 28px;
-      height: 28px;
-      border: 2.5px solid #e5e5ea;
-      border-top-color: #1264CE;
-      border-radius: 50%;
-      animation: loader-spin 0.75s linear infinite;
-      will-change: transform;
+    /* The back-to-top button and the "Copied" toast start out at their
+       resting state, hidden. Shown here until style.css lands, they would
+       fade out from full opacity at the bottom of the screen the moment it
+       applies (its opacity transitions), a flash of two round icons */
+    #back-to-top,
+    .toast {
+      opacity: 0
     }
 
-    @keyframes loader-spin {
+    /* The rest of the hero's first look, copied from style.css so nothing
+       changes when it lands: the name's gradient ink (with the shimmer's
+       start values) and its rise, the pill's fill, the link's chevron and
+       the soft glow behind the copy. The same animation name and timing as
+       style.css, so the rise does not start over when the stylesheet
+       applies. Keep in sync with style.css. */
+    #hero .hero-name {
+      --ink-x: 62%;
+      --ink-c: #1264CE
+    }
+
+    .hero-name-line {
+      color: var(--color-text);
+      animation: name-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) both
+    }
+
+    @supports ((-webkit-background-clip: text) or (background-clip: text)) {
+      .hero-name-line {
+        background-image: linear-gradient(100deg,
+            #1d1d1f 0%,
+            #1d1d1f calc(var(--ink-x) - 30%),
+            var(--ink-c) var(--ink-x),
+            #1d1d1f calc(var(--ink-x) + 30%),
+            #1d1d1f 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent
+      }
+    }
+
+    .hero-name-line:nth-child(2) {
+      animation-delay: 0.14s
+    }
+
+    @keyframes name-rise {
+      from {
+        opacity: .01;
+        transform: translateY(24px)
+      }
+
       to {
-        transform: rotate(360deg);
+        opacity: 1;
+        transform: none
+      }
+    }
+
+    .btn-pill {
+      justify-content: center;
+      border: 0;
+      border-radius: var(--r-capsule);
+      background: var(--color-link);
+      color: #fff
+    }
+
+    .more .chev {
+      background: currentColor;
+      -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 14'%3E%3Cpath d='M1.2 1.2 6.8 7l-5.6 5.8' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+      mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 14'%3E%3Cpath d='M1.2 1.2 6.8 7l-5.6 5.8' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat
+    }
+
+    #hero .hero-copy::before {
+      content: "";
+      position: absolute;
+      left: -12%;
+      top: calc(50% - 38px);
+      transform: translateY(-50%);
+      width: 640px;
+      height: 640px;
+      background: radial-gradient(circle,
+          rgba(90, 167, 255, 0.12) 0%,
+          rgba(252, 252, 253, 0) 62%);
+      z-index: -1;
+      pointer-events: none
+    }
+
+    @media (max-width: 992px) {
+      #hero .hero-copy::before {
+        left: 50%;
+        top: calc(50% - 34px);
+        transform: translate(-50%, -50%);
+        width: 480px;
+        height: 480px
       }
     }
 
     /* Hero text entrance animation (CSS replaces GSAP — no CDN request).
-       Starts at 1% opacity, not 0: invisible (and under the loader), but
+       Starts at 1% opacity, not 0: nearly invisible at first, but
        Chrome skips opacity:0 text when it records Largest Contentful Paint
        and a compositor fade never repaints it, so from 0 the name was only
        counted once the constellation's ink first repainted it */
@@ -670,7 +764,7 @@
       background: none;
       border: none;
       cursor: pointer;
-      color: #1264CE;
+      color: var(--color-link);
       font-size: 0.7647rem;
       font-weight: 500;
       padding: 4px 0 2px;
@@ -757,7 +851,7 @@
     .exp-card-cta-label {
       font-size: 0.8824rem;
       font-weight: 600;
-      color: #1264CE;
+      color: var(--color-link);
       transition: opacity .2s
     }
 
@@ -827,11 +921,6 @@
       letter-spacing: .1px
     }
 
-    .exp-card-highlights .hl-blue {
-      color: #1264CE;
-      background: rgba(18, 100, 206, .08)
-    }
-
     /* Card shimmer on hover */
     #experience .data-box[data-exp] {
       overflow: hidden
@@ -859,7 +948,7 @@
       gap: 5px;
       font-size: 0.6471rem;
       font-weight: 600;
-      color: #1264CE;
+      color: var(--color-text);
       background: rgba(18, 100, 206, .08);
       border-radius: 980px;
       padding: 3px 10px;
@@ -896,7 +985,7 @@
     .exp-duration {
       display: inline-block;
       font-size: 0.7647rem;
-      color: #6e6e73;
+      color: var(--color-text-secondary-small);
       font-weight: 400;
       background: #f5f5f7;
       border-radius: 980px;
@@ -948,7 +1037,7 @@
     .exp-card-stack span {
       font-size: 0.6471rem;
       font-weight: 500;
-      color: #6e6e73;
+      color: var(--color-text-secondary);
       background: #f5f5f7;
       border: none;
       border-radius: 980px;
@@ -1172,14 +1261,14 @@
     .stat-sup {
       font-size: 0.7647rem;
       font-weight: 700;
-      color: #1264CE;
+      color: var(--color-text);
       line-height: 1;
       letter-spacing: 0
     }
 
     .exp-stat-label {
       font-size: 0.7647rem;
-      color: #6e6e73;
+      color: var(--color-text-secondary-small);
       font-weight: 400;
       margin-top: 6px;
       line-height: 1.3
@@ -1338,7 +1427,7 @@
 
     .exp-modal-company {
       font-size: 0.9412rem;
-      color: #6e6e73;
+      color: var(--color-text-secondary);
       font-weight: 400;
       line-height: 1.4
     }
@@ -1347,7 +1436,7 @@
     .exp-modal-period {
       display: inline-block;
       font-size: 0.8235rem;
-      color: #1264CE;
+      color: var(--color-link);
       font-weight: 600;
       background: rgba(18, 100, 206, .08);
       border-radius: 980px;
@@ -1374,7 +1463,7 @@
       border: none
     }
 
-    /* My Projects: a client's own logo takes the drawing's place at the foot
+    /* Projects: a client's own logo takes the drawing's place at the foot
        of its card, in the same box (the drawing stays for the See all list),
        at an optically even share of the card's width (--lw) */
     #portfolio .has-logo .work-icon {
@@ -1456,74 +1545,66 @@
       text-wrap: pretty
     }
 
-    /* ── Apple HIG: Filter chips ── */
+    /* ── Apple HIG: Client pop-up button ── */
     .exp-client-filter {
       display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
       margin: 20px 0 8px;
-      /* room for the sticky close button when the sheet opens scrolled to the chips */
+      /* room for the sticky close button when the sheet opens scrolled to the picker */
       padding-right: 48px
     }
 
-    .exp-filter-chip {
-      background: #f5f5f7;
+    /* one pop-up button for the flat list of clients: a 44px capsule, the
+       chosen client in 17px text (it follows the reader's text size), an
+       up/down chevron at the trailing end */
+    .exp-client-select {
+      -webkit-appearance: none;
+      appearance: none;
+      max-width: 100%;
+      min-height: 44px;
+      margin: 0;
+      padding: 0 42px 0 18px;
       border: none;
       border-radius: 980px;
-      padding: 6px 16px;
-      font-size: 0.8235rem;
-      font-weight: 500;
+      background: #e8e8ed url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 16'%3E%3Cpath d='M1.5 5.5 5 2l3.5 3.5M1.5 10.5 5 14l3.5-3.5' fill='none' stroke='%231d1d1f' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 18px center / 10px 16px;
       color: #1d1d1f;
+      font: inherit;
+      /* 17px on phones too: style.css raises every phone select to 16px with !important */
+      font-size: calc(17rem / 17 / var(--tier)) !important;
+      line-height: calc(44rem / 17 / var(--tier));
+      text-overflow: ellipsis;
       cursor: pointer;
-      transition: background .2s, color .2s, box-shadow .2s
+      transition: background-color .2s
     }
 
-    .exp-filter-chip:hover {
-      background: #e8e8ed;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, .08)
+    .exp-client-select:hover {
+      background-color: #d8d8df
     }
 
-    .exp-filter-chip.active {
-      background: #1264CE;
-      color: #fff;
-      box-shadow: 0 2px 8px rgba(18, 100, 206, .25)
-    }
-
-    @keyframes chip-hint {
-
-      0%,
-      100% {
-        transform: translateY(0)
-      }
-
-      50% {
-        transform: translateY(-4px)
+    /* forced colours: the native control, so the chevron cannot vanish */
+    @media (forced-colors: active) {
+      .exp-client-select {
+        -webkit-appearance: auto;
+        appearance: auto;
+        border: 1px solid ButtonText;
+        background-image: none
       }
     }
 
-    .exp-filter-chip.hint {
-      animation: chip-hint .38s ease-in-out
+    /* the smallest phones: tighter sides, so the longer names fit beside the close button */
+    @media (max-width: 374px) {
+      .exp-client-select {
+        padding: 0 34px 0 14px;
+        background-position: right 14px center
+      }
     }
 
-    /* Mobile: chips scroll horizontally in one row (same pattern as project filters) */
+    /* Mobile: the picker's row reaches the sheet's edge, so it can stick */
     @media(max-width:768px) {
       .exp-client-filter {
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
         margin-left: -18px;
         margin-right: -18px;
         padding-left: 18px;
         padding-right: 18px
-      }
-
-      .exp-client-filter::-webkit-scrollbar {
-        display: none
-      }
-
-      .exp-filter-chip {
-        flex-shrink: 0
       }
     }
 
@@ -1593,7 +1674,7 @@
     .exp-client-section-header .exp-client-tag {
       font-size: 0.6471rem;
       font-weight: 600;
-      color: #1264CE;
+      color: var(--color-link);
       background: rgba(18, 100, 206, .08);
       border-radius: 980px;
       padding: 3px 10px;
@@ -1692,20 +1773,20 @@
       font-weight: 600
     }
 
-    /* Phones keep the compact sizes the user signed off on;
+    /* Phones keep the compact sizes the user signed off on, but for the
+       sheet's reading text (overview and lists), one step up at 15/20;
        the bumps above are desktop-only. */
     @media (max-width: 768px) {
       .exp-card-highlights .hl { font-size: 0.6471rem; }
       .exp-duration { font-size: 0.6471rem; }
       .exp-stat-label { font-size: 0.6471rem; }
-      .exp-modal-overview { font-size: 0.7647rem; }
-      .exp-client-section ul { font-size: 0.7647rem; }
-      .exp-modal-section ul { font-size: 0.7647rem; }
+      .exp-modal-overview { font-size: 0.8824rem; line-height: 1.33334; }
+      .exp-client-section ul { font-size: 0.8824rem; line-height: 1.33334; }
+      .exp-modal-section ul { font-size: 0.8824rem; line-height: 1.33334; }
       .exp-modal-tech span { font-size: 0.6471rem; }
       .exp-modal-period { font-size: 0.7059rem; }
       .exp-card-cta-label { font-size: 0.8235rem; }
       .exp-modal-company { font-size: 0.8824rem; }
-      .exp-filter-chip { font-size: 0.7647rem; }
       .exp-client-section-header h3 { font-size: 0.8824rem; }
     }
 
@@ -1721,7 +1802,6 @@
       .exp-modal-overview { font-size: 1.0588rem; }
       .exp-modal-tech span { font-size: 0.8235rem; }
       .exp-modal-period { font-size: 0.8824rem; }
-      .exp-filter-chip { font-size: 0.8824rem; }
       .exp-client-section-header h3 { font-size: 1.0588rem; }
       .exp-client-section ul { font-size: 1.0588rem; }
       .exp-modal-section ul { font-size: 1.0588rem; }
@@ -1762,10 +1842,10 @@
   </style>
 
   <!-- Full CSS loaded async: no render blocking (bootstrap merged in) -->
-  <link rel="preload" href="assets/css/style.min.css?v=2.71.0" as="style"
+  <link rel="preload" href="assets/css/style.min.css?v=2.72.0" as="style"
     onload="this.onload=null;this.rel='stylesheet'">
   <noscript>
-    <link href="assets/css/style.min.css?v=2.71.0" rel="stylesheet">
+    <link href="assets/css/style.min.css?v=2.72.0" rel="stylesheet">
     <style>.proj-all{visibility:hidden}</style>
   </noscript>
 
@@ -2042,7 +2122,7 @@
   </script>
 
   <!-- Preload deferred JS to start downloading before parser reaches script tags -->
-  <link rel="preload" href="assets/js/main.min.js?v=2.71.0" as="script">
+  <link rel="preload" href="assets/js/main.min.js?v=2.72.0" as="script">
 
   <!-- Google tag (gtag.js). The page view is queued here, stamped with the
        time the page opened; gtag.js sends it when it arrives. -->
@@ -2090,7 +2170,6 @@
 
 <body>
   <a class="skip-link" href="#main-content">Skip to content</a>
-  <div class="loader" aria-hidden="true"></div>
 
   <main id="main-content">
 
@@ -2157,7 +2236,7 @@
                       LLM integration, voice AI (ASR, TTS, <span class="nw">speech-to-speech</span>), and agentic AI systems for business
                       automation.</p>
                     <div class="exp-card-highlights profile-bio-small" style="margin-top:16px">
-                      <span class="hl hl-blue"><span class="nw">Full-Stack</span> Developer</span>
+                      <span class="hl"><span class="nw">Full-Stack</span> Developer</span>
                       <span class="hl">AI Engineer</span>
                       <span class="hl">Computer Engineer</span>
                     </div>
@@ -2189,10 +2268,10 @@
                       </div>
                     </div>
                     <div style="display: flex; flex-wrap: wrap; gap: 18px 24px; margin-top: 24px;">
-                      <a href="#experience" class="resume-exp-link" style="color: #1264CE; text-decoration: none; font-weight: 500;">View
+                      <a href="#experience" class="resume-exp-link" style="text-decoration: none; font-weight: 500;">View
                         Experience →</a>
                       <a href="assets/cv/Tanapol-Chamnanhan-CV.pdf" class="resume-exp-link" download
-                        style="color: #1264CE; text-decoration: none; font-weight: 500;">Download CV (PDF)</a>
+                        style="text-decoration: none; font-weight: 500;">Download CV (PDF)</a>
                     </div>
                   </div>
                 </div>
@@ -2275,7 +2354,7 @@
                       <p class="fw-light profile-bio-small">Chamnanhan, T., Phetkrachang, K., Sathiwantana, S.,
                         Chalearnnetkul, P., Choosong, C. (2023). &ldquo;Measuring of Words Similarity for Question
                         Answering System for Diabetes&rdquo;. Journal of Applied Informatics and Technology, Vol. 5
-                        No. 2, July&ndash;December.</p>
+                        No. 2, <span class="nw">July&ndash;December.</span></p>
                     </div>
                   </div>
                 </div>
@@ -2353,8 +2432,7 @@
                       <span class="exp-card-cta-label" aria-hidden="true">Read more</span>
                       <span class="exp-card-btn">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" aria-hidden="true" focusable="false">
-                          <path
-                            d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" />
+                          <path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" />
                         </svg>
                       </span>
                     </button>
@@ -2418,8 +2496,7 @@
                     <span class="exp-card-cta-label" aria-hidden="true">Read more</span>
                     <span class="exp-card-btn">
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" aria-hidden="true" focusable="false">
-                        <path
-                          d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" />
+                        <path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" />
                       </svg>
                     </span>
                   </button>
@@ -2472,8 +2549,7 @@
                     <span class="exp-card-cta-label" aria-hidden="true">Read more</span>
                     <span class="exp-card-btn">
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" aria-hidden="true" focusable="false">
-                        <path
-                          d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" />
+                        <path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" />
                       </svg>
                     </span>
                   </button>
@@ -2717,7 +2793,7 @@
     <section id="portfolio" class="portfolio section-bg mb-5" aria-labelledby="portfolio-title">
       <div class="container mb-5" data-aos="fade-up">
         <div class="section-title" id="portfolio-title" tabindex="-1">
-          <h2>My Projects</h2>
+          <h2>Projects</h2>
           <p>Every project, highlights first.</p>
         </div>
 
@@ -2740,7 +2816,7 @@
               <h3 class="h4" id="work2-title">Sales campaign CRM, Kasikorn Carabao</h3>
               <p class="fw-light">Predictive dialer, repayment tracking and agent dashboards over large daily call logs.</p>
               <button type="button" class="card-plus" aria-label="Read more: Sales campaign CRM, Kasikorn Carabao">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -2753,7 +2829,7 @@
               <h3 class="h4">TV shopping CRM, Happy Products</h3>
               <p class="fw-light">Airtime, orders and telesales in one CRM, with live warehouse stock and product lock rules.</p>
               <button type="button" class="card-plus" aria-label="Read more: TV shopping CRM, Happy Products">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -2774,7 +2850,7 @@
               <h3 class="h4" id="work1-title">Patient CRM, Bangkok Hospital Chiang Mai</h3>
               <p class="fw-light">Appointments, IV team dispatch with LINE alerts, and every patient call on record.</p>
               <button type="button" class="card-plus" aria-label="Read more: Patient CRM, Bangkok Hospital Chiang Mai">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -2787,7 +2863,7 @@
               <h3 class="h4">Multilingual IVR, Thai VietJet Air</h3>
               <p class="fw-light">Thai and English IVR with live flight status, baggage and refund policy, spoken by TTS.</p>
               <button type="button" class="card-plus" aria-label="Read more: Multilingual IVR, Thai VietJet Air">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -2800,7 +2876,7 @@
               <h3 class="h4">Auto IVR payment reminders, TSR Living Solution</h3>
               <p class="fw-light">Calls customers before and after due dates on its own, from lists pulled by API, up to 30 lines at once.</p>
               <button type="button" class="card-plus" aria-label="Read more: Auto IVR payment reminders, TSR Living Solution">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -2813,7 +2889,7 @@
               <h3 class="h4">AI&nbsp;voice&nbsp;agent, Genius&nbsp;Track</h3>
               <p class="fw-light">Finished and about to be handed over for the client to use.</p>
               <button type="button" class="card-plus" aria-label="Read more: AI voice agent, Genius Track">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -2826,7 +2902,7 @@
               <h3 class="h4">Insurance sales CRM, Insurverse</h3>
               <p class="fw-light">Sales pipeline, policy tracking and appointments, with CTI <span class="nw">screen-pop</span> on the softphone.</p>
               <button type="button" class="card-plus" aria-label="Read more: Insurance sales CRM, Insurverse">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -2839,7 +2915,7 @@
               <h3 class="h4">AI&nbsp;voice&nbsp;bot, KBJ&nbsp;Capital</h3>
               <p class="fw-light">Built for Digiserve, for a bid to KBJ Capital. The client liked the working demo.</p>
               <button type="button" class="card-plus" aria-label="Read more: AI voice bot, KBJ Capital">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -2859,7 +2935,7 @@
               <h3 class="h4" id="work3-title">License and asset platforms, SCG</h3>
               <p class="fw-light">Approval workflows and IT asset tracking, used <span class="nw">group-wide</span> by 2,000+ people.</p>
               <button type="button" class="card-plus" aria-label="Read more: License and asset platforms, SCG">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -2872,7 +2948,7 @@
               <h3 class="h4">Flight change calls, Thai VietJet Air</h3>
               <p class="fw-light">Calls passengers about changed flights in five languages. They press 1 to accept or 2 to decline.</p>
               <button type="button" class="card-plus" aria-label="Read more: Flight change calls, Thai VietJet Air">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -2885,7 +2961,7 @@
               <h3 class="h4">Vehicle sales CRM, Inchcape Thailand</h3>
               <p class="fw-light">The full buyer journey from lead and test drive to purchase and <span class="nw">after-sales</span>, with LINE&nbsp;OA.</p>
               <button type="button" class="card-plus" aria-label="Read more: Vehicle sales CRM, Inchcape Thailand">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -2898,7 +2974,7 @@
               <h3 class="h4">Customer service IVR, Rabbit Card</h3>
               <p class="fw-light">IVR for balance, transaction history and card activation, linked live to the backend API.</p>
               <button type="button" class="card-plus" aria-label="Read more: Customer service IVR, Rabbit Card">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -2911,7 +2987,7 @@
               <h3 class="h4">Callback queue, Aioi Bangkok Insurance</h3>
               <p class="fw-light">A callback queue where agents call each caller back in one click, with dashboards and reports.</p>
               <button type="button" class="card-plus" aria-label="Read more: Callback queue, Aioi Bangkok Insurance">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -2924,7 +3000,7 @@
               <h3 class="h4">Voice AI pipeline for contact centers</h3>
               <p class="fw-light">Prototyped Thai and English call handling, ASR to LLM to TTS, and benchmarked ASR engines.</p>
               <button type="button" class="card-plus" aria-label="Read more: Voice AI pipeline for contact centers">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -2937,7 +3013,7 @@
               <h3 class="h4">Service ticket CRM, Netbay</h3>
               <p class="fw-light">Tickets with SLA escalation, abandoned call callbacks, six reports and security hardening.</p>
               <button type="button" class="card-plus" aria-label="Read more: Service ticket CRM, Netbay">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -2950,7 +3026,7 @@
               <h3 class="h4">Chatbot and LINE images, Kasikorn Carabao</h3>
               <p class="fw-light">Agents send images to customers on LINE, and chats from KBAO's chatbot reach agents with their history.</p>
               <button type="button" class="card-plus" aria-label="Read more: Chatbot and LINE images, Kasikorn Carabao">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -2963,7 +3039,7 @@
               <h3 class="h4">Softphone CTI APIs, Genie Properties</h3>
               <p class="fw-light">Click to call from their CRM, plus APIs for call history, live agent status and recordings.</p>
               <button type="button" class="card-plus" aria-label="Read more: Softphone CTI APIs, Genie Properties">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -2976,7 +3052,7 @@
               <h3 class="h4">Internal reservation system, SCG</h3>
               <p class="fw-light">Meeting rooms, vehicles and equipment, with calendar views, conflict checks and approvals.</p>
               <button type="button" class="card-plus" aria-label="Read more: Internal reservation system, SCG">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -2989,7 +3065,7 @@
               <h3 class="h4">Agentic AI for business workflows</h3>
               <p class="fw-light">Orchestrator and <span class="nw">sub-agents</span> with tool calling, for lead qualification and <span class="nw">after-call</span> work.</p>
               <button type="button" class="card-plus" aria-label="Read more: Agentic AI for business workflows">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -3002,7 +3078,7 @@
               <h3 class="h4">Accident and health insurance CRM, dp&nbsp;a&amp;h</h3>
               <p class="fw-light">Quotes and <span class="nw">follow-ups</span>, six agent break statuses, LINE&nbsp;OA renewal reminders and a claims IVR.</p>
               <button type="button" class="card-plus" aria-label="Read more: Accident and health insurance CRM, dp a&amp;h">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -3015,7 +3091,7 @@
               <h3 class="h4">Lead status and data API, Insurverse</h3>
               <p class="fw-light">New and Follow lead status, a LINE&nbsp;OA link on each lead, and a data API for Insurverse's dashboard.</p>
               <button type="button" class="card-plus" aria-label="Read more: Lead status and data API, Insurverse">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -3028,7 +3104,7 @@
               <h3 class="h4">Operations dashboard, Artelia Cornerstone</h3>
               <p class="fw-light">Live queue and SLA dashboard with LINE and email alerts, KPI targets and historical reports.</p>
               <button type="button" class="card-plus" aria-label="Read more: Operations dashboard, Artelia Cornerstone">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -3041,7 +3117,7 @@
               <h3 class="h4">Airtime sales reports, Happy Products</h3>
               <p class="fw-light">Sales by media slot, and calls, orders, sets and sales for each airtime, down to every PO.</p>
               <button type="button" class="card-plus" aria-label="Read more: Airtime sales reports, Happy Products">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -3054,7 +3130,7 @@
               <h3 class="h4">Customer analytics, Digiserve</h3>
               <p class="fw-light">One view of calls, LINE and email, with <span class="nw">drill-down</span>, period comparison and exports.</p>
               <button type="button" class="card-plus" aria-label="Read more: Customer analytics, Digiserve">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -3067,7 +3143,7 @@
               <h3 class="h4">Job dispatch platform, SCG</h3>
               <p class="fw-light">Create, assign and close field jobs in the southern region, with workload reports.</p>
               <button type="button" class="card-plus" aria-label="Read more: Job dispatch platform, SCG">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -3080,7 +3156,7 @@
               <h3 class="h4">Field service CRM, Treebisfix</h3>
               <p class="fw-light">Repair jobs from intake to technician dispatch and <span class="nw">sign-off</span>, with LINE&nbsp;OA updates.</p>
               <button type="button" class="card-plus" aria-label="Read more: Field service CRM, Treebisfix">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -3093,7 +3169,7 @@
               <h3 class="h4">Scheduled call reports, LivPlus</h3>
               <p class="fw-light">Daily and weekly KPI reports emailed as PDF and Excel, over millions of CDR records.</p>
               <button type="button" class="card-plus" aria-label="Read more: Scheduled call reports, LivPlus">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -3106,7 +3182,7 @@
               <h3 class="h4">Patient CRM, Mediviss</h3>
               <p class="fw-light">Appointments, doctor assignment and LINE&nbsp;OA recall reminders, with each patient's call history.</p>
               <button type="button" class="card-plus" aria-label="Read more: Patient CRM, Mediviss">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -3119,7 +3195,7 @@
               <h3 class="h4">Case API and a&nbsp;new team, dp&nbsp;a&amp;h</h3>
               <p class="fw-light">A case form to the client's fields, an API that passes each case on, and a new team live in July 2026.</p>
               <button type="button" class="card-plus" aria-label="Read more: Case API and a new team, dp a&amp;h">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -3132,7 +3208,7 @@
               <h3 class="h4">Guest reservations CRM, Yunomori</h3>
               <p class="fw-light">Reservations and guest inquiries, with LINE&nbsp;OA confirmations, arrival instructions and surveys.</p>
               <button type="button" class="card-plus" aria-label="Read more: Guest reservations CRM, Yunomori">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -3145,7 +3221,7 @@
               <h3 class="h4">Family Day event shop, SCG</h3>
               <p class="fw-light">Online shop for SCG's annual Family Day, with stock, cart, orders and payment confirmation.</p>
               <button type="button" class="card-plus" aria-label="Read more: Family Day event shop, SCG">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -3158,7 +3234,7 @@
               <h3 class="h4">Order support CRM, MVmall</h3>
               <p class="fw-light">Order inquiries, returns and delivery disputes with SLA tracking and LINE&nbsp;OA order updates.</p>
               <button type="button" class="card-plus" aria-label="Read more: Order support CRM, MVmall">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -3171,7 +3247,7 @@
               <h3 class="h4">Property sales CRM, N&amp;S and Kijsiri</h3>
               <p class="fw-light">One sales CRM for two linked companies, with each team limited to its own call recordings.</p>
               <button type="button" class="card-plus" aria-label="Read more: Property sales CRM, N&amp;S and Kijsiri">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -3184,7 +3260,7 @@
               <h3 class="h4">Diabetes question answering research</h3>
               <p class="fw-light">Published paper on measuring word similarity for a diabetes question answering system.</p>
               <button type="button" class="card-plus" aria-label="Read more: Diabetes question answering research">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -3197,7 +3273,7 @@
               <h3 class="h4">Clinic case CRM, Qprime</h3>
               <p class="fw-light">Cases built around consultation and surgery dates, with alerts that put newly assigned cases first.</p>
               <button type="button" class="card-plus" aria-label="Read more: Clinic case CRM, Qprime">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -3210,7 +3286,7 @@
               <h3 class="h4">Sales order CRM, OTO Vision</h3>
               <p class="fw-light">Sales orders and reports with product codes, plus outbound call lists shared across agents.</p>
               <button type="button" class="card-plus" aria-label="Read more: Sales order CRM, OTO Vision">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -3223,7 +3299,7 @@
               <h3 class="h4">Document reference tracker, SCG</h3>
               <p class="fw-light">Reference codes for documents across SCG business units, with search and audit history.</p>
               <button type="button" class="card-plus" aria-label="Read more: Document reference tracker, SCG">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -3236,7 +3312,7 @@
               <h3 class="h4">Clinic appointment CRM, Dr.Orn</h3>
               <p class="fw-light">Appointment scheduling and LINE&nbsp;OA reminders, with each patient's call history on profile.</p>
               <button type="button" class="card-plus" aria-label="Read more: Clinic appointment CRM, Dr.Orn">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -3249,7 +3325,7 @@
               <h3 class="h4">Customer service CRM, S.B.L. Leasing</h3>
               <p class="fw-light">Full CRM setup through launch, case tracking with audit trail, and a call analytics dashboard.</p>
               <button type="button" class="card-plus" aria-label="Read more: Customer service CRM, S.B.L. Leasing">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -3262,7 +3338,7 @@
               <h3 class="h4">TV shopping support CRM, iShopping</h3>
               <p class="fw-light">Order inquiries, return requests and complaint logging, plus an agent productivity dashboard.</p>
               <button type="button" class="card-plus" aria-label="Read more: TV shopping support CRM, iShopping">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -3275,7 +3351,7 @@
               <h3 class="h4">Contact center analytics, Thaivan</h3>
               <p class="fw-light">CDR and queue log analytics with live agent monitoring and SLA tracking.</p>
               <button type="button" class="card-plus" aria-label="Read more: Contact center analytics, Thaivan">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -3288,7 +3364,7 @@
               <h3 class="h4">Operations reporting, Nova Organic</h3>
               <p class="fw-light">Live queue and SLA dashboard and a bulk file import, plus sales report and permission updates.</p>
               <button type="button" class="card-plus" aria-label="Read more: Operations reporting, Nova Organic">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -3301,7 +3377,7 @@
               <h3 class="h4">Dialer and caller ID, Kasikorn Carabao</h3>
               <p class="fw-light">KBAO now sets the predictive ringing time itself, and AIS mobile caller numbers reach the CRM.</p>
               <button type="button" class="card-plus" aria-label="Read more: Dialer and caller ID, Kasikorn Carabao">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -3314,7 +3390,7 @@
               <h3 class="h4">Softphone CTI, Insurverse</h3>
               <p class="fw-light">Calls on the PhonerLite softphone with a CRM <span class="nw">pop-up</span>, break statuses and recordings kept in the CRM.</p>
               <button type="button" class="card-plus" aria-label="Read more: Softphone CTI, Insurverse">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -3327,7 +3403,7 @@
               <h3 class="h4">Personal data masking, Kasikorn Carabao</h3>
               <p class="fw-light">Four collection reports now export personal data blanked or hashed.</p>
               <button type="button" class="card-plus" aria-label="Read more: Personal data masking, Kasikorn Carabao">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -3340,7 +3416,7 @@
               <h3 class="h4">Call analytics reports, Isuzu Thailand</h3>
               <p class="fw-light">Thai labels for answered and unanswered calls, and readable queue names for supervisors.</p>
               <button type="button" class="card-plus" aria-label="Read more: Call analytics reports, Isuzu Thailand">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -3353,7 +3429,7 @@
               <h3 class="h4">CRM updates, Happy Products</h3>
               <p class="fw-light">Sort arrows on every column of every report, an export button, and a log that catches slow queries.</p>
               <button type="button" class="card-plus" aria-label="Read more: CRM updates, Happy Products">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -3366,7 +3442,7 @@
               <h3 class="h4">Queue names in reports, iShopping</h3>
               <p class="fw-light">Queue reports and PBX dashboards show queue names, and sales order exports line up with imports.</p>
               <button type="button" class="card-plus" aria-label="Read more: Queue names in reports, iShopping">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -3378,7 +3454,7 @@
               <h3 class="h4">Even lead sharing, AME</h3>
               <p class="fw-light">When more leads are uploaded, uncalled numbers are shared out so every agent ends up with the same total.</p>
               <button type="button" class="card-plus" aria-label="Read more: Even lead sharing, AME">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -3391,7 +3467,7 @@
               <h3 class="h4">Customer records, Poch&nbsp;Laundry</h3>
               <p class="fw-light">Required customer name, shop, type and province, plus a customer data report.</p>
               <button type="button" class="card-plus" aria-label="Read more: Customer records, Poch Laundry">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -3403,7 +3479,7 @@
               <h3 class="h4">Phone number masking, Merich24</h3>
               <p class="fw-light">Customer phone numbers hidden from supervisors and from every report.</p>
               <button type="button" class="card-plus" aria-label="Read more: Phone number masking, Merich24">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -3416,7 +3492,7 @@
               <h3 class="h4">Monix codebase docs, Happy Products</h3>
               <p class="fw-light">Technical docs for the Happy Monix codebase, covering its classes, views, controllers and assets.</p>
               <button type="button" class="card-plus" aria-label="Read more: Monix codebase docs, Happy Products">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -3429,7 +3505,7 @@
               <h3 class="h4">Input checks, Kasikorn Carabao</h3>
               <p class="fw-light">Phone format, note length and map coordinates are checked before a collection note is saved.</p>
               <button type="button" class="card-plus" aria-label="Read more: Input checks, Kasikorn Carabao">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -3441,7 +3517,7 @@
               <h3 class="h4">Purchase order report, Manee Daeng</h3>
               <p class="fw-light">Corrected the purchase order report so full price, discount and net price show correctly.</p>
               <button type="button" class="card-plus" aria-label="Read more: Purchase order report, Manee Daeng">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M14.14 12.01L20.54 18.64A0.91 0.91 0 0 0 21.86 17.36L15.46 10.74A0.91 0.91 0 0 0 14.14 12.01ZM20.54 17.36L14.14 23.99A0.91 0.91 0 0 0 15.46 25.26L21.86 18.64A0.91 0.91 0 0 0 20.54 17.36Z" /></svg>
               </button>
             </div>
 
@@ -3452,10 +3528,10 @@
                   loading="lazy" decoding="async" width="1916" height="809" />
               </div>
               <span class="project-tag">IoT / AWS</span>
-              <h3 class="h4" id="project1-title">Real Time Pulse & Temperature Monitoring</h3>
+              <h3 class="h4" id="project1-title">Real time pulse & temperature monitoring</h3>
               <p class="fw-light">ThingsBoard, AWS, Sensors</p>
-              <button type="button" class="card-plus" aria-label="View screenshot: Real Time Pulse & Temperature Monitoring">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+              <button type="button" class="card-plus" aria-label="View screenshot: Real time pulse & temperature monitoring">
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M19.5 16.5 24.5 11.5M20 11.5h4.5V16M16.5 19.5 11.5 24.5M11.5 20v4.5H16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
               </button>
             </div>
 
@@ -3466,10 +3542,10 @@
                   decoding="async" width="1354" height="678" />
               </div>
               <span class="project-tag">Python / Flask</span>
-              <h3 class="h4" id="project3-title"><span class="nw">Covid-19</span> Spread Analysis Website</h3>
+              <h3 class="h4" id="project3-title"><span class="nw">Covid-19</span> spread analysis website</h3>
               <p class="fw-light">Flask, HTML, CSS, Python libraries</p>
-              <button type="button" class="card-plus" aria-label="View screenshot: Covid-19 Spread Analysis Website">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+              <button type="button" class="card-plus" aria-label="View screenshot: Covid-19 spread analysis website">
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M19.5 16.5 24.5 11.5M20 11.5h4.5V16M16.5 19.5 11.5 24.5M11.5 20v4.5H16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
               </button>
             </div>
 
@@ -3480,10 +3556,10 @@
                   decoding="async" width="1888" height="721" />
               </div>
               <span class="project-tag">PHP / MySQL</span>
-              <h3 class="h4" id="project2-title">Student's Project Management System</h3>
+              <h3 class="h4" id="project2-title">Student's project management system</h3>
               <p class="fw-light">PHP, HTML, CSS, MySQL</p>
-              <button type="button" class="card-plus" aria-label="View screenshot: Student's Project Management System">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+              <button type="button" class="card-plus" aria-label="View screenshot: Student's project management system">
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M19.5 16.5 24.5 11.5M20 11.5h4.5V16M16.5 19.5 11.5 24.5M11.5 20v4.5H16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
               </button>
             </div>
 
@@ -3494,10 +3570,10 @@
                   decoding="async" width="980" height="476" />
               </div>
               <span class="project-tag">Java</span>
-              <h3 class="h4" id="project4-title">Classroom Booking Record System</h3>
+              <h3 class="h4" id="project4-title">Classroom booking record system</h3>
               <p class="fw-light">Java, NetBeans</p>
-              <button type="button" class="card-plus" aria-label="View screenshot: Classroom Booking Record System">
-                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z" /></svg>
+              <button type="button" class="card-plus" aria-label="View screenshot: Classroom booking record system">
+                <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false"><path d="M19.5 16.5 24.5 11.5M20 11.5h4.5V16M16.5 19.5 11.5 24.5M11.5 20v4.5H16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
               </button>
             </div>
           </div>
@@ -3541,12 +3617,12 @@
       <div class="container">
         <div class="section-title">
           <h2>Certificates</h2>
-          <p>Credentials that speak for themselves.</p>
+          <p>Certificates I've earned.</p>
         </div>
 
         <!-- Content for larger screens -->
         <div class="row images-list" id="images-list"
-          data-titles="Internship letter (Apr–Jul 2023), The Siam Cement (Thung Song) Co., Ltd.|Internship programme letter (Dec 2023–Mar 2024), The Siam Cement (Thung Song) Co., Ltd.|Statement of Attainment: Systems Tester, Professional Qualification Level 4, TPQI|โครงการยกระดับสมรรถนะบุคคลตามมาตรฐานอาชีพและคุณวุฒิวิชาชีพ, สถาบันคุณวุฒิวิชาชีพ และ ARIT|รางวัลรองชนะเลิศ อันดับ ๑ โครงการตอบปัญหาทางวิชาการ ปีการศึกษา ๒๕๖๒, วิทยาลัยสารพัดช่างสงขลา|รางวัลจากการนำเสนอบทความวิจัยแบบบรรยาย ระดับดีมาก, AUC² 2023|Command Prompt 101, BorntoDev|Essential SQL for Everyone, BorntoDev|Fundamentals of Graphic Design, BorntoDev|Introduction to Computer Science, BorntoDev|ใช้งานแชทบอทร้านค้ายุคใหม่ ด้วย Kaojao, BorntoDev|Notebook Repair Service, vocational short course (75 hours), Songkhla Polytechnic College|การใช้โปรแกรม Microsoft Excel เบื้องต้น, Starfish Academy และ Starfish Labz|วิทยาการคำนวณและโค้ดดิ้ง, Starfish Academy และ Starfish Labz|Online Coaching Startup Thailand League 2021 Mega Hackathon, NIA|Hour of Code (Minecraft), Code.org|The Hour of Code, Code.org|English for Communication, vocational short course (150 hours), Songkhla Polytechnic College|English Public Speaking Contest, อาชีวศึกษาจังหวัดสงขลา|GitHub for Developer, BorntoDev|Computer Repair Service, vocational short course (75 hours), Songkhla Polytechnic College|งานซ่อมเครื่องคอมพิวเตอร์โน๊ตบุ๊ค หลักสูตรระยะสั้น (๗๕ ชั่วโมง), วิทยาลัยสารพัดช่างสงขลา|งานซ่อมเครื่องคอมพิวเตอร์ หลักสูตรระยะสั้น (๗๕ ชั่วโมง), วิทยาลัยสารพัดช่างสงขลา|Computer Repair Service, vocational short course (75 hours), Songkhla Polytechnic College|Introduction to JavaScript, BorntoDev|Lite: Fundamental Web Dev with HTML5 &amp; CSS3, BorntoDev|Coding ทักษะแห่งโลกอนาคต, Starfish Academy และ Starfish Labz|การเขียนโปรแกรมภาษา Python สำหรับผู้เริ่มต้น, Starfish Academy และ Starfish Labz|Basic Software Testing, BorntoDev|NDG Linux Essentials, Cisco Networking Academy|การเพิ่มประสิทธิภาพการทำงานด้วยปัญญาประดิษฐ์, Thai MOOC|Claude 101, Anthropic|Claude Code 101, Anthropic">
+          data-titles="Internship letter (Apr–Jul 2023), The Siam Cement (Thung Song) Co., Ltd.|Internship programme letter (Dec 2023–Mar 2024), The Siam Cement (Thung Song) Co., Ltd.|Statement of Attainment: Systems Tester, Professional Qualification Level 4, TPQI|โครงการยกระดับสมรรถนะบุคคลตามมาตรฐานอาชีพและคุณวุฒิวิชาชีพ, สถาบันคุณวุฒิวิชาชีพ และ ARIT|รางวัลรองชนะเลิศ อันดับ ๑ โครงการตอบปัญหาทางวิชาการ ปีการศึกษา ๒๕๖๒, วิทยาลัยสารพัดช่างสงขลา|รางวัลจากการนำเสนอบทความวิจัยแบบบรรยาย ระดับดีมาก, AUC² 2023|Command Prompt 101, BorntoDev|Essential SQL for Everyone, BorntoDev|Fundamentals of Graphic Design, BorntoDev|Introduction to Computer Science, BorntoDev|ใช้งานแชทบอทร้านค้ายุคใหม่ ด้วย Kaojao, BorntoDev|Notebook Repair Service, vocational short course (75 hours), Songkhla Polytechnic College|การใช้โปรแกรม Microsoft Excel เบื้องต้น, Starfish Academy และ Starfish Labz|วิทยาการคำนวณและโค้ดดิ้ง, Starfish Academy และ Starfish Labz|Online Coaching Startup Thailand League 2021 Mega Hackathon, NIA|Hour of Code (Minecraft), Code.org|The Hour of Code, Code.org|English for Communication, vocational short course (150 hours), Songkhla Polytechnic College|English Public Speaking Contest, อาชีวศึกษาจังหวัดสงขลา|GitHub for Developer, BorntoDev|Computer Repair Service, vocational short course (75 hours), Songkhla Polytechnic College|งานซ่อมเครื่องคอมพิวเตอร์โน๊ตบุ๊ค หลักสูตรระยะสั้น (๗๕ ชั่วโมง), วิทยาลัยสารพัดช่างสงขลา|งานซ่อมเครื่องคอมพิวเตอร์ หลักสูตรระยะสั้น (๗๕ ชั่วโมง), วิทยาลัยสารพัดช่างสงขลา|Introduction to JavaScript, BorntoDev|Lite: Fundamental Web Dev with HTML5 &amp; CSS3, BorntoDev|Coding ทักษะแห่งโลกอนาคต, Starfish Academy และ Starfish Labz|การเขียนโปรแกรมภาษา Python สำหรับผู้เริ่มต้น, Starfish Academy และ Starfish Labz|Basic Software Testing, BorntoDev|NDG Linux Essentials, Cisco Networking Academy|การเพิ่มประสิทธิภาพการทำงานด้วยปัญญาประดิษฐ์, Thai MOOC|Claude 101, Anthropic|Claude Code 101, Anthropic">
           <!-- Images will be added here by JavaScript -->
         </div>
 
@@ -3704,7 +3780,7 @@
     <section id="contact" class="closing-cta">
       <div class="container">
         <div class="cta-inner">
-          <h2 class="cta-headline">Let's build<br>what's next.</h2>
+          <h2 class="cta-headline">Build what's<br>next with me.</h2>
           <p class="cta-sub">Open to <span class="nw">full-time</span> roles and freelance projects — web apps, CRM &amp; POS systems, and AI
             voice agents.</p>
           <div class="cta-row">
@@ -3749,13 +3825,13 @@
   <!-- ======= Footer ======= -->
   <footer id="footer">
     <div class="container fw-light my-3 text-start">
-      <div class="container">
+      <div>
 
         <div class="row ">
           <div class="col-12 col-md-4 mt-3">
             <div style="font-size: 1rem;font-weight:600;color:#1d1d1f;margin-bottom:8px;letter-spacing:-0.2px;">Tanapol
               Chamnanhan</div>
-            <div class="fw-light" style="font-size: 0.8235rem;color:#6e6e73;line-height:1.6;"><span class="nw">Full-Stack</span> Developer &amp;
+            <div class="fw-light" style="font-size: 0.8235rem;color:var(--color-text-secondary-small);line-height:1.6;"><span class="nw">Full-Stack</span> Developer &amp;
               Software Engineer based in Bangkok, Thailand.</div>
           </div>
 
@@ -3765,10 +3841,10 @@
           <div class="col-12 col-md-4 mt-3">
             <div style="font-size: 1rem;font-weight:600;color:#1d1d1f;margin-bottom:8px;letter-spacing:-0.2px;">Contact
             </div>
-            <div class="fw-light" style="font-size: 0.8235rem;color:#6e6e73;"><a href="mailto:tanapol.ch@rmutsvmail.com"
-                class="text-decoration-none footer-contact-link" style="color:#1264CE;">tanapol.ch@<wbr>rmutsvmail.com</a></div>
-            <div class="fw-light" style="font-size: 0.8235rem;color:#6e6e73;"><a href="tel:+66962437210"
-                class="text-decoration-none footer-contact-link" style="color:#1264CE;">+66 962 437 210</a></div>
+            <div class="fw-light" style="font-size: 0.8235rem;color:var(--color-text-secondary);"><a href="mailto:tanapol.ch@rmutsvmail.com"
+                class="text-decoration-none footer-contact-link">tanapol.ch@<wbr>rmutsvmail.com</a></div>
+            <div class="fw-light" style="font-size: 0.8235rem;color:var(--color-text-secondary);"><a href="tel:+66962437210"
+                class="text-decoration-none footer-contact-link">+66 962 437 210</a></div>
 
             <div class="social-links-footer">
               <a href="https://github.com/TawittyTC" class="github" aria-label="Tanapol on GitHub"><svg
@@ -3800,7 +3876,7 @@
 
         </div>
       </div>
-      <div class="container border-top mt-4">
+      <div class="border-top mt-4">
         <div class="d-lg-flex justify-content-between align-items-center text-center text-lg-start mt-2">
           <!-- copyright text -->
           <div class="text-body-secondary text-primary-hover">Copyright &copy; <span id="current-year">2024</span>
@@ -3823,7 +3899,7 @@
   </button>
 
   <!-- Main JS -->
-  <script defer src="assets/js/main.min.js?v=2.71.0"></script>
+  <script defer src="assets/js/main.min.js?v=2.72.0"></script>
   <!-- Service Worker: cache assets for repeat visits -->
   <script>if ('serviceWorker' in navigator) { var _sw = function () { navigator.serviceWorker.register('sw.js') }; 'requestIdleCallback' in window ? requestIdleCallback(_sw) : window.addEventListener('load', _sw) }</script>
 
@@ -3895,47 +3971,49 @@
     <div class="exp-modal-section">
       <h3>Clients &amp; Projects</h3>
       <div class="exp-client-filter">
-        <button class="exp-filter-chip active" data-filter="all">All</button>
-        <button class="exp-filter-chip" data-filter="bkk-hosp">BCM</button>
-        <button class="exp-filter-chip" data-filter="kasikorn">Kasikorn Carabao</button>
-        <button class="exp-filter-chip" data-filter="happy">Happy Products</button>
-        <button class="exp-filter-chip" data-filter="vietjet">Thai VietJet Air</button>
-        <button class="exp-filter-chip" data-filter="tsr">TSR Living Solution</button>
-        <button class="exp-filter-chip" data-filter="artelia">Artelia Cornerstone</button>
-        <button class="exp-filter-chip" data-filter="livplus">LivPlus</button>
-        <button class="exp-filter-chip" data-filter="digiserve">Digiserve</button>
-        <button class="exp-filter-chip" data-filter="geniustrack">Genius Track</button>
-        <button class="exp-filter-chip" data-filter="thaivan">Thaivan</button>
-        <button class="exp-filter-chip" data-filter="netbay">Netbay</button>
-        <button class="exp-filter-chip" data-filter="inchcape">Inchcape Thailand</button>
-        <button class="exp-filter-chip" data-filter="oto">OTO Vision</button>
-        <button class="exp-filter-chip" data-filter="nova">Nova Organic</button>
-        <button class="exp-filter-chip" data-filter="isv">Insurverse</button>
-        <button class="exp-filter-chip" data-filter="aioi">Aioi Bangkok Insurance</button>
-        <button class="exp-filter-chip" data-filter="qprime">Qprime</button>
-        <button class="exp-filter-chip" data-filter="rabbitcard">Rabbit Card (BSS)</button>
-        <button class="exp-filter-chip" data-filter="mvmall">MV Shopping Mall</button>
-        <button class="exp-filter-chip" data-filter="ishopping">iShopping</button>
-        <button class="exp-filter-chip" data-filter="3bissfix">Treebisfix</button>
-        <button class="exp-filter-chip" data-filter="mediviss">Mediviss</button>
-        <button class="exp-filter-chip" data-filter="yunnomori">Yunomori</button>
-        <button class="exp-filter-chip" data-filter="kijsiri">N&amp;S / Kijsiri</button>
-        <button class="exp-filter-chip" data-filter="dpah">dp a&amp;h</button>
-        <button class="exp-filter-chip" data-filter="drorn">Or The Medical</button>
-        <button class="exp-filter-chip" data-filter="sbl">SBL Leasing</button>
-        <button class="exp-filter-chip" data-filter="general">R&amp;D &amp; Infra</button>
-        <button class="exp-filter-chip" data-filter="genie">Genie Properties</button>
-        <button class="exp-filter-chip" data-filter="isuzu">Isuzu Thailand</button>
-        <button class="exp-filter-chip" data-filter="maneydaeng">มณีแดง</button>
-        <button class="exp-filter-chip" data-filter="poch">Poch Laundry</button>
-        <button class="exp-filter-chip" data-filter="merich24">Merich24</button>
-        <button class="exp-filter-chip" data-filter="ame">AME</button>
+        <select class="exp-client-select" aria-label="Client">
+          <option value="all">All Clients</option>
+          <option value="bkk-hosp">BCM</option>
+          <option value="kasikorn">Kasikorn Carabao</option>
+          <option value="happy">Happy Products</option>
+          <option value="vietjet">Thai VietJet Air</option>
+          <option value="tsr">TSR Living Solution</option>
+          <option value="artelia">Artelia Cornerstone</option>
+          <option value="livplus">LivPlus</option>
+          <option value="digiserve">Digiserve</option>
+          <option value="geniustrack">Genius Track</option>
+          <option value="thaivan">Thaivan</option>
+          <option value="netbay">Netbay</option>
+          <option value="inchcape">Inchcape Thailand</option>
+          <option value="oto">OTO Vision</option>
+          <option value="nova">Nova Organic</option>
+          <option value="isv">Insurverse</option>
+          <option value="aioi">Aioi Bangkok Insurance</option>
+          <option value="qprime">Qprime</option>
+          <option value="rabbitcard">Rabbit Card (BSS)</option>
+          <option value="mvmall">MV Shopping Mall</option>
+          <option value="ishopping">iShopping</option>
+          <option value="3bissfix">Treebisfix</option>
+          <option value="mediviss">Mediviss</option>
+          <option value="yunnomori">Yunomori</option>
+          <option value="kijsiri">N&amp;S / Kijsiri</option>
+          <option value="dpah">dp a&amp;h</option>
+          <option value="drorn">Or The Medical</option>
+          <option value="sbl">SBL Leasing</option>
+          <option value="general">R&amp;D &amp; Infra</option>
+          <option value="genie">Genie Properties</option>
+          <option value="isuzu">Isuzu Thailand</option>
+          <option value="maneydaeng">มณีแดง</option>
+          <option value="poch">Poch Laundry</option>
+          <option value="merich24">Merich24</option>
+          <option value="ame">AME</option>
+        </select>
       </div>
 
       <div class="exp-client-section" data-client="bkk-hosp">
         <div class="exp-client-section-header">
           <img src="assets/img/clients/bangkok-hospital.webp" width="62" height="15" alt="" loading="lazy" decoding="async">
-          <h3>BCM <span style="font-weight:400;color:#6e6e73">(Bangkok Hospital Chiang Mai)</span></h3>
+          <h3>BCM <span style="font-weight:400;color:var(--color-text-secondary)">(Bangkok Hospital Chiang Mai)</span></h3>
           <span class="exp-client-tag">Healthcare CRM</span>
         </div>
         <ul>
@@ -3953,7 +4031,7 @@
       <div class="exp-client-section" data-client="kasikorn">
         <div class="exp-client-section-header">
           <img src="assets/img/clients/kasikorn-carabao.webp" width="24" height="24" alt="" loading="lazy" decoding="async">
-          <h3>Kasikorn Carabao Co., Ltd. <span style="font-weight:400;color:#6e6e73">(KBAO)</span></h3>
+          <h3>Kasikorn Carabao Co., Ltd. <span style="font-weight:400;color:var(--color-text-secondary)">(KBAO)</span></h3>
           <span class="exp-client-tag">Sales Campaign CRM</span>
         </div>
         <ul>
@@ -3988,7 +4066,7 @@
       <div class="exp-client-section" data-client="happy">
         <div class="exp-client-section-header">
           <img src="assets/img/clients/happy-products.webp" width="57" height="18" alt="" loading="lazy" decoding="async">
-          <h3>Happy Products &amp; Services Co., Ltd. <span style="font-weight:400;color:#6e6e73">(Tnews, Happy
+          <h3>Happy Products &amp; Services Co., Ltd. <span style="font-weight:400;color:var(--color-text-secondary)">(Tnews, Happy
               Shopping)</span></h3>
           <span class="exp-client-tag"><span class="nw">End-to-End</span> CRM</span>
         </div>
@@ -4019,7 +4097,7 @@
       <div class="exp-client-section" data-client="vietjet">
         <div class="exp-client-section-header">
           <img src="assets/img/clients/thai-vietjet.webp" width="61" height="16" alt="" loading="lazy" decoding="async">
-          <h3>Thai VietJet Air Joint Stock Co., Ltd. <span style="font-weight:400;color:#6e6e73">(VietJet)</span></h3>
+          <h3>Thai VietJet Air Joint Stock Co., Ltd. <span style="font-weight:400;color:var(--color-text-secondary)">(VietJet)</span></h3>
           <span class="exp-client-tag">Multilingual IVR System</span>
         </div>
         <ul>
@@ -4043,7 +4121,7 @@
       <div class="exp-client-section" data-client="tsr">
         <div class="exp-client-section-header">
           <img src="assets/img/clients/tsr-living.webp" width="36" height="24" alt="" loading="lazy" decoding="async">
-          <h3>TSR Living Solution Public Company Limited <span style="font-weight:400;color:#6e6e73">(TSR)</span></h3>
+          <h3>TSR Living Solution Public Company Limited <span style="font-weight:400;color:var(--color-text-secondary)">(TSR)</span></h3>
           <span class="exp-client-tag">Auto IVR Outbound</span>
         </div>
         <ul>
@@ -4076,7 +4154,7 @@
       <div class="exp-client-section" data-client="livplus">
         <div class="exp-client-section-header">
           <img src="assets/img/clients/livplus.webp" width="46" height="21" alt="" loading="lazy" decoding="async">
-          <h3>LivPlus Health Solution Co., Ltd. <span style="font-weight:400;color:#6e6e73">(LivPlus)</span></h3>
+          <h3>LivPlus Health Solution Co., Ltd. <span style="font-weight:400;color:var(--color-text-secondary)">(LivPlus)</span></h3>
           <span class="exp-client-tag">Analytics &amp; Scheduled Reports</span>
         </div>
         <ul>
@@ -4093,7 +4171,7 @@
       <div class="exp-client-section" data-client="digiserve">
         <div class="exp-client-section-header">
           <img src="assets/img/clients/digiserve.webp" width="49" height="20" alt="" loading="lazy" decoding="async">
-          <h3>Digiserve Corporation Co., Ltd. <span style="font-weight:400;color:#6e6e73">(Digiserve)</span></h3>
+          <h3>Digiserve Corporation Co., Ltd. <span style="font-weight:400;color:var(--color-text-secondary)">(Digiserve)</span></h3>
           <span class="exp-client-tag">Customer Analytics</span>
         </div>
         <ul>
@@ -4141,7 +4219,7 @@
       <div class="exp-client-section" data-client="netbay">
         <div class="exp-client-section-header">
           <img src="assets/img/clients/netbay.webp" width="61" height="16" alt="" loading="lazy" decoding="async">
-          <h3>Netbay Public Company Limited <span style="font-weight:400;color:#6e6e73">(Netbay)</span></h3>
+          <h3>Netbay Public Company Limited <span style="font-weight:400;color:var(--color-text-secondary)">(Netbay)</span></h3>
           <span class="exp-client-tag">IT Services CRM</span>
         </div>
         <ul>
@@ -4180,7 +4258,7 @@
       <div class="exp-client-section" data-client="oto">
         <div class="exp-client-section-header">
           <img src="assets/img/clients/oto-vision.webp" width="80" height="12" alt="" loading="lazy" decoding="async">
-          <h3>OTO Vision Co., Ltd. <span style="font-weight:400;color:#6e6e73">(OTO Shopping)</span></h3>
+          <h3>OTO Vision Co., Ltd. <span style="font-weight:400;color:var(--color-text-secondary)">(OTO Shopping)</span></h3>
           <span class="exp-client-tag">TV Shopping CRM</span>
         </div>
         <ul>
@@ -4213,7 +4291,7 @@
       <div class="exp-client-section" data-client="isv">
         <div class="exp-client-section-header">
           <img src="assets/img/clients/insurverse.webp" width="74" height="13" alt="" loading="lazy" decoding="async">
-          <h3>Insurverse Public Company Limited <span style="font-weight:400;color:#6e6e73">(ISV)</span></h3>
+          <h3>Insurverse Public Company Limited <span style="font-weight:400;color:var(--color-text-secondary)">(ISV)</span></h3>
           <span class="exp-client-tag">Sales Pipeline CRM</span>
         </div>
         <ul>
@@ -4242,7 +4320,7 @@
       <div class="exp-client-section" data-client="aioi">
         <div class="exp-client-section-header">
           <img src="assets/img/clients/aioi-bangkok.webp" width="75" height="11" alt="" loading="lazy" decoding="async">
-          <h3>Aioi Bangkok Insurance <span style="font-weight:400;color:#6e6e73">(ABI)</span></h3>
+          <h3>Aioi Bangkok Insurance <span style="font-weight:400;color:var(--color-text-secondary)">(ABI)</span></h3>
           <span class="exp-client-tag">Callback &amp; Call Reports</span>
         </div>
         <ul>
@@ -4275,7 +4353,7 @@
       <div class="exp-client-section" data-client="rabbitcard">
         <div class="exp-client-section-header">
           <img src="assets/img/clients/rabbit-card.webp" width="74" height="14" alt="" loading="lazy" decoding="async">
-          <h3>Bangkok Smart Card System Co., Ltd. <span style="font-weight:400;color:#6e6e73">(Rabbit Card)</span></h3>
+          <h3>Bangkok Smart Card System Co., Ltd. <span style="font-weight:400;color:var(--color-text-secondary)">(Rabbit Card)</span></h3>
           <span class="exp-client-tag">Fintech Customer Service</span>
         </div>
         <ul>
@@ -4291,7 +4369,7 @@
       <div class="exp-client-section" data-client="mvmall">
         <div class="exp-client-section-header">
           <img src="assets/img/clients/mvmall.webp" width="56" height="17" alt="" loading="lazy" decoding="async">
-          <h3>MV Shopping Mall Co., Ltd. <span style="font-weight:400;color:#6e6e73">(MVmall)</span></h3>
+          <h3>MV Shopping Mall Co., Ltd. <span style="font-weight:400;color:var(--color-text-secondary)">(MVmall)</span></h3>
           <span class="exp-client-tag"><span class="nw">E-Commerce</span> CRM</span>
         </div>
         <ul>
@@ -4306,7 +4384,7 @@
       <div class="exp-client-section" data-client="ishopping">
         <div class="exp-client-section-header">
           <img src="assets/img/clients/ishopping.webp" width="26" height="24" alt="" loading="lazy" decoding="async">
-          <h3>iShopping <span style="font-weight:400;color:#6e6e73">(ISP)</span></h3>
+          <h3>iShopping <span style="font-weight:400;color:var(--color-text-secondary)">(ISP)</span></h3>
           <span class="exp-client-tag"><span class="nw">E-Commerce</span> Support CRM</span>
         </div>
         <ul>
@@ -4322,7 +4400,7 @@
       <div class="exp-client-section" data-client="3bissfix">
         <div class="exp-client-section-header">
           <img src="assets/img/clients/treebisfix.webp" width="54" height="19" alt="" loading="lazy" decoding="async">
-          <h3>Treebisfix Co., Ltd. <span style="font-weight:400;color:#6e6e73">(3Bissfix)</span></h3>
+          <h3>Treebisfix Co., Ltd. <span style="font-weight:400;color:var(--color-text-secondary)">(3Bissfix)</span></h3>
           <span class="exp-client-tag">Field Service CRM</span>
         </div>
         <ul>
@@ -4354,7 +4432,7 @@
       <div class="exp-client-section" data-client="yunnomori">
         <div class="exp-client-section-header">
           <img src="assets/img/clients/yunomori.webp" width="72" height="14" alt="" loading="lazy" decoding="async">
-          <h3>Onsen Retreat &amp; Spa Group Co., Ltd. <span style="font-weight:400;color:#6e6e73">(Yunomori)</span></h3>
+          <h3>Onsen Retreat &amp; Spa Group Co., Ltd. <span style="font-weight:400;color:var(--color-text-secondary)">(Yunomori)</span></h3>
           <span class="exp-client-tag">Hospitality CRM</span>
         </div>
         <ul>
@@ -4371,7 +4449,7 @@
         <div class="exp-client-section-header">
           <img src="assets/img/clients/ns-kijsiri.webp" width="41" height="24" alt="" loading="lazy" decoding="async">
           <h3>N&amp;S Number One Ltd. Partnership / Kijsiri Asset Co., Ltd. <span
-              style="font-weight:400;color:#6e6e73">(N&amp;S / Kijsiri)</span></h3>
+              style="font-weight:400;color:var(--color-text-secondary)">(N&amp;S / Kijsiri)</span></h3>
           <span class="exp-client-tag">Real Estate CRM</span>
         </div>
         <ul>
@@ -4407,7 +4485,7 @@
       <div class="exp-client-section" data-client="drorn">
         <div class="exp-client-section-header">
           <img src="assets/img/clients/dr-orn.webp" width="51" height="20" alt="" loading="lazy" decoding="async">
-          <h3>Or The Medical Co., Ltd. <span style="font-weight:400;color:#6e6e73">(Dr.Orn)</span></h3>
+          <h3>Or The Medical Co., Ltd. <span style="font-weight:400;color:var(--color-text-secondary)">(Dr.Orn)</span></h3>
           <span class="exp-client-tag">Medical Appointment CRM</span>
         </div>
         <ul>
@@ -4423,7 +4501,7 @@
       <div class="exp-client-section" data-client="sbl">
         <div class="exp-client-section-header">
           <img src="assets/img/clients/sbl-leasing.webp" width="44" height="23" alt="" loading="lazy" decoding="async">
-          <h3>S.B.L. Leasing Co., Ltd. <span style="font-weight:400;color:#6e6e73">(SBL)</span></h3>
+          <h3>S.B.L. Leasing Co., Ltd. <span style="font-weight:400;color:var(--color-text-secondary)">(SBL)</span></h3>
           <span class="exp-client-tag">Financial Services CRM</span>
         </div>
         <ul>
@@ -4439,7 +4517,7 @@
       <div class="exp-client-section" data-client="genie">
         <div class="exp-client-section-header">
           <img src="assets/img/clients/genie-properties.webp" width="33" height="24" alt="" loading="lazy" decoding="async">
-          <h3>Genie Properties Co., Ltd. <span style="font-weight:400;color:#6e6e73">(Genie)</span></h3>
+          <h3>Genie Properties Co., Ltd. <span style="font-weight:400;color:var(--color-text-secondary)">(Genie)</span></h3>
           <span class="exp-client-tag">CTI Integration</span>
         </div>
         <ul>
@@ -4464,7 +4542,7 @@
       <div class="exp-client-section" data-client="isuzu">
         <div class="exp-client-section-header">
           <img src="assets/img/clients/isuzu.webp" width="76" height="13" alt="" loading="lazy" decoding="async">
-          <h3>Isuzu Thailand <span style="font-weight:400;color:#6e6e73">(Isuzu)</span></h3>
+          <h3>Isuzu Thailand <span style="font-weight:400;color:var(--color-text-secondary)">(Isuzu)</span></h3>
           <span class="exp-client-tag">Call Analytics</span>
         </div>
         <ul>
@@ -4477,7 +4555,7 @@
 
       <div class="exp-client-section" data-client="maneydaeng">
         <div class="exp-client-section-header">
-          <h3>มณีแดง <span style="font-weight:400;color:#6e6e73">(Manee Daeng)</span></h3>
+          <h3>มณีแดง <span style="font-weight:400;color:var(--color-text-secondary)">(Manee Daeng)</span></h3>
           <span class="exp-client-tag">Sales Reporting</span>
         </div>
         <ul>
@@ -4489,7 +4567,7 @@
       <div class="exp-client-section" data-client="poch">
         <div class="exp-client-section-header">
           <img src="assets/img/clients/poch-laundry.webp" width="43" height="22" alt="" loading="lazy" decoding="async">
-          <h3>Poch Laundry Systems <span style="font-weight:400;color:#6e6e73">(24WASH)</span></h3>
+          <h3>Poch Laundry Systems <span style="font-weight:400;color:var(--color-text-secondary)">(24WASH)</span></h3>
           <span class="exp-client-tag">Customer Records</span>
         </div>
         <ul>

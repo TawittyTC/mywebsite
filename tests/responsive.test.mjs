@@ -2,7 +2,7 @@
 // browsers (Facebook/LINE) create by resizing the webview mid-scroll.
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { createContext, inkCount } from './helpers.mjs';
+import { createContext, inkCount, styled } from './helpers.mjs';
 
 let ctx;
 before(async () => { ctx = await createContext(); });
@@ -168,8 +168,8 @@ test('on a phone every control answers a 44px finger (Apple HIG)', async () => {
   const { page } = await ctx.openPage({
     viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, reducedMotion: 'reduce',
   });
-  // the preloader covers the page until it is removed
-  await page.waitForFunction(() => !document.querySelector('.loader'), null, { timeout: 15000 });
+  // the page below the hero shows once style.css applies
+  await page.waitForFunction(styled, null, { timeout: 15000 });
   const misses = await page.evaluate(async () => {
     document.getElementById('back-to-top')?.style.setProperty('display', 'none');
     const controls = [...document.querySelectorAll('a, button, summary, [role="button"]')].filter((e) => {
@@ -284,24 +284,30 @@ test('a phone held sideways shows the name and role on the first screen', async 
   }
 });
 
-test('without JavaScript the loading cover still lifts', async () => {
-  const page = await ctx.browser.newPage({ viewport: { width: 390, height: 844 }, javaScriptEnabled: false });
-  await page.goto(ctx.srv.url + '/index.html', { waitUntil: 'load' });
-  // waitForFunction polls with page script, which is off here: poll from the test
-  let state = '';
-  for (let i = 0; i < 40 && state !== 'hidden'; i++) {
-    await page.waitForTimeout(100);
-    state = await page.evaluate(() => getComputedStyle(document.querySelector('.loader')).visibility);
+test('the page below the hero shows without JavaScript, and without the stylesheet after 3s', async () => {
+  // no loader curtain any more: the hero paints from the critical CSS and only the
+  // sections below it (and the footer) wait for style.css, 3s at most
+  for (const [how, opts, blockCss] of [['without JavaScript', { javaScriptEnabled: false }, false], ['without style.css', {}, true]]) {
+    const page = await ctx.browser.newPage({ viewport: { width: 390, height: 844 }, ...opts });
+    if (blockCss) await page.route(/style\.min\.css/, (r) => r.abort());
+    await page.goto(ctx.srv.url + '/index.html', { waitUntil: 'load' });
+    assert.equal(await page.$('.loader'), null, `${how}: the page still has a loader`);
+    // waitForFunction polls with page script, which may be off here: poll from the test
+    let state = '';
+    for (let i = 0; i < 45 && state !== 'visible'; i++) {
+      await page.waitForTimeout(100);
+      state = await page.evaluate(() => getComputedStyle(document.querySelector('#resume')).visibility);
+    }
+    assert.equal(state, 'visible', `${how}: the sections below the hero never showed`);
+    await page.close();
   }
-  assert.equal(state, 'hidden', 'the loading cover never lifted without JavaScript');
-  await page.close();
 });
 
 test('the hero is laid out the same before the stylesheet arrives', async () => {
   // On a phone network style.css usually lands after the first frame. The
-  // loader hides the page meanwhile, but layout shifts still count, and
-  // main.js sizes the constellation from that first layout — so the
-  // inline critical CSS must already give the hero its final geometry.
+  // hero is on screen meanwhile (there is no loader curtain), layout shifts
+  // count, and main.js sizes the constellation from that first layout — so
+  // the inline critical CSS must already give the hero its final geometry.
   const parts = ['#hero', '#hero .hero-grid', '#hero .hero-eyebrow', '#hero .hero-name-line:nth-child(1)',
     '#hero .hero-name-line:nth-child(2)', '#hero .hero-role', '#hero .hero-actions', '#hero .hero-actions .btn-pill',
     '#hero .hero-actions .more', '#hero .hero-actions .chev', '#hero-net', '#hero-net-labels'];

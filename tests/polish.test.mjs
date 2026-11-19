@@ -242,8 +242,11 @@ test('the self-hosted fonts draw weight 700, not 600 again', async () => {
 });
 
 test('the certificate grid draws small copies; the viewer opens at full size and settles on the original', async () => {
-  for (let i = 1; i <= 33; i++) {
-    assert.ok(existsSync(join(ROOT, `assets/img/certificate/thumb/img-${i}.avif`)), `small copy of certificate ${i} is missing`);
+  // there is no img-24 (it was a second scan of img-21); the 32 tiles draw
+  // files 1-23 and 25-33
+  const file = (n) => (n < 24 ? n : n + 1);
+  for (let i = 1; i <= 32; i++) {
+    assert.ok(existsSync(join(ROOT, `assets/img/certificate/thumb/img-${file(i)}.avif`)), `small copy of certificate ${i} is missing`);
   }
   // (no service worker here: it would answer the original from its cache and skip the delay below)
   const { page, failed } = await ctx.openPage({ serviceWorkers: 'block' });
@@ -255,9 +258,9 @@ test('the certificate grid draws small copies; the viewer opens at full size and
       fw: +im.getAttribute('data-full-w'), fh: +im.getAttribute('data-full-h'),
     }));
   });
-  assert.equal(tiles.length, 33);
+  assert.equal(tiles.length, 32);
   tiles.forEach((t, i) => {
-    assert.equal(t.src, `assets/img/certificate/thumb/img-${i + 1}.avif`, 'the grid must draw the small copy');
+    assert.equal(t.src, `assets/img/certificate/thumb/img-${file(i + 1)}.avif`, 'the grid must draw the small copy');
     assert.ok(t.w > 0 && t.w <= 840 && t.h <= 630, `small copy ${i + 1} is ${t.w}x${t.h}; it must fit 840x630`);
     assert.ok(t.fw > 0 && t.fh > 0, `certificate ${i + 1} does not name its original's size`);
     assert.ok(Math.abs(t.w / t.h - t.fw / t.fh) < 0.01, `small copy ${i + 1} has a different shape from its original`);
@@ -307,7 +310,7 @@ test('a focused control keeps its own shape, and one without a shape gets the 6p
   // A sheet and the viewer put focus on their close button as they open, so the resting shape
   // is read after a blur; the focused one a frame or two after focus (a transition, however
   // short, would otherwise still report the resting value).
-  const probe = (sel) => page.$eval(sel, async (el) => {
+  const probe = (sel, pg = page) => pg.$eval(sel, async (el) => {
     const frames = () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
     el.scrollIntoView({ block: 'center' });
     el.blur();
@@ -318,9 +321,9 @@ test('a focused control keeps its own shape, and one without a shape gets the 6p
     return { rest, focused: getComputedStyle(el).borderRadius, ring: el.matches(':focus-visible'), outline: getComputedStyle(el).outlineStyle };
   });
   // [selector, the ring's corner]: null = the control's own resting radius, which must not be 0
-  const check = async (controls, where) => {
+  const check = async (controls, where, pg = page) => {
     for (const [sel, want] of controls) {
-      const r = await probe(sel);
+      const r = await probe(sel, pg);
       assert.ok(r.ring, `${where} ${sel} should show its focus ring when focused from the keyboard`);
       assert.notEqual(r.outline, 'none', `${where} ${sel} lost its focus ring`);
       if (want === null) {
@@ -335,7 +338,7 @@ test('a focused control keeps its own shape, and one without a shape gets the 6p
     ['#portfolio [data-scroller-next]', null], ['.filter-btn', null],
     // a certificate tile is one square-cornered button; its ring is drawn round the whole card
     ['#images-list button.cert-img', '0px'],
-    ['#back-to-top', null], ['a.btn-pill', null], ['.skip-link', null],
+    ['a.btn-pill', null], ['.skip-link', null],
     // these draw no box of their own; the round "+" is drawn by an inner element
     ['#experience .exp-card-cta', '50%'], ['button.more.proj-all', '6px'], ['a.more', '6px'], ['.footer-contact-link', '6px'],
     // neither a link nor a button: the Skills row is a scroll region the keyboard can stop on
@@ -351,7 +354,7 @@ test('a focused control keeps its own shape, and one without a shape gets the 6p
 
   await page.$eval('#experience [data-exp="protollcall"] .exp-card-cta', (el) => el.click());
   await page.waitForSelector('.exp-lightbox.open');
-  await check([['.exp-lightbox.open .exp-lightbox-close', null], ['.exp-lightbox.open .exp-filter-chip', null]], 'sheet:');
+  await check([['.exp-lightbox.open .exp-lightbox-close', null], ['.exp-lightbox.open .exp-client-select', null]], 'sheet:');
   await page.keyboard.press('Escape');
   await page.waitForFunction(() => !document.querySelector('.exp-lightbox.open'));
 
@@ -370,6 +373,11 @@ test('a focused control keeps its own shape, and one without a shape gets the 6p
   assert.notEqual(pill.rest, '0px');
   assert.equal(pill.focused, pill.rest, `the "All projects" pill changes shape while focused (${pill.rest} -> ${pill.focused})`);
   await page.close();
+  // Back to top is only on touch screens now (mac-back-to-top-hidden): an iPad with a keyboard
+  const pad = await ctx.openPage({ viewport: { width: 820, height: 1180 }, isMobile: true, hasTouch: true, reducedMotion: 'reduce' });
+  await pad.page.keyboard.press('Tab');
+  await check([['#back-to-top', null]], 'iPad:', pad.page);
+  await pad.page.close();
 });
 
 test('Resume sub-headings sit on the stylesheet\'s own margins', async () => {

@@ -10,8 +10,10 @@
   --tier: 1;
   --color-text: #1D1D1F;
   --color-text-secondary: #6E6E73;
+  /* grey text at 14px and below: 7.26:1 on #F5F5F7, 7.91:1 on white */
+  --color-text-secondary-small: #515154;
   --color-link: #1264CE; /* WCAG AA: 5.62:1 on white (the old #1877F2 managed only 4.23:1) */
-  --color-link-hover: #166FE5;
+  --color-link-hover: #0F57B5; /* hover goes darker: 6.32:1 on #F5F5F7, white on it 6.88:1 */
   --color-fill: #F5F5F7;
   --color-background-alt: #F8F8F8;
   /* Concentric radii: inner radius = outer radius − gap, floored at --r-min */
@@ -27,6 +29,18 @@
   /* Resting card definition on the all-white canvas (60/30/10: white
      canvas dominates, neutral gray surfaces structure, facebook-blue accents) */
   --shadow-rest: 0 1px 2px rgba(29, 29, 31, 0.04), 0 10px 28px rgba(29, 29, 31, 0.05);
+}
+/* Increase Contrast (Safari maps the system setting to prefers-contrast: more):
+   secondary text and links get clearly darker variants; the default look
+   keeps #6E6E73 and #1264CE. The small-text grey goes to the same dark grey,
+   so small grey text is never lighter than larger grey text here */
+@media (prefers-contrast: more) {
+  :root {
+    --color-text-secondary: #3A3A3C;
+    --color-text-secondary-small: #3A3A3C;
+    --color-link: #0A4DA3;
+    --color-link-hover: #083F86;
+  }
 }
 
 /* Bootstrap turns on global smooth scrolling; with no anchor nav left it
@@ -72,16 +86,12 @@ a:hover {
 }
 
 
-/* The page is ready to read once this stylesheet applies, so the loader
-   fades now instead of waiting for analytics and the cookie banner. A new
-   animation name, so it starts fresh here rather than retiming the inline
-   3s fallback */
-.loader {
-  animation: loader-gone .25s ease forwards;
-  pointer-events: none;
-}
-@keyframes loader-gone {
-  to { opacity: 0; visibility: hidden; }
+/* The page below the hero is ready to read once this stylesheet applies
+   (index.html holds it back until then, 3s at most) */
+main > section:not(#hero),
+footer {
+  visibility: visible;
+  animation: none;
 }
 
 /*--------------------------------------------------------------
@@ -181,6 +191,10 @@ section {
   margin-bottom: 8px;
   color: var(--color-text);
 }
+/* phones: the subsection titles step down to 28/34 under the 34px section title */
+@media (max-width: 768px) {
+  .resume .resume-title { font-size: 1.6471rem; line-height: 1.2143; }
+}
 
 /*--------------------------------------------------------------
 # Footer
@@ -189,8 +203,18 @@ section {
   background: #fff;
   color: var(--color-text-secondary);
   font-size: 0.8235rem;
+  /* one container, so the text starts on the same edge as every section;
+     Bootstrap's rem-sized row gutter may not hang past the screen when
+     the text is enlarged */
+  overflow-x: clip;
   padding-top: 120px;
   padding-bottom: max(120px, calc(100px + env(safe-area-inset-bottom)));
+}
+/* without the inner container the row would be 24px wider and push the
+   Contact column right; at its old width all three columns move left
+   together, by the same 13px as the name */
+@media (min-width: 768px) {
+  #footer .row { margin-right: 12px; }
 }
 
 
@@ -300,7 +324,6 @@ body:lang(th) {
 :root {
   --sk-body-text-color: var(--color-text);
   --sk-body-background-color: #fff;
-  --sk-focus-color: var(--color-link);
   --sk-link-disabled-opacity: 0.42;
   --sk-paddlenav-background: #d2d2d7a3;
   --sk-paddlenav-arrow-color: #0000008f;
@@ -337,7 +360,8 @@ body:lang(th) {
 }
 
 .paddlenav-arrow:focus {
-  outline: 3px solid var(--sk-focus-color);
+  outline: auto;   /* the system ring, as in the :focus-visible rule below */
+  outline-color: -webkit-focus-ring-color;
   outline-offset: 3px;
 }
 
@@ -379,7 +403,9 @@ button {
   padding: 10px 0;
   overflow-x: auto;
   overflow-y: hidden;
-  overscroll-behavior-x: none;
+  /* contain, not none: a swipe past the last card still never reaches the
+     page or the browser's Back, and the row keeps its own edge bounce */
+  overscroll-behavior-x: contain;
   scrollbar-width: none;
   -ms-overflow-style: none;
   touch-action: manipulation;
@@ -540,7 +566,6 @@ button {
   transition: transform 0.3s var(--ease-swift), background 0.2s ease, color 0.2s ease;
 }
 
-.filter-btn:hover,
 .filter-btn.active {
   background: var(--color-link);
   color: #fff;
@@ -666,7 +691,6 @@ button {
    The :active duration is shorter than the release so touches feel
    tactile, and the release overshoots slightly (Apple-style pop). */
 .filter-btn,
-.exp-filter-chip,
 .cert-expand-btn,
 .cert-lightbox-close,
 .exp-lightbox-close,
@@ -677,10 +701,8 @@ button {
 
 /* Hover lift — real pointers only (touch keeps press feedback) */
 @media (hover: hover) and (pointer: fine) {
-  .filter-btn:hover,
-  .exp-filter-chip:hover {
-    transform: scale(1.05);
-  }
+  /* the skill filters are segments of one control: they tint, never grow
+     (see the segmented control below) */
   .cert-expand-btn:hover {
     transform: scale(1.12);
   }
@@ -692,7 +714,6 @@ button {
   }
 }
 .filter-btn:active,
-.exp-filter-chip:active,
 .cert-expand-btn:active,
 .cert-lightbox-close:active,
 .exp-lightbox-close:active {
@@ -769,7 +790,7 @@ button {
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--color-text-secondary);
+  color: var(--color-text-secondary-small);
 }
 #hero h1.hero-name {
   margin: 0;
@@ -830,6 +851,11 @@ button {
   animation: caret-blink 1.1s steps(1) infinite;
 }
 @keyframes caret-blink { 50% { opacity: 0; } }
+/* Reduce Motion: the role changes a whole word at a time (main.js), so
+   there is no typing caret */
+@media (prefers-reduced-motion: reduce) {
+  #hero .typed::after { display: none; }
+}
 
 /*--------------------------------------------------------------
 # Hero constellation — living multi-agent network (canvas)
@@ -853,7 +879,7 @@ button {
   font-size: 0.6471rem;
   font-weight: 600;
   letter-spacing: 0.14em;
-  color: var(--color-text-secondary);
+  color: var(--color-text-secondary-small);
   background: rgba(252, 252, 253, 0.72);
   padding: 2px 7px;
   border-radius: var(--r-capsule);
@@ -893,7 +919,7 @@ button {
   #hero .hero-copy::before { left: 50%; top: calc(50% - 34px); transform: translate(-50%, -50%); width: 480px; height: 480px; }
   #hero .hero-eyebrow { font-size: 0.6471rem; letter-spacing: 0.1em; margin-bottom: 14px; }
   #hero h1.hero-name { font-size: min(clamp(2.2353rem, 10.5vw, 2.8235rem), 12.5vw); line-height: 1.12; }
-  .hero-net-label { font-size: 0.5294rem; }
+  .hero-net-label { letter-spacing: 0.08em; } /* 11px like every other width; tighter tracking keeps the capsule's footprint */
   .hero-scroll-hint { display: none; }
 }
 
@@ -974,7 +1000,7 @@ button {
       #1d1d1f 0%,
       #1d1d1f 42%,
       #1264CE 58%,
-      #5AA7FF 66%,
+      #2F80E8 66%,   /* 3.59:1 on #F5F5F7: large text needs 3:1 at every stop */
       #1d1d1f 88%);
     -webkit-background-clip: text;
     background-clip: text;
@@ -988,6 +1014,9 @@ button {
   max-width: 560px;
   margin: 0 auto 40px;
 }
+@media (prefers-contrast: more) {
+  .cta-sub { color: var(--color-text-secondary); }
+}
 .cta-actions {
   display: flex;
   align-items: center;
@@ -995,8 +1024,8 @@ button {
   flex-wrap: wrap;
   gap: 8px 22px;
 }
-/* ── 3D business card — Apple Card feel: soft titanium surface, tilts
-   with the pointer (idle sway elsewhere), moving specular glare ── */
+/* ── 3D business card — Apple Card feel: a slow idle sway of its own;
+   it does not follow the pointer, so its links stay put under it ── */
 .biz-scene {
   perspective: 1100px;
   width: min(430px, 88vw);
@@ -1016,18 +1045,6 @@ button {
   justify-content: space-between;
   text-align: left;
   padding: 6.5% 7.5%;
-}
-/* brushed-titanium grain: hairline vertical strokes, barely there */
-.biz-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  background: repeating-linear-gradient(90deg,
-    rgba(29, 29, 31, 0.016) 0 1px,
-    rgba(255, 255, 255, 0.02) 1px 2px,
-    transparent 2px 4px);
 }
 .biz-row {
   display: flex;
@@ -1054,7 +1071,11 @@ button {
   margin-top: 4px;
 }
 .biz-contacts {
-  gap: 6px 14px;
+  /* when the e-mail and phone stack (up to 387px wide, or with larger
+     text) the 28px links sit 16px apart: a 44px pitch, so their 44pt hit
+     areas no longer overlap. Side by side only the 14px column gap counts,
+     so from 388px the card is exactly as before. */
+  gap: 16px 14px;
   flex-wrap: wrap;
 }
 .biz-contacts a {
@@ -1108,7 +1129,7 @@ button {
   font-weight: 600;
   letter-spacing: .02em;
   text-transform: uppercase;
-  color: var(--color-text-secondary);
+  color: var(--color-text-secondary-small);
   margin-bottom: 2px;
 }
 
@@ -1136,9 +1157,10 @@ a.info-item:hover .info-value {
   }
 
 
-  /* phones keep the compact reading sizes — desktop-only bumps above
+  /* phones keep the compact sizes — desktop-only bumps above
      (.profile-bio/.profile-bio-small are overridden next to their base
-     rules further down: source order decides ties in specificity) */
+     rules further down, where the reading paragraphs step up to 15px:
+     source order decides ties in specificity) */
   #skill .rf-cards-scroller-item .skill-desc { font-size: 0.7647rem; }
   .rf-cards-scroller-item p.fw-light { font-size: 0.8235rem; }
   .fw-light { font-size: 0.8824rem; }
@@ -1165,11 +1187,21 @@ a.info-item:hover .info-value {
 .profile-bio { font-size: 1rem; color: var(--color-text-secondary); margin: 0; line-height: 1.7; }
 .profile-bio-small { font-size: 0.9412rem; color: var(--color-text-secondary); margin: 0; line-height: 1.7; }
 
-/* Phones read both bio tiers at the same compact 13px (these overrides
-   MUST come after the base rules above — equal specificity, last wins) */
+/* Phones set both bio tiers at a compact 13px, with the reading paragraphs
+   one step up at 15px (these overrides MUST come after the base rules
+   above — equal specificity, last wins) */
 @media (max-width: 768px) {
   .profile-bio { font-size: 0.7647rem; }
-  .profile-bio-small { font-size: 0.7647rem; }
+  /* 13px here, so grey lines take the darker small-text grey */
+  .profile-bio-small { font-size: 0.7647rem; color: var(--color-text-secondary-small); }
+  /* reading paragraphs one step up, at the 15/20 Subhead size: the bio, the
+     Education and Achievement lines, the experience descriptions and the SCG
+     role paragraphs; date and period lines keep the compact 13px */
+  #resume .profile-bio,
+  #resume p.profile-bio-small,
+  #resume .data-box > .profile-bio-small:not(.exp-card-highlights),
+  #experience .data-box[data-exp] > .profile-bio-small:not(.exp-card-highlights),
+  #experience .data-box[data-exp] .exp-role > p.profile-bio-small { font-size: 0.8824rem; line-height: 1.33334; }
 }
 
 @media (max-width: 576px) {
@@ -1249,8 +1281,14 @@ h1, h2, h3, h4, h5, h6 { color: var(--color-text); }
 .rf-cards-scroller .skip-link { top: 16px; transition: none; }
 
 /* ── Focus States: Visible for all interactive elements (Apple HIG Accessibility) ── */
+/* Every keyboard ring on the page is the system focus ring: the browser's
+   own ring style and colour (the visitor's accent colour in Safari). The
+   colour is named because Chromium otherwise paints an auto ring in the
+   text colour, which made it white, and invisible, around the white-text
+   pills. */
 :focus-visible {
-  outline: 2px solid var(--color-link);
+  outline: auto;
+  outline-color: -webkit-focus-ring-color;
   outline-offset: 3px;
 }
 /* The ring follows each control's own shape: a radius forced here turned
@@ -1270,7 +1308,8 @@ a:focus-visible,
 input:focus-visible,
 textarea:focus-visible,
 select:focus-visible {
-  outline: 2px solid var(--color-link);
+  outline: auto;
+  outline-color: -webkit-focus-ring-color;
   outline-offset: 3px;
 }
 /* where a jump link or Back to top leaves keyboard focus: the heading is
@@ -1627,25 +1666,41 @@ a.info-item:hover .info-value { color: var(--color-link); }
 .biz-contacts a,
 .resume-exp-link,
 .footer-copy-link { position: relative; }
+/* the name link sits inside grey text of almost the same lightness (1.11:1),
+   so it is underlined rather than told apart by colour alone */
+.footer-copy-link {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: .2em;
+}
 
 .info-item { min-height: 44px; }
 
 @media (pointer: coarse) {
   /* each icon owns a 44 square; the row is pulled back by the extra margin
      so the first icon still lines up with the text above it */
-  .social-links,
-  .social-links-footer {
+  .social-links {
     gap: 0;
     margin: 8px 0 -8px -8px;
   }
-  .social-links a,
-  .social-links-footer a {
+  .social-links a {
     min-width: 44px;
     min-height: 44px;
   }
-  /* stacked lines: hit-slop would only overlap the neighbour, so the pitch grows */
-  .footer-contact-link { padding: 10.5px 0; }
 }
+/* The footer's icons and contact lines answer a 44 square with a mouse
+   too, not only on touch screens: the icon pitch goes from 40 to 44px and
+   the glyphs stay where they were */
+.social-links-footer {
+  gap: 0;
+  margin: 8px 0 -8px -8px;
+}
+.social-links-footer a {
+  min-width: 44px;
+  min-height: 44px;
+}
+/* stacked lines: hit-slop would only overlap the neighbour, so the pitch grows */
+.footer-contact-link { padding: 10.5px 0; }
 
 /*--------------------------------------------------------------
 # Kept from the apple.com redesign (v2.37.0)
@@ -1684,6 +1739,8 @@ a.info-item:hover .info-value { color: var(--color-link); }
   background: none;
 }
 .contact-strip .info-icon svg { width: 100%; height: 100%; }
+/* Location is not a link, so its glyph is grey; blue stays on the tappable tiles */
+.contact-strip div.info-item .info-icon { color: var(--color-text-secondary); }
 .contact-strip .info-label {
   margin: 0 0 0.2353rem;
   font-size: 0.8235rem;
@@ -1973,7 +2030,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
 #skill .skill-tag {
   order: 2;
   margin: 0 0 8px;
-  color: var(--color-link);
+  color: var(--color-text-secondary);   /* a label, not a link: blue is kept for what can be tapped */
   font-size: calc(17rem / 17 / var(--tier));
   font-weight: 600;
   line-height: 1.23536;
@@ -2003,7 +2060,8 @@ a.info-item:hover .info-value { color: var(--color-link); }
 }
 @media (max-width: 734px) {
   #skill .rf-cards-scroller-item .skill-icon { width: 56px; height: 56px; padding: 6px; margin: 0 0 20px; border-radius: 16px; }
-  #skill .skill-tag { font-size: calc(14rem / 17 / var(--tier)); line-height: 1.28577; letter-spacing: -0.016em; }
+  /* 14px here, so the label takes the darker small-text grey */
+  #skill .skill-tag { font-size: calc(14rem / 17 / var(--tier)); line-height: 1.28577; letter-spacing: -0.016em; color: var(--color-text-secondary-small); }
   #skill .skill-tools { gap: 6px; padding-top: 20px; }
   #skill .skill-tools li { padding: 5px 12px; font-size: calc(12rem / 17 / var(--tier)); line-height: 1.33337; letter-spacing: -0.01em; }
 }
@@ -2012,22 +2070,56 @@ a.info-item:hover .info-value { color: var(--color-link); }
 }
 
 /*--------------------------------------------------------------
-# Skill cards: the mark at the top. The skill's own drawing, large and
-  in the theme blue, centred in its own space on the card's grey.
+# Skill cards, built as the Projects cards: the words on top (eyebrow,
+  title, description, then the tools right under it) and the skill's
+  own drawing, a fixed square, at the foot of the card where a project
+  keeps its drawing. The slack sits between the two, never mid-text,
+  and a skill card is as tall as a project card at every size
+  (500 / 460px, and 392-430px on phones).
 --------------------------------------------------------------*/
+#skill .rf-cards-scroller-item { min-height: 500px; }
+#skill .skill-tag { order: 1; margin: 0 0 8px; }
+#skill .rf-cards-scroller-item .title { order: 2; }
+#skill .rf-cards-scroller-item .skill-desc { order: 3; }
+#skill .skill-tools { order: 4; margin: 0; padding: 20px 0 0; }
 #skill .rf-cards-scroller-item .skill-icon {
-  order: 1;
-  width: auto;
-  height: auto;
-  aspect-ratio: 16 / 10;
-  margin: -16px -16px 24px;      /* the space reaches 20px from the card edge */
-  padding: 9.5% 0;
+  order: 5;
+  flex: none;
+  align-self: center;
+  width: 202px;
+  height: 202px;
+  aspect-ratio: auto;
+  /* margin-top auto takes the slack; the drawing keeps its own white
+     space inside the square, so the square reaches into the padding */
+  margin: auto 0 -16px;
+  padding: 0;
+  border-radius: 0;
 }
+/* the marks are drawn larger than the project drawings, so their lines are
+   a step lighter to meet them on screen; each keeps its 4/5/6 steps */
+#skill .skill-icon [stroke-width='4'] { stroke-width: 3.6; }
+#skill .skill-icon [stroke-width='5'] { stroke-width: 4.5; }
+#skill .skill-icon [stroke-width='6'] { stroke-width: 5.4; }
 @media (max-width: 1068px) {
-  #skill .rf-cards-scroller-item .skill-icon { width: auto; height: auto; margin: -12px -12px 22px; }
+  #skill .rf-cards-scroller-item { min-height: 460px; }
+  #skill .rf-cards-scroller-item .skill-icon { width: 172px; height: 172px; margin: auto 0 -14px; }
 }
 @media (max-width: 734px) {
-  #skill .rf-cards-scroller-item .skill-icon { width: auto; height: auto; margin: -8px -8px 20px; padding: 8% 0; }
+  /* the project card's phone height, which grows a little less than its width */
+  #skill .rf-cards-scroller-item { aspect-ratio: auto; min-height: clamp(392px, calc(228px + 40.3vw), 430px); }
+  #skill .skill-tools { padding-top: 16px; }
+  #skill .rf-cards-scroller-item .skill-icon { width: 72px; height: 72px; margin: auto 0 -10px; }
+  /* drawn this small, the skill marks take heavier lines to meet the
+     project drawings on screen (7.7 = 3.26px x 170 / 72), keeping 4/5/6 */
+  #skill .skill-icon [stroke-width='4'] { stroke-width: 6.2; }
+  #skill .skill-icon [stroke-width='5'] { stroke-width: 7.7; }
+  #skill .skill-icon [stroke-width='6'] { stroke-width: 9.25; }
+}
+@media (min-width: 2000px) {
+  #skill .rf-cards-scroller-item { min-height: 515px; }
+}
+@media (min-width: 3000px) and (min-height: 1700px) {
+  #skill .rf-cards-scroller-item { min-height: 610px; }
 }
 
 /*--------------------------------------------------------------
@@ -2075,6 +2167,9 @@ a.info-item:hover .info-value { color: var(--color-link); }
   height: auto;
   aspect-ratio: 1;
 }
+/* one stroke weight for every line drawing: the services are drawn smaller
+   than the skill marks, so their lines are set heavier to match */
+.svc-icon svg [stroke-width='5'] { stroke-width: 6.3; }
 #services .svc-card h3 {
   margin: 0 0 14px;
   padding: 0;
@@ -2181,22 +2276,23 @@ a.info-item:hover .info-value { color: var(--color-link); }
 }
 #services .faq summary::-webkit-details-marker { display: none; }
 #services .faq summary::marker { content: ''; }
-/* "+" in the theme blue, centred on the question's first line; turned
-   45 degrees it reads as "x" */
+/* a disclosure chevron in the theme blue, centred on the question's first
+   line: it points right while the answer is hidden and down once shown */
 #services .faq summary::after {
   content: '';
   flex: none;
-  width: 16px;
+  width: 10px;
   height: 16px;
   margin-top: 5px;              /* (26px line - 16px) / 2 */
   background-color: var(--color-link);
-  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 1.5v13M1.5 8h13' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") center / contain no-repeat;
-  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 1.5v13M1.5 8h13' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") center / contain no-repeat;
-  transition: transform .4s var(--ease-swift);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 14'%3E%3Cpath d='M1.2 1.2 6.8 7l-5.6 5.8' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 14'%3E%3Cpath d='M1.2 1.2 6.8 7l-5.6 5.8' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  transition: transform .3s var(--ease-swift);
 }
-#services .faq details[open] > summary::after { transform: rotate(45deg); }
+#services .faq details[open] > summary::after { transform: rotate(90deg); }
 #services .faq summary:focus-visible {
-  outline: 2px solid var(--color-link);
+  outline: auto;
+  outline-color: -webkit-focus-ring-color;
   outline-offset: 0;
   border-radius: 14px;
 }
@@ -2262,7 +2358,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
   #services .faq h3 { margin-bottom: 28px; font-size: calc(28rem / 17 / var(--tier)); line-height: 1.14286; }
   #services .faq-list { --faq-pull: -6px; padding: 4px 20px; }
   #services .faq summary { gap: 14px; padding: 18px 12px; font-size: calc(16rem / 17 / var(--tier)); line-height: 1.5; }
-  #services .faq summary::after { width: 14px; height: 14px; margin-top: 5px; }
+  #services .faq summary::after { margin-top: 4px; }   /* (24px line - 16px) / 2 */
   #services .faq details > p { padding: 0 0 22px; font-size: calc(15rem / 17 / var(--tier)); line-height: 1.53334; }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -2278,14 +2374,15 @@ a.info-item:hover .info-value { color: var(--color-link); }
 }
 
 /*--------------------------------------------------------------
-# Business card: Liquid Glass, as it was before the apple.com rebuild.
-  A clear slab held over two soft pools of the accent light that drift
-  slowly behind it: the backdrop frosts and brightens what shows
-  through, a white rim lights the top edge, a faint blue light gathers
-  along the foot, and a glare stands where the pointer or finger is.
-  Asking for less transparency gives a frostier slab, more contrast a
-  solid white one with a drawn edge, and browsers without backdrop
-  filters the frosty one.
+# Business card: frosted glass over the accent light.
+  A frosted slab (55% white, so it reads as a material rather than clear
+  glass) held over two soft pools of the accent light that drift slowly
+  behind it: the backdrop blurs and brightens what shows through, so the
+  blue still tints its corners, a white rim lights the top edge and a
+  faint blue light gathers along the foot. No glare follows the pointer
+  or finger. Asking for less transparency gives a frostier slab, more
+  contrast a solid white one with a drawn edge, and browsers without
+  backdrop filters the frosty one.
 --------------------------------------------------------------*/
 .biz-scene {
   position: relative;
@@ -2319,7 +2416,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
 
 .biz-card {
   transform-style: flat;          /* a backdrop filter samples through a flat surface */
-  background: rgba(255, 255, 255, .2);
+  background: rgba(255, 255, 255, .55);
   -webkit-backdrop-filter: blur(18px) saturate(180%) brightness(1.05);
   backdrop-filter: blur(18px) saturate(180%) brightness(1.05);
   border: 1px solid rgba(255, 255, 255, .75);
@@ -2332,17 +2429,6 @@ a.info-item:hover .info-value { color: var(--color-link); }
     0 30px 60px rgba(29, 29, 31, .12),
     0 4px 12px rgba(29, 29, 31, .06);
 }
-/* the glare, in place of the titanium grain: only while the card is
-   pointed at or touched, so the resting slab shows its light pools; behind
-   the type, so it lights the glass without washing out the words */
-.biz-card::before {
-  z-index: -1;
-  background: radial-gradient(circle 260px at var(--lx, 50%) var(--ly, 50%),
-    rgba(255, 255, 255, .55), rgba(255, 255, 255, 0) 70%);
-  opacity: 0;
-  transition: opacity .35s ease;
-}
-.biz-card:hover::before { opacity: 1; }
 /* the scene paints after the content around it, so the pill is lifted
    to stay above the light that reaches up behind it */
 .cta-pill {
@@ -2358,7 +2444,6 @@ a.info-item:hover .info-value { color: var(--color-link); }
 @media (prefers-reduced-motion: reduce) {
   .biz-scene::before,
   .biz-scene::after { animation: none; }
-  .biz-card::before { transition: none; }
 }
 /* frostier, not gone: the light still shows through as colour */
 @media (prefers-reduced-transparency: reduce) {
@@ -2389,8 +2474,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
 }
 @media (forced-colors: active) {
   .biz-scene::before,
-  .biz-scene::after,
-  .biz-card::before { display: none; }
+  .biz-scene::after { display: none; }
   .biz-card { border-color: CanvasText; }
 }
 
@@ -2407,9 +2491,19 @@ a.info-item:hover .info-value { color: var(--color-link); }
   #hero { padding: 0; height: auto; min-height: 100svh; }
   #hero .hero-grid { padding-top: 40px; padding-bottom: 40px; }
 }
+/* Compact height (a phone held sideways): 220 + 220px between two sections
+   was more than a whole 390px-tall screen of nothing. The phone spacing
+   applies here, keyed on height only, so Mac, iPad and portrait phones
+   keep theirs. The Contact band sets its own 220px, so it is named too. */
+@media (max-height: 500px) {
+  section,
+  .closing-cta { padding: 128px 0; }
+  .section-title { padding-bottom: 56px; }
+}
 
-/* Skills filter on phones: all four chips fit from 360px up (narrower
-   phones scroll the row); tablets keep the full-size chips */
+/* Skills filter on phones: the track is as wide as its four segments,
+   centred (the segmented control below sets the rest; all four fit from
+   320px up) */
 @media (max-width: 768px) {
   #skill .project-filters {
     width: max-content;
@@ -2422,13 +2516,59 @@ a.info-item:hover .info-value { color: var(--color-link); }
   #skill .filter-btn { min-width: 58px; justify-content: center; padding-left: 16px; padding-right: 16px; }
 }
 
+/* The four skill filters are one segmented control: equal segments in a
+   grey track, the chosen one a white thumb. The wrapper centres the
+   track, as the separate pills were centred. */
+#skill .project-filters-wrap { text-align: center; }
+#skill .project-filters {
+  display: inline-grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 0;
+  padding: 3px;
+  border-radius: 980px;
+  background: #E8E8ED;
+  vertical-align: top;
+}
+#skill .filter-btn {
+  min-height: 44px;
+  min-width: 96px;
+  justify-content: center;
+  background: transparent;
+}
+#skill .filter-btn.active,
+#skill .filter-btn[aria-pressed="true"] {
+  background: #fff;
+  color: #1D1D1F;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .12);
+}
+@media (hover: hover) {
+  /* a pointed-at segment that is not the chosen one tints light grey: it
+     never grows into its neighbours and never looks chosen */
+  #skill .filter-btn:hover { transform: none; }
+  #skill .filter-btn:not(.active):hover { background: rgba(0, 0, 0, .04); }
+}
+@media (max-width: 734px) {
+  #skill .project-filters { grid-auto-columns: auto; }
+  #skill .filter-btn { min-width: 0; }
+}
+@media (max-width: 374px) {
+  #skill .filter-btn { min-width: 44px; padding-left: 10px; padding-right: 10px; }
+}
+/* Increase Contrast: a darker track and an edge round the chosen segment */
+@media (prefers-contrast: more) {
+  #skill .project-filters { background: #D2D2D7; }
+  #skill .filter-btn.active,
+  #skill .filter-btn[aria-pressed="true"] { box-shadow: 0 0 0 1px rgba(0, 0, 0, .35); }
+}
+
 /* Recruiters never opened "Read more", so the client names were never
    seen: six of them sit under the current job's numbers */
 .exp-clients-line {
   margin: 20px 0 0;
   font-size: 0.8235rem;
   line-height: 1.5;
-  color: var(--color-text-secondary);
+  color: var(--color-text-secondary-small);
   text-wrap: pretty;
 }
 .exp-clients-more { color: var(--color-link); white-space: nowrap; }
@@ -2436,7 +2576,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
   .exp-clients-line { font-size: 0.7647rem; }
 }
 
-/* My Projects, the apple.com gallery card: eyebrow, headline and one
+/* Projects, the apple.com gallery card: eyebrow, headline and one
    line on top, the project's own line drawing large at the foot on every
    screen (phones too), the round "+" beside it. The tools live in the
    sheet the card opens. */
@@ -2453,6 +2593,11 @@ a.info-item:hover .info-value { color: var(--color-link); }
   aspect-ratio: 1;
   margin: auto;
 }
+/* the project drawings are larger than the skill marks: lighter lines
+   give the same weight on screen, each drawing keeping its 4/5/6 steps */
+.work-icon svg [stroke-width='4'] { stroke-width: 3.5; }
+.work-icon svg [stroke-width='5'] { stroke-width: 4.4; }
+.work-icon svg [stroke-width='6'] { stroke-width: 5.25; }
 @media (max-width: 734px) {
   /* the 2:3 phone card (260 x 392) grows less than its width on bigger
      phones, so the words and the drawing don't drift apart */
@@ -2479,7 +2624,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
   margin: 0 0 10px;
   font-size: calc(15rem / 17 / var(--tier));
   font-weight: 600;
-  color: #6E6E73;
+  color: var(--color-text-secondary);
 }
 .proj-rows {
   margin: 0;
@@ -2546,64 +2691,68 @@ a.info-item:hover .info-value { color: var(--color-link); }
 .proj-back + div { clear: both; padding-top: 8px; }
 .proj-back + div .exp-client-filter { position: static; box-shadow: none; }
 
-/* The current job's sheet on a phone: the client chips stay at the top
-   while you read, clear of the close button, and each client folds to
-   its name until it is opened */
+/* The current job's sheet: each client folds to its name until it is
+   opened, at every size */
+.exp-clients-folded .exp-client-section-header {
+  position: relative;
+  margin-bottom: 0;
+  padding-right: 26px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.exp-clients-folded .exp-client-section-header::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  width: 10px;
+  height: 16px;
+  margin-top: -8px;
+  background-color: var(--color-link);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 14'%3E%3Cpath d='M1.2 1.2 6.8 7l-5.6 5.8' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 14'%3E%3Cpath d='M1.2 1.2 6.8 7l-5.6 5.8' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  transition: transform .3s var(--ease-swift);
+}
+.exp-clients-folded .exp-client-section.is-open .exp-client-section-header { margin-bottom: 16px; }
+.exp-clients-folded .exp-client-section.is-open .exp-client-section-header::after { transform: rotate(90deg); }
+.exp-clients-folded .exp-client-section:not(.is-open) > :not(.exp-client-section-header) { display: none; }
+.exp-clients-folded .exp-client-section:not(.is-open) { cursor: pointer; }
+.exp-client-toggle {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.exp-client-toggle:focus-visible { outline: auto; outline-color: -webkit-focus-ring-color; outline-offset: 3px; border-radius: 4px; }
+
+/* On a phone the client picker stays at the top while you read, clear of
+   the close button */
 @media (max-width: 734px) {
   /* the sheet keeps 26px (24px under 600px) of padding above its content;
-     the stuck row covers it so nothing shows through above the chips,
-     which sit level with the close button */
+     the stuck row covers it so nothing shows through above the picker,
+     which sits level with the close button */
   .exp-clients-folded .exp-client-filter {
     position: sticky;
     top: -26px;
     z-index: 5;
     margin-top: 12px;
-    padding-top: 28px;
+    /* the 44px picker's middle level with the close button's */
+    padding-top: 24px;
     padding-bottom: 10px;
     margin-right: 46px;
-    padding-right: 18px;
+    padding-right: 0;
     background: rgba(255, 255, 255, .97);
     box-shadow: 64px 0 0 rgba(255, 255, 255, .97), 64px 1px 0 #E8E8ED, 0 1px 0 #E8E8ED;
   }
   @media (max-width: 600px) {
-    .exp-clients-folded .exp-client-filter { top: -24px; padding-top: 26px; }
+    .exp-clients-folded .exp-client-filter { top: -24px; padding-top: 22px; }
   }
-  .exp-clients-folded .exp-client-section-header {
-    position: relative;
-    margin-bottom: 0;
-    padding-right: 26px;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .exp-clients-folded .exp-client-section-header::after {
-    content: '';
-    position: absolute;
-    right: 0;
-    top: 50%;
-    width: 14px;
-    height: 14px;
-    margin-top: -7px;
-    background-color: var(--color-link);
-    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 1.5v13M1.5 8h13' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") center / contain no-repeat;
-    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 1.5v13M1.5 8h13' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") center / contain no-repeat;
-    transition: transform .3s var(--ease-swift);
-  }
-  .exp-clients-folded .exp-client-section.is-open .exp-client-section-header { margin-bottom: 16px; }
-  .exp-clients-folded .exp-client-section.is-open .exp-client-section-header::after { transform: rotate(45deg); }
-  .exp-clients-folded .exp-client-section:not(.is-open) > :not(.exp-client-section-header) { display: none; }
-  .exp-client-toggle {
-    margin: 0;
-    padding: 0;
-    border: 0;
-    background: none;
-    color: inherit;
-    font: inherit;
-    letter-spacing: inherit;
-    text-align: left;
-    cursor: pointer;
-  }
-  .exp-client-toggle:focus-visible { outline: 2px solid var(--color-link); outline-offset: 3px; border-radius: 4px; }
-  /* a focused client header is never left hidden under the stuck chip row */
+  /* a focused client header is never left hidden under the stuck picker */
   .exp-lightbox-inner:has(.exp-clients-folded) { scroll-padding-top: 84px; }
 }
 @media (forced-colors: active) {
@@ -2655,13 +2804,21 @@ a.info-item:hover .info-value { color: var(--color-link); }
 /* back-to-top clears the iPhone home indicator */
 #back-to-top { bottom: calc(22px + env(safe-area-inset-bottom, 0px)); }
 
+/* On a Mac the window's bottom edge is no place for a control (and the
+   button sat on card text there). Home, Fn-Left or Cmd-Up reach the top;
+   iPhone and iPad keep the button. */
+@media (hover: hover) and (pointer: fine) {
+  #back-to-top { display: none; }
+}
+
 /* Small phones: a one-word stat label ("Customizations") is wider than a
-   third of the card, so each cell takes at least its label's width */
+   third of the card, so each cell takes at least its label's width. Below
+   360px the cells pad less, and the labels keep the 11px phone size (the
+   iOS minimum) rather than dropping to 10px */
 @media (max-width: 400px) {
   .exp-stat-item { flex: 1 1 0; min-width: min-content; padding: 0 4px; }
 }
 @media (max-width: 359px) {
-  .exp-stat-label { font-size: 0.5882rem; }
   .exp-stat-item { padding: 0 2px; }
 }
 
@@ -2699,14 +2856,16 @@ a.info-item:hover .info-value { color: var(--color-link); }
 
 /* High contrast: every filter chip keeps an outline and the chosen one is filled */
 @media (forced-colors: active) {
-  .filter-btn,
-  .exp-filter-chip { border: 1px solid ButtonText; }
+  .filter-btn { border: 1px solid ButtonText; }
   .filter-btn[aria-pressed="true"],
-  .exp-filter-chip[aria-pressed="true"] {
+  /* the skill segmented control's white thumb is set by ID, so it is named here too */
+  #skill .filter-btn.active,
+  #skill .filter-btn[aria-pressed="true"] {
     forced-color-adjust: none;
     background: Highlight;
     color: HighlightText;
     border-color: Highlight;
+    box-shadow: none;
   }
 }
 
@@ -2727,7 +2886,6 @@ a.info-item:hover .info-value { color: var(--color-link); }
 /* Resume on the white band: grey cards, white chips, no hairline */
 #resume .data-box { background: #F5F5F7; }
 #resume .hl { background: #fff; }
-#resume .hl-blue { background: #ECF3FB; }   /* the 8% blue tint, solid */
 #resume .data-box,
 #resume .contact-strip .info-item { border: 0; }
 /* the strip only wraps the three tiles; painted grey it would fuse them */
@@ -2782,7 +2940,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
   height: 36px;
   background: #E2E2E5;   /* the paddle fill made solid: the certificate corner never shows through */
   color: rgba(0, 0, 0, .56);
-  font-size: 0;   /* the "+" text gives way to the Projects plus glyph */
+  font-size: 0;   /* the "+" text gives way to the expand glyph drawn below */
   box-shadow: none;
 }
 #certificates .cert-expand-btn::before {
@@ -2790,10 +2948,33 @@ a.info-item:hover .info-value { color: var(--color-link); }
   width: 36px;
   height: 36px;
   background: currentColor;
-  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'%3E%3Cpath d='m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z'/%3E%3C/svg%3E") center / 36px no-repeat;
-  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'%3E%3Cpath d='m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z'/%3E%3C/svg%3E") center / 36px no-repeat;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'%3E%3Cpath d='M19.5 16.5 24.5 11.5M20 11.5h4.5V16M16.5 19.5 11.5 24.5M11.5 20v4.5H16' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 36px no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'%3E%3Cpath d='M19.5 16.5 24.5 11.5M20 11.5h4.5V16M16.5 19.5 11.5 24.5M11.5 20v4.5H16' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 36px no-repeat;
 }
 #certificates .cert-expand-btn:hover { transform: none; background: #E2E2E5; color: rgba(0, 0, 0, .72); }
+/* Press states: pressing differs from hovering. The round buttons take
+   the paddles' own press fill and shrink a little; text links dim; rows
+   tint; whole cards give way slightly at every width (the ID selectors
+   outrank the hover rules above) */
+#portfolio .rf-cards-scroller-item .card-plus:active,
+#experience .data-box[data-exp] .exp-card-cta:active .exp-card-btn,
+#certificates .cert-expand-btn:active {
+  background: rgba(194, 194, 199, .655);
+  transform: scale(.94);
+  transition-duration: .08s;
+}
+.more:active,
+.resume-exp-link:active { opacity: .6; }
+#services .faq summary:active,
+.proj-row:active { background: rgba(0, 0, 0, .05); }
+/* a See-all row's tint fills its band of the grouped list, edge to edge,
+   while the separators stay inset; the end rows take the list's corners
+   while pressed (at rest the 6px focus corner is left alone) */
+.proj-row { width: calc(100% + 32px); margin: 0 -16px; padding: 10px 16px; }
+.proj-rows li:first-child .proj-row:active { border-top-left-radius: 18px; border-top-right-radius: 18px; }
+.proj-rows li:last-child .proj-row:active { border-bottom-left-radius: 18px; border-bottom-right-radius: 18px; }
+#portfolio .rf-cards-scroller-item:active,
+#images-list .cert-card:active { transform: scale(.98) !important; }
 @media (min-width: 768px) { #certificates .images-list { gap: 24px; } }
 @media (max-width: 767px) {
   #certificates .images-list { gap: 12px; }
@@ -2887,7 +3068,7 @@ p.profile-bio-small,
   letter-spacing: -0.022em;
   text-decoration: none;
 }
-.more:hover { text-decoration: underline; text-underline-offset: .12em; }
+.more:hover { color: var(--color-link-hover); text-decoration: underline; text-underline-offset: .12em; }
 .more .chev,
 .proj-row .chev {
   display: inline-block;
@@ -2995,7 +3176,15 @@ p.profile-bio-small,
   pointer-events: none;
   transition: opacity .25s ease, transform .35s cubic-bezier(.32, .72, 0, 1);
 }
-.toast.is-shown { opacity: 1; transform: translate(-50%, 0); }
+/* a shown toast takes the pointer, so hovering it keeps it open */
+.toast.is-shown { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+/* On a Mac the bottom of the window is often below the screen edge, so
+   the confirmation drops in near the top there; phones and tablets keep
+   it at the bottom */
+@media (hover: hover) and (pointer: fine) {
+  .toast { top: 24px; bottom: auto; transform: translate(-50%, -8px); }
+  .toast.is-shown { transform: translate(-50%, 0); }
+}
 .toast-check {
   flex: none;
   width: 22px;
@@ -3042,7 +3231,8 @@ p.profile-bio-small,
 /* a focused card or tile is outlined whole, not just its corner "+" */
 #portfolio .rf-cards-scroller-item:has(.card-plus:focus-visible),
 #certificates .cert-card:has(.cert-img:focus-visible) {
-  outline: 2px solid var(--color-link);
+  outline: auto;
+  outline-color: -webkit-focus-ring-color;
   outline-offset: 3px;
 }
 #portfolio .card-plus:focus-visible,

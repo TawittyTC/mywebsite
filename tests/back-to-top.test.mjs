@@ -1,6 +1,7 @@
 // Back to top on a touch screen: it floats in the right-hand column, over the row paddles and
 // the "+" of a certificate or a question. It may be there while the visitor scrolls back up;
 // two seconds after the scrolling stops it has to be gone, so a tap reaches what is under it.
+// With a mouse or trackpad (a Mac) it is not shown at all.
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { createContext } from './helpers.mjs';
@@ -216,23 +217,21 @@ test('turning the phone does not bring Back to top out', async () => {
   await page.close();
 });
 
-test('with a mouse Back to top stays for as long as the visitor is past the first screen', async () => {
+test('with a mouse or trackpad there is no Back to top at all, so nothing floats on the window\'s bottom edge (mac-back-to-top-hidden)', async () => {
   const { page, errors } = await open();
-  assert.equal(await page.evaluate(() => matchMedia('(hover: none)').matches), false, 'this run must count as a pointer device');
-  assertGone(await look(page), 'top of the page');
-  await scrollTo(page, 2000);
-  assertOut(await look(page, 600), 'past 0.9 screens');
-  assertOut(await look(page, 3000), '3s later with no scrolling');
-  // a press held past two seconds changes nothing either
-  const { x, y } = await look(page);
-  await page.mouse.move(x, y);
-  await page.mouse.down();
-  await page.waitForTimeout(2300);
-  assertOut(await look(page), 'pressed for 2.3s');
-  await page.mouse.up();
-  await page.waitForFunction(() => scrollY === 0, null, { timeout: 8000 });
-  await faded(page);
-  assertGone(await look(page), 'back at the top');
+  assert.equal(await page.evaluate(() => matchMedia('(hover: hover) and (pointer: fine)').matches), true, 'this run must count as a pointer device');
+  for (const [y, when] of [[0, 'top of the page'], [2000, 'past 0.9 screens'], [DEEP, 'deep in the page']]) {
+    await scrollTo(page, y);
+    await page.waitForTimeout(300);
+    const s = await page.$eval('#back-to-top', (b) => {
+      const r = b.getBoundingClientRect();
+      return { display: getComputedStyle(b).display, w: r.width, h: r.height };
+    });
+    assert.deepEqual(s, { display: 'none', w: 0, h: 0 }, `${when}: Back to top is drawn`);
+  }
+  // nor can it take keyboard focus, so Tab never stops on it
+  const stops = await page.evaluate(() => { document.getElementById('back-to-top').focus(); return document.activeElement.id; });
+  assert.notEqual(stops, 'back-to-top', 'a hidden Back to top still takes keyboard focus');
   assert.deepEqual(errors, []);
   await page.close();
 });

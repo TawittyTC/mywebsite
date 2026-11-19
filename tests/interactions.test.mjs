@@ -2,7 +2,7 @@
 // actually touches, driven in a real browser.
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { createContext, inkCount } from './helpers.mjs';
+import { createContext, inkCount, styled } from './helpers.mjs';
 
 let ctx;
 before(async () => { ctx = await createContext(); });
@@ -14,28 +14,22 @@ test('experience modal: opens from a card, filters by client, closes with Escape
   await page.waitForSelector('[data-exp="protollcall"]');
   await page.click('[data-exp="protollcall"]');
   await page.waitForSelector('.exp-lightbox.open');
-  await page.waitForSelector('.exp-lightbox .exp-filter-chip');
-  // pick a specific client chip → other client sections hide
-  const filtered = await page.evaluate(() => {
-    const chips = [...document.querySelectorAll('.exp-lightbox .exp-filter-chip')];
-    const target = chips.find((c) => c.dataset.filter && c.dataset.filter !== 'all' && c.dataset.filter !== 'general');
-    if (!target) return null;
-    target.click();
-    const sections = [...document.querySelectorAll('.exp-lightbox .exp-client-section')];
-    return {
-      chosen: target.dataset.filter,
-      shown: sections.filter((s) => s.style.display !== 'none').map((s) => s.dataset.client),
-    };
-  });
-  assert.ok(filtered, 'no client chips found in modal');
-  assert.deepEqual(filtered.shown, [filtered.chosen], 'chip did not filter client sections');
+  await page.waitForSelector('.exp-lightbox .exp-client-select');
+  // pick a specific client from the pop-up button → other client sections hide
+  const chosen = await page.$$eval('.exp-lightbox .exp-client-select option', (os) =>
+    os.map((o) => o.value).find((v) => v !== 'all' && v !== 'general'));
+  assert.ok(chosen, 'no clients in the pop-up button');
+  await page.selectOption('.exp-lightbox .exp-client-select', chosen);
+  const shown = await page.$$eval('.exp-lightbox .exp-client-section', (ss) =>
+    ss.filter((s) => s.style.display !== 'none').map((s) => s.dataset.client));
+  assert.deepEqual(shown, [chosen], 'choosing a client did not filter the client sections');
   await page.keyboard.press('Escape');
   await page.waitForFunction(() => !document.querySelector('.exp-lightbox.open'));
   await page.waitForFunction(() => document.body.style.overflow === '');
   await page.close();
 });
 
-test('client work leads My Projects, and every card shows without a filter row', async () => {
+test('client work leads Projects, and every card shows without a filter row', async () => {
   const { page } = await ctx.openPage();
   const state = await page.evaluate(() => {
     const items = [...document.querySelectorAll('#portfolio .rf-cards-scroller-item')];
@@ -61,7 +55,7 @@ test('every project card opens something real, and work comes before the student
       const t = document.getElementById('exp-' + c.dataset.openExp);
       if (!t) return true;
       const k = c.dataset.client;
-      return !!k && !t.content.querySelector(`.exp-filter-chip[data-filter="${k}"], .exp-client-section[data-client="${k}"]`);
+      return !!k && !t.content.querySelector(`.exp-client-select option[value="${k}"], .exp-client-section[data-client="${k}"]`);
     }).map((c) => c.querySelector('h3').textContent);
     const shots = items.map((c) => !!c.querySelector('.project-img'));
     const firstShot = shots.indexOf(true);
@@ -107,13 +101,12 @@ test('a client-work card opens its story in the experience sheet, on that client
   await page.waitForSelector('.exp-lightbox.open');
   const sheet = await page.evaluate(() => {
     const inner = document.querySelector('.exp-lightbox-inner');
-    const active = inner.querySelector('.exp-filter-chip.active');
+    const select = inner.querySelector('.exp-client-select');
     const shown = [...inner.querySelectorAll('.exp-client-section')].filter((s) => s.style.display !== 'none');
-    return { active: active && active.dataset.filter, pressed: active && active.getAttribute('aria-pressed'),
-      shown: [...new Set(shown.map((s) => s.dataset.client))] };
+    return { chosen: select && select.value, shown: [...new Set(shown.map((s) => s.dataset.client))] };
   });
-  assert.equal(sheet.active, want, 'the sheet did not open on the card\'s client');
-  assert.equal(sheet.pressed, 'true', 'the chosen client chip does not say it is selected');
+  // the pop-up button shows the client it was opened on (it says so itself)
+  assert.equal(sheet.chosen, want, 'the sheet did not open on the card\'s client');
   assert.deepEqual(sheet.shown, [want], 'other clients are still listed');
   await page.keyboard.press('Escape');
   await page.waitForFunction(() => !document.querySelector('.exp-lightbox.open'));
@@ -163,7 +156,7 @@ test('"See all" lists every project; a row opens it in the sheet and Back return
   await page.evaluate(() => { document.querySelector('.exp-lightbox-inner').scrollTop = 300; });
   await row.evaluate((r) => r.click());
   await page.waitForSelector('.proj-back');
-  const opened = await page.evaluate(() => document.querySelector('.exp-lightbox .exp-filter-chip.active')?.dataset.filter);
+  const opened = await page.evaluate(() => document.querySelector('.exp-lightbox .exp-client-select')?.value);
   assert.equal(opened, 'kasikorn', 'the row did not open its own client');
   // it lands on that client's story, clear of the "All projects" pill
   await page.waitForTimeout(700);
@@ -204,7 +197,7 @@ test('Back closes an open sheet or picture instead of leaving the site', async (
   const site = page.url();
   await page.goto(ctx.srv.url + '/robots.txt');
   await page.goto(site, { waitUntil: 'load' });
-  await page.waitForFunction(() => !document.querySelector('.loader'), null, { timeout: 8000 });
+  await page.waitForFunction(styled, null, { timeout: 8000 });
   // certificate viewer: Back closes it and stays on the page
   await page.$eval('#images-list .cert-card', (c) => c.click());
   await page.waitForSelector('.cert-lightbox.open');
@@ -312,12 +305,16 @@ test('reduced motion: constellation still paints and still self-heals', async ()
   const page = await ctx.browser.newPage({ viewport: { width: 1440, height: 900 } });
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto(ctx.srv.url + '/index.html', { waitUntil: 'load' });
-  await page.waitForFunction(() => !document.querySelector('.loader'), null, { timeout: 8000 });
+  await page.waitForFunction(styled, null, { timeout: 8000 });
   await page.waitForTimeout(800);
   assert.ok(await page.evaluate(inkCount()) > 500, 'no ink under reduced motion');
+  // the graph is a still frame under Reduce Motion: nothing repaints it on
+  // its own, a return to the tab (or a resize, or pageshow) does, which is
+  // what restores a canvas iOS purged while the page was hidden
   await page.evaluate(() => {
     const c = document.getElementById('hero-net');
     c.getContext('2d').clearRect(0, 0, c.width, c.height);
+    document.dispatchEvent(new Event('visibilitychange'));
   });
   await page.waitForTimeout(300);
   assert.ok(await page.evaluate(inkCount()) > 500, 'no repaint after wipe under reduced motion');

@@ -4,11 +4,12 @@
 // missing assets, cert grid count, parallax, reveals, reduced motion.
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { chromium } from 'playwright';
 import { startServer } from './serve.mjs';
+import { styled } from './helpers.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const EXECUTABLE = process.env.CHROMIUM_PATH || undefined;
@@ -26,8 +27,8 @@ after(async () => {
 });
 
 /**
- * Open the page, wait for the intro loader to clear (it blocks scrolling
- * and clicks while visible) and collect page errors / failed requests.
+ * Open the page, wait for style.css to apply (until then the page below
+ * the hero is held back) and collect page errors / failed requests.
  * Third-party requests (analytics, consent banner) are ignored — they are
  * unreachable from sandboxes and are not bugs in this site.
  */
@@ -46,7 +47,7 @@ async function openPage(opts = {}) {
     if (r.status() >= 400 && sameOrigin(r.url())) failed.push(`${r.status()} ${r.url()}`);
   });
   await page.goto(srv.url + '/index.html', { waitUntil: 'load' });
-  await page.waitForFunction(() => !document.querySelector('.loader'), null, { timeout: 8000 });
+  await page.waitForFunction(styled, null, { timeout: 8000 });
   return { page, errors, failed };
 }
 
@@ -67,13 +68,23 @@ test('main.js and main.min.js agree on certificate count, and every cert file ex
   const min = readFileSync(join(ROOT, 'assets/js/main.min.js'), 'utf8');
   const srcCount = Number(src.match(/i <= (\d+); i\+\+/)?.[1]);
   const minCount = Number(min.match(/<=(\d+);/)?.[1]);
-  assert.ok(srcCount >= 33, `cert loop in main.js should be >= 33, got ${srcCount}`);
+  assert.equal(srcCount, 32, `cert loop in main.js should build 32 tiles, got ${srcCount}`);
   assert.equal(srcCount, minCount, 'main.min.js is out of sync with main.js — run ./build.sh');
+  // img-24 was a second scan of img-21 and is gone; the loop skips its number
+  const file = (n) => (n < 24 ? n : n + 1);
   for (let i = 1; i <= srcCount; i++) {
-    assert.doesNotThrow(
-      () => readFileSync(join(ROOT, `assets/img/certificate/img-${i}.avif`)),
-      `certificate img-${i}.avif referenced by the loop but missing on disk`
-    );
+    for (const dir of ['', 'thumb/']) {
+      assert.doesNotThrow(
+        () => readFileSync(join(ROOT, `assets/img/certificate/${dir}img-${file(i)}.avif`)),
+        `certificate ${dir}img-${file(i)}.avif referenced by the loop but missing on disk`
+      );
+    }
+  }
+  // one file per tile, and no stray copy of the duplicate left behind
+  for (const dir of ['', 'thumb']) {
+    const files = readdirSync(join(ROOT, 'assets/img/certificate', dir)).filter((f) => /^img-\d+\.avif$/.test(f));
+    assert.equal(files.length, srcCount, `assets/img/certificate/${dir} holds ${files.length} certificates`);
+    assert.ok(!files.includes('img-24.avif'), `the duplicate certificate is still in assets/img/certificate/${dir}`);
   }
 });
 
@@ -235,7 +246,7 @@ test('prefers-reduced-motion: no parallax, no reveal-gating, titles visible', as
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto(srv.url + '/index.html', { waitUntil: 'load' });
-  await page.waitForFunction(() => !document.querySelector('.loader'), null, { timeout: 8000 });
+  await page.waitForFunction(styled, null, { timeout: 8000 });
   await page.evaluate(() => window.scrollTo(0, 400));
   await page.waitForTimeout(400);
   const heroTransform = await page.$eval('#hero .hero-copy', (el) => el.style.transform || '');
@@ -274,9 +285,15 @@ test('hero stays clean: no navbar, no CTA buttons; name lines carry the ink trea
 });
 
 test('back-to-top appears after scrolling and returns to top', async () => {
-  const { page } = await openPage();
+  // a touch screen: on a Mac there is no Back to top (mac-back-to-top-hidden)
+  const { page } = await openPage({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
   assert.ok(!(await page.$eval('#back-to-top', (b) => b.classList.contains('visible'))), 'hidden at top');
-  await page.evaluate(() => window.scrollTo(0, 2000));
+  // there it comes out as the visitor scrolls back up
+  await page.evaluate(() => window.scrollTo(0, 2200));
+  await page.waitForTimeout(100);
+  for (let y = 2160; y >= 2000; y -= 40) {
+    await page.evaluate((to) => new Promise((done) => { window.scrollTo(0, to); requestAnimationFrame(() => requestAnimationFrame(done)); }), y);
+  }
   await page.waitForFunction(() => document.getElementById('back-to-top').classList.contains('visible'));
   await page.click('#back-to-top');
   await page.waitForFunction(() => window.scrollY === 0, null, { timeout: 5000 });

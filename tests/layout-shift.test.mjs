@@ -1,11 +1,12 @@
 // Layout shift (CLS) when the async stylesheet lands after the first paint.
 // On the live site style.min.css usually applies after the first frame (the
-// HTML is still streaming in). Chrome counts every box that moves then, even
-// under the opaque loader, so the inline critical CSS must already lay out
-// the first screen exactly as style.css will.
+// HTML is still streaming in). Chrome counts every box that moves then, and
+// the hero is on screen from the first paint (no loader curtain), so the
+// inline critical CSS must already lay out the first screen exactly as
+// style.css will.
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { createContext } from './helpers.mjs';
+import { createContext, styled } from './helpers.mjs';
 
 let ctx;
 before(async () => { ctx = await createContext(); });
@@ -32,7 +33,7 @@ async function clsWithLateStylesheet(viewport, mobile) {
     await route.continue();
   });
   await page.goto(ctx.srv.url + '/index.html', { waitUntil: 'load' });
-  await page.waitForFunction(() => !document.querySelector('.loader'), null, { timeout: 8000 });
+  await page.waitForFunction(styled, null, { timeout: 8000 });
   await page.waitForTimeout(500);
   const shifts = await page.evaluate(() => window.__shifts);
   await page.close();

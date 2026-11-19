@@ -115,7 +115,7 @@ async function measureAt(width) {
   for (const sel of openers) {
     await page.$eval(sel, (el) => el.click());
     await page.waitForSelector('.exp-lightbox.open .exp-lightbox-inner > div');
-    // on a phone each client story is folded to its name: open them all
+    // each client story is folded to its name (at every size): open them all
     await page.evaluate(() => document.querySelectorAll('.exp-lightbox-inner .exp-clients-folded .exp-client-section:not(.is-open) .exp-client-section-header').forEach((h) => h.click()));
     await settle(page);
     const r = await page.evaluate(breaksIn, { sel: '.exp-lightbox-inner', allowed });

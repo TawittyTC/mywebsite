@@ -89,35 +89,6 @@
   });
 
   /**
-   * Preloader — the stylesheet fades it as soon as it applies (style.css);
-   * this only takes the element away once it has faded, or on load, and
-   * no later than 2s from navigation start
-   */
-  let preloader = select(".loader");
-  if (preloader) {
-    let done = false;
-    const hideLoader = () => {
-      if (done) return;
-      done = true;
-      preloader.style.transition = 'opacity 0.25s';
-      preloader.style.opacity = '0';
-      setTimeout(() => { if (preloader.parentNode) preloader.remove(); }, 260);
-    };
-    preloader.addEventListener("animationend", (e) => {
-      if (e.target === preloader && /^loader-(out|gone)$/.test(e.animationName)) hideLoader();
-    });
-    // On load only once the stylesheet has applied (it gives the loader its
-    // loader-gone fade): load no longer waits for the analytics and consent
-    // scripts, so it can now come before the stylesheet, and lifting the
-    // loader then would show the page unstyled
-    window.addEventListener("load", () => {
-      if (/loader-gone/.test(getComputedStyle(preloader).animationName)) hideLoader();
-    });
-    // Failsafe: never block the page for more than 2s from navigation start
-    setTimeout(hideLoader, Math.max(0, 2000 - performance.now()));
-  }
-
-  /**
    * Hero type effect — native (replaces Typed.js, saves 11KB)
    */
   const typedEl = select(".typed");
@@ -126,10 +97,31 @@
     let i = 0, j = 0, deleting = false;
     // the words before the role: "I'm a " in the markup, "I'm an " before a vowel
     const lead = typedEl.previousSibling && typedEl.previousSibling.nodeType === 3 ? typedEl.previousSibling : null;
+    const setArticle = (word) => {
+      if (lead) lead.nodeValue = lead.nodeValue.replace(/\ban?(\s+)$/, (/^[aeiou]/i.test(word) ? "an" : "a") + "$1");
+    };
+    // Reduce Motion: no letter-by-letter typing and no caret (style.css).
+    // The roles still take turns, a whole word at a time: every 3s the word
+    // fades out (250ms), the next one is put in and fades in (250ms).
+    // (Web Animations, which the stylesheet's reduce rule leaves alone.)
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      typedEl.textContent = items[0];
+      if (items.length > 1 && typedEl.animate) {
+        setInterval(() => {
+          typedEl.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 250, easing: "ease", fill: "forwards" }).onfinish = () => {
+            i = (i + 1) % items.length;
+            setArticle(items[i]);
+            typedEl.textContent = items[i];
+            typedEl.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 250, easing: "ease", fill: "forwards" });
+          };
+        }, 3000);
+      }
+      return;
+    }
     function typeTick() {
       const cur = items[i];
       // the article follows the role, and changes while nothing is typed
-      if (lead && j === 0 && !deleting) lead.nodeValue = lead.nodeValue.replace(/\ban?(\s+)$/, (/^[aeiou]/i.test(cur) ? "an" : "a") + "$1");
+      if (j === 0 && !deleting) setArticle(cur);
       typedEl.textContent = cur.slice(0, j);
       if (!deleting) {
         j++;
@@ -587,7 +579,7 @@ var overlayHistory = (function () {
     if (e.key === 'Tab' && lightbox.classList.contains('open') &&
         !document.querySelector('.cert-lightbox.open')) {
       var focusables = Array.prototype.filter.call(
-        inner.querySelectorAll('button, [href], [tabindex]:not([tabindex="-1"])'),
+        inner.querySelectorAll('button, select, [href], [tabindex]:not([tabindex="-1"])'),
         // a list's rows other than its Tab stop carry tabindex -1
         function (el) { return el.offsetParent !== null && el.tabIndex >= 0; }
       );
@@ -635,16 +627,16 @@ var overlayHistory = (function () {
     if (reduce) motion.jump(1); else motion.to(1);
     closeBtn.focus();
 
-    // Initialize client filter chips
-    var chips = inner.querySelectorAll('.exp-filter-chip');
+    // Initialize the client pop-up button
+    var select = inner.querySelector('.exp-client-select');
     var sections = inner.querySelectorAll('.exp-client-section');
-    if (chips.length && sections.length) {
-      var phone = window.matchMedia('(max-width: 734px)').matches;
-      var clientsBlock = chips[0].closest('.exp-modal-section');
+    if (select && sections.length) {
+      var clientsBlock = select.closest('.exp-modal-section');
       var heads = [];
-      // On a phone the client list is the proof, so it follows the role
-      // overview straight away, each client folded to its name until opened
-      if (phone && clientsBlock) {
+      // The client list is the proof, so it follows the role overview
+      // straight away, each client folded to its name until opened (at
+      // every size: unfolded, the stories ran to 21 sheet heights on a Mac)
+      if (clientsBlock) {
         var overview = inner.querySelector('.exp-modal-overview');
         var overviewBlock = overview && overview.closest('.exp-modal-section');
         if (overviewBlock && overviewBlock.nextElementSibling !== clientsBlock) overviewBlock.after(clientsBlock);
@@ -662,71 +654,42 @@ var overlayHistory = (function () {
           while (h3.firstChild) btn.appendChild(h3.firstChild);
           h3.appendChild(btn);
           heads.push(head);
-          head.addEventListener('click', function () {
+          // folded, the whole row (its padding too) opens it; open, only the
+          // header closes it, so taps in the story text do nothing
+          sec.addEventListener('click', function (e) {
+            if (sec.classList.contains('is-open') && !head.contains(e.target)) return;
             btn.setAttribute('aria-expanded', String(sec.classList.toggle('is-open')));
           });
         });
       }
-      var choose = function (chip) {
-        var filter = chip.dataset.filter;
-        chips.forEach(function (c) {
-          c.classList.toggle('active', c === chip);
-          c.setAttribute('aria-pressed', String(c === chip));
-        });
+      // a native pop-up: the menu is the system's, and it says the chosen
+      // client itself, so no status line is needed
+      var choose = function (filter) {
+        select.value = filter;
         sections.forEach(function (sec) {
           var show = filter === 'all' || sec.dataset.client === filter;
           sec.style.display = show ? '' : 'none';
           // one client chosen: its story shows open
-          if (phone && show && filter !== 'all') {
+          if (show && filter !== 'all') {
             sec.classList.add('is-open');
             var toggle = sec.querySelector('.exp-client-toggle');
             if (toggle) toggle.setAttribute('aria-expanded', 'true');
           }
         });
-        // chosen from the stuck row further down: bring the story up under it
-        if (phone && clientsBlock && inner.scrollTop > clientsBlock.offsetTop - 8) {
+        // chosen from the stuck picker further down: bring the story up under it
+        if (clientsBlock && inner.scrollTop > clientsBlock.offsetTop - 8) {
           inner.scrollTop = clientsBlock.offsetTop - 8;
         }
       };
-      // what a chip left on screen, for VoiceOver
-      var chipStatus = null;
-      if (chips.length) {
-        chipStatus = document.createElement('p');
-        chipStatus.className = 'visuallyhidden';
-        chipStatus.setAttribute('role', 'status');
-        chips[0].parentNode.parentNode.insertBefore(chipStatus, chips[0].parentNode.nextSibling);
-      }
-      chips.forEach(function (chip) {
-        chip.setAttribute('aria-pressed', String(chip.classList.contains('active')));
-        chip.addEventListener('click', function () {
-          choose(chip);
-          if (chipStatus) chipStatus.textContent = chip.dataset.filter === 'all' ?
-            'Showing all ' + sections.length + ' clients' : 'Showing ' + chip.textContent.trim();
-        });
-      });
-      var preset = client && inner.querySelector('.exp-filter-chip[data-filter="' + client + '"]');
+      select.addEventListener('change', function () { choose(select.value); });
+      var preset = client && select.querySelector('option[value="' + client + '"]');
       if (preset && clientsBlock) {
-        // opened from a client-work card: straight to that client
-        choose(preset);
+        // opened from a client-work card: straight to that client, preselected
+        choose(client);
         inner.scrollTop = Math.max(0, clientsBlock.offsetTop - 8);
-        var row = preset.parentNode;
-        row.scrollLeft = preset.offsetLeft - row.offsetLeft - 18;
-      } else {
-        // Hint animation: bounce non-"All" chips after modal opens
-        setTimeout(function () {
-          var delay = 0;
-          chips.forEach(function (chip) {
-            if (chip.dataset.filter === 'all') return;
-            setTimeout(function () {
-              chip.classList.add('hint');
-              chip.addEventListener('animationend', function () { chip.classList.remove('hint'); }, { once: true });
-            }, delay);
-            delay += 70;
-          });
-        }, 450);
       }
     } else if (client) {
-      // a sheet without client chips (SCG): open it on that project
+      // a sheet without a client picker (SCG): open it on that project
       var sec = inner.querySelector('.exp-client-section[data-client="' + client + '"]');
       if (sec) inner.scrollTop = Math.max(0, sec.offsetTop - 8);
     }
@@ -753,8 +716,8 @@ var overlayHistory = (function () {
     inner.insertBefore(b, closeBtn.nextSibling);
     b.focus({ preventScroll: true });
     // the sheet opened on a project (scrolled to it): start it below the pill
-    var chip = inner.querySelector('.exp-filter-chip');
-    var t = inner.scrollTop && (chip ? chip.closest('.exp-modal-section') : inner.querySelector('.exp-client-section[data-client="' + client + '"]'));
+    var picker = inner.querySelector('.exp-client-select');
+    var t = inner.scrollTop && (picker ? picker.closest('.exp-modal-section') : inner.querySelector('.exp-client-section[data-client="' + client + '"]'));
     if (t) inner.scrollTop = Math.max(0, t.offsetTop - parseFloat(getComputedStyle(inner).paddingTop) - b.offsetHeight - 8);
   };
 })();
@@ -763,10 +726,10 @@ document.addEventListener('DOMContentLoaded', function () {
   // ── Auto-sync Protollcall client count from template ──
   var protollcallTmpl = document.getElementById('exp-protollcall');
   if (protollcallTmpl) {
-    var chips = protollcallTmpl.content.querySelectorAll(
-      '.exp-filter-chip[data-filter]:not([data-filter="all"]):not([data-filter="general"])'
+    var options = protollcallTmpl.content.querySelectorAll(
+      '.exp-client-select option[value]:not([value="all"]):not([value="general"])'
     );
-    var clientCount = chips.length;
+    var clientCount = options.length;
     // Update stat number + data-count for count-up
     var statSpan = document.querySelector('[data-exp="protollcall"] .exp-stat-clients');
     if (statSpan) { statSpan.dataset.count = clientCount; statSpan.textContent = clientCount; }
@@ -793,10 +756,16 @@ document.addEventListener('DOMContentLoaded', function () {
   function countUp(el) {
     var target = parseInt(el.dataset.count, 10);
     if (isNaN(target) || target <= 0) return;
+    // Reduce Motion: the number is simply there, at its final value
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      el.textContent = target;
+      return;
+    }
     var dur = 700, t0 = performance.now();
     el.textContent = '0';
     (function step(now) {
-      var p = Math.min((now - t0) / dur, 1);
+      // (clamped at 0 too: a frame's timestamp can come before t0)
+      var p = Math.max(0, Math.min((now - t0) / dur, 1));
       el.textContent = Math.round((1 - Math.pow(1 - p, 3)) * target);
       if (p < 1) requestAnimationFrame(step);
     }(performance.now()));
@@ -927,17 +896,24 @@ document.addEventListener("DOMContentLoaded", function () {
   const imagesList = document.getElementById("images-list");
   if (!imagesList) return;
 
-  // Each certificate's own pixel size, in file order. The grid shows a small
+  // There is no img-24: it was a second scan of img-21 (the same Computer
+  // Repair Service certificate, No 10, 16 June 2017) and was taken out.
+  // The other files keep their names, so a cached copy never shows under
+  // another certificate's title; from the 24th tile on, the grid draws the
+  // next file up.
+  const certFile = (i) => (i < 24 ? i : i + 1);
+
+  // Each certificate's own pixel size, in grid order. The grid shows a small
   // copy (assets/img/certificate/thumb, 840px at most): the originals run to
   // 9333x6600, and decoding those for a 360px tile made the grid stutter.
   // The viewer opens on the small copy at the original's size, then trades up.
   const CERT_SIZES = ("1700x2200 1656x2339 2480x3509 2480x3509 2338x1654 1754x1241 4096x2628 4096x2900 " +
     "4096x2628 4096x2628 4096x2900 1611x1049 9333x6600 9333x6600 3509x2480 1754x1235 1754x1235 1619x1170 " +
-    "1649x1185 1684x1190 1623x1040 1584x1017 1570x1011 1617x1041 1261x884 1684x1190 9333x6600 9333x6600 " +
+    "1649x1185 1684x1190 1623x1040 1584x1017 1570x1011 1261x884 1684x1190 9333x6600 9333x6600 " +
     "1684x1200 1200x848 1200x738 3300x2550 2000x1545").split(" ");
 
   // What each certificate is, as printed on it (data-titles on the grid,
-  // in file order, "|" between them): its name for VoiceOver, for the
+  // in grid order, "|" between them): its name for VoiceOver, for the
   // button that opens it and for the full-screen viewer. A missing entry
   // falls back to its place in the grid.
   const CERT_TITLES = (imagesList.getAttribute("data-titles") || "").split("|");
@@ -945,7 +921,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function buildCerts() {
     if (imagesList.dataset.loaded) return;
     imagesList.dataset.loaded = "1";
-    for (let i = 1; i <= 33; i++) {
+    for (let i = 1; i <= 32; i++) {
       const colDiv = document.createElement("div");
       colDiv.classList.add("col-6", "col-md-4", "mb-5");
       const card = document.createElement("div");
@@ -956,16 +932,16 @@ document.addEventListener("DOMContentLoaded", function () {
       wrapper.type = "button";
       wrapper.classList.add("cert-img");
       const imgElement = document.createElement("img");
-      const src = `assets/img/certificate/img-${i}.avif`;
+      const src = `assets/img/certificate/img-${certFile(i)}.avif`;
       const title = CERT_TITLES[i - 1] || "";
-      const alt = title || "Certificate " + i + " of 33";
+      const alt = title || "Certificate " + i + " of 32";
       // a certificate printed in Thai is named in Thai, and read with a Thai voice
       const thai = /[\u0E00-\u0E7F]/.test(title);
       if (thai) wrapper.lang = "th";
       wrapper.setAttribute("aria-label", title ? (thai ? "ดูใบรับรอง " : "View certificate: ") + title :
-        "View certificate " + i + " of 33, full screen");
+        "View certificate " + i + " of 32, full screen");
       const size = (CERT_SIZES[i - 1] || "").split("x");
-      imgElement.src = `assets/img/certificate/thumb/img-${i}.avif`;
+      imgElement.src = `assets/img/certificate/thumb/img-${certFile(i)}.avif`;
       if (size.length === 2) {
         imgElement.setAttribute("data-full-w", size[0]);
         imgElement.setAttribute("data-full-h", size[1]);
@@ -1129,16 +1105,18 @@ function createCardScroller(scroller, options) {
   update();
   setTimeout(update, 500);
 
-  // Mobile: nudge the row left-and-back every few seconds to hint that
-  // it scrolls horizontally; pause while (and shortly after) the user
-  // interacts, and fire the first hint when the row enters the viewport.
+  // Mobile: nudge the row left-and-back to hint that it scrolls
+  // horizontally: once when the row first enters the viewport, and once
+  // more 6 s later only if the row is still untouched. The visitor's own
+  // scroll (finger, wheel, paddle or keyboard) ends the hint for good.
   if (window.innerWidth <= 1024 && !reduceMotion) {
     var hintDistance = 80;
     var duration = 250;
     var userScrolling = false;
     var isAnimating = false;
-    var scrollEndTimer = null;
     var hintInterval = null;
+    var hintsOver = false;   // the visitor has used the row
+    var hintsLeft = 2;
 
     var easeInOut = function (t) {
       return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
@@ -1160,7 +1138,8 @@ function createCardScroller(scroller, options) {
     };
 
     var runHint = function () {
-      if (userScrolling || isAnimating) return;
+      if (hintsOver || hintsLeft <= 0 || userScrolling || isAnimating) return;
+      hintsLeft--;
       var maxScrollLeft = scroller.scrollWidth - scroller.clientWidth;
       var atRightEnd = scroller.scrollLeft >= maxScrollLeft - 1;
       var dir = atRightEnd ? -1 : 1;
@@ -1188,10 +1167,12 @@ function createCardScroller(scroller, options) {
 
     var rowVisible = false;
     var startHintLoop = function () {
-      clearInterval(hintInterval);
+      clearTimeout(hintInterval);
       hintInterval = null;
-      // off screen nobody sees the nudge: it waits until the row is back
-      if (rowVisible) hintInterval = setInterval(runHint, 3000);
+      // off screen nobody sees the nudge: the second one waits until the row is back
+      if (rowVisible && !hintsOver && hintsLeft > 0) {
+        hintInterval = setTimeout(function () { hintInterval = null; runHint(); }, 6000);
+      }
     };
 
     var onUserScroll = function (e) {
@@ -1200,14 +1181,11 @@ function createCardScroller(scroller, options) {
       // and the nudge stops where it is on its next frame (it used to run on
       // and slide the row back under the finger).
       if (isAnimating && (!e || e.type === 'scroll')) return;
+      // the visitor has scrolled the row: no more hints for this visit
+      hintsOver = true;
       userScrolling = true;
-      clearInterval(hintInterval);
+      clearTimeout(hintInterval);
       hintInterval = null;
-      clearTimeout(scrollEndTimer);
-      scrollEndTimer = setTimeout(function () {
-        userScrolling = false;
-        startHintLoop();
-      }, 10000);
     };
 
     scroller.addEventListener('touchstart', function (e) {
@@ -1252,7 +1230,7 @@ function createCardScroller(scroller, options) {
       var started = !hintStarted && rowVisible && (firstCall || e.intersectionRatio >= 0.3);
       firstCall = false;
       if (!rowVisible) {
-        clearInterval(hintInterval);
+        clearTimeout(hintInterval);
         hintInterval = null;
       } else if (started) {
         hintStarted = true;
@@ -1325,10 +1303,17 @@ document.addEventListener('DOMContentLoaded', function () {
         btn.classList.add('active');
         btn.setAttribute('aria-pressed', 'true');
         var filter = btn.getAttribute('data-filter');
+        // the cards the filter shows fade in, so the change can be followed;
+        // opacity only, so it never fights the scroll reveal's transform
+        var fade = !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
         items.forEach(function (item) {
           // data-tech may hold several space-separated categories
           var tags = (item.getAttribute('data-tech') || '').split(/\s+/);
-          item.style.display = (filter === 'all' || tags.indexOf(filter) !== -1) ? '' : 'none';
+          var show = filter === 'all' || tags.indexOf(filter) !== -1;
+          item.style.display = show ? '' : 'none';
+          if (show && fade && item.animate) {
+            item.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 240, easing: 'cubic-bezier(.25,.1,.25,1)' });
+          }
         });
         var shown = Array.prototype.filter.call(items, function (it) { return it.style.display !== 'none'; }).length;
         status.textContent = 'Showing ' + shown + ' ' + noun[shown === 1 ? 0 : 1] +
@@ -1338,6 +1323,10 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 });
+
+// iOS Safari applies :active only where a touch listener exists: one on the
+// document gives every control its press state, not just the two scrollers
+document.addEventListener('touchstart', function () {}, { passive: true });
 
 // Hero animation now handled by CSS (@keyframes heroFadeIn) — no GSAP needed
 
@@ -1698,6 +1687,9 @@ document.addEventListener('DOMContentLoaded', function () {
     return { r: parseInt(h.slice(1, 3), 16), g: parseInt(h.slice(3, 5), 16), b: parseInt(h.slice(5, 7), 16) };
   }
   var WARM1 = hexToRgb('#1877F2'), WARM2 = hexToRgb('#5AA7FF'), COOL = hexToRgb('#64748B');
+  // the name's ink peaks at a deeper blue than the nodes' light one, so the
+  // lit letters keep 3:1 on white (#5AA7FF is 2.50:1, #2F80E8 is 3.91:1)
+  var INK_LIGHT = hexToRgb('#2F80E8');
   function lerp(a, b, t) { return a + (b - a) * t; }
   function mix(c1, c2, t) {
     return { r: Math.round(lerp(c1.r, c2.r, t)), g: Math.round(lerp(c1.g, c2.g, t)), b: Math.round(lerp(c1.b, c2.b, t)) };
@@ -1716,6 +1708,12 @@ document.addEventListener('DOMContentLoaded', function () {
     var b = frameBounds || bounds();
     var t = Math.max(0, Math.min(1, (x - b.x0) / Math.max(b.x1 - b.x0, 1)));
     return t < 0.5 ? mix(WARM1, WARM2, t / 0.5) : mix(WARM2, COOL, (t - 0.5) / 0.5);
+  }
+  // the same sweep for the name's ink, through INK_LIGHT instead of WARM2
+  function inkColorForX(x) {
+    var b = frameBounds || bounds();
+    var t = Math.max(0, Math.min(1, (x - b.x0) / Math.max(b.x1 - b.x0, 1)));
+    return t < 0.5 ? mix(WARM1, INK_LIGHT, t / 0.5) : mix(INK_LIGHT, COOL, (t - 0.5) / 0.5);
   }
 
   // bounds() for the frame being drawn (colorForX runs for every link)
@@ -1738,6 +1736,25 @@ document.addEventListener('DOMContentLoaded', function () {
   var inkX = 62, inkR = 24, inkG = 119, inkB = 242;
   var inkNode = null, nextInkSwitch = 1.6;
   var inkXWritten = '', inkCWritten = '';
+  var lastLabelT = 0; // the labels' own fade clock (drawFrame)
+  // At 11px the labels can drift into each other on the narrowest phones
+  // (320px). A label never covers another: one that would touch a label
+  // already on screen waits, faded out, until it is clear (the first in
+  // the list keeps its place when two shown ones meet). Boxes are last
+  // frame's; the size is measured once per sizing (resize() clears it).
+  function labelBlocked(el, idx, x, y) {
+    if (!el._w) return false;
+    var shown = (el._lo || 0) > 0, pad = shown ? 2 : 4;
+    var x0 = x + 12 - pad, y0 = y - el._h / 2 - pad, x1 = x + 12 + el._w + pad, y1 = y + el._h / 2 + pad;
+    for (var q = 0; q < labelEls.length; q++) {
+      var o = labelEls[q];
+      if (o === el || !o._box || !(o._lo > 0)) continue;
+      if (shown && q > idx) continue; // a later label gives way to this one
+      var b = o._box;
+      if (x0 < b[2] && x1 > b[0] && y0 < b[3] && y1 > b[1]) return true;
+    }
+    return false;
+  }
 
   // ── Big-bang intro: the whole graph starts as one clustered blob,
   // trembles harder and harder, then detonates outward — every node
@@ -2033,8 +2050,8 @@ document.addEventListener('DOMContentLoaded', function () {
   function resize() {
     // Until the stylesheet lands the canvas is still in the hero's flow:
     // sized then, it stands a screen tall and the page jumps when it leaves
-    // the flow (a layout shift of ~1). The loader covers the page until the
-    // stylesheet applies, so nothing is lost by waiting; the loop retries.
+    // the flow (a layout shift of ~1). The critical CSS in index.html already
+    // places it, so this only waits when that is missing; the loop retries.
     if (getComputedStyle(canvas).position !== 'absolute') return;
     var rect = hero.getBoundingClientRect();
     // WKWebViews (e.g. Facebook's in-app browser) can report a transient
@@ -2046,7 +2063,7 @@ document.addEventListener('DOMContentLoaded', function () {
     W = rect.width;
     H = rect.height;
     if (compactMq) compact = compactMq.matches;
-    DPR = Math.min(window.devicePixelRatio || 1, 2);
+    DPR = Math.min(window.devicePixelRatio || 1, 3); // 3x iPhones get a 3x bitmap
     var bw = Math.round(W * DPR), bh = Math.round(H * DPR);
     // Setting canvas.width WIPES the bitmap even when the value is
     // unchanged — a resize() storm (Firefox reports fractional sizes
@@ -2065,6 +2082,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!ctx) ctx = canvas.getContext('2d');
     ctx.setTransform(bw / W, 0, 0, bh / H, 0, 0);
     updateCopyRect();
+    for (var le = 0; le < labelEls.length; le++) labelEls[le]._w = 0; // label size follows the breakpoint
     if (!nodes.length) {
       layoutW = W;
       layoutH = H;
@@ -2091,7 +2109,10 @@ document.addEventListener('DOMContentLoaded', function () {
     // so look on every resize (a node already clear is left where it is).
     clearHint();
     // (until the loop has drawn once there is no picture to keep)
-    if (bitmapChanged && nodes.length && painted) drawFrame(lastDrawT);
+    // (under Reduce Motion nothing else repaints the still frame: redraw it
+    // whenever the size is checked, which also covers pageshow and a return
+    // to the tab, where iOS may have purged the canvas)
+    if (nodes.length && painted && (bitmapChanged || reduce)) drawFrame(lastDrawT);
   }
 
   if (finePointer) {
@@ -2118,7 +2139,10 @@ document.addEventListener('DOMContentLoaded', function () {
   function refitCopy() {
     var was = copyRect ? copyRect.y1 : null;
     updateCopyRect();
-    if (nodes.length && copyRect && copyRect.y1 !== was) { placeSpecials(); clearHint(); }
+    if (nodes.length && copyRect && copyRect.y1 !== was) {
+      placeSpecials(); clearHint();
+      if (reduce && painted) drawFrame(lastDrawT);
+    }
   }
   if (document.fonts && 'ready' in document.fonts) {
     afterPaint(function () {
@@ -2301,13 +2325,15 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         var src = (inkNode && inkNode.f > 0.3) ? inkNode : nearest;
         var cb = bounds();
-        var targetC = colorForX(src.x + src.px);
+        var targetC = inkColorForX(src.x + src.px);
         var rel = ((src.x + src.px) - cb.x0) / Math.max(cb.x1 - cb.x0, 1);
         var targetX = 12 + Math.max(0, Math.min(1, rel)) * 76;
-        inkX += (targetX - inkX) * 0.02;
-        inkR += (targetC.r - inkR) * 0.02;
-        inkG += (targetC.g - inkG) * 0.02;
-        inkB += (targetC.b - inkB) * 0.02;
+        // (under Reduce Motion a still frame takes the ink at once)
+        var ek = reduce ? 1 : 0.02;
+        inkX += (targetX - inkX) * ek;
+        inkR += (targetC.r - inkR) * ek;
+        inkG += (targetC.g - inkG) * ek;
+        inkB += (targetC.b - inkB) * ek;
         // an unchanged value is not written again: each write restyles and
         // repaints the name
         var inkXs = inkX.toFixed(1) + '%';
@@ -2323,6 +2349,18 @@ document.addEventListener('DOMContentLoaded', function () {
     // words inside the shaking blob would be noise)
     var labelGate = (reduce || it >= SHAKE_END + 0.45) ? 1
       : (it <= SHAKE_END ? 0 : (it - SHAKE_END) / 0.45);
+    // real seconds since the labels were last stepped (their fades run on
+    // the wall clock; a long gap just lands them where they are going)
+    var labelNow = performance.now();
+    var labelDt = lastLabelT ? Math.min((labelNow - lastLabelT) / 1000, 0.3) : 0;
+    lastLabelT = labelNow;
+    // (under Reduce Motion each frame is a still: the labels take their
+    // state at once, and only this frame's boxes count, so the earlier
+    // label in the list keeps its place)
+    if (reduce) {
+      labelDt = 0.3;
+      for (var lr = 0; lr < labelEls.length; lr++) { labelEls[lr]._lo = 0; labelEls[lr]._box = null; }
+    }
     var li = 0;
     for (var m = 0; m < nodes.length; m++) {
       var nm = nodes[m];
@@ -2331,10 +2369,22 @@ document.addEventListener('DOMContentLoaded', function () {
       if (nm.special) {
         var el = labelEls[li++];
         if (el) {
-          el.style.left = nx + 'px';
-          el.style.top = ny + 'px';
-          el.style.opacity = String(f * labelGate);
           if (el.style.display) el.style.display = '';
+          // (measured before it is placed, so the edge and overlap rules
+          // hold from the first frame after a sizing)
+          if (!el._w) { el._w = el.offsetWidth; el._h = el.offsetHeight; } // once per sizing
+          // (an 11px label near the right edge would be cut off by the
+          // hero: it moves in just far enough to stay whole)
+          var lx = el._w ? Math.min(nx, W - el._w - 16) : nx;
+          el.style.left = lx + 'px';
+          el.style.top = ny + 'px';
+          // A label is shown or it is not: shown, it holds full opacity (and
+          // full contrast); it fades only on its way in or out, over 300ms
+          var lo = el._lo || 0, want = f * labelGate > 0.05 && !labelBlocked(el, li - 1, lx, ny) ? 1 : 0;
+          lo = want > lo ? Math.min(want, lo + labelDt / 0.3) : Math.max(want, lo - labelDt / 0.3);
+          el._lo = lo;
+          el.style.opacity = String(lo);
+          el._box = [lx + 12, ny - el._h / 2, lx + 12 + el._w, ny + el._h / 2];
         }
         if (f <= 0.02) continue;
         var col = colorForX(nx);
@@ -2374,36 +2424,99 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   var running = false, t0 = null, lastDrawT = 0.01;
-  var curtainUp = false, painted = false;
+
+  // Reduce Motion: two still layouts of the same graph. One is shown at a
+  // time and every 10s it cross-fades (600ms, opacity only) into the other;
+  // no node ever travels across the screen.
+  var STILLS = [0.01, 4.2], stillIdx = 0, swapTimer = null;
+  function scheduleSwap() {
+    if (swapTimer) return;
+    swapTimer = setTimeout(function () {
+      swapTimer = null;
+      // off screen or hidden: the next loop run starts the timer again
+      if (running && painted && !document.hidden) crossFade(stillIdx = 1 - stillIdx);
+    }, 10000);
+  }
+  // Each still is the same picture every time it comes back, the name's
+  // ink included. The agent the ink follows is picked on the scene clock,
+  // which jumps between the two stills, so it is kept per still (and picked
+  // again once the graph is laid out anew).
+  var stillInk = [undefined, undefined], stillNodes = null;
+  function drawStill(idx) {
+    if (stillNodes !== nodes) { stillNodes = nodes; stillInk = [undefined, undefined]; }
+    var kept = stillInk[idx];
+    inkNode = kept === undefined ? null : kept;
+    nextInkSwitch = kept === undefined ? 1.6 : Infinity;
+    lastDrawT = STILLS[idx];
+    drawFrame(lastDrawT);
+    stillInk[idx] = inkNode;
+  }
+  function snapshot() {
+    var c = document.createElement('canvas');
+    c.width = canvas.width; c.height = canvas.height;
+    c.getContext('2d').drawImage(canvas, 0, 0);
+    return c;
+  }
+  function labelState() {
+    return labelEls.map(function (el) { return [el.style.left, el.style.top, parseFloat(el.style.opacity) || 0]; });
+  }
+  function writeInk(x, r, g, b) {
+    if (!nameEl) return;
+    var xs = x.toFixed(1) + '%', cs = 'rgb(' + Math.round(r) + ',' + Math.round(g) + ',' + Math.round(b) + ')';
+    if (xs !== inkXWritten) nameEl.style.setProperty('--ink-x', inkXWritten = xs);
+    if (cs !== inkCWritten) nameEl.style.setProperty('--ink-c', inkCWritten = cs);
+  }
+  function crossFade(idx) {
+    var bw = canvas.width, bh = canvas.height;
+    var from = snapshot(), labFrom = labelState(), inkFrom = [inkX, inkR, inkG, inkB];
+    drawStill(idx);
+    var to = snapshot(), labTo = labelState(), inkTo = [inkX, inkR, inkG, inkB];
+    var start = null;
+    function step(ts) {
+      if (canvas.width !== bw || canvas.height !== bh) { drawFrame(lastDrawT); scheduleSwap(); return; } // resized mid-fade
+      if (start === null) start = ts;
+      var p = Math.min((ts - start) / 600, 1);
+      ctx.save();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, bw, bh);
+      ctx.globalAlpha = 1 - p; ctx.drawImage(from, 0, 0);
+      ctx.globalAlpha = p; ctx.drawImage(to, 0, 0);
+      ctx.restore();
+      // labels: out at the old spots in the first half, in at the new ones
+      var first = p < 0.5, lab = first ? labFrom : labTo, k = first ? 1 - 2 * p : 2 * p - 1;
+      for (var i = 0; i < labelEls.length; i++) {
+        var el = labelEls[i], st = lab[i];
+        if (!st) continue;
+        el.style.left = st[0]; el.style.top = st[1]; el.style.opacity = String(st[2] * k);
+      }
+      writeInk(inkFrom[0] + (inkTo[0] - inkFrom[0]) * p, inkFrom[1] + (inkTo[1] - inkFrom[1]) * p,
+        inkFrom[2] + (inkTo[2] - inkFrom[2]) * p, inkFrom[3] + (inkTo[3] - inkFrom[3]) * p);
+      if (p < 1) requestAnimationFrame(step);
+      else scheduleSwap();
+    }
+    requestAnimationFrame(step);
+  }
+  var painted = false;
   function loop(ts) {
     if (!running) return;
+    // the intro clock starts on the first frame: nothing covers the hero
     if (t0 === null) t0 = ts;
-    // Hold the intro clock at zero until the page loader curtain lifts —
-    // otherwise the cluster/shake plays hidden behind the overlay and
-    // visitors only catch the tail of the explosion.
-    var held = false;
-    if (!curtainUp) {
-      var curtain = document.querySelector('.loader');
-      if (curtain && parseFloat(getComputedStyle(curtain).opacity) > 0.5) { t0 = ts; held = true; }
-      else { curtainUp = true; }
-    }
     // iOS batches resize events until scroll momentum ends; catch the
     // container changing size the moment it happens instead
     // (tolerance 2px: fractional-layout jitter must not trigger it)
     if (Math.abs(hero.clientWidth - W) > 2 || Math.abs(hero.clientHeight - H) > 2) resize();
-    // While the clock is held at zero every node is still fully transparent
-    // and the canvas is blank, so after one cleared frame there is nothing
-    // to draw until the curtain lifts (the blob's spot is still taken now)
-    if (held && painted && nodes.length) {
-      if (!introCluster) introCluster = clusterPoint();
-      lastDrawT = 0;
-      requestAnimationFrame(loop);
+    // Under Reduce Motion the scene is a fully assembled still frame (no
+    // drift, no pulses, no assembly) that cross-fades into a second still
+    // layout every 10s; no frames are asked for in between. resize() draws
+    // it again on a resize, pageshow or a return to the tab, which keeps
+    // the canvas backing store alive on iOS/WKWebView.
+    if (reduce) {
+      drawStill(stillIdx);
+      if (!painted) requestAnimationFrame(loop); // not sized yet: try next frame
+      else scheduleSwap();
       return;
     }
-    // Under reduced motion the scene drifts at half speed (no pulses,
-    // no assembly) — never a hard freeze, and the continuous paint
-    // keeps the canvas backing store alive on iOS/WKWebView.
-    lastDrawT = (ts - t0) / (reduce ? 2000 : 1000);
+    lastDrawT = (ts - t0) / 1000;
     if (replayQueued) { // bfcache reopen: restart the intro on this clock
       replayQueued = false;
       introT0 = lastDrawT;
@@ -2446,10 +2559,10 @@ document.addEventListener('DOMContentLoaded', function () {
 })();
 
 /**
- * BizCard — Apple Card-style 3D tilt.
- * Fine pointers tilt the card directly; elsewhere it sways gently on
- * its own. A specular glare tracks the tilt via --gx/--gy. Runs only
- * while visible; skipped entirely under reduced motion.
+ * BizCard — Apple Card-style idle sway.
+ * The card sways gently on its own and does not follow the pointer, so
+ * its links stay where they are. Runs only while visible; skipped
+ * entirely under reduced motion.
  */
 (function () {
   var card = document.getElementById('biz-card');
@@ -2458,32 +2571,19 @@ document.addEventListener('DOMContentLoaded', function () {
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (reduce) return; // the card is fully readable standing still
 
-  var run = false, raf = null, hover = false;
+  var run = false, raf = null;
   var tx = 0, ty = 0, cx = 0, cy = 0;
 
   function frame(ts) {
     if (!run) { raf = null; return; }
     var t = ts / 1000;
-    if (!hover) { // idle: a slow left-right sway, like the Apple Card promo
-      tx = Math.sin(t * 0.85) * 17;
-      ty = Math.cos(t * 0.6) * 8;
-    }
+    // a slow left-right sway, like the Apple Card promo
+    tx = Math.sin(t * 0.85) * 17;
+    ty = Math.cos(t * 0.6) * 8;
     cx += (tx - cx) * 0.08;
     cy += (ty - cy) * 0.08;
     card.style.transform = 'rotateY(' + cx.toFixed(2) + 'deg) rotateX(' + cy.toFixed(2) + 'deg)';
     raf = requestAnimationFrame(frame);
-  }
-
-  if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-    scene.addEventListener('pointermove', function (e) {
-      var r = scene.getBoundingClientRect();
-      var px = (e.clientX - r.left) / r.width - 0.5;
-      var py = (e.clientY - r.top) / r.height - 0.5;
-      hover = true;
-      tx = px * 34;
-      ty = -py * 22;
-    });
-    scene.addEventListener('pointerleave', function () { hover = false; });
   }
 
   var io = new IntersectionObserver(function (entries) {
@@ -2492,22 +2592,6 @@ document.addEventListener('DOMContentLoaded', function () {
     else if (!vis) { run = false; }
   }, { threshold: 0.1 });
   io.observe(scene);
-})();
-
-/**
- * BizCard glass light — the glare stands where the pointer or the finger
- * is. CSS draws the light; this only tells it where to stand.
- */
-(function () {
-  var card = document.getElementById('biz-card');
-  if (!card) return;
-  function light(e) {
-    var r = card.getBoundingClientRect();
-    card.style.setProperty('--lx', (e.clientX - r.left) + 'px');
-    card.style.setProperty('--ly', (e.clientY - r.top) + 'px');
-  }
-  card.addEventListener('pointermove', light, { passive: true });
-  card.addEventListener('pointerdown', light, { passive: true });
 })();
 
 /**
@@ -2563,15 +2647,38 @@ document.addEventListener('DOMContentLoaded', function () {
   toast.appendChild(check);
   toast.appendChild(text);
   document.body.appendChild(toast);
+  // It stays 5 s, long enough to read; a pointer resting on it holds it
+  // open, and leaving gives it 2 s more. Escape or the next click anywhere
+  // closes it at once.
   var hideTimer = null;
+  function hide() {
+    clearTimeout(hideTimer);
+    hideTimer = null;
+    toast.classList.remove('is-shown');
+  }
+  function later(ms) {
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(hide, ms);
+  }
   function show(msg, fail) {
     check.hidden = !!fail;   // no tick on a message that says something failed
     text.textContent = msg;
     toast.classList.add('is-shown');
-    clearTimeout(hideTimer);
-    hideTimer = setTimeout(function () { toast.classList.remove('is-shown'); }, 2400);
+    later(5000);
   }
   window._toast = show;
+  toast.addEventListener('mouseenter', function () { clearTimeout(hideTimer); hideTimer = null; });
+  toast.addEventListener('mouseleave', function () {
+    if (toast.classList.contains('is-shown')) later(2000);
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && toast.classList.contains('is-shown')) hide();
+  });
+  // capture phase: runs before the handler below, so the click that brings
+  // up a toast does not also close it
+  document.addEventListener('click', function () {
+    if (toast.classList.contains('is-shown')) hide();
+  }, true);
 
   var desk = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)');
   document.addEventListener('click', function (e) {

@@ -1,5 +1,6 @@
-// A card row on a touch screen nudges itself left and back every few seconds
-// to show that it scrolls. A finger that lands while a nudge is under way must
+// A card row on a touch screen nudges itself left and back to show that it
+// scrolls: once as it comes into view and once more 6s later, unless the
+// visitor has used it by then. A finger that lands while a nudge is under way must
 // get the row at once: it used to be ignored until the nudge was over, so the
 // row slid back under the finger and a drag lost a third of its distance.
 import { test, before, after } from 'node:test';
@@ -64,8 +65,7 @@ test('a finger that lands during the nudge gets the row at once, and a drag move
         const now = el.scrollLeft;
         if (now !== last && now > 10 && now < 70) return resolve(now);
         last = now;
-        // the first nudge runs as the row comes into view; the next within 3s, or 13s after
-        // anything that counted as the visitor's
+        // the first nudge runs as the row comes into view, the second 6s later
         if (performance.now() - t0 > 17000) return resolve(null);
         requestAnimationFrame(tick);
       })();
@@ -87,7 +87,7 @@ test('a finger that lands during the nudge gets the row at once, and a drag move
     const moved = (await page.$eval(sel, (el) => el.scrollLeft)) - from;
     assert.ok(moved >= 140, `${sel}: a 150px drag moved the row ${moved}px`);
 
-    // the visitor has the row: no nudge for a good while (the next would be due in 3s)
+    // the visitor has the row: no nudge after that (nudge-stops-after-use)
     const quiet = await watch(page, sel, 4500);
     assert.ok(Math.max(...quiet) - Math.min(...quiet) <= 1, `${sel}: the row nudged again within 4.5s of a drag`);
     await page.close();
@@ -138,7 +138,9 @@ test('a page scrolled up or down over a row during the nudge does not leave the 
   }
 });
 
-test('the nudge comes back after the visitor lets the row be, and a row at rest follows a drag', async () => {
+// nudge-stops-after-use (v2.72.0): this test used to require the nudge to come
+// back 10s after a drag; the owner chose that the visitor's own scroll ends it
+test('a row at rest follows a drag, and the nudge never comes back after it', async () => {
   const { page } = await ctx.openPage(phone);
   const at = await rowInView(page, '#scroller');
   // let the first nudge pass: the row has not moved for 300ms
@@ -160,8 +162,8 @@ test('the nudge comes back after the visitor lets the row be, and a row at rest 
   await page.waitForTimeout(400);
   const to = await page.$eval('#scroller', (el) => el.scrollLeft);
   assert.ok(to - from >= 140, `a 150px drag on a row at rest moved it ${to - from}px`);
-  // the nudge is the owner's design: it must resume (10s after the last scroll, then every 3s)
-  const later = await watch(page, '#scroller', 13500);
-  assert.ok(Math.max(...later) - Math.min(...later) >= 40, 'the row never nudged again after the visitor let it be');
+  // the visitor has used the row: no second nudge (it was due 6s after the first)
+  const later = await watch(page, '#scroller', 8000);
+  assert.ok(Math.max(...later) - Math.min(...later) <= 1, 'the row nudged again after the visitor had used it');
   await page.close();
 });

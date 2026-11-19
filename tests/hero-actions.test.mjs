@@ -6,7 +6,7 @@ import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { createContext, ROOT } from './helpers.mjs';
+import { createContext, ROOT, styled } from './helpers.mjs';
 
 let ctx;
 before(async () => { ctx = await createContext(); });
@@ -159,7 +159,7 @@ async function labels(opts) {
     const page = await ctx.browser.newPage({ serviceWorkers: 'block', ...opts });
     await seeded(page, seed);
     await page.goto(ctx.srv.url + '/index.html', { waitUntil: 'load' });
-    await page.waitForFunction(() => !document.querySelector('.loader'), null, { timeout: 8000 });
+    await page.waitForFunction(styled, null, { timeout: 8000 });
     await page.waitForTimeout(2600);
     const r = await page.evaluate(async () => {
       const out = { sum: {}, overlaps: 0, onCopy: 0, cut: 0, looks: 0 };
@@ -227,7 +227,7 @@ test('from 993px the graph takes the field to the right of the copy, and all six
   // and at 992px it is still the phone composition: the labels are below the copy
   const page = await ctx.browser.newPage({ viewport: { width: 992, height: 1000 }, serviceWorkers: 'block' });
   await page.goto(ctx.srv.url + '/index.html', { waitUntil: 'load' });
-  await page.waitForFunction(() => !document.querySelector('.loader'), null, { timeout: 8000 });
+  await page.waitForFunction(styled, null, { timeout: 8000 });
   await page.waitForTimeout(2600);
   const below = await page.evaluate(() => {
     const copy = document.querySelector('.hero-copy').getBoundingClientRect();
