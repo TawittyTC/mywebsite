@@ -2,7 +2,7 @@
 // actually touches, driven in a real browser.
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { createContext, inkCount } from './helpers.mjs';
+import { createContext, inkCount, styled } from './helpers.mjs';
 
 let ctx;
 before(async () => { ctx = await createContext(); });
@@ -204,7 +204,7 @@ test('Back closes an open sheet or picture instead of leaving the site', async (
   const site = page.url();
   await page.goto(ctx.srv.url + '/robots.txt');
   await page.goto(site, { waitUntil: 'load' });
-  await page.waitForFunction(() => !document.querySelector('.loader'), null, { timeout: 8000 });
+  await page.waitForFunction(styled, null, { timeout: 8000 });
   // certificate viewer: Back closes it and stays on the page
   await page.$eval('#images-list .cert-card', (c) => c.click());
   await page.waitForSelector('.cert-lightbox.open');
@@ -312,12 +312,16 @@ test('reduced motion: constellation still paints and still self-heals', async ()
   const page = await ctx.browser.newPage({ viewport: { width: 1440, height: 900 } });
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto(ctx.srv.url + '/index.html', { waitUntil: 'load' });
-  await page.waitForFunction(() => !document.querySelector('.loader'), null, { timeout: 8000 });
+  await page.waitForFunction(styled, null, { timeout: 8000 });
   await page.waitForTimeout(800);
   assert.ok(await page.evaluate(inkCount()) > 500, 'no ink under reduced motion');
+  // the graph is a still frame under Reduce Motion: nothing repaints it on
+  // its own, a return to the tab (or a resize, or pageshow) does, which is
+  // what restores a canvas iOS purged while the page was hidden
   await page.evaluate(() => {
     const c = document.getElementById('hero-net');
     c.getContext('2d').clearRect(0, 0, c.width, c.height);
+    document.dispatchEvent(new Event('visibilitychange'));
   });
   await page.waitForTimeout(300);
   assert.ok(await page.evaluate(inkCount()) > 500, 'no repaint after wipe under reduced motion');

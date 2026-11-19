@@ -251,14 +251,13 @@
     }
 
     /* ── Hero geometry, mirrored from style.css ──
-       The loader hides the page until style.css applies, but the page is
-       laid out (and measured by main.js) before that whenever the
-       stylesheet arrives after the first frame, as it usually does on a
-       phone network. These copies give that first layout the hero's real
-       geometry, so nothing under the loader jumps when style.css lands
-       (CLS was up to 1.0 on mobile, 0.22 on desktop). Layout only: the
-       entrance animations and the loader fade stay in style.css, so they
-       still start when it applies. Keep in sync with style.css (a test
+       The hero is painted from this block before style.css applies
+       whenever the stylesheet arrives after the first frame, as it usually
+       does on a phone network. These copies give that first layout the
+       hero's real geometry, so nothing in it jumps when style.css lands
+       (CLS was up to 1.0 on mobile, 0.22 on desktop). Its first look (the
+       name's ink and rise, the pill, the chevron, the glow) is copied
+       further down, next to the rule that holds back the rest of the page. Keep in sync with style.css (a test
        compares the hero with and without the stylesheet). */
     :root {
       --color-text: #1D1D1F;
@@ -362,6 +361,14 @@
       margin-left: 3px;
       vertical-align: text-bottom;
       background: var(--color-link)
+    }
+
+    /* Reduce Motion: the role changes a whole word at a time (main.js), so
+       there is no typing caret (as in style.css) */
+    @media (prefers-reduced-motion: reduce) {
+      #hero .typed::after {
+        display: none
+      }
     }
 
     /* The two actions under the role line: the closing section's pair
@@ -475,7 +482,7 @@
       }
 
       .hero-net-label {
-        font-size: 0.5294rem
+        letter-spacing: 0.08em
       }
 
       .hero-scroll-hint {
@@ -578,49 +585,118 @@
       }
     }
 
-    /* Loader: covers the page only until the full stylesheet applies, which
-       fades it at once (style.css). If that never happens it still goes
-       after 3s, with or without scripts. */
-    .loader {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: #fff;
-      z-index: 99999;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      animation: loader-out .3s ease 3s forwards;
+    /* No loader curtain: the hero above is painted from this block at once.
+       Only what lies below the hero waits for style.css (which shows it);
+       if the stylesheet never arrives it still appears after 3s, with or
+       without scripts. */
+    main > section:not(#hero),
+    footer {
+      visibility: hidden;
+      animation: show-late 0s 3s forwards
     }
 
-    @keyframes loader-out {
+    @keyframes show-late {
       to {
-        opacity: 0;
-        visibility: hidden;
+        visibility: visible
       }
     }
 
-    .loader::before {
-      content: '';
-      width: 28px;
-      height: 28px;
-      border: 2.5px solid #e5e5ea;
-      border-top-color: #1264CE;
-      border-radius: 50%;
-      animation: loader-spin 0.75s linear infinite;
-      will-change: transform;
+    /* The back-to-top button and the "Copied" toast start out at their
+       resting state, hidden. Shown here until style.css lands, they would
+       fade out from full opacity at the bottom of the screen the moment it
+       applies (its opacity transitions), a flash of two round icons */
+    #back-to-top,
+    .toast {
+      opacity: 0
     }
 
-    @keyframes loader-spin {
+    /* The rest of the hero's first look, copied from style.css so nothing
+       changes when it lands: the name's gradient ink (with the shimmer's
+       start values) and its rise, the pill's fill, the link's chevron and
+       the soft glow behind the copy. The same animation name and timing as
+       style.css, so the rise does not start over when the stylesheet
+       applies. Keep in sync with style.css. */
+    #hero .hero-name {
+      --ink-x: 62%;
+      --ink-c: #1264CE
+    }
+
+    .hero-name-line {
+      color: var(--color-text);
+      animation: name-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) both
+    }
+
+    @supports ((-webkit-background-clip: text) or (background-clip: text)) {
+      .hero-name-line {
+        background-image: linear-gradient(100deg,
+            #1d1d1f 0%,
+            #1d1d1f calc(var(--ink-x) - 30%),
+            var(--ink-c) var(--ink-x),
+            #1d1d1f calc(var(--ink-x) + 30%),
+            #1d1d1f 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent
+      }
+    }
+
+    .hero-name-line:nth-child(2) {
+      animation-delay: 0.14s
+    }
+
+    @keyframes name-rise {
+      from {
+        opacity: .01;
+        transform: translateY(24px)
+      }
+
       to {
-        transform: rotate(360deg);
+        opacity: 1;
+        transform: none
+      }
+    }
+
+    .btn-pill {
+      justify-content: center;
+      border: 0;
+      border-radius: var(--r-capsule);
+      background: var(--color-link);
+      color: #fff
+    }
+
+    .more .chev {
+      background: currentColor;
+      -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 14'%3E%3Cpath d='M1.2 1.2 6.8 7l-5.6 5.8' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+      mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 14'%3E%3Cpath d='M1.2 1.2 6.8 7l-5.6 5.8' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat
+    }
+
+    #hero .hero-copy::before {
+      content: "";
+      position: absolute;
+      left: -12%;
+      top: calc(50% - 38px);
+      transform: translateY(-50%);
+      width: 640px;
+      height: 640px;
+      background: radial-gradient(circle,
+          rgba(90, 167, 255, 0.12) 0%,
+          rgba(252, 252, 253, 0) 62%);
+      z-index: -1;
+      pointer-events: none
+    }
+
+    @media (max-width: 992px) {
+      #hero .hero-copy::before {
+        left: 50%;
+        top: calc(50% - 34px);
+        transform: translate(-50%, -50%);
+        width: 480px;
+        height: 480px
       }
     }
 
     /* Hero text entrance animation (CSS replaces GSAP — no CDN request).
-       Starts at 1% opacity, not 0: invisible (and under the loader), but
+       Starts at 1% opacity, not 0: nearly invisible at first, but
        Chrome skips opacity:0 text when it records Largest Contentful Paint
        and a compositor fade never repaints it, so from 0 the name was only
        counted once the constellation's ink first repainted it */
@@ -2090,7 +2166,6 @@
 
 <body>
   <a class="skip-link" href="#main-content">Skip to content</a>
-  <div class="loader" aria-hidden="true"></div>
 
   <main id="main-content">
 

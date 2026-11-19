@@ -7,11 +7,18 @@ import { startServer } from './serve.mjs';
 export const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const EXECUTABLE = process.env.CHROMIUM_PATH || undefined;
 
+/**
+ * True once style.css has applied. There is no loader curtain: index.html
+ * holds back everything below the hero (a 3s show-late animation as the
+ * failsafe) and style.css shows it, setting the footer's animation to none.
+ */
+export const styled = () => getComputedStyle(document.querySelector('footer')).animationName === 'none';
+
 export async function createContext() {
   const srv = await startServer(ROOT);
   const browser = await chromium.launch(EXECUTABLE ? { executablePath: EXECUTABLE } : {});
 
-  /** Open the page, wait for the loader to clear, collect errors. */
+  /** Open the page, wait for style.css to apply, collect errors. */
   async function openPage(opts = {}) {
     const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, ...opts });
     const errors = [];
@@ -27,7 +34,7 @@ export async function createContext() {
       if (r.status() >= 400 && sameOrigin(r.url())) failed.push(`${r.status()} ${r.url()}`);
     });
     await page.goto(srv.url + '/index.html', { waitUntil: 'load' });
-    await page.waitForFunction(() => !document.querySelector('.loader'), null, { timeout: 8000 });
+    await page.waitForFunction(styled, null, { timeout: 8000 });
     return { page, errors, failed };
   }
 

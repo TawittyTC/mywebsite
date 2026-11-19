@@ -3,7 +3,7 @@
 // system settings Reduce Transparency and contrast themes. Each test names the HIG rule.
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { createContext } from './helpers.mjs';
+import { createContext, styled } from './helpers.mjs';
 
 let ctx;
 before(async () => { ctx = await createContext(); });
@@ -18,7 +18,7 @@ async function openAt(opts, px) {
   const cdp = await page.context().newCDPSession(page);
   await cdp.send('Page.setFontSizes', { fontSizes: { standard: px, fixed: 13 } });
   await page.goto(ctx.srv.url + '/index.html', { waitUntil: 'load' });
-  await page.waitForFunction(() => !document.querySelector('.loader'), null, { timeout: 8000 });
+  await page.waitForFunction(styled, null, { timeout: 8000 });
   return { page, cdp };
 }
 
