@@ -68,6 +68,10 @@
       if (select(this.hash)) {
         e.preventDefault();
         scrollto(this.hash);
+        // keyboard focus follows the jump, so the next Tab continues from
+        // the section it landed on instead of pulling the page back up
+        var to = select(this.hash).querySelector('.section-title[tabindex="-1"]');
+        if (to) to.focus({ preventScroll: true });
       }
     },
     true
@@ -157,6 +161,69 @@ function afterPaint(fn) {
   };
   requestAnimationFrame(function () { if (go) go(); });
   setTimeout(function () { if (go) go(); }, 200);
+}
+
+/**
+ * While a sheet or the full-screen viewer is open, the page behind it is
+ * inert, as behind a native sheet: VoiceOver and Tab reach only the open
+ * layer. Called after each overlay opens or closes; it reads which are open.
+ */
+function syncPageInert() {
+  var on = !!document.querySelector(".exp-lightbox.open, .cert-lightbox.open");
+  ["body > .skip-link", "#main-content", "#footer", "#back-to-top"].forEach(function (sel) {
+    var el = document.querySelector(sel);
+    if (el) el.inert = on;
+  });
+}
+
+/**
+ * One Tab stop per collection, as in a native collection view: Tab lands on
+ * the item last used (the first one to begin with), the arrow keys move
+ * between items, Home and End go to the ends. mode is 'row' (Left/Right),
+ * 'list' (Up/Down) or 'grid' (all four; the columns are read from the
+ * layout). Returns settle(item), which makes item the collection's stop.
+ */
+function rovingFocus(container, selector, mode) {
+  function items() {
+    return Array.prototype.filter.call(container.querySelectorAll(selector), function (el) {
+      return el.getClientRects().length > 0;
+    });
+  }
+  function settle(current) {
+    var all = container.querySelectorAll(selector);
+    var list = items();
+    if (list.indexOf(current) < 0) current = list[0] || all[0];
+    Array.prototype.forEach.call(all, function (el) { el.tabIndex = el === current ? 0 : -1; });
+  }
+  container.addEventListener("focusin", function (e) {
+    var it = e.target.closest && e.target.closest(selector);
+    if (it && container.contains(it)) settle(it);
+  });
+  container.addEventListener("keydown", function (e) {
+    var it = e.target.closest && e.target.closest(selector);
+    if (!it || !container.contains(it) || e.altKey || e.ctrlKey || e.metaKey) return;
+    var list = items(), i = list.indexOf(it), k = e.key, to;
+    if (i < 0) return;
+    var cols = 1;
+    if (mode === "grid") {
+      var top = list[0].getBoundingClientRect().top;
+      cols = list.filter(function (el) { return Math.abs(el.getBoundingClientRect().top - top) < 8; }).length || 1;
+    }
+    if (k === "Home") to = 0;
+    else if (k === "End") to = list.length - 1;
+    else if (k === (mode === "list" ? "ArrowDown" : "ArrowRight")) to = i + 1;
+    else if (k === (mode === "list" ? "ArrowUp" : "ArrowLeft")) to = i - 1;
+    else if (mode === "grid" && k === "ArrowDown") to = i + cols;
+    else if (mode === "grid" && k === "ArrowUp") to = i - cols;
+    else return;
+    e.preventDefault();   // the keys move focus, not the scroll position
+    if (to < 0 || to >= list.length || to === i) return;
+    // the project row brings the card onto its column itself (focusin there)
+    list[to].focus(mode === "row" ? { preventScroll: true } : undefined);
+  });
+  // to begin with the first item is the stop (no layout read at start-up)
+  Array.prototype.forEach.call(container.querySelectorAll(selector), function (el, n) { el.tabIndex = n ? -1 : 0; });
+  return settle;
 }
 
 /**
@@ -405,7 +472,15 @@ var overlayHistory = (function () {
     lightbox.classList.add("open");
     lightbox.style.display = "flex";
     document.body.style.overflow = "hidden";
+    // focus returns to the control of the tile it came from, even when the
+    // tile itself was clicked (Safari does not focus a clicked button)
     lastFocus = document.activeElement;
+    if (!lastFocus || lastFocus === document.body) {
+      var holder = source && source.closest ? source.closest(".cert-card, .rf-cards-scroller-item") : null;
+      var ctl = holder && holder.querySelector("button.cert-img, .card-plus");
+      if (ctl) lastFocus = ctl;
+    }
+    syncPageInert();
     anchorOrigin(lbImg, source);
     frame.scrollLeft = 0;
     if (reduce) motion.jump(1); else motion.to(1);
@@ -415,12 +490,13 @@ var overlayHistory = (function () {
     if (!lightbox.classList.contains("open")) return; // Escape pressed elsewhere
     showing++;   // a full picture still on its way stays out of the closing frame
     lightbox.classList.remove("open");
+    syncPageInert();
     // the overlay stays painted until the spring settles, so hold the frame
     lightbox.style.display = "flex";
     // scroll is handed back on the dismissal itself, not when the fade ends
     if (!document.querySelector(".exp-lightbox.open")) document.body.style.overflow = "";
     if (reduce) motion.jump(0); else motion.to(0);
-    if (lastFocus && typeof lastFocus.focus === "function") lastFocus.focus();
+    if (lastFocus && typeof lastFocus.focus === "function") lastFocus.focus({ preventScroll: true });
     lastFocus = null;
     overlayHistory.closed(closeLightbox);
   }
@@ -487,6 +563,7 @@ var overlayHistory = (function () {
   function closeExp() {
     if (!lightbox.classList.contains('open')) return; // Escape pressed elsewhere
     lightbox.classList.remove('open');
+    syncPageInert();
     if (lastFocus && typeof lastFocus.focus === 'function') lastFocus.focus();
     lastFocus = null;
     // the dismissal is honoured at once; the fade out is only the picture
@@ -511,7 +588,8 @@ var overlayHistory = (function () {
         !document.querySelector('.cert-lightbox.open')) {
       var focusables = Array.prototype.filter.call(
         inner.querySelectorAll('button, [href], [tabindex]:not([tabindex="-1"])'),
-        function (el) { return el.offsetParent !== null; }
+        // a list's rows other than its Tab stop carry tabindex -1
+        function (el) { return el.offsetParent !== null && el.tabIndex >= 0; }
       );
       if (!focusables.length) return;
       var first = focusables[0];
@@ -550,6 +628,7 @@ var overlayHistory = (function () {
     lightbox.classList.add('open');
     document.body.style.overflow = 'hidden';
     if (!was) lastFocus = document.activeElement;
+    syncPageInert();
     // make it measurable, then grow it out of the card that was clicked
     lightbox.style.visibility = 'visible';
     anchorOrigin(inner, source);
@@ -609,9 +688,21 @@ var overlayHistory = (function () {
           inner.scrollTop = clientsBlock.offsetTop - 8;
         }
       };
+      // what a chip left on screen, for VoiceOver
+      var chipStatus = null;
+      if (chips.length) {
+        chipStatus = document.createElement('p');
+        chipStatus.className = 'visuallyhidden';
+        chipStatus.setAttribute('role', 'status');
+        chips[0].parentNode.parentNode.insertBefore(chipStatus, chips[0].parentNode.nextSibling);
+      }
       chips.forEach(function (chip) {
         chip.setAttribute('aria-pressed', String(chip.classList.contains('active')));
-        chip.addEventListener('click', function () { choose(chip); });
+        chip.addEventListener('click', function () {
+          choose(chip);
+          if (chipStatus) chipStatus.textContent = chip.dataset.filter === 'all' ?
+            'Showing all ' + sections.length + ' clients' : 'Showing ' + chip.textContent.trim();
+        });
       });
       var preset = client && inner.querySelector('.exp-filter-chip[data-filter="' + client + '"]');
       if (preset && clientsBlock) {
@@ -807,10 +898,13 @@ document.addEventListener("DOMContentLoaded", function () {
             '" height="' + esc(logos[g][1][1] || "") + '" alt="" loading="lazy" decoding="async">' : '') + '</h3><ul class="proj-rows">' + groups[g].join("") + "</ul></div>";
       }).join("");
   }
+  // the list is one Tab stop; Up and Down walk it, across the companies
+  var settleRows = rovingFocus(inner, ".proj-row", "list");
   function showList() {
     window._expLightboxOpen(list(), btn);
     inner.scrollTop = at;
     var row = from && inner.querySelector('.proj-row[data-i="' + from + '"]');
+    settleRows(row);
     if (row) row.focus({ preventScroll: true });
   }
   btn.addEventListener("click", function () { at = 0; from = null; showList(); });
@@ -842,6 +936,12 @@ document.addEventListener("DOMContentLoaded", function () {
     "1649x1185 1684x1190 1623x1040 1584x1017 1570x1011 1617x1041 1261x884 1684x1190 9333x6600 9333x6600 " +
     "1684x1200 1200x848 1200x738 3300x2550 2000x1545").split(" ");
 
+  // What each certificate is, as printed on it (data-titles on the grid,
+  // in file order, "|" between them): its name for VoiceOver, for the
+  // button that opens it and for the full-screen viewer. A missing entry
+  // falls back to its place in the grid.
+  const CERT_TITLES = (imagesList.getAttribute("data-titles") || "").split("|");
+
   function buildCerts() {
     if (imagesList.dataset.loaded) return;
     imagesList.dataset.loaded = "1";
@@ -850,11 +950,20 @@ document.addEventListener("DOMContentLoaded", function () {
       colDiv.classList.add("col-6", "col-md-4", "mb-5");
       const card = document.createElement("div");
       card.classList.add("cert-card");
-      const wrapper = document.createElement("div");
+      // the whole tile is the button that opens the certificate: one Tab
+      // stop and one name; the round "+" in its corner is only its picture
+      const wrapper = document.createElement("button");
+      wrapper.type = "button";
       wrapper.classList.add("cert-img");
       const imgElement = document.createElement("img");
       const src = `assets/img/certificate/img-${i}.avif`;
-      const alt = "Tanapol Certificate " + i;
+      const title = CERT_TITLES[i - 1] || "";
+      const alt = title || "Certificate " + i + " of 33";
+      // a certificate printed in Thai is named in Thai, and read with a Thai voice
+      const thai = /[\u0E00-\u0E7F]/.test(title);
+      if (thai) wrapper.lang = "th";
+      wrapper.setAttribute("aria-label", title ? (thai ? "ดูใบรับรอง " : "View certificate: ") + title :
+        "View certificate " + i + " of 33, full screen");
       const size = (CERT_SIZES[i - 1] || "").split("x");
       imgElement.src = `assets/img/certificate/thumb/img-${i}.avif`;
       if (size.length === 2) {
@@ -865,27 +974,27 @@ document.addEventListener("DOMContentLoaded", function () {
       imgElement.alt = alt;
       imgElement.loading = "lazy";
       imgElement.draggable = false;
-      const expandBtn = document.createElement("button");
-      expandBtn.className = "cert-expand-btn";
-      expandBtn.setAttribute("aria-label", "View certificate fullscreen");
-      expandBtn.innerHTML = "+";
-      expandBtn.addEventListener("click", function (e) {
-        e.stopPropagation();
-        window._certLightboxOpen(src, alt, card);
-      });
+      const expandMark = document.createElement("span");
+      expandMark.className = "cert-expand-btn";
+      expandMark.setAttribute("aria-hidden", "true");
+      expandMark.textContent = "+";
       card.style.cursor = "pointer";
+      // a click anywhere on the tile, or Enter / Space on its button
       card.addEventListener("click", function () {
-        window._certLightboxOpen(src, alt, card);
+        // the viewer is named after the certificate it shows
+        window._certLightboxOpen(src, alt, card, title ? "Certificate: " + title : "Certificate preview");
       });
       wrapper.appendChild(imgElement);
+      wrapper.appendChild(expandMark);
       card.appendChild(wrapper);
-      card.appendChild(expandBtn);
       colDiv.appendChild(card);
       imagesList.appendChild(colDiv);
     }
   }
 
   buildCerts();
+  // the grid is one Tab stop; the arrow keys walk it
+  rovingFocus(imagesList, "button.cert-img", "grid");
 });
 
 
@@ -921,12 +1030,17 @@ function createCardScroller(scroller, options) {
 
   function update() {
     if (!prevBtn || !nextBtn) return;
+    var had = document.activeElement;
     var left = scroller.scrollLeft;
     var max = scroller.scrollWidth - scroller.clientWidth;
     prevBtn.disabled = left <= 0;
     prevBtn.classList.toggle('disabled', left <= 0);
     nextBtn.disabled = left >= max - 1;
     nextBtn.classList.toggle('disabled', left >= max - 1);
+    // a paddle that turns off at the end of the row while it has keyboard
+    // focus hands focus to the other paddle instead of dropping it
+    if (had === nextBtn && nextBtn.disabled && !prevBtn.disabled) prevBtn.focus({ preventScroll: true });
+    else if (had === prevBtn && prevBtn.disabled && !nextBtn.disabled) nextBtn.focus({ preventScroll: true });
   }
 
   // Paging, the way apple.com's gallery paddles move: a whole page of
@@ -1171,6 +1285,9 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('[data-card-scroller]').forEach(function (el) {
       createCardScroller(el);
     });
+    // the project row is one Tab stop; the arrow keys walk its cards
+    var row = document.getElementById('scroller');
+    if (row) rovingFocus(row, '.card-plus', 'row');
   });
 });
 
@@ -1196,6 +1313,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // the selected chip is said, not only shown in colour
     btns.forEach(function (b) { b.setAttribute('aria-pressed', String(b.classList.contains('active'))); });
+    // and VoiceOver hears what the filter left on screen
+    var status = document.createElement('p');
+    status.className = 'visuallyhidden';
+    status.setAttribute('role', 'status');
+    group.parentNode.insertBefore(status, group.nextSibling);
+    var noun = root.id === 'skill' ? ['skill', 'skills'] : ['project', 'projects'];
     btns.forEach(function (btn) {
       btn.addEventListener('click', function () {
         btns.forEach(function (b) { b.classList.remove('active'); b.setAttribute('aria-pressed', 'false'); });
@@ -1207,6 +1330,9 @@ document.addEventListener('DOMContentLoaded', function () {
           var tags = (item.getAttribute('data-tech') || '').split(/\s+/);
           item.style.display = (filter === 'all' || tags.indexOf(filter) !== -1) ? '' : 'none';
         });
+        var shown = Array.prototype.filter.call(items, function (it) { return it.style.display !== 'none'; }).length;
+        status.textContent = 'Showing ' + shown + ' ' + noun[shown === 1 ? 0 : 1] +
+          (filter === 'all' ? '' : ': ' + btn.textContent.trim());
         if (scroller && scroller._cardScroller) scroller._cardScroller.reset();
       });
     });
@@ -1526,10 +1652,24 @@ document.addEventListener('DOMContentLoaded', function () {
         if (toTop.classList.contains('visible')) count(true);
       }, { passive: true });
     });
+    // a tablet with a trackpad or mouse: moving the pointer to the button's
+    // corner brings it back, the way scrolling up does for a finger
+    window.addEventListener('pointermove', function (e) {
+      if (e.pointerType !== 'mouse' || toTop.classList.contains('visible')) return;
+      if ((window.scrollY || 0) <= window.innerHeight * 0.9) return;
+      var r = toTop.getBoundingClientRect();
+      if (e.clientX >= r.left - 40 && e.clientX <= r.right && e.clientY >= r.top - 40 && e.clientY <= r.bottom) {
+        toTop.classList.add('visible');
+        count(true);
+      }
+    }, { passive: true });
   }
 
   toTop.addEventListener('click', function () {
     window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+    // focus goes back to the top too: the next Tab starts at the hero
+    var top = document.querySelector('#hero .hero-name');
+    if (top) top.focus({ preventScroll: true });
   });
 })();
 /**
@@ -2424,7 +2564,8 @@ document.addEventListener('DOMContentLoaded', function () {
   toast.appendChild(text);
   document.body.appendChild(toast);
   var hideTimer = null;
-  function show(msg) {
+  function show(msg, fail) {
+    check.hidden = !!fail;   // no tick on a message that says something failed
     text.textContent = msg;
     toast.classList.add('is-shown');
     clearTimeout(hideTimer);
@@ -2447,7 +2588,12 @@ document.addEventListener('DOMContentLoaded', function () {
     if (tel) e.preventDefault();
     navigator.clipboard.writeText(value).then(function () {
       show((tel ? 'Phone number copied: ' : 'Email copied: ') + value);
-    }, function () {});
+    }, function () {
+      // the browser refused the copy: select the text so Command-C works
+      var sel = window.getSelection && window.getSelection();
+      if (sel) sel.selectAllChildren(a.querySelector('.info-value') || a);
+      show(tel ? "Couldn't copy. The number is selected" : "Couldn't copy. The address is selected", true);
+    });
   });
 })();
 

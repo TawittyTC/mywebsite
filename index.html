@@ -237,6 +237,13 @@
       letter-spacing: normal
     }
 
+    /* the role line's drawn words sit in a span that VoiceOver skips: it
+       keeps the line's grey, only the typed role is blue */
+    #hero .hero-role > [aria-hidden] {
+      color: inherit;
+      letter-spacing: inherit
+    }
+
     @media(max-width:992px) {
       #hero {
         text-align: center
@@ -324,6 +331,21 @@
     .hero-name-line {
       display: block;
       width: fit-content
+    }
+
+    /* Read by VoiceOver, not drawn: the role line's whole sentence, and the
+       live result line of a filter */
+    .visuallyhidden {
+      position: absolute !important;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      clip-path: inset(50%);
+      white-space: nowrap;
+      border: 0
     }
 
     #hero .hero-role {
@@ -448,7 +470,7 @@
       }
 
       #hero h1.hero-name {
-        font-size: clamp(2.2353rem, 10.5vw, 2.8235rem);
+        font-size: min(clamp(2.2353rem, 10.5vw, 2.8235rem), 12.5vw);
         line-height: 1.12
       }
 
@@ -1740,10 +1762,10 @@
   </style>
 
   <!-- Full CSS loaded async: no render blocking (bootstrap merged in) -->
-  <link rel="preload" href="assets/css/style.min.css?v=2.70.0" as="style"
+  <link rel="preload" href="assets/css/style.min.css?v=2.71.0" as="style"
     onload="this.onload=null;this.rel='stylesheet'">
   <noscript>
-    <link href="assets/css/style.min.css?v=2.70.0" rel="stylesheet">
+    <link href="assets/css/style.min.css?v=2.71.0" rel="stylesheet">
     <style>.proj-all{visibility:hidden}</style>
   </noscript>
 
@@ -2020,7 +2042,7 @@
   </script>
 
   <!-- Preload deferred JS to start downloading before parser reaches script tags -->
-  <link rel="preload" href="assets/js/main.min.js?v=2.70.0" as="script">
+  <link rel="preload" href="assets/js/main.min.js?v=2.71.0" as="script">
 
   <!-- Google tag (gtag.js). The page view is queued here, stamped with the
        time the page opened; gtag.js sends it when it arrives. -->
@@ -2081,10 +2103,11 @@
       <div class="container hero-grid">
         <div class="hero-copy">
           <p class="hero-eyebrow">Software Engineer · Bangkok</p>
-          <h1 class="hero-name"><span class="hero-name-line">Tanapol</span> <span
+          <h1 class="hero-name" tabindex="-1"><span class="hero-name-line">Tanapol</span> <span
               class="hero-name-line">Chamnanhan</span></h1>
-          <p class="hero-role">I'm a <span class="typed"
-              data-typed-items="Full-Stack Developer, AI Engineer, Software Engineer"></span>
+          <p class="hero-role"><span class="visuallyhidden">I'm a Full-Stack Developer, an AI Engineer and a
+              Software Engineer.</span><span aria-hidden="true">I'm a <span class="typed"
+              data-typed-items="Full-Stack Developer, AI Engineer, Software Engineer"></span></span>
           </p>
           <div class="hero-actions">
             <a class="btn-pill scrollto" href="#portfolio">View projects</a>
@@ -2106,7 +2129,7 @@
     <section id="resume" class="resume">
       <div class="container" data-aos="fade-up">
 
-        <div class="section-title">
+        <div class="section-title" tabindex="-1">
           <h2>Resume</h2>
           <p>Background and education.</p>
         </div>
@@ -2693,7 +2716,7 @@
 
     <section id="portfolio" class="portfolio section-bg mb-5" aria-labelledby="portfolio-title">
       <div class="container mb-5" data-aos="fade-up">
-        <div class="section-title" id="portfolio-title">
+        <div class="section-title" id="portfolio-title" tabindex="-1">
           <h2>My Projects</h2>
           <p>Every project, highlights first.</p>
         </div>
@@ -3522,7 +3545,8 @@
         </div>
 
         <!-- Content for larger screens -->
-        <div class="row images-list" id="images-list">
+        <div class="row images-list" id="images-list"
+          data-titles="Internship letter (Apr–Jul 2023), The Siam Cement (Thung Song) Co., Ltd.|Internship programme letter (Dec 2023–Mar 2024), The Siam Cement (Thung Song) Co., Ltd.|Statement of Attainment: Systems Tester, Professional Qualification Level 4, TPQI|โครงการยกระดับสมรรถนะบุคคลตามมาตรฐานอาชีพและคุณวุฒิวิชาชีพ, สถาบันคุณวุฒิวิชาชีพ และ ARIT|รางวัลรองชนะเลิศ อันดับ ๑ โครงการตอบปัญหาทางวิชาการ ปีการศึกษา ๒๕๖๒, วิทยาลัยสารพัดช่างสงขลา|รางวัลจากการนำเสนอบทความวิจัยแบบบรรยาย ระดับดีมาก, AUC² 2023|Command Prompt 101, BorntoDev|Essential SQL for Everyone, BorntoDev|Fundamentals of Graphic Design, BorntoDev|Introduction to Computer Science, BorntoDev|ใช้งานแชทบอทร้านค้ายุคใหม่ ด้วย Kaojao, BorntoDev|Notebook Repair Service, vocational short course (75 hours), Songkhla Polytechnic College|การใช้โปรแกรม Microsoft Excel เบื้องต้น, Starfish Academy และ Starfish Labz|วิทยาการคำนวณและโค้ดดิ้ง, Starfish Academy และ Starfish Labz|Online Coaching Startup Thailand League 2021 Mega Hackathon, NIA|Hour of Code (Minecraft), Code.org|The Hour of Code, Code.org|English for Communication, vocational short course (150 hours), Songkhla Polytechnic College|English Public Speaking Contest, อาชีวศึกษาจังหวัดสงขลา|GitHub for Developer, BorntoDev|Computer Repair Service, vocational short course (75 hours), Songkhla Polytechnic College|งานซ่อมเครื่องคอมพิวเตอร์โน๊ตบุ๊ค หลักสูตรระยะสั้น (๗๕ ชั่วโมง), วิทยาลัยสารพัดช่างสงขลา|งานซ่อมเครื่องคอมพิวเตอร์ หลักสูตรระยะสั้น (๗๕ ชั่วโมง), วิทยาลัยสารพัดช่างสงขลา|Computer Repair Service, vocational short course (75 hours), Songkhla Polytechnic College|Introduction to JavaScript, BorntoDev|Lite: Fundamental Web Dev with HTML5 &amp; CSS3, BorntoDev|Coding ทักษะแห่งโลกอนาคต, Starfish Academy และ Starfish Labz|การเขียนโปรแกรมภาษา Python สำหรับผู้เริ่มต้น, Starfish Academy และ Starfish Labz|Basic Software Testing, BorntoDev|NDG Linux Essentials, Cisco Networking Academy|การเพิ่มประสิทธิภาพการทำงานด้วยปัญญาประดิษฐ์, Thai MOOC|Claude 101, Anthropic|Claude Code 101, Anthropic">
           <!-- Images will be added here by JavaScript -->
         </div>
 
@@ -3625,27 +3649,27 @@
             </details>
             <details>
               <summary>ธนพล ชำนาญหาญ รับทำเว็บไซต์กรุงเทพหรือไม่?</summary>
-              <p>รับครับ ธนพล ชำนาญหาญ รับทำเว็บไซต์ทุกประเภท ทั้ง Corporate Website, Landing Page, <span class="nw">E-Commerce</span> และ Web Application พร้อมให้บริการในกรุงเทพและทั่วประเทศไทย ติดต่อได้ที่ <a href="mailto:tanapol.ch@rmutsvmail.com">tanapol.ch@rmutsvmail.com</a></p>
+              <p>รับครับ ธนพล ชำนาญหาญ รับทำเว็บไซต์ทุกประเภท ทั้ง Corporate Website, Landing Page, <span class="nw">E-Commerce</span> และ Web Application พร้อมให้บริการในกรุงเทพและทั่วประเทศไทย ติดต่อได้ที่ <a href="mailto:tanapol.ch@rmutsvmail.com">tanapol.ch@<wbr>rmutsvmail.com</a></p>
             </details>
             <details>
               <summary>รับทำระบบ CRM กรุงเทพ ติดต่อได้อย่างไร?</summary>
-              <p>ธนพล ชำนาญหาญ รับทำระบบ CRM แบบ Custom สำหรับองค์กร มีประสบการณ์จริงจากการพัฒนา CRM ให้บริษัทชั้นนำ 33 แห่ง อาทิ Bangkok Hospital Chiang Mai, Kasikorn Carabao, Thai VietJet Air ติดต่อ <a href="mailto:tanapol.ch@rmutsvmail.com">tanapol.ch@rmutsvmail.com</a> หรือ <a href="tel:+66962437210">+66 962 437 210</a></p>
+              <p>ธนพล ชำนาญหาญ รับทำระบบ CRM แบบ Custom สำหรับองค์กร มีประสบการณ์จริงจากการพัฒนา CRM ให้บริษัทชั้นนำ 33 แห่ง อาทิ Bangkok Hospital Chiang Mai, Kasikorn Carabao, Thai VietJet Air ติดต่อ <a href="mailto:tanapol.ch@rmutsvmail.com">tanapol.ch@<wbr>rmutsvmail.com</a> หรือ <a href="tel:+66962437210">+66 962 437 210</a></p>
             </details>
             <details>
               <summary>รับทำระบบ POS (Point of Sale) กรุงเทพมีไหม?</summary>
-              <p>มีครับ ธนพล ชำนาญหาญ รับพัฒนาระบบ POS แบบ Custom ครบวงจร ทั้งจุดขาย, ระบบสต็อกสินค้า, รายงานยอดขาย และการเชื่อมต่อกับระบบอื่น ราคาเหมาะสม ปรึกษาฟรีที่ <a href="mailto:tanapol.ch@rmutsvmail.com">tanapol.ch@rmutsvmail.com</a></p>
+              <p>มีครับ ธนพล ชำนาญหาญ รับพัฒนาระบบ POS แบบ Custom ครบวงจร ทั้งจุดขาย, ระบบสต็อกสินค้า, รายงานยอดขาย และการเชื่อมต่อกับระบบอื่น ราคาเหมาะสม ปรึกษาฟรีที่ <a href="mailto:tanapol.ch@rmutsvmail.com">tanapol.ch@<wbr>rmutsvmail.com</a></p>
             </details>
             <details>
               <summary>ธนพล ชำนาญหาญ กำลังหางานอยู่ไหม?</summary>
-              <p>ใช่ครับ ธนพล ชำนาญหาญ เปิดรับโอกาสงานใหม่ ทั้งตำแหน่ง Software Engineer, <span class="nw">Full-Stack</span> Developer, Web Developer และ Programmer ในกรุงเทพหรือรูปแบบ Remote ติดต่อ HR ได้ที่ <a href="mailto:tanapol.ch@rmutsvmail.com">tanapol.ch@rmutsvmail.com</a> หรือ LinkedIn: <a href="https://www.linkedin.com/in/tanapol-chamnanhan/">linkedin.com/in/tanapol-chamnanhan/</a></p>
+              <p>ใช่ครับ ธนพล ชำนาญหาญ เปิดรับโอกาสงานใหม่ ทั้งตำแหน่ง Software Engineer, <span class="nw">Full-Stack</span> Developer, Web Developer และ Programmer ในกรุงเทพหรือรูปแบบ Remote ติดต่อ HR ได้ที่ <a href="mailto:tanapol.ch@rmutsvmail.com">tanapol.ch@<wbr>rmutsvmail.com</a> หรือ LinkedIn: <a href="https://www.linkedin.com/in/tanapol-chamnanhan/">linkedin.com/in/tanapol-chamnanhan/</a></p>
             </details>
             <details lang="en">
               <summary>How to hire Tanapol Chamnanhan (ธนพล ชำนาญหาญ) as Software Engineer or Web Developer?</summary>
-              <p>Contact Tanapol Chamnanhan via email <a href="mailto:tanapol.ch@rmutsvmail.com">tanapol.ch@rmutsvmail.com</a> or LinkedIn <a href="https://www.linkedin.com/in/tanapol-chamnanhan/">linkedin.com/in/tanapol-chamnanhan/</a>. <span class="nw">Bangkok-based</span> <span class="nw">Full-Stack</span> Developer open to <span class="nw">full-time</span>, contract, and freelance opportunities in Software Engineering, Web Development, CRM/POS system development.</p>
+              <p>Contact Tanapol Chamnanhan via email <a href="mailto:tanapol.ch@rmutsvmail.com">tanapol.ch@<wbr>rmutsvmail.com</a> or LinkedIn <a href="https://www.linkedin.com/in/tanapol-chamnanhan/">linkedin.com/in/tanapol-chamnanhan/</a>. <span class="nw">Bangkok-based</span> <span class="nw">Full-Stack</span> Developer open to <span class="nw">full-time</span>, contract, and freelance opportunities in Software Engineering, Web Development, CRM/POS system development.</p>
             </details>
             <details>
               <summary>โปรแกรมเมอร์รับทำเว็บไซต์กรุงเทพ ราคาเท่าไหร่?</summary>
-              <p>ธนพล ชำนาญหาญ รับทำเว็บไซต์และพัฒนาระบบ ราคาขึ้นอยู่กับ scope งาน ปรึกษาฟรีก่อน ไม่มีค่าใช้จ่าย ติดต่อได้ที่ <a href="mailto:tanapol.ch@rmutsvmail.com">tanapol.ch@rmutsvmail.com</a> หรือโทร <a href="tel:+66962437210">+66 962 437 210</a> เพื่อรับใบเสนอราคา</p>
+              <p>ธนพล ชำนาญหาญ รับทำเว็บไซต์และพัฒนาระบบ ราคาขึ้นอยู่กับ scope งาน ปรึกษาฟรีก่อน ไม่มีค่าใช้จ่าย ติดต่อได้ที่ <a href="mailto:tanapol.ch@rmutsvmail.com">tanapol.ch@<wbr>rmutsvmail.com</a> หรือโทร <a href="tel:+66962437210">+66 962 437 210</a> เพื่อรับใบเสนอราคา</p>
             </details>
             <details>
               <summary>ขั้นตอนการทำงานเป็นอย่างไร?</summary>
@@ -3661,11 +3685,11 @@
             </details>
             <details>
               <summary>ธนพล ชำนาญหาญ รับพัฒนา AI Agent และระบบ AI สำหรับธุรกิจไหม?</summary>
-              <p>รับครับ ธนพล ชำนาญหาญ รับพัฒนา AI Agent และระบบ AI สำหรับธุรกิจครบวงจร — Agentic AI (<span class="nw">Multi-Agent</span> Orchestration, <span class="nw">Sub-Agents</span>), LLM Integration (GPT, Gemini, Claude), Voice AI (ASR, TTS, <span class="nw">Speech-to-Speech</span> แบบ Realtime), AI Chatbot และ AI IVR สำหรับ Contact Center ติดต่อ <a href="mailto:tanapol.ch@rmutsvmail.com">tanapol.ch@rmutsvmail.com</a></p>
+              <p>รับครับ ธนพล ชำนาญหาญ รับพัฒนา AI Agent และระบบ AI สำหรับธุรกิจครบวงจร — Agentic AI (<span class="nw">Multi-Agent</span> Orchestration, <span class="nw">Sub-Agents</span>), LLM Integration (GPT, Gemini, Claude), Voice AI (ASR, TTS, <span class="nw">Speech-to-Speech</span> แบบ Realtime), AI Chatbot และ AI IVR สำหรับ Contact Center ติดต่อ <a href="mailto:tanapol.ch@rmutsvmail.com">tanapol.ch@<wbr>rmutsvmail.com</a></p>
             </details>
             <details lang="en">
               <summary>Does Tanapol Chamnanhan build AI agents and voice AI systems?</summary>
-              <p>Yes. Tanapol Chamnanhan designs and builds agentic AI systems (orchestrator + <span class="nw">sub-agent</span> architectures, <span class="nw">multi-agent</span> orchestration), LLM integrations (GPT, Gemini, Claude), and voice AI pipelines (ASR, TTS, realtime <span class="nw">speech-to-speech</span>) for business automation and contact centers. Based in Bangkok, Thailand — contact <a href="mailto:tanapol.ch@rmutsvmail.com">tanapol.ch@rmutsvmail.com</a></p>
+              <p>Yes. Tanapol Chamnanhan designs and builds agentic AI systems (orchestrator + <span class="nw">sub-agent</span> architectures, <span class="nw">multi-agent</span> orchestration), LLM integrations (GPT, Gemini, Claude), and voice AI pipelines (ASR, TTS, realtime <span class="nw">speech-to-speech</span>) for business automation and contact centers. Based in Bangkok, Thailand — contact <a href="mailto:tanapol.ch@rmutsvmail.com">tanapol.ch@<wbr>rmutsvmail.com</a></p>
             </details>
             <details lang="en">
               <summary>What technologies does Tanapol Chamnanhan use for CRM and POS development?</summary>
@@ -3706,7 +3730,7 @@
                   <div class="biz-role"><span class="nw">Full-Stack</span> Developer · CRM, POS &amp; AI Voice Agents</div>
                 </div>
                 <div class="biz-row biz-contacts">
-                  <a href="mailto:tanapol.ch@rmutsvmail.com">tanapol.ch@rmutsvmail.com</a>
+                  <a href="mailto:tanapol.ch@rmutsvmail.com">tanapol.ch@<wbr>rmutsvmail.com</a>
                   <a href="tel:+66962437210">+66 962 437 210</a>
                 </div>
               </div>
@@ -3742,7 +3766,7 @@
             <div style="font-size: 1rem;font-weight:600;color:#1d1d1f;margin-bottom:8px;letter-spacing:-0.2px;">Contact
             </div>
             <div class="fw-light" style="font-size: 0.8235rem;color:#6e6e73;"><a href="mailto:tanapol.ch@rmutsvmail.com"
-                class="text-decoration-none footer-contact-link" style="color:#1264CE;">tanapol.ch@rmutsvmail.com</a></div>
+                class="text-decoration-none footer-contact-link" style="color:#1264CE;">tanapol.ch@<wbr>rmutsvmail.com</a></div>
             <div class="fw-light" style="font-size: 0.8235rem;color:#6e6e73;"><a href="tel:+66962437210"
                 class="text-decoration-none footer-contact-link" style="color:#1264CE;">+66 962 437 210</a></div>
 
@@ -3799,7 +3823,7 @@
   </button>
 
   <!-- Main JS -->
-  <script defer src="assets/js/main.min.js?v=2.70.0"></script>
+  <script defer src="assets/js/main.min.js?v=2.71.0"></script>
   <!-- Service Worker: cache assets for repeat visits -->
   <script>if ('serviceWorker' in navigator) { var _sw = function () { navigator.serviceWorker.register('sw.js') }; 'requestIdleCallback' in window ? requestIdleCallback(_sw) : window.addEventListener('load', _sw) }</script>
 
