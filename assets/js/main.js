@@ -1134,16 +1134,18 @@ function createCardScroller(scroller, options) {
   update();
   setTimeout(update, 500);
 
-  // Mobile: nudge the row left-and-back every few seconds to hint that
-  // it scrolls horizontally; pause while (and shortly after) the user
-  // interacts, and fire the first hint when the row enters the viewport.
+  // Mobile: nudge the row left-and-back to hint that it scrolls
+  // horizontally: once when the row first enters the viewport, and once
+  // more 6 s later only if the row is still untouched. The visitor's own
+  // scroll (finger, wheel, paddle or keyboard) ends the hint for good.
   if (window.innerWidth <= 1024 && !reduceMotion) {
     var hintDistance = 80;
     var duration = 250;
     var userScrolling = false;
     var isAnimating = false;
-    var scrollEndTimer = null;
     var hintInterval = null;
+    var hintsOver = false;   // the visitor has used the row
+    var hintsLeft = 2;
 
     var easeInOut = function (t) {
       return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
@@ -1165,7 +1167,8 @@ function createCardScroller(scroller, options) {
     };
 
     var runHint = function () {
-      if (userScrolling || isAnimating) return;
+      if (hintsOver || hintsLeft <= 0 || userScrolling || isAnimating) return;
+      hintsLeft--;
       var maxScrollLeft = scroller.scrollWidth - scroller.clientWidth;
       var atRightEnd = scroller.scrollLeft >= maxScrollLeft - 1;
       var dir = atRightEnd ? -1 : 1;
@@ -1193,10 +1196,12 @@ function createCardScroller(scroller, options) {
 
     var rowVisible = false;
     var startHintLoop = function () {
-      clearInterval(hintInterval);
+      clearTimeout(hintInterval);
       hintInterval = null;
-      // off screen nobody sees the nudge: it waits until the row is back
-      if (rowVisible) hintInterval = setInterval(runHint, 3000);
+      // off screen nobody sees the nudge: the second one waits until the row is back
+      if (rowVisible && !hintsOver && hintsLeft > 0) {
+        hintInterval = setTimeout(function () { hintInterval = null; runHint(); }, 6000);
+      }
     };
 
     var onUserScroll = function (e) {
@@ -1205,14 +1210,11 @@ function createCardScroller(scroller, options) {
       // and the nudge stops where it is on its next frame (it used to run on
       // and slide the row back under the finger).
       if (isAnimating && (!e || e.type === 'scroll')) return;
+      // the visitor has scrolled the row: no more hints for this visit
+      hintsOver = true;
       userScrolling = true;
-      clearInterval(hintInterval);
+      clearTimeout(hintInterval);
       hintInterval = null;
-      clearTimeout(scrollEndTimer);
-      scrollEndTimer = setTimeout(function () {
-        userScrolling = false;
-        startHintLoop();
-      }, 10000);
     };
 
     scroller.addEventListener('touchstart', function (e) {
@@ -1257,7 +1259,7 @@ function createCardScroller(scroller, options) {
       var started = !hintStarted && rowVisible && (firstCall || e.intersectionRatio >= 0.3);
       firstCall = false;
       if (!rowVisible) {
-        clearInterval(hintInterval);
+        clearTimeout(hintInterval);
         hintInterval = null;
       } else if (started) {
         hintStarted = true;
@@ -1330,10 +1332,17 @@ document.addEventListener('DOMContentLoaded', function () {
         btn.classList.add('active');
         btn.setAttribute('aria-pressed', 'true');
         var filter = btn.getAttribute('data-filter');
+        // the cards the filter shows fade in, so the change can be followed;
+        // opacity only, so it never fights the scroll reveal's transform
+        var fade = !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
         items.forEach(function (item) {
           // data-tech may hold several space-separated categories
           var tags = (item.getAttribute('data-tech') || '').split(/\s+/);
-          item.style.display = (filter === 'all' || tags.indexOf(filter) !== -1) ? '' : 'none';
+          var show = filter === 'all' || tags.indexOf(filter) !== -1;
+          item.style.display = show ? '' : 'none';
+          if (show && fade && item.animate) {
+            item.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 240, easing: 'cubic-bezier(.25,.1,.25,1)' });
+          }
         });
         var shown = Array.prototype.filter.call(items, function (it) { return it.style.display !== 'none'; }).length;
         status.textContent = 'Showing ' + shown + ' ' + noun[shown === 1 ? 0 : 1] +
@@ -1343,6 +1352,10 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 });
+
+// iOS Safari applies :active only where a touch listener exists: one on the
+// document gives every control its press state, not just the two scrollers
+document.addEventListener('touchstart', function () {}, { passive: true });
 
 // Hero animation now handled by CSS (@keyframes heroFadeIn) — no GSAP needed
 

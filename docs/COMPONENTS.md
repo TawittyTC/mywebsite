@@ -29,7 +29,8 @@
 สิ่งที่ได้อัตโนมัติเมื่อใส่ `data-card-scroller`:
 - ลูกศรเลื่อนทีละก้าว (ค่าเริ่ม 400px — ปรับได้ด้วย `data-scroller-step="480"`)
 - ลูกศร enable/disable ตามตำแหน่งซ้ายสุด/ขวาสุดเอง
-- มือถือ: การ์ดขยับซ้าย-กลับเป็นจังหวะเพื่อบอกว่าเลื่อนได้ และหยุดเมื่อผู้ใช้แตะเอง
+- มือถือและ iPad: แถวขยับซ้าย-กลับเพื่อบอกว่าเลื่อนได้ 2 ครั้ง (ตอนแถวเข้ามาในจอ และอีกครั้งหลัง 6 วินาทีถ้ายังไม่มีใครแตะ) แล้วหยุด; ถ้าผู้ใช้แตะหรือเลื่อนแถวเมื่อไหร่ ก็หยุดจนกว่าจะเปิดหน้าใหม่
+- เลื่อนจนสุดปลายแล้วเลื่อนต่อ แถวเด้งเอง ไม่ส่งการปัดต่อให้หน้าเว็บ (`overscroll-behavior-x: contain`)
 
 ลูกศรถูกหาจาก `[data-scroller-prev]` / `[data-scroller-next]` ภายใน `<section>`
 เดียวกัน (หนึ่ง section ต่อหนึ่ง scroller) — ควบคุมด้วยโค้ดได้ผ่าน
@@ -37,6 +38,9 @@
 หรือเรียก `createCardScroller(el, { prev, next, step })` เองก็ได้
 
 ## 2. Filter Chips (ปุ่มกรองการ์ดใน scroller — ใช้กับ section ไหนก็ได้)
+
+ใน `#skill` ปุ่มกลุ่มนี้แสดงเป็น segmented control: แถบเทาแถบเดียว ช่องที่เลือกเป็นก้อนขาวตัวหนังสือดำ
+การ์ดที่ตัวกรองแสดงจะค่อยๆ ชัดขึ้นใน 0.24 วินาที (ไม่จางเมื่อเปิด Reduce Motion)
 
 ใช้อยู่ที่: Projects — แต่เป็น component คู่กับ Card Scroller: วางกลุ่ม
 `.project-filters` ใน section ไหน มันจะกรอง **การ์ดของ section นั้นเท่านั้น**
@@ -71,19 +75,25 @@
 </div>
 ```
 
-- `data-open-exp` คือ id ของ `<template id="exp-…">` ที่ปุ่ม + เปิด; `data-client` เลือกลูกค้า (chip) หรือเลื่อนไปที่ `.exp-client-section` นั้น
-- งานมหาวิทยาลัยใช้ `<div class="project-img"><img …></div>` แทน `.work-icon` และปุ่ม + เปิดภาพหน้าจอ
+- `data-open-exp` คือ id ของ `<template id="exp-…">` ที่ปุ่มกลมเปิด; `data-client` เลือกลูกค้า (chip) หรือเลื่อนไปที่ `.exp-client-section` นั้น
+- สัญลักษณ์ในปุ่มกลมบอกว่าปุ่มทำอะไร: ลูกศรชี้ขวาเมื่อเปิดเรื่องราว (การ์ดโปรเจกต์และ Experience) ลูกศรขยายสองทางเมื่อเปิดภาพเต็มจอ (ภาพหน้าจอและใบรับรอง)
+- งานมหาวิทยาลัยใช้ `<div class="project-img"><img …></div>` แทน `.work-icon` และปุ่มกลม (ลูกศรขยาย) เปิดภาพหน้าจอ
 - "See all N projects" สร้างรายการจากการ์ดเหล่านี้เอง (แบ่งกลุ่มตาม eyebrow, แยกชื่อกับลูกค้าที่ ", ") จึงไม่ต้องแก้สองที่
 - คำที่มีขีดในชื่อ ห่อด้วย `<span class="nw">` เพื่อไม่ให้ตัดบรรทัดที่ขีด
 
-## 4. Skill Card (การ์ดไอคอน + หัวข้อ + คำอธิบาย)
+## 4. Skill Card (eyebrow + หัวข้อ + คำอธิบาย + เครื่องมือ + ภาพเส้นท้ายการ์ด)
+
+สูงเท่าการ์ดโปรเจกต์ทุกขนาดจอ (500 / 460px และ 392-430px บนมือถือ) ข้อความอยู่บน
+ภาพเส้นเป็นกรอบสี่เหลี่ยมขนาดคงที่ (202 / 172 / 72px) อยู่ท้ายการ์ด กึ่งกลาง
 
 ```html
 <!-- ต้องอยู่ใน <section id="skill"> หรือ section ที่มี override เดียวกัน -->
-<div class="rf-cards-scroller-item">
-  <img class="skill-icon" src="assets/img/icon/xxx.svg" alt="" loading="lazy">
-  <div class="title">Web Design</div>
-  <p class="skill-desc">UX/UI, Graphic &amp; Responsive Design</p>
+<div class="rf-cards-scroller-item" data-tech="web">
+  <svg class="skill-icon" viewBox="0 0 170 170" fill="none" aria-hidden="true">…</svg>  <!-- CSS วางไว้ท้ายการ์ด -->
+  <span class="skill-tag">Web</span>
+  <h3 class="title h3">Web Design</h3>
+  <p class="skill-desc fw-light">UX/UI, Graphic &amp; Responsive Design</p>
+  <ul class="skill-tools" aria-label="Tools"><li>UX/UI</li>…</ul>      <!-- อยู่ใต้คำอธิบายทันที -->
 </div>
 ```
 

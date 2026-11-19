@@ -636,3 +636,263 @@ test('content: the second scan of the Computer Repair Service certificate (No 10
   assert.deepEqual(requested.filter((u) => /img-24\.avif/.test(u)), []);
   await page.close();
 });
+
+/* ---- controls (v2.72.0, stage 4) ---- */
+
+/** Hold the mouse down on the centre of a selector's first match (it stays held). */
+async function press(page, sel) {
+  await page.$eval(sel, (el) => el.scrollIntoView({ block: 'center', behavior: 'instant' }));
+  await page.waitForTimeout(300);
+  const b = await page.$eval(sel, (el) => { const r = el.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
+  await page.mouse.move(b.x, b.y);
+  await page.mouse.down();
+  await page.waitForTimeout(450);
+}
+
+test('buttons > press state: a held "+" darkens and shrinks, its card gives way, links dim and rows tint (press-states)', async () => {
+  {
+    const { page } = await open({ ...MAC, reducedMotion: 'reduce' });
+    await press(page, '#portfolio .rf-cards-scroller-item .card-plus');
+    const plus = await page.$eval('#portfolio .rf-cards-scroller-item .card-plus', (b) => ({
+      bg: getComputedStyle(b).backgroundColor, t: getComputedStyle(b).transform, card: getComputedStyle(b.closest('.rf-cards-scroller-item')).transform,
+    }));
+    assert.deepEqual(plus, { bg: 'rgba(194, 194, 199, 0.655)', t: 'matrix(0.94, 0, 0, 0.94, 0, 0)', card: 'matrix(0.98, 0, 0, 0.98, 0, 0)' }, 'the held "+" looks like a hovered one');
+    await page.close();
+  }
+  {
+    const { page } = await open({ ...MAC, reducedMotion: 'reduce' });
+    await press(page, '#services .faq summary');
+    assert.equal(await page.$eval('#services .faq summary', (s) => getComputedStyle(s).backgroundColor), 'rgba(0, 0, 0, 0.05)', 'a held FAQ question does not change');
+    await page.close();
+  }
+  {
+    const { page } = await open({ ...MAC, reducedMotion: 'reduce' });
+    await press(page, '#portfolio button.more.proj-all');
+    assert.equal(await page.$eval('#portfolio button.more.proj-all', (b) => getComputedStyle(b).opacity), '0.6', 'a held "See all" link does not dim');
+    await page.close();
+  }
+  // a held row of the "All projects" list tints its whole band of the grouped list
+  const { page } = await open({ ...PHONE, reducedMotion: 'reduce' });
+  await page.$eval('[data-proj-all]', (el) => el.click());
+  await page.waitForSelector('.exp-lightbox.open .proj-row');
+  await page.waitForTimeout(400);
+  await press(page, '.exp-lightbox.open .proj-row');
+  const row = await page.$eval('.exp-lightbox.open .proj-row', (r) => {
+    const a = r.getBoundingClientRect(), g = r.closest('.proj-rows').getBoundingClientRect();
+    return { bg: getComputedStyle(r).backgroundColor, left: Math.round(a.left - g.left), right: Math.round(g.right - a.right), corner: getComputedStyle(r).borderTopLeftRadius };
+  });
+  assert.deepEqual(row, { bg: 'rgba(0, 0, 0, 0.05)', left: 0, right: 0, corner: '18px' }, 'the held row is not tinted edge to edge');
+  await page.close();
+});
+
+test('controls > segmented control: the four skill filters are one grey track; the chosen segment is a white thumb with dark text; all fit at 320px (skill-filter-segmented)', async () => {
+  {
+    const { page } = await open(MAC);
+    const s = await page.evaluate(() => {
+      const track = document.querySelector('#skill .project-filters');
+      const segs = [...track.querySelectorAll('.filter-btn')].map((b) => ({ w: Math.round(b.getBoundingClientRect().width * 10) / 10, bg: getComputedStyle(b).backgroundColor, c: getComputedStyle(b).color }));
+      const t = track.getBoundingClientRect();
+      return { track: getComputedStyle(track).backgroundColor, centred: Math.abs((t.left + t.right) / 2 - innerWidth / 2) < 2, segs };
+    });
+    assert.equal(s.track, 'rgb(232, 232, 237)');
+    assert.ok(s.centred, 'the track is not centred');
+    assert.equal(new Set(s.segs.map((x) => x.w)).size, 1, `the Mac segments differ in width: ${s.segs.map((x) => x.w).join(', ')}`);
+    assert.deepEqual([s.segs[0].bg, s.segs[0].c], ['rgb(255, 255, 255)', INK], 'the chosen segment is not a white thumb with dark text');
+    assert.deepEqual(s.segs.slice(1).map((x) => x.bg), Array(3).fill('rgba(0, 0, 0, 0)'));
+    // choosing Web moves the thumb; nothing is blue
+    await page.$eval('#skill .filter-btn[data-filter="web"]', (b) => b.click());
+    await page.waitForTimeout(400);
+    const after = await page.$$eval('#skill .filter-btn', (bs) => bs.map((b) => [getComputedStyle(b).backgroundColor, b.getAttribute('aria-pressed')]));
+    assert.deepEqual(after[1], ['rgb(255, 255, 255)', 'true']);
+    assert.equal(after[0][0], 'rgba(0, 0, 0, 0)');
+    await page.close();
+  }
+  const { page } = await open(SMALL);
+  const r = await page.evaluate(() => {
+    const wrap = document.querySelector('#skill .project-filters-wrap');
+    const segs = [...wrap.querySelectorAll('.filter-btn')].map((b) => { const x = b.getBoundingClientRect(); return { l: x.left, r: x.right, w: x.width, h: x.height, clip: b.scrollWidth > b.clientWidth }; });
+    return { wrap: wrap.scrollWidth - wrap.clientWidth, page: document.documentElement.scrollWidth - innerWidth, segs };
+  });
+  assert.equal(r.wrap, 0, 'the filter row scrolls sideways at 320px');
+  assert.equal(r.page, 0);
+  for (const s of r.segs) {
+    assert.ok(s.l >= 0 && s.r <= 320, 'a segment runs off a 320px screen');
+    assert.ok(s.w >= 44 && s.h >= 44, `a segment is ${s.w}x${s.h}, under 44pt`);
+    assert.ok(!s.clip, 'a segment label is cut');
+  }
+  await page.close();
+});
+
+test('controls > hover: a pointed-at skill segment tints light grey, never blue and never larger (filter-hover-tint, as the segmented control)', async () => {
+  const { page } = await open(MAC);
+  const web = page.locator('#skill .filter-btn[data-filter="web"]');
+  await web.scrollIntoViewIfNeeded();
+  await web.hover();
+  await page.waitForTimeout(500);
+  await settle(web);
+  const s = await page.$$eval('#skill .filter-btn', (bs) => bs.map((b) => [getComputedStyle(b).backgroundColor, getComputedStyle(b).color, getComputedStyle(b).transform]));
+  assert.deepEqual(s[1], ['rgba(0, 0, 0, 0.04)', INK, 'none'], `the hovered segment is ${s[1].join(' / ')}`);
+  assert.equal(s[0][0], 'rgb(255, 255, 255)', 'the chosen segment changed while another was hovered');
+  assert.equal(s.filter((x) => x[0] === BLUE).length, 0, 'a segment is blue');
+  await page.close();
+});
+
+test('motion > the cards a skill filter shows fade in over 240ms; hidden ones go at once; none under Reduce Motion (skill-filter-fade-in)', async () => {
+  for (const [rm, fades] of [['no-preference', true], ['reduce', false]]) {
+    const { page } = await open({ ...MAC, reducedMotion: rm });
+    await page.$eval('#skill', (el) => el.scrollIntoView());
+    await page.waitForTimeout(600);
+    await page.$eval('#skill .filter-btn[data-filter="ai"]', (b) => b.click());
+    const s = await page.evaluate(() => [...document.querySelectorAll('#skill .rf-cards-scroller-item')].map((c) => ({
+      shown: c.style.display !== 'none',
+      fade: c.getAnimations().filter((a) => a.effect && a.effect.getKeyframes().some((k) => k.opacity !== undefined)).map((a) => a.effect.getTiming().duration),
+    })));
+    const shown = s.filter((c) => c.shown), hidden = s.filter((c) => !c.shown);
+    assert.ok(shown.length >= 1 && hidden.length >= 1);
+    assert.deepEqual(hidden.map((c) => c.fade.length), hidden.map(() => 0), 'a hidden card fades');
+    if (fades) assert.deepEqual(shown.map((c) => c.fade), shown.map(() => [240]), 'a shown card does not fade in over 240ms');
+    else assert.deepEqual(shown.map((c) => c.fade.length), shown.map(() => 0), 'a card fades under Reduce Motion');
+    await page.waitForTimeout(400);
+    assert.deepEqual(await page.$$eval('#skill .rf-cards-scroller-item', (cs) => cs.filter((c) => c.style.display !== 'none' && getComputedStyle(c).opacity !== '1').length), 0, 'a card stays faded');
+    await page.close();
+  }
+});
+
+test('controls > disclosure: the FAQ and the folded clients end in a blue chevron that points right, and down when open (faq-disclosure-chevron)', async () => {
+  for (const [where, opts, mt] of [['Mac', MAC, '5px'], ['iPhone', PHONE, '4px']]) {
+    const { page } = await open(opts);
+    await page.$eval('#services .faq details', (d) => { d.open = true; });
+    await page.waitForTimeout(400);
+    const [open1, closed] = await page.$$eval('#services .faq summary', (ss) => ss.slice(0, 2).map((s) => {
+      const st = getComputedStyle(s, '::after');
+      return { w: st.width, h: st.height, t: st.transform, mt: st.marginTop, chev: /viewBox='0 0 8 14'/.test(st.maskImage || st.webkitMaskImage) };
+    }));
+    assert.deepEqual(closed, { w: '10px', h: '16px', t: 'none', mt, chev: true }, `${where}: a closed question's indicator`);
+    assert.deepEqual(open1, { w: '10px', h: '16px', t: 'matrix(0, 1, -1, 0, 0, 0)', mt, chev: true }, `${where}: an open question's chevron does not point down`);
+    if (where === 'iPhone') {
+      // the folded client rows in the Experience sheet
+      await page.$eval('#experience [data-exp="protollcall"] .exp-card-cta', (el) => el.click());
+      await page.waitForSelector('.exp-lightbox.open .exp-clients-folded .exp-client-section-header');
+      const hs = page.locator('.exp-lightbox.open .exp-clients-folded .exp-client-section-header');
+      await hs.nth(1).click();
+      await page.waitForTimeout(500);
+      const rows = await hs.evaluateAll((els) => els.slice(0, 2).map((h) => { const s = getComputedStyle(h, '::after'); return [s.width, s.height, s.transform, /viewBox='0 0 8 14'/.test(s.maskImage || s.webkitMaskImage)]; }));
+      assert.deepEqual(rows, [['10px', '16px', 'none', true], ['10px', '16px', 'matrix(0, 1, -1, 0, 0, 0)', true]], 'the folded client rows');
+    }
+    await page.close();
+  }
+});
+
+test('icons > the round corner button shows what it does: a chevron where it opens a story, an expand mark where it opens a picture (plus-glyph-matches-action)', async () => {
+  const { page } = await open(MAC);
+  const r = await page.evaluate(() => {
+    const d = (el) => el.querySelector('path').getAttribute('d');
+    const plus = (s) => /^m24 16\.5h-4\.5/.test(s);
+    const cards = [...document.querySelectorAll('#portfolio .card-plus')];
+    const shots = cards.filter((b) => /^View screenshot/.test(b.getAttribute('aria-label')));
+    const stories = cards.filter((b) => /^Read more/.test(b.getAttribute('aria-label')));
+    const exp = [...document.querySelectorAll('#experience .exp-card-btn')];
+    const cert = getComputedStyle(document.querySelector('#images-list .cert-expand-btn'), '::before');
+    return {
+      plus: [...document.querySelectorAll('svg path')].filter((p) => plus(p.getAttribute('d') || '')).length,
+      stories: stories.length, storyChevron: stories.filter((b) => /^M14\.14 12\.01L20\.54 18\.64/.test(d(b))).length,
+      shots: shots.length, shotExpand: shots.filter((b) => d(b) === 'M19.5 16.5 24.5 11.5M20 11.5h4.5V16M16.5 19.5 11.5 24.5M11.5 20v4.5H16' && b.querySelector('path').getAttribute('fill') === 'none').length,
+      exp: exp.length, expChevron: exp.filter((b) => /^M14\.14 12\.01L20\.54 18\.64/.test(d(b))).length,
+      certExpand: /M19\.5 16\.5 24\.5 11\.5/.test(cert.maskImage || cert.webkitMaskImage),
+      size: [...new Set(cards.map((b) => b.offsetWidth))],
+    };
+  });
+  assert.equal(r.plus, 0, 'a "+" glyph is left');
+  assert.deepEqual([r.stories, r.storyChevron], [54, 54]);
+  assert.deepEqual([r.shots, r.shotExpand], [4, 4]);
+  assert.deepEqual([r.exp, r.expChevron], [3, 3]);
+  assert.ok(r.certExpand, 'the certificate corner is not the expand mark');
+  assert.deepEqual(r.size, [36], 'the round button changed size');
+  await page.close();
+});
+
+test('icons > one line weight: the project drawings are drawn lighter and the service drawings heavier, to meet on screen (icon-stroke-match)', async () => {
+  const { page } = await open(MAC);
+  // rendered line = stroke-width x the drawing's scale on screen
+  const w = await page.evaluate(() => {
+    // the first drawing that is laid out (offsetWidth ignores the scroll reveal's scale)
+    const px = (sel) => {
+      const p = [...document.querySelectorAll(sel)].find((e) => e.ownerSVGElement.clientWidth > 0);
+      const svg = p.ownerSVGElement;
+      return parseFloat(getComputedStyle(p).strokeWidth) * svg.clientWidth / svg.viewBox.baseVal.width;
+    };
+    return {
+      svc: parseFloat(getComputedStyle(document.querySelector(".svc-icon svg [stroke-width='5']")).strokeWidth),
+      work: [4, 5, 6].map((n) => { const el = document.querySelector(`.work-icon svg [stroke-width='${n}']`); return el ? parseFloat(getComputedStyle(el).strokeWidth) : null; }),
+      svcPx: px(".svc-icon svg [stroke-width='5']"), workPx: px(".work-icon svg [stroke-width='5']"),
+    };
+  });
+  assert.equal(w.svc, 6.3);
+  assert.deepEqual(w.work.filter((x) => x !== null), [3.5, 4.4, 5.25].filter((_, i) => w.work[i] !== null));
+  assert.ok(Math.abs(w.svcPx - w.workPx) / w.workPx < 0.05, `on a Mac the service lines (${w.svcPx.toFixed(2)}px) and project lines (${w.workPx.toFixed(2)}px) differ`);
+  await page.close();
+});
+
+test('scroll views > a card row past its last card bounces on its own and never hands the swipe to the page (scroller-overscroll-contain)', async () => {
+  const { page } = await open(PHONE);
+  assert.deepEqual(await page.$$eval('#scroller, #skill-scroller', (els) => els.map((e) => getComputedStyle(e).overscrollBehaviorX)), ['contain', 'contain']);
+  await page.close();
+});
+
+test('motion > the project row nudges once as it comes into view and once more 6s later, then stops (nudge-stops-after-use)', async () => {
+  const { page } = await open(PHONE);
+  await page.$eval('#scroller', (el) => el.scrollIntoView({ block: 'center' }));
+  // count the times the row leaves its resting place in the next 10s (it nudged every 3s before)
+  const starts = await page.$eval('#scroller', (el) => new Promise((resolve) => {
+    // the row rests at its start; a nudge takes it about 80px out and back in 0.5s
+    const t0 = performance.now(), out = [];
+    let away = false;
+    (function tick() {
+      const off = el.scrollLeft > 10, t = performance.now() - t0;
+      if (off && !away && !(out.length && t / 1000 - out[out.length - 1] < 1)) out.push(Math.round(t / 100) / 10);
+      away = off;
+      if (performance.now() - t0 < 10000) requestAnimationFrame(tick); else resolve(out);
+    })();
+  }));
+  assert.equal(starts.length, 2, `the row nudged at ${starts.join(', ')}s`);
+  assert.ok(Math.abs(starts[1] - starts[0] - 6) < 0.6, `the second nudge came ${(starts[1] - starts[0]).toFixed(1)}s after the first`);
+  await page.close();
+});
+
+test('layout > the Skills cards are as tall as the Projects cards, words on top and the drawing at the foot, every card whole (q-skills-card)', async () => {
+  for (const [w, icon] of [[320, 72], [390, 72], [430, 72], [768, 172], [1440, 202]]) {
+    const { page } = await open({ viewport: { width: w, height: 900 }, isMobile: w < 1024, hasTouch: w < 1024, reducedMotion: 'reduce' });
+    await page.evaluate(() => document.fonts.ready);
+    const r = await page.evaluate(() => {
+      const proj = document.querySelector('#portfolio .rf-cards-scroller-item').offsetHeight;
+      const cards = [...document.querySelectorAll('#skill .rf-cards-scroller-item')].map((c) => {
+        const q = (s) => c.querySelector(s).getBoundingClientRect(), cr = c.getBoundingClientRect();
+        const [tag, title, desc, tools, ic] = ['.skill-tag', '.title', '.skill-desc', '.skill-tools', '.skill-icon'].map(q);
+        return {
+          name: c.querySelector('.title').textContent.trim(), h: c.offsetHeight, icon: [Math.round(ic.width), Math.round(ic.height)],
+          order: tag.bottom <= title.top + 0.5 && title.bottom <= desc.top + 0.5 && desc.bottom <= tools.top + 0.5 && tools.bottom <= ic.top + 0.5,
+          toolsUnder: Math.round(tools.top - desc.bottom), centred: Math.abs((ic.left + ic.right) / 2 - (cr.left + cr.right) / 2) < 1,
+          inside: [tag, title, desc, tools, ic].every((b) => b.left >= cr.left - 0.5 && b.right <= cr.right + 0.5 && b.bottom <= cr.bottom + 0.5),
+          cut: [...c.querySelectorAll('.skill-tag, .title, .skill-desc, .skill-tools li')].filter((e) => e.scrollWidth > e.clientWidth + 1 || e.scrollHeight > e.clientHeight + 1).length,
+        };
+      });
+      return { proj, cards, sideways: document.documentElement.scrollWidth - innerWidth };
+    });
+    assert.equal(r.sideways, 0, `${w}px: the page scrolls sideways`);
+    assert.equal(r.cards.length, 12);
+    for (const c of r.cards) {
+      assert.equal(c.h, r.proj, `${w}px: ${c.name} is ${c.h}px tall, the project cards ${r.proj}px`);
+      assert.ok(c.order, `${w}px: ${c.name} is not eyebrow, title, description, tools, drawing from the top`);
+      assert.equal(c.toolsUnder, 0, `${w}px: ${c.name}'s tools are not right under its description`);
+      assert.deepEqual(c.icon, [icon, icon], `${w}px: ${c.name}'s drawing is not a ${icon}px square`);
+      assert.ok(c.centred && c.inside, `${w}px: ${c.name}'s parts are off centre or past the card's edge`);
+      assert.equal(c.cut, 0, `${w}px: ${c.name} has cut text`);
+    }
+    // a filter keeps the height (skill-filter-segmented, skill-filter-fade-in)
+    await page.$eval('#skill .filter-btn[data-filter="ai"]', (b) => b.click());
+    await page.waitForTimeout(400);
+    const hs = await page.$$eval('#skill .rf-cards-scroller-item', (cs) => cs.filter((c) => c.style.display !== 'none').map((c) => c.offsetHeight));
+    assert.ok(hs.length >= 1 && hs.every((h) => h === r.proj), `${w}px: filtered cards are ${hs.join(', ')}px tall`);
+    await page.close();
+  }
+});
