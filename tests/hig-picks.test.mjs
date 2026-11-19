@@ -253,3 +253,227 @@ test('launching > loading: no white loader; the hero shows at once and nothing f
     }
   }
 });
+
+const MAC = { viewport: { width: 1440, height: 900 } };
+const GREY = 'rgb(110, 110, 115)', GREY_SMALL = 'rgb(81, 81, 84)', GREY_MORE = 'rgb(58, 58, 60)';
+const BLUE = 'rgb(18, 100, 206)', BLUE_MORE = 'rgb(10, 77, 163)', BLUE_HOVER = 'rgb(15, 87, 181)', INK = 'rgb(29, 29, 31)';
+/** Computed colour of each selector's first match (hidden ones too: the sheets are in the page). */
+/** Wait until the hover transitions on a locator's element have run out. */
+const settle = (loc) => loc.evaluate((el) => Promise.all(el.getAnimations().map((a) => a.finished)));
+/** The grey "(KBAO)"-style aside after a client's name, in the Experience sheet (an inline colour). */
+async function clientAside(page) {
+  await page.$eval('#experience [data-exp="protollcall"] .exp-card-cta', (el) => el.click());
+  await page.waitForSelector('.exp-lightbox.open .exp-client-section-header h3 span[style]');
+  return page.$eval('.exp-lightbox.open .exp-client-section-header h3 span[style]', (el) => getComputedStyle(el).color);
+}
+const colours = (page, sels) => page.evaluate((sels) => Object.fromEntries(Object.entries(sels).map(([k, s]) => {
+  const el = document.querySelector(s);
+  return [k, el ? getComputedStyle(el).color : 'missing'];
+})), sels);
+
+test('color > Increase Contrast: grey text and link blue get darker variants; the default look stays (increased-contrast-tokens)', async () => {
+  const sels = {
+    role: '#hero .hero-role > [aria-hidden]',   // 20px grey
+    typed: '#hero .typed',                      // the typed role word, still blue (blue-for-interactive-only, closest)
+    more: '#hero a.more',
+    cv: '#resume a.resume-exp-link[download]',  // an inline colour in the page
+    footMail: 'footer .footer-contact-link',    // another inline colour
+    footName: '.footer-copy-link',
+    duration: '.exp-duration',                  // small grey (small-text-7-to-1) follows to the same dark grey
+    statLabel: '.exp-stat-label',
+    ctaSub: '.cta-sub',
+  };
+  for (const [where, opts] of [['iPhone', PHONE], ['Mac', MAC]]) {
+    const def = await open(opts);
+    const d = await colours(def.page, sels);
+    d.clientAside = await clientAside(def.page);
+    await def.page.close();
+    for (const k of ['role', 'clientAside']) assert.equal(d[k], GREY, `${where}: ${k} changed in the default look`);
+    for (const k of ['typed', 'more', 'cv', 'footMail', 'footName']) assert.equal(d[k], BLUE, `${where}: ${k} changed in the default look`);
+    assert.equal(d.ctaSub, 'rgb(99, 99, 102)', `${where}: the contact subline changed in the default look`);
+    const { page } = await open({ ...opts, contrast: 'more' });
+    const c = await colours(page, sels);
+    for (const k of ['role', 'duration', 'statLabel', 'ctaSub']) assert.equal(c[k], GREY_MORE, `${where}, Increase Contrast: ${k} is ${c[k]}`);
+    for (const k of ['typed', 'more', 'cv', 'footMail', 'footName']) assert.equal(c[k], BLUE_MORE, `${where}, Increase Contrast: ${k} is ${c[k]}`);
+    // the pill follows the same tokens, resting and under the pointer
+    assert.equal(await page.$eval('#hero .btn-pill', (b) => getComputedStyle(b).backgroundColor), BLUE_MORE);
+    if (where === 'Mac') {
+      const pill = page.locator('#hero .btn-pill');
+      await pill.hover();
+      await settle(pill);
+      assert.equal(await pill.evaluate((b) => getComputedStyle(b).backgroundColor), 'rgb(8, 63, 134)', 'the hovered pill under Increase Contrast');
+    }
+    assert.equal(await clientAside(page), GREY_MORE, `${where}, Increase Contrast: the client aside in the sheet`);
+    await page.close();
+  }
+  // the first paint already has the darker tokens (the hero's copies in index.html)
+  const page = await ctx.browser.newPage({ ...PHONE, serviceWorkers: 'block', contrast: 'more' });
+  await page.route((u) => !u.href.startsWith(ctx.srv.url) || /style\.min\.css/.test(u.href), (r) => r.abort());
+  await page.goto(ctx.srv.url + '/index.html', { waitUntil: 'load' });
+  const first = await colours(page, { role: '#hero .hero-role > [aria-hidden]', eyebrow: '#hero .hero-eyebrow', more: '#hero a.more' });
+  assert.deepEqual(first, { role: GREY_MORE, eyebrow: GREY_MORE, more: BLUE_MORE }, 'the hero before style.css lands, under Increase Contrast');
+  await page.close();
+});
+
+test('color > contrast: grey text at 14px and below on the page reaches 7:1; larger grey stays #6E6E73 (small-text-7-to-1)', async () => {
+  const small = {
+    eyebrow: '#hero .hero-eyebrow', label: '.hero-net-label', info: '#resume .info-label', duration: '.exp-duration',
+    stat: '.exp-stat-label', clients: '.exp-clients-line', tagline: 'footer .col-md-4 .fw-light',
+  };
+  for (const [where, opts] of [['iPhone', PHONE], ['Mac', MAC]]) {
+    const { page } = await open(opts);
+    const c = await page.evaluate((small) => Object.fromEntries(Object.entries(small).map(([k, s]) => {
+      const el = document.querySelector(s);
+      let bg = 'rgb(255, 255, 255)';
+      for (let p = el; p; p = p.parentElement) {
+        const b = getComputedStyle(p).backgroundColor;
+        if (b !== 'rgba(0, 0, 0, 0)' && !/, 0\)$/.test(b)) { bg = b; break; }
+      }
+      return [k, { color: getComputedStyle(el).color, size: parseFloat(getComputedStyle(el).fontSize), bg }];
+    })), small);
+    for (const [k, v] of Object.entries(c)) {
+      assert.ok(v.size <= 14.5, `${where}: ${k} is ${v.size}px, not small text`);
+      assert.equal(v.color, GREY_SMALL, `${where}: ${k} is ${v.color}`);
+      assert.ok(contrast(rgbOf(v.color), rgbOf(v.bg)) >= 7, `${where}: ${k} is ${contrast(rgbOf(v.color), rgbOf(v.bg)).toFixed(2)}:1 on ${v.bg}`);
+    }
+    // the Education and role-period lines are 13px only on phones, and only there take the darker grey
+    const edu = await page.$eval('#resume p.profile-bio-small', (el) => ({ color: getComputedStyle(el).color, size: parseFloat(getComputedStyle(el).fontSize) }));
+    assert.equal(edu.color, edu.size <= 14.5 ? GREY_SMALL : GREY, `${where}: an Education line at ${edu.size}px is ${edu.color}`);
+    assert.equal(await page.$eval('#hero .hero-role > [aria-hidden]', (el) => getComputedStyle(el).color), GREY, `${where}: the 20px role line left #6E6E73`);
+    await page.close();
+  }
+});
+
+test('color > blue is for what can be tapped: no blue text that is not a link or button, but the typed role (blue-for-interactive-only, closest)', async () => {
+  for (const [where, opts] of [['iPhone', PHONE], ['Mac', MAC]]) {
+    const { page } = await open({ ...opts, reducedMotion: 'reduce' });   // the role shows whole words
+    const blue = await page.evaluate((BLUE) => {
+      const out = new Set();
+      const walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      for (let n; (n = walk.nextNode());) {
+        const el = n.parentElement;
+        if (!n.nodeValue.trim() || !el || el.closest('a, button, [role="button"], template, noscript, .exp-lightbox, .proj-sheet, [hidden]')) continue;
+        const r = el.getBoundingClientRect();
+        if (r.width < 2 || r.height < 2 || el.closest('.visuallyhidden')) continue;   // screen-reader text is not seen
+        if (getComputedStyle(el).visibility !== 'visible' || getComputedStyle(el).color !== BLUE) continue;
+        out.add((el.closest('.typed, .exp-clients-more') || el).className || el.tagName);
+      }
+      return [...out].sort();
+    }, BLUE);
+    assert.deepEqual(blue, ['exp-clients-more', 'typed'], `${where}: blue text that cannot be tapped: ${blue.join(', ')}`);
+    const r = await page.evaluate(() => {
+      const chip = [...document.querySelectorAll('#resume .exp-card-highlights .hl')].find((h) => /Full-Stack/.test(h.textContent));
+      const near = chip.nextElementSibling;
+      const cs = (el) => getComputedStyle(el);
+      return {
+        chip: [cs(chip).color, cs(chip).backgroundColor], near: [cs(near).color, cs(near).backgroundColor],
+        location: cs(document.querySelector('#resume .contact-strip div.info-item .info-icon')).color,
+        phone: cs(document.querySelector('#resume .contact-strip a.info-item .info-icon')).color,
+        active: cs(document.querySelector('.exp-status-active')).color,
+        activeTint: cs(document.querySelector('.exp-status-active')).backgroundColor,
+        sup: cs(document.querySelector('.stat-sup')).color,
+        tag: cs(document.querySelector('#skill .skill-tag')).color,
+        typed: cs(document.querySelector('#hero .typed')).color,
+      };
+    });
+    assert.deepEqual(r.chip, r.near, `${where}: the Full-Stack Developer chip differs from AI Engineer beside it`);
+    assert.deepEqual(r.chip, [INK, 'rgb(255, 255, 255)']);
+    assert.equal(r.location, GREY, `${where}: the Location pin`);
+    assert.equal(r.phone, BLUE, `${where}: the Phone tile is a link and keeps its blue glyph`);
+    assert.equal(r.active, INK);
+    assert.equal(r.activeTint, 'rgba(18, 100, 206, 0.08)', `${where}: the Active tint was meant to stay`);
+    assert.equal(r.sup, INK);
+    assert.equal(r.tag, where === 'iPhone' ? GREY_SMALL : GREY, `${where}: the skill tag`);
+    assert.equal(r.typed, BLUE, `${where}: the typed role word stays blue (closest)`);
+    await page.close();
+  }
+});
+
+test('color > hover: a pointed-at link or button goes darker, not lighter (link-hover-darker)', async () => {
+  const { page } = await open(MAC);
+  const pill = page.locator('#hero .btn-pill');
+  await pill.hover();
+  await settle(pill);
+  assert.equal(await pill.evaluate((b) => getComputedStyle(b).backgroundColor), BLUE_HOVER);
+  await page.$eval('#services .faq a[href*="linkedin"]', (a) => { a.closest('details').open = true; });
+  const faq = page.locator('#services .faq a[href*="linkedin"]').first();
+  await faq.scrollIntoViewIfNeeded();
+  assert.equal(await faq.evaluate((a) => getComputedStyle(a).color), BLUE, 'the resting link blue changed');
+  await faq.hover();
+  await settle(faq);
+  const c = await faq.evaluate((a) => getComputedStyle(a).color);
+  assert.equal(c, BLUE_HOVER);
+  assert.ok(contrast(rgbOf(c), [245, 245, 247]) >= 4.5, `the hovered FAQ link is ${contrast(rgbOf(c), [245, 245, 247]).toFixed(2)}:1`);
+  const icon = page.locator('.social-links-footer a').first();
+  await icon.scrollIntoViewIfNeeded();
+  await icon.hover();
+  await settle(icon);
+  assert.equal(await icon.evaluate((a) => getComputedStyle(a).color), BLUE_HOVER, 'a hovered footer icon');
+  await page.close();
+});
+
+test('accessibility > focus: every keyboard ring is the system ring, in each control\'s own shape (system-focus-ring)', async () => {
+  const ring = (page, sel, of) => page.$eval(sel, (el, of) => {
+    const t = of ? el.closest(of) : el, cs = getComputedStyle(t);
+    return { fv: el.matches(':focus-visible'), style: cs.outlineStyle, color: cs.outlineColor, text: cs.color, offset: cs.outlineOffset, radius: cs.borderRadius };
+  }, of);
+  const { page } = await open({ ...MAC, reducedMotion: 'reduce' });
+  await page.keyboard.press('Tab');   // keyboard modality
+  for (const [sel, of, offset, radius] of [
+    ['#hero .btn-pill', null, '3px', '980px'], ['#hero a.more', null, '3px', '6px'],
+    ['#scroller .card-plus[tabindex="0"]', '.rf-cards-scroller-item', '3px', null],
+    ['#images-list button.cert-img[tabindex="0"]', '.cert-card', '3px', null],
+    ['#services .faq summary', null, '0px', '14px'],
+  ]) {
+    await page.focus(sel);
+    await page.waitForTimeout(250);
+    const r = await ring(page, sel, of);
+    assert.ok(r.fv, `${sel} is not :focus-visible`);
+    assert.equal(r.style, 'auto', `${sel}${of ? ' (its ' + of + ')' : ''} draws a ${r.style} ring`);
+    assert.notEqual(r.color, r.text, `${sel}: the ring takes the text colour (white on the white-text pill)`);
+    assert.equal(r.offset, offset, `${sel}: ring offset`);
+    if (radius) assert.equal(r.radius, radius, `${sel}: the ring lost the control's shape`);
+  }
+  // the scroller paddles
+  const pad = await page.evaluate(() => {
+    const b = [...document.querySelectorAll('.paddlenav-arrow')].find((x) => !x.disabled && x.getClientRects().length);
+    b.focus();
+    return { style: getComputedStyle(b).outlineStyle, offset: getComputedStyle(b).outlineOffset };
+  });
+  assert.deepEqual(pad, { style: 'auto', offset: '3px' }, 'a focused paddle');
+  await page.close();
+  // the client toggle in the Experience sheet (phones)
+  const ph = await open({ ...PHONE, reducedMotion: 'reduce' });
+  await ph.page.keyboard.press('Tab');
+  await ph.page.$eval('#experience [data-exp="protollcall"] .exp-card-cta', (el) => el.click());
+  await ph.page.waitForSelector('.exp-lightbox.open');
+  await ph.page.focus('.exp-client-toggle');
+  await ph.page.waitForTimeout(250);
+  const t = await ring(ph.page, '.exp-client-toggle');
+  assert.equal(t.style, 'auto', 'the client toggle in the sheet');
+  assert.equal(t.offset, '3px');
+  await ph.page.close();
+});
+
+test('color > not by colour alone: the name in the copyright line is underlined at rest (footer-link-underline)', async () => {
+  for (const [where, opts] of [['small phone', SMALL], ['iPhone', PHONE], ['Mac', MAC]]) {
+    const { page } = await open(opts);
+    const r = await page.$eval('.footer-copy-link', (a) => {
+      const cs = getComputedStyle(a);
+      return { line: cs.textDecorationLine, thick: cs.textDecorationThickness, off: parseFloat(cs.textUnderlineOffset) / parseFloat(cs.fontSize), color: cs.color };
+    });
+    assert.equal(r.line, 'underline', `${where}: no underline at rest`);
+    assert.equal(r.thick, '1px', `${where}: underline thickness`);
+    assert.ok(Math.abs(r.off - 0.2) < 0.01, `${where}: underline offset is ${r.off.toFixed(3)}em`);
+    assert.equal(r.color, BLUE, `${where}: the name changed colour`);
+    if (where === 'Mac') {
+      // under the pointer it behaves like the site's other links: darker, without the line
+      const a = page.locator('.footer-copy-link');
+      await a.scrollIntoViewIfNeeded();
+      await a.hover();
+      await settle(a);
+      assert.deepEqual(await a.evaluate((el) => [getComputedStyle(el).textDecorationLine, getComputedStyle(el).color]), ['none', BLUE_HOVER]);
+    }
+    await page.close();
+  }
+});

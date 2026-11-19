@@ -208,13 +208,13 @@ test('collections: one Tab stop per collection, and the arrow keys move inside i
   await page.close();
 });
 
-test('focus: a focused card or certificate is outlined whole, and a focused See-all row fills', async () => {
+test('focus: a focused card or certificate is outlined whole in the system ring, and a focused See-all row fills', async () => {
   const { page } = await ctx.openPage({ reducedMotion: 'reduce' });
   await page.keyboard.press('Tab');   // keyboard modality
   await page.focus('#scroller .card-plus[tabindex="0"]');
-  assert.equal(await page.$eval('#scroller .card-plus[tabindex="0"]', (b) => getComputedStyle(b.closest('.rf-cards-scroller-item')).outlineStyle), 'solid');
+  assert.equal(await page.$eval('#scroller .card-plus[tabindex="0"]', (b) => getComputedStyle(b.closest('.rf-cards-scroller-item')).outlineStyle), 'auto');
   await page.focus('#images-list button.cert-img[tabindex="0"]');
-  assert.equal(await page.$eval('#images-list button.cert-img[tabindex="0"]', (b) => getComputedStyle(b.closest('.cert-card')).outlineStyle), 'solid');
+  assert.equal(await page.$eval('#images-list button.cert-img[tabindex="0"]', (b) => getComputedStyle(b.closest('.cert-card')).outlineStyle), 'auto');
   await page.$eval('[data-proj-all]', (el) => el.click());
   await page.waitForSelector('.proj-row');
   await page.focus('.proj-row[tabindex="0"]');
