@@ -270,7 +270,7 @@ const GREY = 'rgb(110, 110, 115)', GREY_SMALL = 'rgb(81, 81, 84)', GREY_MORE = '
 const BLUE = 'rgb(18, 100, 206)', BLUE_MORE = 'rgb(10, 77, 163)', BLUE_HOVER = 'rgb(15, 87, 181)', INK = 'rgb(29, 29, 31)';
 /** Computed colour of each selector's first match (hidden ones too: the sheets are in the page). */
 /** Wait until the hover transitions on a locator's element have run out. */
-const settle = (loc) => loc.evaluate((el) => Promise.all(el.getAnimations().map((a) => a.finished)));
+const settle = (loc) => loc.evaluate((el) => Promise.all(el.getAnimations().map((a) => a.finished.catch(() => {}))));
 /** The grey "(KBAO)"-style aside after a client's name, in the Experience sheet (an inline colour). */
 async function clientAside(page) {
   await page.$eval('#experience [data-exp="protollcall"] .exp-card-cta', (el) => el.click());
@@ -536,6 +536,19 @@ test('typography > legibility: on phones the reading paragraphs step up from 13p
       assert.deepEqual([x.size, x.lh], [15, 20], `${where}: ${sel} is ${x.size}/${x.lh}`);
     }
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth), 0, `${where}: the page scrolls sideways`);
+    await page.close();
+  }
+  // the larger text does not split the citation's "July–December." at its en dash
+  for (const width of [375, 390, 393]) {
+    const { page } = await open({ viewport: { width, height: 800 } });
+    const lines = await page.$$eval('#resume p.profile-bio-small .nw', (els) => {
+      const el = els.find((e) => e.textContent === 'July\u2013December.');
+      if (!el) return 0;
+      const r = document.createRange();
+      r.selectNodeContents(el);
+      return new Set([...r.getClientRects()].map((q) => Math.round(q.top))).size;
+    });
+    assert.equal(lines, 1, `${width}px: "July–December." breaks over ${lines} lines`);
     await page.close();
   }
   // the Mac keeps its sizes
@@ -1013,6 +1026,13 @@ test('modality > the sheet stays short: on iPad and Mac too each client folds to
     const opened = await page.$$eval('.exp-lightbox.open .exp-client-section', (ss) =>
       ss.filter((s) => getComputedStyle(s.querySelector('ul')).display !== 'none').map((s) => s.dataset.client));
     assert.deepEqual(opened, ['kasikorn'], `${where}: clicking the second row opened ${opened.join(', ')}`);
+    // the row's padding opens it too, not only the header strip
+    const third = page.locator('.exp-lightbox.open .exp-client-section').nth(2);
+    await third.scrollIntoViewIfNeeded();
+    const box = await third.boundingBox();
+    await page.mouse.click(box.x + box.width - 12, box.y + box.height - 10);
+    assert.equal(await third.evaluate((s) => s.classList.contains('is-open')), true,
+      `${where}: a click in the third row's bottom padding left it closed`);
     assert.deepEqual(errors, []);
     await page.close();
   }

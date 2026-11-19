@@ -654,7 +654,10 @@ var overlayHistory = (function () {
           while (h3.firstChild) btn.appendChild(h3.firstChild);
           h3.appendChild(btn);
           heads.push(head);
-          head.addEventListener('click', function () {
+          // folded, the whole row (its padding too) opens it; open, only the
+          // header closes it, so taps in the story text do nothing
+          sec.addEventListener('click', function (e) {
+            if (sec.classList.contains('is-open') && !head.contains(e.target)) return;
             btn.setAttribute('aria-expanded', String(sec.classList.toggle('is-open')));
           });
         });
