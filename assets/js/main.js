@@ -2556,10 +2556,10 @@ document.addEventListener('DOMContentLoaded', function () {
 })();
 
 /**
- * BizCard — Apple Card-style 3D tilt.
- * Fine pointers tilt the card directly; elsewhere it sways gently on
- * its own. A specular glare tracks the tilt via --gx/--gy. Runs only
- * while visible; skipped entirely under reduced motion.
+ * BizCard — Apple Card-style idle sway.
+ * The card sways gently on its own and does not follow the pointer, so
+ * its links stay where they are. Runs only while visible; skipped
+ * entirely under reduced motion.
  */
 (function () {
   var card = document.getElementById('biz-card');
@@ -2568,32 +2568,19 @@ document.addEventListener('DOMContentLoaded', function () {
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (reduce) return; // the card is fully readable standing still
 
-  var run = false, raf = null, hover = false;
+  var run = false, raf = null;
   var tx = 0, ty = 0, cx = 0, cy = 0;
 
   function frame(ts) {
     if (!run) { raf = null; return; }
     var t = ts / 1000;
-    if (!hover) { // idle: a slow left-right sway, like the Apple Card promo
-      tx = Math.sin(t * 0.85) * 17;
-      ty = Math.cos(t * 0.6) * 8;
-    }
+    // a slow left-right sway, like the Apple Card promo
+    tx = Math.sin(t * 0.85) * 17;
+    ty = Math.cos(t * 0.6) * 8;
     cx += (tx - cx) * 0.08;
     cy += (ty - cy) * 0.08;
     card.style.transform = 'rotateY(' + cx.toFixed(2) + 'deg) rotateX(' + cy.toFixed(2) + 'deg)';
     raf = requestAnimationFrame(frame);
-  }
-
-  if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-    scene.addEventListener('pointermove', function (e) {
-      var r = scene.getBoundingClientRect();
-      var px = (e.clientX - r.left) / r.width - 0.5;
-      var py = (e.clientY - r.top) / r.height - 0.5;
-      hover = true;
-      tx = px * 34;
-      ty = -py * 22;
-    });
-    scene.addEventListener('pointerleave', function () { hover = false; });
   }
 
   var io = new IntersectionObserver(function (entries) {
@@ -2602,22 +2589,6 @@ document.addEventListener('DOMContentLoaded', function () {
     else if (!vis) { run = false; }
   }, { threshold: 0.1 });
   io.observe(scene);
-})();
-
-/**
- * BizCard glass light — the glare stands where the pointer or the finger
- * is. CSS draws the light; this only tells it where to stand.
- */
-(function () {
-  var card = document.getElementById('biz-card');
-  if (!card) return;
-  function light(e) {
-    var r = card.getBoundingClientRect();
-    card.style.setProperty('--lx', (e.clientX - r.left) + 'px');
-    card.style.setProperty('--ly', (e.clientY - r.top) + 'px');
-  }
-  card.addEventListener('pointermove', light, { passive: true });
-  card.addEventListener('pointerdown', light, { passive: true });
 })();
 
 /**

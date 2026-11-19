@@ -1018,8 +1018,8 @@ button {
   flex-wrap: wrap;
   gap: 8px 22px;
 }
-/* ── 3D business card — Apple Card feel: soft titanium surface, tilts
-   with the pointer (idle sway elsewhere), moving specular glare ── */
+/* ── 3D business card — Apple Card feel: a slow idle sway of its own;
+   it does not follow the pointer, so its links stay put under it ── */
 .biz-scene {
   perspective: 1100px;
   width: min(430px, 88vw);
@@ -1039,18 +1039,6 @@ button {
   justify-content: space-between;
   text-align: left;
   padding: 6.5% 7.5%;
-}
-/* brushed-titanium grain: hairline vertical strokes, barely there */
-.biz-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  background: repeating-linear-gradient(90deg,
-    rgba(29, 29, 31, 0.016) 0 1px,
-    rgba(255, 255, 255, 0.02) 1px 2px,
-    transparent 2px 4px);
 }
 .biz-row {
   display: flex;
@@ -1077,7 +1065,11 @@ button {
   margin-top: 4px;
 }
 .biz-contacts {
-  gap: 6px 14px;
+  /* when the e-mail and phone stack (up to 387px wide, or with larger
+     text) the 28px links sit 16px apart: a 44px pitch, so their 44pt hit
+     areas no longer overlap. Side by side only the 14px column gap counts,
+     so from 388px the card is exactly as before. */
+  gap: 16px 14px;
   flex-wrap: wrap;
 }
 .biz-contacts a {
@@ -2369,14 +2361,15 @@ a.info-item:hover .info-value { color: var(--color-link); }
 }
 
 /*--------------------------------------------------------------
-# Business card: Liquid Glass, as it was before the apple.com rebuild.
-  A clear slab held over two soft pools of the accent light that drift
-  slowly behind it: the backdrop frosts and brightens what shows
-  through, a white rim lights the top edge, a faint blue light gathers
-  along the foot, and a glare stands where the pointer or finger is.
-  Asking for less transparency gives a frostier slab, more contrast a
-  solid white one with a drawn edge, and browsers without backdrop
-  filters the frosty one.
+# Business card: frosted glass over the accent light.
+  A frosted slab (55% white, so it reads as a material rather than clear
+  glass) held over two soft pools of the accent light that drift slowly
+  behind it: the backdrop blurs and brightens what shows through, so the
+  blue still tints its corners, a white rim lights the top edge and a
+  faint blue light gathers along the foot. No glare follows the pointer
+  or finger. Asking for less transparency gives a frostier slab, more
+  contrast a solid white one with a drawn edge, and browsers without
+  backdrop filters the frosty one.
 --------------------------------------------------------------*/
 .biz-scene {
   position: relative;
@@ -2410,7 +2403,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
 
 .biz-card {
   transform-style: flat;          /* a backdrop filter samples through a flat surface */
-  background: rgba(255, 255, 255, .2);
+  background: rgba(255, 255, 255, .55);
   -webkit-backdrop-filter: blur(18px) saturate(180%) brightness(1.05);
   backdrop-filter: blur(18px) saturate(180%) brightness(1.05);
   border: 1px solid rgba(255, 255, 255, .75);
@@ -2423,17 +2416,6 @@ a.info-item:hover .info-value { color: var(--color-link); }
     0 30px 60px rgba(29, 29, 31, .12),
     0 4px 12px rgba(29, 29, 31, .06);
 }
-/* the glare, in place of the titanium grain: only while the card is
-   pointed at or touched, so the resting slab shows its light pools; behind
-   the type, so it lights the glass without washing out the words */
-.biz-card::before {
-  z-index: -1;
-  background: radial-gradient(circle 260px at var(--lx, 50%) var(--ly, 50%),
-    rgba(255, 255, 255, .55), rgba(255, 255, 255, 0) 70%);
-  opacity: 0;
-  transition: opacity .35s ease;
-}
-.biz-card:hover::before { opacity: 1; }
 /* the scene paints after the content around it, so the pill is lifted
    to stay above the light that reaches up behind it */
 .cta-pill {
@@ -2449,7 +2431,6 @@ a.info-item:hover .info-value { color: var(--color-link); }
 @media (prefers-reduced-motion: reduce) {
   .biz-scene::before,
   .biz-scene::after { animation: none; }
-  .biz-card::before { transition: none; }
 }
 /* frostier, not gone: the light still shows through as colour */
 @media (prefers-reduced-transparency: reduce) {
@@ -2480,8 +2461,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
 }
 @media (forced-colors: active) {
   .biz-scene::before,
-  .biz-scene::after,
-  .biz-card::before { display: none; }
+  .biz-scene::after { display: none; }
   .biz-card { border-color: CanvasText; }
 }
 

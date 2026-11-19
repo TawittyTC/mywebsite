@@ -1137,3 +1137,140 @@ test('layout > compact height: a phone held sideways gets the phone spacing, 128
     await page.close();
   }
 });
+
+test('app icons > one simple mark, the same everywhere: the tab, Home Screen and Android icons are the card\'s three-node mark in white on #1264CE, not a photo (web-clip-mark)', async () => {
+  const { page } = await open(MAC);
+  const icons = await page.evaluate(async () => {
+    const links = [...document.querySelectorAll('link[rel~="icon"], link[rel="apple-touch-icon"]')];
+    const out = [];
+    for (const l of links) {
+      const status = await fetch(l.href, { cache: 'no-store' }).then((r) => r.status, () => 0);
+      const img = new Image();
+      img.src = l.href;
+      const decoded = await img.decode().then(() => true, () => false);
+      if (!decoded) { out.push({ file: l.getAttribute('href'), status, decoded }); continue; }
+      const w = img.naturalWidth || 180, h = img.naturalHeight || 180;
+      const c = document.createElement('canvas');
+      c.width = w; c.height = h;
+      const g = c.getContext('2d');
+      g.drawImage(img, 0, 0, w, h);
+      const d = g.getImageData(0, 0, w, h).data;
+      let white = 0, clear = 0;
+      for (let i = 0; i < d.length; i += 4) {
+        if (d[i] > 235 && d[i + 1] > 235 && d[i + 2] > 235) white++;
+        if (d[i + 3] < 255) clear++;
+      }
+      const px = (x, y) => [...d.slice((y * w + x) * 4, (y * w + x) * 4 + 3)];
+      out.push({
+        rel: l.rel, type: l.type, file: l.getAttribute('href'), status, w, h,
+        corners: [px(1, 1), px(w - 2, 1), px(1, h - 2), px(w - 2, h - 2)],
+        white: white / (w * h), clear,
+      });
+    }
+    return out;
+  });
+  const files = icons.map((i) => i.file);
+  assert.ok(icons.some((i) => i.rel === 'icon' && i.type === 'image/svg+xml'), `no SVG favicon among ${files.join(', ')}`);
+  assert.ok(icons.some((i) => i.rel === 'apple-touch-icon' && i.w === 180 && i.h === 180), 'no 180px Home Screen icon');
+  // the photo icons' old addresses would still be answered from caches
+  for (const old of ['assets/img/favicon.ico', 'assets/img/icon-180.png', 'assets/img/icon-192.png']) {
+    assert.ok(!files.includes(old), `${old} (the photo icon's address) is still linked`);
+  }
+  for (const i of icons) {
+    assert.equal(i.status, 200, `${i.file} is missing`);
+    assert.notEqual(i.decoded, false, `${i.file} does not decode`);
+    // full-bleed accent blue to every corner, opaque, so iOS draws no black edge
+    for (const c of i.corners) assert.ok(c.every((v, k) => Math.abs(v - [18, 100, 206][k]) <= 3), `${i.file}: a corner is ${c}, not #1264CE`);
+    assert.equal(i.clear, 0, `${i.file}: ${i.clear} see-through pixels`);
+    // the white mark is a small part of the square, never a photo's highlights
+    // (at 32px antialiasing leaves about 5% pure white)
+    assert.ok(i.white > 0.03 && i.white < 0.3, `${i.file}: ${(i.white * 100).toFixed(1)}% white`);
+  }
+  await page.close();
+});
+
+test('materials > the business card is frosted glass: 55% white over the blue light, the white rims kept, no glare under the pointer (glass-card-standard-material, closest)', async () => {
+  const { page } = await open(MAC);
+  await page.$eval('#biz-scene', (el) => el.scrollIntoView({ block: 'center' }));
+  const look = () => page.$eval('#biz-card', (el) => {
+    const s = getComputedStyle(el), b = getComputedStyle(el, '::before');
+    return { bg: s.backgroundColor, filter: s.backdropFilter, shadow: s.boxShadow, before: b.content, glare: b.backgroundImage };
+  });
+  const rest = await look();
+  assert.equal(rest.bg, 'rgba(255, 255, 255, 0.55)', 'the card\'s tint');
+  assert.match(rest.filter, /blur\(18px\).*brightness\(1\.05\)/, 'the backdrop blur');
+  assert.match(rest.shadow, /inset/, 'the white inner rims went');
+  assert.equal(rest.before, 'none', 'the card still draws a ::before layer (glare or grain)');
+  const box = await page.$eval('#biz-card', (el) => { const r = el.getBoundingClientRect(); return { x: r.left + 40, y: r.top + 40 }; });
+  await page.mouse.move(box.x, box.y);
+  await page.mouse.move(box.x + 5, box.y + 5);
+  await page.waitForTimeout(450);
+  assert.deepEqual(await look(), rest, 'the card changes under the pointer');
+  await page.close();
+});
+
+test('motion > the business card does not tip toward the pointer; it keeps its own slow sway and its links stay put (bizcard-no-pointer-tilt)', async () => {
+  // two Macs on the same frozen clock: one rests the pointer on the card's
+  // top-right corner, the other away from it; after the same 3s the card
+  // stands at the same angle in both
+  const run = async (onCard) => {
+    const page = await ctx.browser.newPage({ serviceWorkers: 'block', ...MAC });
+    await page.route((u) => !u.href.startsWith(ctx.srv.url), (r) => r.abort());
+    await page.goto(ctx.srv.url + '/index.html', { waitUntil: 'load' });
+    await page.waitForFunction(styled, null, { timeout: 8000 });
+    // the clock stops before the card comes into view, so both sways start
+    // from the same frame
+    await page.clock.install({ time: 0 });
+    await page.clock.pauseAt(1000);
+    await page.$eval('#biz-scene', (el) => el.scrollIntoView({ block: 'center' }));
+    await page.waitForTimeout(300);
+    const r = await page.$eval('#biz-scene', (el) => { const q = el.getBoundingClientRect(); return { x: q.right - 12, y: q.top + 12 }; });
+    await page.mouse.move(onCard ? r.x : 20, onCard ? r.y : 20);
+    for (let i = 0; i < 30; i++) {
+      await page.clock.runFor(100);
+      await page.mouse.move((onCard ? r.x : 20) + (i % 2), onCard ? r.y : 20);
+    }
+    const out = await page.evaluate(() => ({
+      t: document.getElementById('biz-card').style.transform,
+      mail: (() => { const q = document.querySelector('#biz-card a[href^="mailto:"]').getBoundingClientRect(); return [q.left, q.top, q.width, q.height].map((v) => Math.round(v)); })(),
+    }));
+    await page.close();
+    return out;
+  };
+  const [on, off] = [await run(true), await run(false)];
+  assert.match(off.t, /rotateY/, 'the card stopped swaying');
+  assert.equal(on.t, off.t, 'the card turns toward the pointer');
+  assert.deepEqual(on.mail, off.mail, 'the e-mail link moves under the pointer');
+});
+
+test('layout > hit regions: where the card\'s e-mail and phone stack they sit 44px apart, so a finger on the e-mail never lands on the phone (biz-links-44-pitch-320)', async () => {
+  for (const [w, cardH] of [[320, 207.2], [375, 208.1], [387, null]]) {
+    const { page } = await open({ ...SMALL, viewport: { width: w, height: 700 }, reducedMotion: 'reduce' });
+    await page.$eval('#biz-scene', (el) => el.scrollIntoView({ block: 'center' }));
+    const r = await page.evaluate(() => {
+      const [mail, tel] = [...document.querySelectorAll('#biz-card .biz-contacts a')];
+      const m = mail.getBoundingClientRect(), t = tel.getBoundingClientRect();
+      const cx = m.left + 20, cy = m.top + m.height / 2;
+      // a finger landing 20px either side of the e-mail's centre still reaches it
+      // (the two 44px hit areas meet exactly; the card's layer snaps to whole
+      // pixels, so the last pixel at the seam can go either way)
+      const reach = [-20, 20].map((dy) => mail.contains(document.elementFromPoint(cx, cy + dy)));
+      return { pitch: t.top - m.top, reach, card: document.getElementById('biz-card').getBoundingClientRect().height, sideways: document.documentElement.scrollWidth - document.documentElement.clientWidth };
+    });
+    assert.ok(Math.abs(r.pitch - 44) < 0.5, `${w}px: e-mail to phone ${r.pitch.toFixed(1)}px apart`);
+    assert.deepEqual(r.reach, [true, true], `${w}px: the e-mail's hit area is cut by its neighbours`);
+    if (cardH) assert.ok(Math.abs(r.card - cardH) < 0.5, `${w}px: the card is ${r.card.toFixed(1)}px tall, expected ${cardH}`);
+    assert.equal(r.sideways, 0, `${w}px: the page scrolls sideways`);
+    await page.close();
+  }
+  // side by side (388px and up) nothing moves: the gap only applies between stacked lines
+  for (const [opts, top] of [[PHONE, 165.3], [MAC, 214.4]]) {
+    const { page } = await open({ ...opts, reducedMotion: 'reduce' });
+    const r = await page.evaluate(() => {
+      const c = document.getElementById('biz-card').getBoundingClientRect();
+      return [...document.querySelectorAll('#biz-card .biz-contacts a')].map((a) => Math.round((a.getBoundingClientRect().top - c.top) * 10) / 10);
+    });
+    assert.deepEqual(r, [top, top], `${opts.viewport.width}px: the e-mail and phone moved`);
+    await page.close();
+  }
+});
