@@ -91,10 +91,14 @@ test('asset size budgets hold', () => {
     const kb = statSync(join(ROOT, p)).size / 1024;
     assert.ok(kb <= max, `${p} is ${kb.toFixed(0)}KB (budget ${max}KB)`);
   };
-  budget('assets/js/main.min.js', 45);
+  // 48KB after the v2.71 keyboard and VoiceOver work (one Tab stop per
+  // collection, the inert page behind a sheet, announced filter results)
+  budget('assets/js/main.min.js', 48);
   // 66KB minified (~13KB gzipped) after the v2.47 usability fixes and the
-  // v2.48 surface system; dead rules are swept before raising it again
-  budget('assets/css/style.min.css', 66);
+  // v2.48 surface system; 68KB after v2.71 (larger text, focus on whole
+  // cards), with no unused class left to sweep. Sweep dead rules before
+  // raising it again.
+  budget('assets/css/style.min.css', 68);
   for (const f of readdirSync(join(ROOT, 'assets/img/certificate'))) {
     budget(`assets/img/certificate/${f}`, 80);
   }

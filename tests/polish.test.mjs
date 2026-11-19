@@ -17,7 +17,7 @@ test('the typed role line says "an" before a vowel and "a" before a consonant', 
   const seen = { vowel: false, consonant: false };
   const wrong = [];
   for (let i = 0; i < 220 && !(seen.vowel && seen.consonant); i++) {
-    const line = (await page.$eval('#hero .hero-role', (el) => el.textContent)).replace(/\s+/g, ' ').trim();
+    const line = (await page.$eval('#hero .hero-role > [aria-hidden]', (el) => el.textContent)).replace(/\s+/g, ' ').trim();
     const m = line.match(/^I'm (an?) (\S.*)$/);
     if (m) {
       const vowel = /^[aeiou]/i.test(m[2]);
@@ -332,7 +332,9 @@ test('a focused control keeps its own shape, and one without a shape gets the 6p
     }
   };
   await check([
-    ['#portfolio [data-scroller-next]', null], ['.filter-btn', null], ['#images-list .cert-expand-btn', null],
+    ['#portfolio [data-scroller-next]', null], ['.filter-btn', null],
+    // a certificate tile is one square-cornered button; its ring is drawn round the whole card
+    ['#images-list button.cert-img', '0px'],
     ['#back-to-top', null], ['a.btn-pill', null], ['.skip-link', null],
     // these draw no box of their own; the round "+" is drawn by an inner element
     ['#experience .exp-card-cta', '50%'], ['button.more.proj-all', '6px'], ['a.more', '6px'], ['.footer-contact-link', '6px'],

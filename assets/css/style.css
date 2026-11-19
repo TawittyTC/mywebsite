@@ -4,6 +4,10 @@
 :root {
   /* light-only site: block browser forced/auto dark theming */
   color-scheme: only light;
+  /* card, chip and FAQ sizes are written as px at the 17px root, so they
+     follow the reader's text size; the 2K and 4K tiers raise the root, and
+     --tier keeps those sizes where they were drawn there */
+  --tier: 1;
   --color-text: #1D1D1F;
   --color-text-secondary: #6E6E73;
   --color-link: #1264CE; /* WCAG AA: 5.62:1 on white (the old #1877F2 managed only 4.23:1) */
@@ -546,8 +550,11 @@ button {
 /* Progressive disclosure — experience cards: the description is a
    three-line teaser; the full story lives in the Read-more modal.
    (:not() guard: the highlight-chip row shares the type class and must
-   keep its flex layout — clamping it shattered the pills.) */
-#experience .data-box[data-exp] .profile-bio-small:not(.exp-card-highlights) {
+   keep its flex layout — clamping it shattered the pills. The date and
+   period lines are not clamped: at larger text they wrap instead of
+   being cut.) */
+#experience .data-box[data-exp] > .profile-bio-small:not(.exp-card-highlights),
+#experience .data-box[data-exp] .exp-role > p.profile-bio-small {
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
@@ -885,7 +892,7 @@ button {
   #hero .hero-copy { text-align: center; margin: 0 auto; }
   #hero .hero-copy::before { left: 50%; top: calc(50% - 34px); transform: translate(-50%, -50%); width: 480px; height: 480px; }
   #hero .hero-eyebrow { font-size: 0.6471rem; letter-spacing: 0.1em; margin-bottom: 14px; }
-  #hero h1.hero-name { font-size: clamp(2.2353rem, 10.5vw, 2.8235rem); line-height: 1.12; }
+  #hero h1.hero-name { font-size: min(clamp(2.2353rem, 10.5vw, 2.8235rem), 12.5vw); line-height: 1.12; }
   .hero-net-label { font-size: 0.5294rem; }
   .hero-scroll-hint { display: none; }
 }
@@ -1154,7 +1161,7 @@ a.info-item:hover .info-value {
   border-radius: var(--r-min);
   object-fit: cover;
 }
-.profile-featured-body { flex: 1; }
+.profile-featured-body { flex: 1; min-width: 0; }
 .profile-bio { font-size: 1rem; color: var(--color-text-secondary); margin: 0; line-height: 1.7; }
 .profile-bio-small { font-size: 0.9412rem; color: var(--color-text-secondary); margin: 0; line-height: 1.7; }
 
@@ -1172,6 +1179,7 @@ a.info-item:hover .info-value {
     padding: 24px;
     gap: 20px;
   }
+  .profile-featured-body { align-self: stretch; }
   .profile-featured-img {
     width: 100%;
   }
@@ -1265,6 +1273,10 @@ select:focus-visible {
   outline: 2px solid var(--color-link);
   outline-offset: 3px;
 }
+/* where a jump link or Back to top leaves keyboard focus: the heading is
+   only a starting point for the next Tab, not a control, so no ring */
+.section-title[tabindex="-1"]:focus,
+#hero .hero-name:focus { outline: none; }
 
 /* ── Inline SVG Icons (replaces Boxicons + Bootstrap Icons + Font Awesome) ── */
 .social-icon {
@@ -1280,12 +1292,13 @@ select:focus-visible {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 28px;
-  min-height: 28px;
+  min-width: calc(28rem / 17 / var(--tier));
+  min-height: calc(28rem / 17 / var(--tier));
 }
 .footer-contact-link { display: inline-block; padding: 5px 0; }
 .biz-contacts a { display: inline-block; padding: 4px 0; }
-.social-links-footer .social-icon { width: 24px; height: 24px; }
+/* icon sizes follow the reader's text size, like the words around them */
+.social-links-footer .social-icon { width: calc(24rem / 17 / var(--tier)); height: calc(24rem / 17 / var(--tier)); }
 
 /* ── Mobile: iOS input zoom fix (font-size ≥ 16px prevents auto-zoom) ── */
 @media (max-width: 768px) {
@@ -1297,6 +1310,9 @@ select:focus-visible {
     padding-left: 20px;
     padding-right: 20px;
   }
+  /* a row's gutter grows with the text; past the 20px padding it would
+     push the page sideways, so it stops there (default text: unchanged) */
+  .row { --bs-gutter-x: min(1.5rem, 40px); }
   /* Filter buttons: horizontal scroll on mobile (App Store style) */
   .project-filters-wrap {
     overflow-x: auto;
@@ -1344,14 +1360,6 @@ select:focus-visible {
 
 
 /* Users who turn off transparency get solid surfaces, no blur */
-@media (prefers-reduced-transparency: reduce) {
-  #back-to-top {
-    background: #fbfbfd;
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
-}
-
 /*--------------------------------------------------------------
 # Back to top
 --------------------------------------------------------------*/
@@ -1453,6 +1461,8 @@ select:focus-visible {
 /* 2K tier — 1.13× */
 @media (min-width: 2000px) {
   html { font-size: 118.75%; }
+  /* sizes written in px at the 17px root keep their size on this tier */
+  :root { --tier: 1.117647; }
 
   /* layout scales with the type so proportions stay put */
   .container { max-width: 1490px; }
@@ -1471,6 +1481,7 @@ select:focus-visible {
 /* 4K tier — 1.45× (height guard keeps 3440×1440 ultrawides on the 2K step) */
 @media (min-width: 3000px) and (min-height: 1700px) {
   html { font-size: 156.25%; }
+  :root { --tier: 1.470588; }
 
   .container { max-width: 1910px; }
   section { padding: 319px 0; }
@@ -1692,7 +1703,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
 }
 
 /* social marks: the accent glyph in a white well on the grey card */
-.profile-featured .social-links { gap: 10px; margin: 1.4118rem 0 0; }
+.profile-featured .social-links { flex-wrap: wrap; gap: 10px; margin: 1.4118rem 0 0; }
 .profile-featured .social-links a {
   width: 44px;
   height: 44px;
@@ -1700,7 +1711,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
   background: #fff;
 }
 .profile-featured .social-links a:hover { background: #E8E8ED; }
-.profile-featured .social-links .social-icon { width: 20px; height: 20px; }
+.profile-featured .social-links .social-icon { width: calc(20rem / 17 / var(--tier)); height: calc(20rem / 17 / var(--tier)); }
 
 /* the name's gradient ink paints only inside each line's box, so the box
    must hold every glyph (2K/4K screens, larger reader fonts) */
@@ -1764,7 +1775,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
   border-radius: 0;
   background: none;
   color: #1D1D1F;
-  font-size: 17px;
+  font-size: calc(17rem / 17 / var(--tier));
   font-weight: 600;
   line-height: 1.23536;
   letter-spacing: -0.022em;
@@ -1774,7 +1785,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
   order: 2;
   margin: 0 0 14px;
   padding: 0;
-  font-size: 28px;
+  font-size: calc(28rem / 17 / var(--tier));
   font-weight: 600;
   line-height: 1.14286;
   letter-spacing: .007em;
@@ -1785,7 +1796,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
   order: 2;
   margin: 0;
   padding: 0;
-  font-size: 17px;
+  font-size: calc(17rem / 17 / var(--tier));
   font-weight: 400 !important;
   line-height: 1.47059;
   letter-spacing: -0.022em;
@@ -1856,7 +1867,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
   #skill .rf-cards-scroller-item { width: 376px; min-height: 500px; padding: 32px; margin-right: 26px; }
   #portfolio .rf-cards-scroller-item { min-height: 460px; padding-bottom: 84px; }
   #portfolio .rf-cards-scroller-item h3,
-  #skill .rf-cards-scroller-item .title { font-size: 24px; line-height: 1.16667; letter-spacing: .009em; }
+  #skill .rf-cards-scroller-item .title { font-size: calc(24rem / 17 / var(--tier)); line-height: 1.16667; letter-spacing: .009em; }
   #skill .rf-cards-scroller-item .skill-icon { width: 80px; height: 80px; margin-bottom: 24px; }
 }
 /* iPhone: the measured card, about 10% larger */
@@ -1873,11 +1884,11 @@ a.info-item:hover .info-value { color: var(--color-link); }
     transform: none;
   }
   #portfolio .rf-cards-scroller-item { padding-bottom: 80px; }
-  #portfolio .project-tag { font-size: 14px; line-height: 1.28577; letter-spacing: -0.016em; }
+  #portfolio .project-tag { font-size: calc(14rem / 17 / var(--tier)); line-height: 1.28577; letter-spacing: -0.016em; }
   #portfolio .rf-cards-scroller-item h3,
-  #skill .rf-cards-scroller-item .title { font-size: 21px; line-height: 1.19048; letter-spacing: .011em; margin-bottom: 12px; }
+  #skill .rf-cards-scroller-item .title { font-size: calc(21rem / 17 / var(--tier)); line-height: 1.19048; letter-spacing: .011em; margin-bottom: 12px; }
   #portfolio .rf-cards-scroller-item p.fw-light,
-  #skill .rf-cards-scroller-item .skill-desc { font-size: 14px; line-height: 1.42859; letter-spacing: -0.016em; }
+  #skill .rf-cards-scroller-item .skill-desc { font-size: calc(14rem / 17 / var(--tier)); line-height: 1.42859; letter-spacing: -0.016em; }
   #skill .rf-cards-scroller-item .skill-icon { width: 72px; height: 72px; margin: -6px 0 20px -8px; }
   #portfolio .project-img { padding-top: 24px; }
   .card-plus { right: 21px; bottom: 21px; }
@@ -1921,6 +1932,8 @@ a.info-item:hover .info-value { color: var(--color-link); }
   transform: none;
 }
 .rf-cards-scroller .paddlenav-arrow span:not(.visuallyhidden) { display: flex; }
+/* Read by VoiceOver, not drawn (also in the critical CSS) */
+.visuallyhidden { position: absolute !important; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0; }
 .rf-cards-scroller .paddlenav-arrow svg { width: 36px; height: 36px; fill: currentColor; }
 .rf-cards-scroller .paddlenav-arrow::after {
   content: '';
@@ -1961,7 +1974,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
   order: 2;
   margin: 0 0 8px;
   color: var(--color-link);
-  font-size: 17px;
+  font-size: calc(17rem / 17 / var(--tier));
   font-weight: 600;
   line-height: 1.23536;
   letter-spacing: -0.022em;
@@ -1980,7 +1993,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
   border-radius: 980px;
   background: #fff;
   color: #1D1D1F;
-  font-size: 14px;
+  font-size: calc(14rem / 17 / var(--tier));
   line-height: 1.42859;
   letter-spacing: -0.016em;
   white-space: nowrap;
@@ -1990,9 +2003,9 @@ a.info-item:hover .info-value { color: var(--color-link); }
 }
 @media (max-width: 734px) {
   #skill .rf-cards-scroller-item .skill-icon { width: 56px; height: 56px; padding: 6px; margin: 0 0 20px; border-radius: 16px; }
-  #skill .skill-tag { font-size: 14px; line-height: 1.28577; letter-spacing: -0.016em; }
+  #skill .skill-tag { font-size: calc(14rem / 17 / var(--tier)); line-height: 1.28577; letter-spacing: -0.016em; }
   #skill .skill-tools { gap: 6px; padding-top: 20px; }
-  #skill .skill-tools li { padding: 5px 12px; font-size: 12px; line-height: 1.33337; letter-spacing: -0.01em; }
+  #skill .skill-tools li { padding: 5px 12px; font-size: calc(12rem / 17 / var(--tier)); line-height: 1.33337; letter-spacing: -0.01em; }
 }
 @media (prefers-contrast: more) {
   #skill .skill-tools li { box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .35); }
@@ -2065,7 +2078,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
 #services .svc-card h3 {
   margin: 0 0 14px;
   padding: 0;
-  font-size: 28px;
+  font-size: calc(28rem / 17 / var(--tier));
   font-weight: 600;
   line-height: 1.14286;
   letter-spacing: .007em;
@@ -2073,7 +2086,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
 }
 #services .svc-card p {
   margin: 0;
-  font-size: 17px;
+  font-size: calc(17rem / 17 / var(--tier));
   font-weight: 400;
   line-height: 1.47059;
   letter-spacing: -0.022em;
@@ -2096,7 +2109,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
 #services .svc-card.svc-more h3 {
   flex: none;
   margin: 0;
-  font-size: 17px;
+  font-size: calc(17rem / 17 / var(--tier));
   line-height: 1.47059;
   letter-spacing: -0.022em;
 }
@@ -2117,7 +2130,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
   border-radius: 980px;
   background: #fff;
   color: #1D1D1F;
-  font-size: 14px;
+  font-size: calc(14rem / 17 / var(--tier));
   line-height: 1.42859;
   letter-spacing: -0.016em;
   white-space: nowrap;
@@ -2131,7 +2144,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
 #services .faq h3 {
   margin: 0 0 40px;
   text-align: center;
-  font-size: 40px;
+  font-size: calc(40rem / 17 / var(--tier));
   font-weight: 600;
   line-height: 1.1;
   letter-spacing: 0;
@@ -2158,7 +2171,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
   border-radius: 14px;
   list-style: none;
   cursor: pointer;
-  font-size: 19px;
+  font-size: calc(19rem / 17 / var(--tier));
   font-weight: 600;
   line-height: 1.36842;
   letter-spacing: 0;
@@ -2190,7 +2203,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
 #services .faq details > p {
   margin: var(--faq-pull) 0 0;
   padding: 0 56px 26px 0;
-  font-size: 17px;
+  font-size: calc(17rem / 17 / var(--tier));
   line-height: 1.47059;
   letter-spacing: -0.022em;
   color: #6E6E73;
@@ -2220,12 +2233,12 @@ a.info-item:hover .info-value { color: var(--color-link); }
   #services .svc-card { padding: 32px; }
   #services .svc-icon { aspect-ratio: 5 / 2; margin: -12px -12px 24px; }
   #services .svc-icon svg { width: 29%; }
-  #services .svc-card h3 { font-size: 24px; line-height: 1.16667; letter-spacing: .009em; }
+  #services .svc-card h3 { font-size: calc(24rem / 17 / var(--tier)); line-height: 1.16667; letter-spacing: .009em; }
   #services .svc-more { padding-top: 28px; padding-bottom: 28px; }
   #services .faq { margin-top: 100px; }
-  #services .faq h3 { margin-bottom: 32px; font-size: 32px; line-height: 1.125; }
+  #services .faq h3 { margin-bottom: 32px; font-size: calc(32rem / 17 / var(--tier)); line-height: 1.125; }
   #services .faq-list { --faq-pull: -8px; padding: 4px 32px; }
-  #services .faq summary { padding: 22px 12px; font-size: 17px; line-height: 1.47059; }
+  #services .faq summary { padding: 22px 12px; font-size: calc(17rem / 17 / var(--tier)); line-height: 1.47059; }
   #services .faq summary::after { margin-top: 4.5px; }
   #services .faq details > p { padding-bottom: 24px; }
 }
@@ -2239,18 +2252,18 @@ a.info-item:hover .info-value { color: var(--color-link); }
   #services .svc-card { padding: 28px; }
   #services .svc-icon { aspect-ratio: 8 / 3; margin: -8px -8px 20px; }
   #services .svc-icon svg { width: 27%; }
-  #services .svc-card h3 { margin-bottom: 12px; font-size: 21px; line-height: 1.19048; letter-spacing: .011em; }
-  #services .svc-card p { font-size: 14px; line-height: 1.42859; letter-spacing: -0.016em; }
+  #services .svc-card h3 { margin-bottom: 12px; font-size: calc(21rem / 17 / var(--tier)); line-height: 1.19048; letter-spacing: .011em; }
+  #services .svc-card p { font-size: calc(14rem / 17 / var(--tier)); line-height: 1.42859; letter-spacing: -0.016em; }
   #services .svc-more { gap: 12px; padding-top: 24px; padding-bottom: 24px; }
-  #services .svc-card.svc-more h3 { margin: 0; font-size: 15px; line-height: 1.33337; letter-spacing: -0.016em; }
+  #services .svc-card.svc-more h3 { margin: 0; font-size: calc(15rem / 17 / var(--tier)); line-height: 1.33337; letter-spacing: -0.016em; }
   #services .svc-chips { margin: 0 -6px -6px 0; }
-  #services .svc-chips li { margin: 0 6px 6px 0; padding: 5px 12px; font-size: 12px; line-height: 1.33337; letter-spacing: -0.01em; }
+  #services .svc-chips li { margin: 0 6px 6px 0; padding: 5px 12px; font-size: calc(12rem / 17 / var(--tier)); line-height: 1.33337; letter-spacing: -0.01em; }
   #services .faq { margin-top: 80px; }
-  #services .faq h3 { margin-bottom: 28px; font-size: 28px; line-height: 1.14286; }
+  #services .faq h3 { margin-bottom: 28px; font-size: calc(28rem / 17 / var(--tier)); line-height: 1.14286; }
   #services .faq-list { --faq-pull: -6px; padding: 4px 20px; }
-  #services .faq summary { gap: 14px; padding: 18px 12px; font-size: 16px; line-height: 1.5; }
+  #services .faq summary { gap: 14px; padding: 18px 12px; font-size: calc(16rem / 17 / var(--tier)); line-height: 1.5; }
   #services .faq summary::after { width: 14px; height: 14px; margin-top: 5px; }
-  #services .faq details > p { padding: 0 0 22px; font-size: 15px; line-height: 1.53334; }
+  #services .faq details > p { padding: 0 0 22px; font-size: calc(15rem / 17 / var(--tier)); line-height: 1.53334; }
 }
 @media (prefers-reduced-motion: reduce) {
   #services .faq summary::after { transition: none; }
@@ -2453,7 +2466,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
 .proj-all {
   margin-right: auto;
   padding: 10px 0;
-  font-size: 17px;
+  font-size: calc(17rem / 17 / var(--tier));
   line-height: 24px;
 }
 
@@ -2464,7 +2477,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
 .proj-group { margin-top: 28px; }
 .proj-group h3 {
   margin: 0 0 10px;
-  font-size: 15px;
+  font-size: calc(15rem / 17 / var(--tier));
   font-weight: 600;
   color: #6E6E73;
 }
@@ -2502,12 +2515,12 @@ a.info-item:hover .info-value { color: var(--color-link); }
 .proj-name {
   display: block;
   color: #1D1D1F;
-  font-size: 16px;
+  font-size: calc(16rem / 17 / var(--tier));
   font-weight: 600;
   line-height: 1.3125;
   text-wrap: pretty;
 }
-.proj-kind { display: block; color: #6E6E73; font-size: 14px; line-height: 1.42859; }
+.proj-kind { display: block; color: #6E6E73; font-size: calc(14rem / 17 / var(--tier)); line-height: 1.42859; }
 @media (hover: hover) { .proj-row:hover .proj-name { color: var(--color-link); } }
 .proj-text { flex: 1; }
 .proj-row .chev { flex: none; color: #86868B; }
@@ -2526,7 +2539,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
   background: rgba(232, 232, 237, .9);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
   backdrop-filter: saturate(180%) blur(20px);
-  font-size: 15px;
+  font-size: calc(15rem / 17 / var(--tier));
 }
 .proj-back .chev { margin: 0 6px 0 0; transform: scaleX(-1); }
 .proj-back:hover { text-decoration: none; background: #D8D8DF; }
@@ -2615,7 +2628,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
   margin: 16px auto 0;
   padding: 0 16px;
   color: rgba(255, 255, 255, .88);
-  font-size: 15px;
+  font-size: calc(15rem / 17 / var(--tier));
   line-height: 1.4;
   text-align: center;
 }
@@ -2650,6 +2663,31 @@ a.info-item:hover .info-value { color: var(--color-link); }
 @media (max-width: 359px) {
   .exp-stat-label { font-size: 0.5882rem; }
   .exp-stat-item { padding: 0 2px; }
+}
+
+/* Larger text (browser text size or zoom): a stat cell never gets narrower
+   than its own words, and the row wraps instead of clipping. At default
+   sizes every row fits on one line, so nothing moves. */
+.exp-card-stats { flex-wrap: wrap; row-gap: 12px; }
+.exp-stat-item { min-width: min-content; }
+
+/* Matches only when the text is very large for the window (200% text on a
+   phone, or 200% page zoom); 16em is 256px at the default text size. */
+/* Very large text on a phone (19em is 304px at the default size, so no
+   phone of 320px or more matches it then): the contact values wrap at
+   their spaces, and an address longer than the tile breaks rather than
+   running off it */
+@media (max-width: 19em) {
+  .info-item > div { min-width: 0; max-width: 100%; }
+  .info-value,
+  .contact-strip .info-item[href^="tel:"] .info-value { white-space: normal; overflow-wrap: break-word; }
+}
+
+@media (max-width: 16em) {
+  .container { padding-left: 10px; padding-right: 10px; }
+  .row { --bs-gutter-x: 20px; }
+  .data-box.profile-featured { padding: 16px; }
+  .section-title h2 { font-size: min(2rem, 13vw); }
 }
 
 /* links inside FAQ answers are told apart by more than their colour */
@@ -2949,7 +2987,7 @@ p.profile-bio-small,
   backdrop-filter: saturate(180%) blur(20px);
   box-shadow: 0 0 0 .5px rgba(0, 0, 0, .08), 0 8px 28px rgba(0, 0, 0, .14);
   color: #1D1D1F;
-  font-size: 15px;
+  font-size: calc(15rem / 17 / var(--tier));
   line-height: 1.33;
   letter-spacing: -0.01em;
   opacity: 0;
@@ -2973,3 +3011,68 @@ p.profile-bio-small,
   .toast { background: #fff; -webkit-backdrop-filter: none; backdrop-filter: none; }
 }
 @media (forced-colors: active) { .toast { border: 1px solid CanvasText; } }
+
+/*--------------------------------------------------------------
+# HIG (v2.71): keyboard, VoiceOver and larger text, no visible change
+  at default settings
+--------------------------------------------------------------*/
+/* each certificate tile is one button: it keeps the tile's look */
+#certificates button.cert-img {
+  display: block;
+  margin: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: inherit;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+/* the viewer's close button reaches 44 x 44 like the sheet's */
+.cert-lightbox-close::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 44px;
+  height: 44px;
+  transform: translate(-50%, -50%);
+}
+/* a focused card or tile is outlined whole, not just its corner "+" */
+#portfolio .rf-cards-scroller-item:has(.card-plus:focus-visible),
+#certificates .cert-card:has(.cert-img:focus-visible) {
+  outline: 2px solid var(--color-link);
+  outline-offset: 3px;
+}
+#portfolio .card-plus:focus-visible,
+#certificates button.cert-img:focus-visible { outline: 2px solid transparent; }
+/* a focused row of the See-all list fills edge to edge, as a selected
+   row does in a grouped list */
+.proj-row:focus-visible { outline: 2px solid transparent; }
+.proj-rows li:has(> .proj-row:focus-visible) {
+  margin: 0 -16px;
+  padding: 0 16px;
+  background: var(--color-link);
+}
+.proj-rows li:first-child:has(> .proj-row:focus-visible) { border-radius: 18px 18px 0 0; }
+.proj-rows li:last-child:has(> .proj-row:focus-visible) { border-radius: 0 0 18px 18px; }
+.proj-rows li:only-child:has(> .proj-row:focus-visible) { border-radius: 18px; }
+.proj-rows li:has(> .proj-row:focus-visible) .proj-name,
+.proj-rows li:has(> .proj-row:focus-visible) .proj-kind,
+.proj-rows li:has(> .proj-row:focus-visible) .chev { color: #fff; }
+/* Reduce Transparency: Back to top and "All projects" turn opaque too
+   (after their base rules, so this wins) */
+@media (prefers-reduced-transparency: reduce) {
+  #back-to-top { background: #fbfbfd; }
+  .proj-back { background: #E8E8ED; }
+  #back-to-top,
+  .proj-back {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+/* Windows contrast themes draw no fill: the capsule keeps an edge */
+@media (forced-colors: active) {
+  .btn-pill { border: 1px solid LinkText; }
+}
