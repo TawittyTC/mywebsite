@@ -203,6 +203,10 @@ section {
   background: #fff;
   color: var(--color-text-secondary);
   font-size: 0.8235rem;
+  /* one container, so the text starts on the same edge as every section;
+     Bootstrap's rem-sized row gutter may not hang past the screen when
+     the text is enlarged */
+  overflow-x: clip;
   padding-top: 120px;
   padding-bottom: max(120px, calc(100px + env(safe-area-inset-bottom)));
 }
@@ -681,7 +685,6 @@ button {
    The :active duration is shorter than the release so touches feel
    tactile, and the release overshoots slightly (Apple-style pop). */
 .filter-btn,
-.exp-filter-chip,
 .cert-expand-btn,
 .cert-lightbox-close,
 .exp-lightbox-close,
@@ -694,9 +697,6 @@ button {
 @media (hover: hover) and (pointer: fine) {
   /* the skill filters are segments of one control: they tint, never grow
      (see the segmented control below) */
-  .exp-filter-chip:hover {
-    transform: scale(1.05);
-  }
   .cert-expand-btn:hover {
     transform: scale(1.12);
   }
@@ -708,7 +708,6 @@ button {
   }
 }
 .filter-btn:active,
-.exp-filter-chip:active,
 .cert-expand-btn:active,
 .cert-lightbox-close:active,
 .exp-lightbox-close:active {
@@ -1685,19 +1684,28 @@ a.info-item:hover .info-value { color: var(--color-link); }
 @media (pointer: coarse) {
   /* each icon owns a 44 square; the row is pulled back by the extra margin
      so the first icon still lines up with the text above it */
-  .social-links,
-  .social-links-footer {
+  .social-links {
     gap: 0;
     margin: 8px 0 -8px -8px;
   }
-  .social-links a,
-  .social-links-footer a {
+  .social-links a {
     min-width: 44px;
     min-height: 44px;
   }
-  /* stacked lines: hit-slop would only overlap the neighbour, so the pitch grows */
-  .footer-contact-link { padding: 10.5px 0; }
 }
+/* The footer's icons and contact lines answer a 44 square with a mouse
+   too, not only on touch screens: the icon pitch goes from 40 to 44px and
+   the glyphs stay where they were */
+.social-links-footer {
+  gap: 0;
+  margin: 8px 0 -8px -8px;
+}
+.social-links-footer a {
+  min-width: 44px;
+  min-height: 44px;
+}
+/* stacked lines: hit-slop would only overlap the neighbour, so the pitch grows */
+.footer-contact-link { padding: 10.5px 0; }
 
 /*--------------------------------------------------------------
 # Kept from the apple.com redesign (v2.37.0)
@@ -2490,6 +2498,15 @@ a.info-item:hover .info-value { color: var(--color-link); }
   #hero { padding: 0; height: auto; min-height: 100svh; }
   #hero .hero-grid { padding-top: 40px; padding-bottom: 40px; }
 }
+/* Compact height (a phone held sideways): 220 + 220px between two sections
+   was more than a whole 390px-tall screen of nothing. The phone spacing
+   applies here, keyed on height only, so Mac, iPad and portrait phones
+   keep theirs. The Contact band sets its own 220px, so it is named too. */
+@media (max-height: 500px) {
+  section,
+  .closing-cta { padding: 128px 0; }
+  .section-title { padding-bottom: 56px; }
+}
 
 /* Skills filter on phones: the track is as wide as its four segments,
    centred (the segmented control below sets the rest; all four fit from
@@ -2675,64 +2692,67 @@ a.info-item:hover .info-value { color: var(--color-link); }
 .proj-back + div { clear: both; padding-top: 8px; }
 .proj-back + div .exp-client-filter { position: static; box-shadow: none; }
 
-/* The current job's sheet on a phone: the client chips stay at the top
-   while you read, clear of the close button, and each client folds to
-   its name until it is opened */
+/* The current job's sheet: each client folds to its name until it is
+   opened, at every size */
+.exp-clients-folded .exp-client-section-header {
+  position: relative;
+  margin-bottom: 0;
+  padding-right: 26px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.exp-clients-folded .exp-client-section-header::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  width: 10px;
+  height: 16px;
+  margin-top: -8px;
+  background-color: var(--color-link);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 14'%3E%3Cpath d='M1.2 1.2 6.8 7l-5.6 5.8' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 14'%3E%3Cpath d='M1.2 1.2 6.8 7l-5.6 5.8' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  transition: transform .3s var(--ease-swift);
+}
+.exp-clients-folded .exp-client-section.is-open .exp-client-section-header { margin-bottom: 16px; }
+.exp-clients-folded .exp-client-section.is-open .exp-client-section-header::after { transform: rotate(90deg); }
+.exp-clients-folded .exp-client-section:not(.is-open) > :not(.exp-client-section-header) { display: none; }
+.exp-client-toggle {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.exp-client-toggle:focus-visible { outline: auto; outline-color: -webkit-focus-ring-color; outline-offset: 3px; border-radius: 4px; }
+
+/* On a phone the client picker stays at the top while you read, clear of
+   the close button */
 @media (max-width: 734px) {
   /* the sheet keeps 26px (24px under 600px) of padding above its content;
-     the stuck row covers it so nothing shows through above the chips,
-     which sit level with the close button */
+     the stuck row covers it so nothing shows through above the picker,
+     which sits level with the close button */
   .exp-clients-folded .exp-client-filter {
     position: sticky;
     top: -26px;
     z-index: 5;
     margin-top: 12px;
-    padding-top: 28px;
+    /* the 44px picker's middle level with the close button's */
+    padding-top: 24px;
     padding-bottom: 10px;
     margin-right: 46px;
-    padding-right: 18px;
+    padding-right: 0;
     background: rgba(255, 255, 255, .97);
     box-shadow: 64px 0 0 rgba(255, 255, 255, .97), 64px 1px 0 #E8E8ED, 0 1px 0 #E8E8ED;
   }
   @media (max-width: 600px) {
-    .exp-clients-folded .exp-client-filter { top: -24px; padding-top: 26px; }
+    .exp-clients-folded .exp-client-filter { top: -24px; padding-top: 22px; }
   }
-  .exp-clients-folded .exp-client-section-header {
-    position: relative;
-    margin-bottom: 0;
-    padding-right: 26px;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .exp-clients-folded .exp-client-section-header::after {
-    content: '';
-    position: absolute;
-    right: 0;
-    top: 50%;
-    width: 10px;
-    height: 16px;
-    margin-top: -8px;
-    background-color: var(--color-link);
-    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 14'%3E%3Cpath d='M1.2 1.2 6.8 7l-5.6 5.8' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
-    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 14'%3E%3Cpath d='M1.2 1.2 6.8 7l-5.6 5.8' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
-    transition: transform .3s var(--ease-swift);
-  }
-  .exp-clients-folded .exp-client-section.is-open .exp-client-section-header { margin-bottom: 16px; }
-  .exp-clients-folded .exp-client-section.is-open .exp-client-section-header::after { transform: rotate(90deg); }
-  .exp-clients-folded .exp-client-section:not(.is-open) > :not(.exp-client-section-header) { display: none; }
-  .exp-client-toggle {
-    margin: 0;
-    padding: 0;
-    border: 0;
-    background: none;
-    color: inherit;
-    font: inherit;
-    letter-spacing: inherit;
-    text-align: left;
-    cursor: pointer;
-  }
-  .exp-client-toggle:focus-visible { outline: auto; outline-color: -webkit-focus-ring-color; outline-offset: 3px; border-radius: 4px; }
-  /* a focused client header is never left hidden under the stuck chip row */
+  /* a focused client header is never left hidden under the stuck picker */
   .exp-lightbox-inner:has(.exp-clients-folded) { scroll-padding-top: 84px; }
 }
 @media (forced-colors: active) {
@@ -2784,6 +2804,13 @@ a.info-item:hover .info-value { color: var(--color-link); }
 /* back-to-top clears the iPhone home indicator */
 #back-to-top { bottom: calc(22px + env(safe-area-inset-bottom, 0px)); }
 
+/* On a Mac the window's bottom edge is no place for a control (and the
+   button sat on card text there). Home, Fn-Left or Cmd-Up reach the top;
+   iPhone and iPad keep the button. */
+@media (hover: hover) and (pointer: fine) {
+  #back-to-top { display: none; }
+}
+
 /* Small phones: a one-word stat label ("Customizations") is wider than a
    third of the card, so each cell takes at least its label's width. Below
    360px the cells pad less, and the labels keep the 11px phone size (the
@@ -2829,10 +2856,8 @@ a.info-item:hover .info-value { color: var(--color-link); }
 
 /* High contrast: every filter chip keeps an outline and the chosen one is filled */
 @media (forced-colors: active) {
-  .filter-btn,
-  .exp-filter-chip { border: 1px solid ButtonText; }
-  .filter-btn[aria-pressed="true"],
-  .exp-filter-chip[aria-pressed="true"] {
+  .filter-btn { border: 1px solid ButtonText; }
+  .filter-btn[aria-pressed="true"] {
     forced-color-adjust: none;
     background: Highlight;
     color: HighlightText;
@@ -3147,7 +3172,15 @@ p.profile-bio-small,
   pointer-events: none;
   transition: opacity .25s ease, transform .35s cubic-bezier(.32, .72, 0, 1);
 }
-.toast.is-shown { opacity: 1; transform: translate(-50%, 0); }
+/* a shown toast takes the pointer, so hovering it keeps it open */
+.toast.is-shown { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+/* On a Mac the bottom of the window is often below the screen edge, so
+   the confirmation drops in near the top there; phones and tablets keep
+   it at the bottom */
+@media (hover: hover) and (pointer: fine) {
+  .toast { top: 24px; bottom: auto; transform: translate(-50%, -8px); }
+  .toast.is-shown { transform: translate(-50%, 0); }
+}
 .toast-check {
   flex: none;
   width: 22px;

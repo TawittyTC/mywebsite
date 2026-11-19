@@ -148,12 +148,21 @@ test('keyboards: "View projects" and Back to top move keyboard focus along with 
   assert.ok(at.inPortfolio, 'the next Tab after "View projects" left the projects section');
   assert.ok(at.y > 3000, `the page jumped back up to y=${at.y}`);
 
-  await page.evaluate(() => scrollTo(0, 6000));
-  await page.waitForFunction(() => document.getElementById('back-to-top').classList.contains('visible'));
-  await page.click('#back-to-top');
-  assert.equal(await page.evaluate(() => document.activeElement.classList.contains('hero-name')), true,
-    'focus stayed on Back to top');
   await page.close();
+
+  // Back to top is on touch screens only (mac-back-to-top-hidden): an iPad with a keyboard,
+  // where it comes out as the page moves back up
+  const { page: pad } = await ctx.openPage({ viewport: { width: 820, height: 1180 }, isMobile: true, hasTouch: true, reducedMotion: 'reduce' });
+  await pad.evaluate(() => scrollTo(0, 6000));
+  await pad.waitForTimeout(100);
+  for (let y = 5960; y >= 5800; y -= 40) {
+    await pad.evaluate((to) => new Promise((done) => { scrollTo(0, to); requestAnimationFrame(() => requestAnimationFrame(done)); }), y);
+  }
+  await pad.waitForFunction(() => document.getElementById('back-to-top').classList.contains('visible'));
+  await pad.click('#back-to-top');
+  assert.equal(await pad.evaluate(() => document.activeElement.classList.contains('hero-name')), true,
+    'focus stayed on Back to top');
+  await pad.close();
 });
 
 test('images > alt text: each certificate is named by what is printed on it', async () => {

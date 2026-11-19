@@ -504,7 +504,7 @@ test('typography > legibility: on phones the reading paragraphs step up from 13p
       (els) => els.map((el) => getComputedStyle(el).webkitLineClamp)), ['3', '3']);
     // the sheet behind a card's "+" reads at the same size
     await page.$eval('#experience [data-exp="protollcall"] .exp-card-cta', (el) => el.click());
-    await page.waitForSelector('.exp-lightbox.open .exp-modal-overview');   // (the client lists start folded on phones)
+    await page.waitForSelector('.exp-lightbox.open .exp-modal-overview');   // (the client lists start folded)
     for (const sel of ['.exp-lightbox.open .exp-modal-overview', '.exp-lightbox.open .exp-client-section ul']) {
       const [x] = await sizes(page, sel);
       assert.deepEqual([x.size, x.lh], [15, 20], `${where}: ${sel} is ${x.size}/${x.lh}`);
@@ -893,6 +893,247 @@ test('layout > the Skills cards are as tall as the Projects cards, words on top 
     await page.waitForTimeout(400);
     const hs = await page.$$eval('#skill .rf-cards-scroller-item', (cs) => cs.filter((c) => c.style.display !== 'none').map((c) => c.offsetHeight));
     assert.ok(hs.length >= 1 && hs.every((h) => h === r.proj), `${w}px: filtered cards are ${hs.join(', ')}px tall`);
+    await page.close();
+  }
+});
+
+const IPAD = { viewport: { width: 820, height: 1180 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true };
+
+/** Opens the current job's sheet from its card's "+" and waits for it to settle. */
+async function openProtollcall(page) {
+  await page.$eval('#experience [data-exp="protollcall"] .exp-card-cta', (el) => el.click());
+  await page.waitForSelector('.exp-lightbox.open .exp-client-section');
+  await page.waitForTimeout(450);
+}
+
+test('modality > the sheet stays short: on iPad and Mac too each client folds to its name, right after the role overview (sheet-fold-all-sizes)', async () => {
+  for (const [where, opts, most] of [['Mac', MAC, 7.5], ['iPad', IPAD, 6]]) {
+    const { page, errors } = await open({ ...opts, reducedMotion: 'reduce' });
+    await openProtollcall(page);
+    const r = await page.evaluate(() => {
+      const inner = document.querySelector('.exp-lightbox-inner');
+      const block = inner.querySelector('.exp-client-section').closest('.exp-modal-section');
+      const secs = [...inner.querySelectorAll('.exp-client-section')];
+      return {
+        folded: block.classList.contains('exp-clients-folded'),
+        after: block.previousElementSibling && !!block.previousElementSibling.querySelector('.exp-modal-overview'),
+        open: secs.filter((s) => getComputedStyle(s.querySelector('ul')).display !== 'none').length,
+        toggles: inner.querySelectorAll('.exp-client-toggle[aria-expanded="false"]').length, n: secs.length,
+        heights: inner.scrollHeight / inner.clientHeight,
+        sideways: inner.scrollWidth - inner.clientWidth,
+      };
+    });
+    assert.ok(r.folded, `${where}: the clients are not folded`);
+    assert.ok(r.after, `${where}: the client list does not follow the role overview`);
+    assert.equal(r.open, 0, `${where}: ${r.open} client stories show before they are opened`);
+    assert.equal(r.toggles, r.n, `${where}: a client row is not a collapsed disclosure button`);
+    assert.ok(r.heights <= most, `${where}: the sheet runs to ${r.heights.toFixed(1)} sheet heights`);
+    assert.equal(r.sideways, 0, `${where}: the sheet scrolls sideways`);
+    // a click on a row opens that client's story, and only that one
+    const head = page.locator('.exp-lightbox.open .exp-client-section-header').nth(1);
+    await head.click();
+    const opened = await page.$$eval('.exp-lightbox.open .exp-client-section', (ss) =>
+      ss.filter((s) => getComputedStyle(s.querySelector('ul')).display !== 'none').map((s) => s.dataset.client));
+    assert.deepEqual(opened, ['kasikorn'], `${where}: clicking the second row opened ${opened.join(', ')}`);
+    assert.deepEqual(errors, []);
+    await page.close();
+  }
+});
+
+test('controls > pop-up button: the 35 client chips are one grey "All Clients" capsule, 44px tall with 17px text, that filters the stories (sheet-client-popup)', async () => {
+  for (const [where, opts] of [['small phone', SMALL], ['iPhone', PHONE], ['iPad', IPAD], ['Mac', MAC]]) {
+    const { page, errors } = await open({ ...opts, reducedMotion: 'reduce' });
+    await openProtollcall(page);
+    const r = await page.evaluate(() => {
+      const inner = document.querySelector('.exp-lightbox-inner');
+      const sel = inner.querySelector('select.exp-client-select');
+      const cs = sel && getComputedStyle(sel), q = sel && sel.getBoundingClientRect();
+      return {
+        chips: inner.querySelectorAll('.exp-filter-chip, .exp-client-filter button').length,
+        selects: inner.querySelectorAll('.exp-client-filter select').length,
+        options: sel && sel.options.length, first: sel && sel.options[0].text, value: sel && sel.value,
+        h: q && q.height, font: cs && cs.fontSize, bg: cs && cs.backgroundColor, radius: cs && parseFloat(cs.borderRadius) >= q.height / 2,
+        label: sel && sel.getAttribute('aria-label'),
+        count: document.querySelector('[data-exp="protollcall"] .exp-stat-clients').textContent,
+        sideways: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      };
+    });
+    assert.deepEqual([r.chips, r.selects], [0, 1], `${where}: chips ${r.chips}, pop-up buttons ${r.selects}`);
+    assert.deepEqual([r.options, r.first, r.value], [35, 'All Clients', 'all'], `${where}: the pop-up's choices`);
+    assert.deepEqual([r.h, r.font, r.bg, r.radius], [44, '17px', 'rgb(232, 232, 237)', true], `${where}: the capsule's look`);
+    assert.equal(r.label, 'Client');
+    assert.equal(r.count, '33', `${where}: the client count changed`);
+    assert.equal(r.sideways, 0, `${where}: the page scrolls sideways`);
+    if (opts.isMobile && opts.viewport.width < 735) {
+      // scrolled into the stories, the capsule sticks beside the close button, level with it
+      await page.evaluate(() => { const inner = document.querySelector('.exp-lightbox-inner'); inner.scrollTop = inner.querySelector('.exp-client-section[data-client="vietjet"]').offsetTop - 120; });
+      await page.waitForTimeout(150);
+      const s = await page.evaluate(() => {
+        const inner = document.querySelector('.exp-lightbox-inner').getBoundingClientRect();
+        const a = document.querySelector('.exp-lightbox .exp-client-select').getBoundingClientRect();
+        const b = document.querySelector('.exp-lightbox .exp-lightbox-close').getBoundingClientRect();
+        return { mid: [a.top + a.height / 2 - inner.top, b.top + b.height / 2 - inner.top], gap: b.left - a.right };
+      });
+      assert.deepEqual(s.mid, [44, 44], `${where}: the stuck capsule and the close button are not level`);
+      assert.ok(s.gap >= 6, `${where}: the capsule comes within ${s.gap}px of the close button`);
+    }
+    await page.selectOption('.exp-lightbox.open .exp-client-select', 'vietjet');
+    const shown = await page.$$eval('.exp-lightbox.open .exp-client-section', (ss) => ss.filter((s) => s.style.display !== 'none').map((s) => s.dataset.client + (s.classList.contains('is-open') ? ' open' : '')));
+    assert.deepEqual(shown, ['vietjet open'], `${where}: choosing Thai VietJet Air left ${shown.join(', ')}`);
+    assert.deepEqual(errors, []);
+    await page.close();
+  }
+  // opened from a client's project card: that client is already chosen
+  const { page } = await open({ ...MAC, reducedMotion: 'reduce' });
+  await page.$eval('#portfolio [data-open-exp][data-client="kasikorn"]', (el) => el.click());
+  await page.waitForSelector('.exp-lightbox.open .exp-client-select');
+  assert.equal(await page.$eval('.exp-lightbox.open .exp-client-select', (s) => s.value), 'kasikorn');
+  await page.close();
+});
+
+test('motion > no hint wave is left in the sheet once the chips are gone (chip-hint-once, moot under sheet-client-popup)', async () => {
+  const { page } = await open(MAC);
+  const css = await page.evaluate(() => [...document.styleSheets].some((sh) => {
+    try { return [...sh.cssRules].some((r) => /chip-hint/.test(r.cssText)); } catch { return false; }
+  }));
+  assert.equal(css, false, 'a chip-hint animation is still defined');
+  await openProtollcall(page);
+  await page.waitForTimeout(1200);   // the old wave started 450ms after opening
+  const moved = await page.$$eval('.exp-lightbox.open .exp-client-filter *, .exp-lightbox.open .exp-client-filter', (els) =>
+    els.filter((el) => el.classList.contains('hint') || getComputedStyle(el).animationName !== 'none').length);
+  assert.equal(moved, 0, 'something in the client picker animates after the sheet opens');
+  await page.close();
+});
+
+test('layout > on a Mac nothing floats on the window\'s bottom edge: Back to top is for touch screens only (mac-back-to-top-hidden)', async () => {
+  const { page } = await open(MAC);
+  await page.evaluate(() => scrollTo(0, 6000));
+  await page.waitForTimeout(400);
+  assert.equal(await page.$eval('#back-to-top', (b) => getComputedStyle(b).display), 'none', 'Mac: Back to top is drawn');
+  await page.close();
+  // an iPhone keeps it: it comes out as the page moves back up
+  const ph = await open(PHONE);
+  await ph.page.evaluate(() => scrollTo(0, 6000));
+  await ph.page.waitForTimeout(100);
+  for (let y = 5960; y >= 5800; y -= 40) {
+    await ph.page.evaluate((to) => new Promise((done) => { scrollTo(0, to); requestAnimationFrame(() => requestAnimationFrame(done)); }), y);
+  }
+  await ph.page.waitForFunction(() => document.getElementById('back-to-top').classList.contains('visible'));
+  assert.notEqual(await ph.page.$eval('#back-to-top', (b) => getComputedStyle(b).display), 'none', 'iPhone: Back to top is gone');
+  await ph.page.close();
+});
+
+test('feedback > on a Mac the confirmation drops in at the top centre, 24px down; phones keep it 28px above the bottom (mac-toast-top)', async () => {
+  for (const [where, opts, want] of [['Mac', MAC, { top: 24 }], ['iPhone', PHONE, { bottom: 28 }]]) {
+    const { page } = await open({ ...opts, reducedMotion: 'reduce' });
+    await page.evaluate(() => window._toast('Downloading the CV'));
+    await page.waitForTimeout(400);
+    const r = await page.$eval('.toast', (t) => {
+      const q = t.getBoundingClientRect();
+      return { top: Math.round(q.top), bottom: Math.round(innerHeight - q.bottom), centre: Math.round(q.left + q.width / 2 - innerWidth / 2) };
+    });
+    if (want.top !== undefined) assert.equal(r.top, want.top, `${where}: the toast's top`);
+    else assert.equal(r.bottom, want.bottom, `${where}: the toast's gap to the bottom`);
+    assert.ok(Math.abs(r.centre) <= 1, `${where}: the toast is off centre by ${r.centre}px`);
+    await page.close();
+  }
+});
+
+test('feedback > a confirmation stays 5s; a pointer on it holds it, and it goes 2s after the pointer leaves; Escape or a click closes it (toast-longer-hover-pause)', async () => {
+  const { page } = await open({ ...MAC, reducedMotion: 'reduce' });
+  const shown = () => page.$eval('.toast', (t) => t.classList.contains('is-shown'));
+  await page.mouse.move(10, 600);
+  await page.evaluate(() => window._toast('Downloading the CV'));
+  await page.waitForTimeout(4500);
+  assert.equal(await shown(), true, 'gone before 4.5s');
+  await page.waitForTimeout(1000);
+  assert.equal(await shown(), false, 'still there after 5.5s');
+  // held by the pointer well past 5s, then 2s more once it leaves
+  await page.evaluate(() => window._toast('Downloading the CV'));
+  await page.waitForTimeout(300);
+  assert.equal(await page.$eval('.toast', (t) => getComputedStyle(t).pointerEvents), 'auto', 'a shown toast does not take the pointer');
+  const c = await page.$eval('.toast', (t) => { const q = t.getBoundingClientRect(); return [q.left + q.width / 2, q.top + q.height / 2]; });
+  await page.mouse.move(c[0], c[1]);
+  await page.waitForTimeout(5800);
+  assert.equal(await shown(), true, 'it left from under the pointer');
+  await page.mouse.move(10, 600);
+  await page.waitForTimeout(1500);
+  assert.equal(await shown(), true, 'gone sooner than 2s after the pointer left');
+  await page.waitForTimeout(900);
+  assert.equal(await shown(), false, 'still there 2.4s after the pointer left');
+  // Escape and a click anywhere close it at once
+  await page.evaluate(() => window._toast('x'));
+  await page.keyboard.press('Escape');
+  assert.equal(await shown(), false, 'Escape left it up');
+  await page.evaluate(() => window._toast('x'));
+  await page.mouse.click(10, 600);
+  assert.equal(await shown(), false, 'a click elsewhere left it up');
+  await page.close();
+});
+
+test('layout > the footer starts on the same left edge as every section and its own separator; phones keep the copyright centred (footer-aligned)', async () => {
+  for (const [where, opts, centred] of [['small phone', SMALL, true], ['iPhone', PHONE, true], ['iPad', IPAD, true], ['Mac', MAC, false]]) {
+    const { page } = await open(opts);
+    const r = await page.evaluate(() => {
+      const f = document.getElementById('footer');
+      const sec = document.querySelector('#contact .container');
+      const edge = sec.getBoundingClientRect().left + parseFloat(getComputedStyle(sec).paddingLeft);
+      const copy = f.querySelector('.border-top .text-body-secondary');
+      return {
+        edge: Math.round(edge), name: Math.round(f.querySelector('.col-12 > div').getBoundingClientRect().left),
+        sep: Math.round(f.querySelector('.border-top').getBoundingClientRect().left),
+        copy: Math.round(copy.getBoundingClientRect().left), align: getComputedStyle(copy.parentNode).textAlign,
+        sideways: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      };
+    });
+    assert.equal(r.name, r.edge, `${where}: the footer name starts at ${r.name}, the sections at ${r.edge}`);
+    assert.equal(r.sep, r.edge, `${where}: the separator starts at ${r.sep}`);
+    if (centred) assert.equal(r.align, 'center', `${where}: the copyright is no longer centred`);
+    else assert.equal(r.copy, r.edge, `${where}: the copyright starts at ${r.copy}`);
+    assert.equal(r.sideways, 0, `${where}: the page scrolls sideways`);
+    await page.close();
+  }
+});
+
+test('layout > hit regions: on a Mac the footer icons and contact lines answer a 44px square, as on phones (footer-hit-regions-mac)', async () => {
+  for (const [where, opts] of [['Mac', MAC], ['iPhone', PHONE]]) {
+    const { page } = await open(opts);
+    const r = await page.evaluate(() => {
+      const icons = [...document.querySelectorAll('.social-links-footer a')].map((a) => a.getBoundingClientRect());
+      return {
+        icons: icons.map((q) => [Math.round(q.width), Math.round(q.height)]),
+        pitch: icons.slice(1).map((q, i) => Math.round(q.left - icons[i].left)),
+        lines: [...document.querySelectorAll('.footer-contact-link')].map((a) => Math.round(a.getBoundingClientRect().height)),
+        // the first glyph stays on the text's edge (2px in, as the icon draws it)
+        glyph: Math.round(document.querySelector('.social-links-footer svg').getBoundingClientRect().left -
+          [...document.querySelectorAll('#footer .col-12 > div')].find((d) => d.textContent.trim() === 'Contact').getBoundingClientRect().left),
+      };
+    });
+    assert.deepEqual(r.icons, [[44, 44], [44, 44], [44, 44], [44, 44]], `${where}: the footer icons' hit areas`);
+    assert.deepEqual(r.pitch, [44, 44, 44], `${where}: the icons overlap or leave gaps`);
+    assert.deepEqual(r.lines, [44, 44], `${where}: the contact lines' height`);
+    assert.equal(r.glyph, 2, `${where}: the first icon moved off the text's edge`);
+    await page.close();
+  }
+});
+
+test('layout > compact height: a phone held sideways gets the phone spacing, 128px round each section and 56px under its title; other screens keep theirs (landscape-compact-height-spacing)', async () => {
+  for (const [where, opts, pad, title] of [
+    ['iPhone sideways', { viewport: { width: 844, height: 390 }, isMobile: true, hasTouch: true }, '128px', '56px'],
+    ['a 480px-tall window', { viewport: { width: 1440, height: 480 } }, '128px', '56px'],
+    ['iPhone', PHONE, '128px', '56px'], ['iPad', IPAD, '220px', '96px'], ['Mac', MAC, '220px', '96px'],
+  ]) {
+    const { page } = await open(opts);
+    const r = await page.evaluate(() => ({
+      pads: [...new Set(['#resume', '#experience', '#skill', '#certificates', '#services', '#contact'].map((s) => getComputedStyle(document.querySelector(s)).paddingTop))],
+      title: getComputedStyle(document.querySelector('#resume .section-title')).paddingBottom,
+      hero: getComputedStyle(document.getElementById('hero')).paddingTop,
+      sideways: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    }));
+    assert.deepEqual(r.pads, [pad], `${where}: section padding ${r.pads.join(', ')}`);
+    assert.equal(r.title, title, `${where}: the space under a section title`);
+    assert.equal(r.sideways, 0, `${where}: the page scrolls sideways`);
+    if (opts.viewport.height <= 500) assert.equal(r.hero, '0px', `${where}: the hero got padding back`);
     await page.close();
   }
 });

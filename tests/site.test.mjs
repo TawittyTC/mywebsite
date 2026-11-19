@@ -285,9 +285,15 @@ test('hero stays clean: no navbar, no CTA buttons; name lines carry the ink trea
 });
 
 test('back-to-top appears after scrolling and returns to top', async () => {
-  const { page } = await openPage();
+  // a touch screen: on a Mac there is no Back to top (mac-back-to-top-hidden)
+  const { page } = await openPage({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
   assert.ok(!(await page.$eval('#back-to-top', (b) => b.classList.contains('visible'))), 'hidden at top');
-  await page.evaluate(() => window.scrollTo(0, 2000));
+  // there it comes out as the visitor scrolls back up
+  await page.evaluate(() => window.scrollTo(0, 2200));
+  await page.waitForTimeout(100);
+  for (let y = 2160; y >= 2000; y -= 40) {
+    await page.evaluate((to) => new Promise((done) => { window.scrollTo(0, to); requestAnimationFrame(() => requestAnimationFrame(done)); }), y);
+  }
   await page.waitForFunction(() => document.getElementById('back-to-top').classList.contains('visible'));
   await page.click('#back-to-top');
   await page.waitForFunction(() => window.scrollY === 0, null, { timeout: 5000 });

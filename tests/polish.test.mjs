@@ -310,7 +310,7 @@ test('a focused control keeps its own shape, and one without a shape gets the 6p
   // A sheet and the viewer put focus on their close button as they open, so the resting shape
   // is read after a blur; the focused one a frame or two after focus (a transition, however
   // short, would otherwise still report the resting value).
-  const probe = (sel) => page.$eval(sel, async (el) => {
+  const probe = (sel, pg = page) => pg.$eval(sel, async (el) => {
     const frames = () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
     el.scrollIntoView({ block: 'center' });
     el.blur();
@@ -321,9 +321,9 @@ test('a focused control keeps its own shape, and one without a shape gets the 6p
     return { rest, focused: getComputedStyle(el).borderRadius, ring: el.matches(':focus-visible'), outline: getComputedStyle(el).outlineStyle };
   });
   // [selector, the ring's corner]: null = the control's own resting radius, which must not be 0
-  const check = async (controls, where) => {
+  const check = async (controls, where, pg = page) => {
     for (const [sel, want] of controls) {
-      const r = await probe(sel);
+      const r = await probe(sel, pg);
       assert.ok(r.ring, `${where} ${sel} should show its focus ring when focused from the keyboard`);
       assert.notEqual(r.outline, 'none', `${where} ${sel} lost its focus ring`);
       if (want === null) {
@@ -338,7 +338,7 @@ test('a focused control keeps its own shape, and one without a shape gets the 6p
     ['#portfolio [data-scroller-next]', null], ['.filter-btn', null],
     // a certificate tile is one square-cornered button; its ring is drawn round the whole card
     ['#images-list button.cert-img', '0px'],
-    ['#back-to-top', null], ['a.btn-pill', null], ['.skip-link', null],
+    ['a.btn-pill', null], ['.skip-link', null],
     // these draw no box of their own; the round "+" is drawn by an inner element
     ['#experience .exp-card-cta', '50%'], ['button.more.proj-all', '6px'], ['a.more', '6px'], ['.footer-contact-link', '6px'],
     // neither a link nor a button: the Skills row is a scroll region the keyboard can stop on
@@ -354,7 +354,7 @@ test('a focused control keeps its own shape, and one without a shape gets the 6p
 
   await page.$eval('#experience [data-exp="protollcall"] .exp-card-cta', (el) => el.click());
   await page.waitForSelector('.exp-lightbox.open');
-  await check([['.exp-lightbox.open .exp-lightbox-close', null], ['.exp-lightbox.open .exp-filter-chip', null]], 'sheet:');
+  await check([['.exp-lightbox.open .exp-lightbox-close', null], ['.exp-lightbox.open .exp-client-select', null]], 'sheet:');
   await page.keyboard.press('Escape');
   await page.waitForFunction(() => !document.querySelector('.exp-lightbox.open'));
 
@@ -373,6 +373,11 @@ test('a focused control keeps its own shape, and one without a shape gets the 6p
   assert.notEqual(pill.rest, '0px');
   assert.equal(pill.focused, pill.rest, `the "All projects" pill changes shape while focused (${pill.rest} -> ${pill.focused})`);
   await page.close();
+  // Back to top is only on touch screens now (mac-back-to-top-hidden): an iPad with a keyboard
+  const pad = await ctx.openPage({ viewport: { width: 820, height: 1180 }, isMobile: true, hasTouch: true, reducedMotion: 'reduce' });
+  await pad.page.keyboard.press('Tab');
+  await check([['#back-to-top', null]], 'iPad:', pad.page);
+  await pad.page.close();
 });
 
 test('Resume sub-headings sit on the stylesheet\'s own margins', async () => {

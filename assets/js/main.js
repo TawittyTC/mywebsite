@@ -579,7 +579,7 @@ var overlayHistory = (function () {
     if (e.key === 'Tab' && lightbox.classList.contains('open') &&
         !document.querySelector('.cert-lightbox.open')) {
       var focusables = Array.prototype.filter.call(
-        inner.querySelectorAll('button, [href], [tabindex]:not([tabindex="-1"])'),
+        inner.querySelectorAll('button, select, [href], [tabindex]:not([tabindex="-1"])'),
         // a list's rows other than its Tab stop carry tabindex -1
         function (el) { return el.offsetParent !== null && el.tabIndex >= 0; }
       );
@@ -627,16 +627,16 @@ var overlayHistory = (function () {
     if (reduce) motion.jump(1); else motion.to(1);
     closeBtn.focus();
 
-    // Initialize client filter chips
-    var chips = inner.querySelectorAll('.exp-filter-chip');
+    // Initialize the client pop-up button
+    var select = inner.querySelector('.exp-client-select');
     var sections = inner.querySelectorAll('.exp-client-section');
-    if (chips.length && sections.length) {
-      var phone = window.matchMedia('(max-width: 734px)').matches;
-      var clientsBlock = chips[0].closest('.exp-modal-section');
+    if (select && sections.length) {
+      var clientsBlock = select.closest('.exp-modal-section');
       var heads = [];
-      // On a phone the client list is the proof, so it follows the role
-      // overview straight away, each client folded to its name until opened
-      if (phone && clientsBlock) {
+      // The client list is the proof, so it follows the role overview
+      // straight away, each client folded to its name until opened (at
+      // every size: unfolded, the stories ran to 21 sheet heights on a Mac)
+      if (clientsBlock) {
         var overview = inner.querySelector('.exp-modal-overview');
         var overviewBlock = overview && overview.closest('.exp-modal-section');
         if (overviewBlock && overviewBlock.nextElementSibling !== clientsBlock) overviewBlock.after(clientsBlock);
@@ -659,66 +659,34 @@ var overlayHistory = (function () {
           });
         });
       }
-      var choose = function (chip) {
-        var filter = chip.dataset.filter;
-        chips.forEach(function (c) {
-          c.classList.toggle('active', c === chip);
-          c.setAttribute('aria-pressed', String(c === chip));
-        });
+      // a native pop-up: the menu is the system's, and it says the chosen
+      // client itself, so no status line is needed
+      var choose = function (filter) {
+        select.value = filter;
         sections.forEach(function (sec) {
           var show = filter === 'all' || sec.dataset.client === filter;
           sec.style.display = show ? '' : 'none';
           // one client chosen: its story shows open
-          if (phone && show && filter !== 'all') {
+          if (show && filter !== 'all') {
             sec.classList.add('is-open');
             var toggle = sec.querySelector('.exp-client-toggle');
             if (toggle) toggle.setAttribute('aria-expanded', 'true');
           }
         });
-        // chosen from the stuck row further down: bring the story up under it
-        if (phone && clientsBlock && inner.scrollTop > clientsBlock.offsetTop - 8) {
+        // chosen from the stuck picker further down: bring the story up under it
+        if (clientsBlock && inner.scrollTop > clientsBlock.offsetTop - 8) {
           inner.scrollTop = clientsBlock.offsetTop - 8;
         }
       };
-      // what a chip left on screen, for VoiceOver
-      var chipStatus = null;
-      if (chips.length) {
-        chipStatus = document.createElement('p');
-        chipStatus.className = 'visuallyhidden';
-        chipStatus.setAttribute('role', 'status');
-        chips[0].parentNode.parentNode.insertBefore(chipStatus, chips[0].parentNode.nextSibling);
-      }
-      chips.forEach(function (chip) {
-        chip.setAttribute('aria-pressed', String(chip.classList.contains('active')));
-        chip.addEventListener('click', function () {
-          choose(chip);
-          if (chipStatus) chipStatus.textContent = chip.dataset.filter === 'all' ?
-            'Showing all ' + sections.length + ' clients' : 'Showing ' + chip.textContent.trim();
-        });
-      });
-      var preset = client && inner.querySelector('.exp-filter-chip[data-filter="' + client + '"]');
+      select.addEventListener('change', function () { choose(select.value); });
+      var preset = client && select.querySelector('option[value="' + client + '"]');
       if (preset && clientsBlock) {
-        // opened from a client-work card: straight to that client
-        choose(preset);
+        // opened from a client-work card: straight to that client, preselected
+        choose(client);
         inner.scrollTop = Math.max(0, clientsBlock.offsetTop - 8);
-        var row = preset.parentNode;
-        row.scrollLeft = preset.offsetLeft - row.offsetLeft - 18;
-      } else {
-        // Hint animation: bounce non-"All" chips after modal opens
-        setTimeout(function () {
-          var delay = 0;
-          chips.forEach(function (chip) {
-            if (chip.dataset.filter === 'all') return;
-            setTimeout(function () {
-              chip.classList.add('hint');
-              chip.addEventListener('animationend', function () { chip.classList.remove('hint'); }, { once: true });
-            }, delay);
-            delay += 70;
-          });
-        }, 450);
       }
     } else if (client) {
-      // a sheet without client chips (SCG): open it on that project
+      // a sheet without a client picker (SCG): open it on that project
       var sec = inner.querySelector('.exp-client-section[data-client="' + client + '"]');
       if (sec) inner.scrollTop = Math.max(0, sec.offsetTop - 8);
     }
@@ -745,8 +713,8 @@ var overlayHistory = (function () {
     inner.insertBefore(b, closeBtn.nextSibling);
     b.focus({ preventScroll: true });
     // the sheet opened on a project (scrolled to it): start it below the pill
-    var chip = inner.querySelector('.exp-filter-chip');
-    var t = inner.scrollTop && (chip ? chip.closest('.exp-modal-section') : inner.querySelector('.exp-client-section[data-client="' + client + '"]'));
+    var picker = inner.querySelector('.exp-client-select');
+    var t = inner.scrollTop && (picker ? picker.closest('.exp-modal-section') : inner.querySelector('.exp-client-section[data-client="' + client + '"]'));
     if (t) inner.scrollTop = Math.max(0, t.offsetTop - parseFloat(getComputedStyle(inner).paddingTop) - b.offsetHeight - 8);
   };
 })();
@@ -755,10 +723,10 @@ document.addEventListener('DOMContentLoaded', function () {
   // ── Auto-sync Protollcall client count from template ──
   var protollcallTmpl = document.getElementById('exp-protollcall');
   if (protollcallTmpl) {
-    var chips = protollcallTmpl.content.querySelectorAll(
-      '.exp-filter-chip[data-filter]:not([data-filter="all"]):not([data-filter="general"])'
+    var options = protollcallTmpl.content.querySelectorAll(
+      '.exp-client-select option[value]:not([value="all"]):not([value="general"])'
     );
-    var clientCount = chips.length;
+    var clientCount = options.length;
     // Update stat number + data-count for count-up
     var statSpan = document.querySelector('[data-exp="protollcall"] .exp-stat-clients');
     if (statSpan) { statSpan.dataset.count = clientCount; statSpan.textContent = clientCount; }
@@ -2705,15 +2673,38 @@ document.addEventListener('DOMContentLoaded', function () {
   toast.appendChild(check);
   toast.appendChild(text);
   document.body.appendChild(toast);
+  // It stays 5 s, long enough to read; a pointer resting on it holds it
+  // open, and leaving gives it 2 s more. Escape or the next click anywhere
+  // closes it at once.
   var hideTimer = null;
+  function hide() {
+    clearTimeout(hideTimer);
+    hideTimer = null;
+    toast.classList.remove('is-shown');
+  }
+  function later(ms) {
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(hide, ms);
+  }
   function show(msg, fail) {
     check.hidden = !!fail;   // no tick on a message that says something failed
     text.textContent = msg;
     toast.classList.add('is-shown');
-    clearTimeout(hideTimer);
-    hideTimer = setTimeout(function () { toast.classList.remove('is-shown'); }, 2400);
+    later(5000);
   }
   window._toast = show;
+  toast.addEventListener('mouseenter', function () { clearTimeout(hideTimer); hideTimer = null; });
+  toast.addEventListener('mouseleave', function () {
+    if (toast.classList.contains('is-shown')) later(2000);
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && toast.classList.contains('is-shown')) hide();
+  });
+  // capture phase: runs before the handler below, so the click that brings
+  // up a toast does not also close it
+  document.addEventListener('click', function () {
+    if (toast.classList.contains('is-shown')) hide();
+  }, true);
 
   var desk = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)');
   document.addEventListener('click', function (e) {
