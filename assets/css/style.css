@@ -210,6 +210,12 @@ section {
   padding-top: 120px;
   padding-bottom: max(120px, calc(100px + env(safe-area-inset-bottom)));
 }
+/* without the inner container the row would be 24px wider and push the
+   Contact column right; at its old width all three columns move left
+   together, by the same 13px as the name */
+@media (min-width: 768px) {
+  #footer .row { margin-right: 12px; }
+}
 
 
 * {
@@ -1196,9 +1202,6 @@ a.info-item:hover .info-value {
   #resume .data-box > .profile-bio-small:not(.exp-card-highlights),
   #experience .data-box[data-exp] > .profile-bio-small:not(.exp-card-highlights),
   #experience .data-box[data-exp] .exp-role > p.profile-bio-small { font-size: 0.8824rem; line-height: 1.33334; }
-  /* at 15px the grey Education and Achievement lines are no longer small
-     text, so they keep the regular grey rather than the darker small one */
-  #resume p.profile-bio-small { color: var(--color-text-secondary); }
 }
 
 @media (max-width: 576px) {
@@ -2092,6 +2095,11 @@ a.info-item:hover .info-value { color: var(--color-link); }
   padding: 0;
   border-radius: 0;
 }
+/* the marks are drawn larger than the project drawings, so their lines are
+   a step lighter to meet them on screen; each keeps its 4/5/6 steps */
+#skill .skill-icon [stroke-width='4'] { stroke-width: 3.6; }
+#skill .skill-icon [stroke-width='5'] { stroke-width: 4.5; }
+#skill .skill-icon [stroke-width='6'] { stroke-width: 5.4; }
 @media (max-width: 1068px) {
   #skill .rf-cards-scroller-item { min-height: 460px; }
   #skill .rf-cards-scroller-item .skill-icon { width: 172px; height: 172px; margin: auto 0 -14px; }
@@ -2101,6 +2109,11 @@ a.info-item:hover .info-value { color: var(--color-link); }
   #skill .rf-cards-scroller-item { aspect-ratio: auto; min-height: clamp(392px, calc(228px + 40.3vw), 430px); }
   #skill .skill-tools { padding-top: 16px; }
   #skill .rf-cards-scroller-item .skill-icon { width: 72px; height: 72px; margin: auto 0 -10px; }
+  /* drawn this small, the skill marks take heavier lines to meet the
+     project drawings on screen (7.7 = 3.26px x 170 / 72), keeping 4/5/6 */
+  #skill .skill-icon [stroke-width='4'] { stroke-width: 6.2; }
+  #skill .skill-icon [stroke-width='5'] { stroke-width: 7.7; }
+  #skill .skill-icon [stroke-width='6'] { stroke-width: 9.25; }
 }
 @media (min-width: 2000px) {
   #skill .rf-cards-scroller-item { min-height: 515px; }
@@ -2542,6 +2555,12 @@ a.info-item:hover .info-value { color: var(--color-link); }
 @media (max-width: 374px) {
   #skill .filter-btn { min-width: 44px; padding-left: 10px; padding-right: 10px; }
 }
+/* Increase Contrast: a darker track and an edge round the chosen segment */
+@media (prefers-contrast: more) {
+  #skill .project-filters { background: #D2D2D7; }
+  #skill .filter-btn.active,
+  #skill .filter-btn[aria-pressed="true"] { box-shadow: 0 0 0 1px rgba(0, 0, 0, .35); }
+}
 
 /* Recruiters never opened "Read more", so the client names were never
    seen: six of them sit under the current job's numbers */
@@ -2837,11 +2856,15 @@ a.info-item:hover .info-value { color: var(--color-link); }
 /* High contrast: every filter chip keeps an outline and the chosen one is filled */
 @media (forced-colors: active) {
   .filter-btn { border: 1px solid ButtonText; }
-  .filter-btn[aria-pressed="true"] {
+  .filter-btn[aria-pressed="true"],
+  /* the skill segmented control's white thumb is set by ID, so it is named here too */
+  #skill .filter-btn.active,
+  #skill .filter-btn[aria-pressed="true"] {
     forced-color-adjust: none;
     background: Highlight;
     color: HighlightText;
     border-color: Highlight;
+    box-shadow: none;
   }
 }
 
@@ -3044,7 +3067,7 @@ p.profile-bio-small,
   letter-spacing: -0.022em;
   text-decoration: none;
 }
-.more:hover { text-decoration: underline; text-underline-offset: .12em; }
+.more:hover { color: var(--color-link-hover); text-decoration: underline; text-underline-offset: .12em; }
 .more .chev,
 .proj-row .chev {
   display: inline-block;

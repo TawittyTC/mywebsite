@@ -193,6 +193,17 @@ test('color > contrast: the lightest blue in the name and in the Contact headlin
   }
   assert.deepEqual(low, [], `the name's light dropped under 3:1 on white: ${low.join(', ')}`);
   await page.close();
+  // with Increase Contrast the name and headline keep their gradient, with the darker blue; they do not turn solid
+  {
+    const { page: more } = await open({ viewport: { width: 1440, height: 900 }, contrast: 'more' });
+    const g = await more.evaluate(() => ({
+      cta: getComputedStyle(document.querySelector('.cta-headline')).backgroundImage,
+      name: getComputedStyle(document.querySelector('.hero-name-line')).backgroundImage,
+    }));
+    assert.ok(g.cta.includes('rgb(47, 128, 232) 66%'), `Increase Contrast: the headline gradient is ${g.cta}`);
+    assert.notEqual(g.name, 'none', 'Increase Contrast: the name lost its gradient');
+    await more.close();
+  }
 });
 
 test('images > resolution: on a 3x iPhone the hero graph is drawn at 3x (hero-canvas-dpr3)', async () => {
@@ -336,9 +347,13 @@ test('color > contrast: grey text at 14px and below on the page reaches 7:1; lar
       assert.equal(v.color, GREY_SMALL, `${where}: ${k} is ${v.color}`);
       assert.ok(contrast(rgbOf(v.color), rgbOf(v.bg)) >= 7, `${where}: ${k} is ${contrast(rgbOf(v.color), rgbOf(v.bg)).toFixed(2)}:1 on ${v.bg}`);
     }
-    // the Education and role-period lines are 13px only on phones, and only there take the darker grey
+    // on phones the Education and Achievement lines keep the darker grey the owner approved, also at
+    // their 15px size (phone-body-17), so they are never lighter than the 13px dates under them
+    const line = (sel) => page.$$eval(sel, (els) => { const el = els[els.length - 1]; return { color: getComputedStyle(el).color, size: parseFloat(getComputedStyle(el).fontSize) }; });
     const edu = await page.$eval('#resume p.profile-bio-small', (el) => ({ color: getComputedStyle(el).color, size: parseFloat(getComputedStyle(el).fontSize) }));
-    assert.equal(edu.color, edu.size <= 14.5 ? GREY_SMALL : GREY, `${where}: an Education line at ${edu.size}px is ${edu.color}`);
+    assert.equal(edu.color, where === 'iPhone' ? GREY_SMALL : GREY, `${where}: an Education line at ${edu.size}px is ${edu.color}`);
+    const ach = await line('#resume .data-box p.profile-bio-small');
+    assert.equal(ach.color, where === 'iPhone' ? GREY_SMALL : GREY, `${where}: an Achievement line at ${ach.size}px is ${ach.color}`);
     assert.equal(await page.$eval('#hero .hero-role > [aria-hidden]', (el) => getComputedStyle(el).color), GREY, `${where}: the 20px role line left #6E6E73`);
     await page.close();
   }
@@ -409,6 +424,17 @@ test('color > hover: a pointed-at link or button goes darker, not lighter (link-
   await icon.hover();
   await settle(icon);
   assert.equal(await icon.evaluate((a) => getComputedStyle(a).color), BLUE_HOVER, 'a hovered footer icon');
+  // the Resume links, the footer e-mail and phone and "See all 58 projects" darken too (no inline colour holds them)
+  for (const sel of ['#resume a.resume-exp-link', 'footer .footer-contact-link', '[data-proj-all]']) {
+    const l = page.locator(sel).first();
+    await l.scrollIntoViewIfNeeded();
+    await page.mouse.move(0, 0);
+    await page.waitForTimeout(300);
+    assert.equal(await l.evaluate((a) => getComputedStyle(a).color), BLUE, `${sel} at rest`);
+    await l.hover();
+    await page.waitForTimeout(450);
+    assert.equal(await l.evaluate((a) => getComputedStyle(a).color), BLUE_HOVER, `${sel} under the pointer`);
+  }
   await page.close();
 });
 
@@ -634,6 +660,12 @@ test('content: the second scan of the Computer Repair Service certificate (No 10
   });
   assert.deepEqual(await page.$$eval('#images-list img', (imgs) => imgs.filter((im) => !(im.naturalWidth > 0)).map((im) => im.getAttribute('src'))), []);
   assert.deepEqual(requested.filter((u) => /img-24\.avif/.test(u)), []);
+  // each tile's stored full size (CERT_SIZES) has the shape of its own file, so the viewer opens it at the right shape
+  const off = await page.$$eval('#images-list img', (imgs) => imgs.map((im) => {
+    const w = +im.getAttribute('data-full-w'), h = +im.getAttribute('data-full-h');
+    return { src: im.getAttribute('src'), w, h, d: Math.abs(w / h - im.naturalWidth / im.naturalHeight) };
+  }).filter((x) => !(x.d < 0.02)));
+  assert.deepEqual(off, [], 'a tile\'s stored size does not match its file');
   await page.close();
 });
 
@@ -721,6 +753,15 @@ test('controls > segmented control: the four skill filters are one grey track; t
     assert.ok(!s.clip, 'a segment label is cut');
   }
   await page.close();
+  // Windows High Contrast: the chosen segment is filled with the system Highlight, unlike the others
+  {
+    const { page: fc } = await open({ ...MAC, forcedColors: 'active' });
+    const bgs = await fc.$$eval('#skill .filter-btn', (bs) => bs.map((b) => [b.getAttribute('aria-pressed'), getComputedStyle(b).backgroundColor]));
+    const on = bgs.find((x) => x[0] === 'true')[1];
+    assert.ok(bgs.filter((x) => x[0] !== 'true').every((x) => x[1] !== on), `forced colours: the chosen segment looks like the others (${on})`);
+    assert.notEqual(on, 'rgb(255, 255, 255)', 'forced colours: the chosen segment kept the white thumb');
+    await fc.close();
+  }
 });
 
 test('controls > hover: a pointed-at skill segment tints light grey, never blue and never larger (filter-hover-tint, as the segmented control)', async () => {
@@ -831,6 +872,20 @@ test('icons > one line weight: the project drawings are drawn lighter and the se
   assert.deepEqual(w.work.filter((x) => x !== null), [3.5, 4.4, 5.25].filter((_, i) => w.work[i] !== null));
   assert.ok(Math.abs(w.svcPx - w.workPx) / w.workPx < 0.05, `on a Mac the service lines (${w.svcPx.toFixed(2)}px) and project lines (${w.workPx.toFixed(2)}px) differ`);
   await page.close();
+  // the Skills marks (72px on phones, 202px on a Mac) meet the project lines too
+  for (const [where, opts] of [['iPhone', PHONE], ['Mac', MAC]]) {
+    const { page: p } = await open(opts);
+    const k = await p.evaluate(() => {
+      const px = (sel) => {
+        const el = [...document.querySelectorAll(sel)].find((e) => e.ownerSVGElement.clientWidth > 0);
+        const svg = el.ownerSVGElement;
+        return parseFloat(getComputedStyle(el).strokeWidth) * svg.clientWidth / svg.viewBox.baseVal.width;
+      };
+      return { skill: px("#skill .skill-icon [stroke-width='5']"), work: px(".work-icon svg [stroke-width='5']") };
+    });
+    assert.ok(Math.abs(k.skill - k.work) / k.work < 0.1, `${where}: the skill lines (${k.skill.toFixed(2)}px) and project lines (${k.work.toFixed(2)}px) differ`);
+    await p.close();
+  }
 });
 
 test('scroll views > a card row past its last card bounces on its own and never hands the swipe to the page (scroller-overscroll-contain)', async () => {
@@ -857,6 +912,29 @@ test('motion > the project row nudges once as it comes into view and once more 6
   assert.equal(starts.length, 2, `the row nudged at ${starts.join(', ')}s`);
   assert.ok(Math.abs(starts[1] - starts[0] - 6) < 0.6, `the second nudge came ${(starts[1] - starts[0]).toFixed(1)}s after the first`);
   await page.close();
+  // a touch swipe on the row stops the nudging for good
+  const { page: p } = await open(PHONE);
+  await p.$eval('#scroller', (el) => el.scrollIntoView({ block: 'center' }));
+  await p.waitForTimeout(1000);
+  const box = await p.$eval('#scroller', (el) => { const r = el.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
+  const cdp = await p.context().newCDPSession(p);
+  const at = (x) => [{ x, y: box.y, id: 1 }];
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: at(box.x + 100) });
+  for (let i = 1; i <= 10; i++) {
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: at(box.x + 100 - i * 15) });
+    await p.waitForTimeout(16);
+  }
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  await p.waitForTimeout(1500);
+  const moves = await p.$eval('#scroller', (el) => new Promise((resolve) => {
+    const t0 = performance.now(), rest = el.scrollLeft, out = [];
+    (function tick() {
+      if (Math.abs(el.scrollLeft - rest) > 2) out.push(Math.round((performance.now() - t0) / 100) / 10);
+      if (performance.now() - t0 < 10000) requestAnimationFrame(tick); else resolve(out);
+    })();
+  }));
+  assert.deepEqual(moves.slice(0, 3), [], `after a swipe the row moved again at ${moves[0]}s`);
+  await p.close();
 });
 
 test('layout > the Skills cards are as tall as the Projects cards, words on top and the drawing at the foot, every card whole (q-skills-card)', async () => {
@@ -1091,6 +1169,12 @@ test('layout > the footer starts on the same left edge as every section and its 
     if (centred) assert.equal(r.align, 'center', `${where}: the copyright is no longer centred`);
     else assert.equal(r.copy, r.edge, `${where}: the copyright starts at ${r.copy}`);
     assert.equal(r.sideways, 0, `${where}: the page scrolls sideways`);
+    // the Contact column moves left with the rest: 948.8 / 538.8 in v2.71.0, 12.5px further left now
+    const was = { iPad: 538.8, Mac: 948.8 }[where];
+    if (was) {
+      const contact = await page.evaluate(() => [...document.querySelectorAll('#footer *')].find((e) => e.children.length === 0 && e.textContent.trim() === 'Contact').getBoundingClientRect().left);
+      assert.ok(Math.abs(contact - (was - 12.5)) <= 1, `${where}: the footer Contact heading starts at ${contact}`);
+    }
     await page.close();
   }
 });
