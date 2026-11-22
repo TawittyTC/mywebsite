@@ -133,7 +133,7 @@ test('every project card shows its client\'s logo, a picture or its drawing, pho
 test('"See all" lists every project; a row opens it in the sheet and Back returns to the list', async () => {
   const { page } = await ctx.openPage({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
   const total = await page.$$eval('#scroller > .rf-cards-scroller-item', (c) => c.length);
-  assert.match(await page.textContent('[data-proj-all]'), new RegExp(`See all ${total} projects`));
+  assert.match(await page.textContent('[data-proj-all]'), new RegExp(`See All ${total} Projects`));
   await page.$eval('[data-proj-all]', (b) => { b.scrollIntoView({ block: 'center' }); b.click(); });
   await page.waitForSelector('.exp-lightbox.open .proj-row');
   // grouped by company, as SCG is: "Vehicle sales CRM" under "Inchcape Thailand";

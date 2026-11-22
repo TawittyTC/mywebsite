@@ -701,7 +701,7 @@ var overlayHistory = (function () {
     var b = document.createElement('button');
     b.type = 'button';
     b.className = 'more proj-back';
-    b.innerHTML = '<span class="chev" aria-hidden="true"></span>All projects';
+    b.innerHTML = '<span class="chev" aria-hidden="true"></span>All Projects';
     // screen readers hear which project they are in, not just the way back
     var nm = source && source.querySelector('.proj-name');
     if (nm) {
@@ -1399,7 +1399,7 @@ document.addEventListener('DOMContentLoaded', function () {
   var months = now.getMonth() - start.getMonth();
   if (months < 0) { years--; months += 12; }
   var parts = [];
-  if (years > 0) parts.push(years + (years === 1 ? ' yr' : ' yrs'));
+  if (years > 0) parts.push(years + (years === 1 ? ' year' : ' years'));
   if (months > 0) parts.push(months + (months === 1 ? ' month' : ' months'));
   el.textContent = parts.join(' ') || '1 month';
 })();

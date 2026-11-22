@@ -45,7 +45,8 @@ test('every FAQPage question is visible on the page', () => {
   const faq = blocks.find((b) => b['@type'] === 'FAQPage');
   if (!faq) return;
   const decode = (s) => s.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
-  const shown = [...html.matchAll(/<summary>([\s\S]*?)<\/summary>/g)].map((m) => decode(m[1].trim()));
+  // a question may mark an abbreviation up (<abbr>, inside one <span>): compare its text
+  const shown = [...html.matchAll(/<summary>([\s\S]*?)<\/summary>/g)].map((m) => decode(m[1].replace(/<[^>]+>/g, '').trim()));
   const missing = faq.mainEntity.map((q) => q.name).filter((q) => !shown.includes(q));
   assert.deepEqual(missing, [], 'FAQ questions only in JSON-LD');
 });

@@ -3,7 +3,9 @@
 // v2.71.0.
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { createContext, styled } from './helpers.mjs';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { createContext, styled, ROOT } from './helpers.mjs';
 
 let ctx;
 before(async () => { ctx = await createContext(); });
@@ -1375,6 +1377,237 @@ test('layout > hit regions: where the card\'s e-mail and phone stack they sit 44
       return [...document.querySelectorAll('#biz-card .biz-contacts a')].map((a) => Math.round((a.getBoundingClientRect().top - c.top) * 10) / 10);
     });
     assert.deepEqual(r, [top, top], `${opts.viewport.width}px: the e-mail and phone moved`);
+    await page.close();
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Round 2 (v2.73.0): copy and text
+// ---------------------------------------------------------------------------
+
+const text = (el) => el.textContent.replace(/\s+/g, ' ').trim();
+
+test('buttons > title-style capitalisation on every button and link label, and one name per action (button-label-case)', async () => {
+  const { page } = await open({ ...PHONE, reducedMotion: 'reduce' });
+  const r = await page.evaluate((textSrc) => {
+    const text = eval('(' + textSrc + ')');
+    const q = (s) => document.querySelector(s);
+    const sheetLinks = [...document.querySelectorAll('template')].flatMap((t) => [...t.content.querySelectorAll('a.exp-sheet-link')].map(text));
+    const resume = [...document.querySelectorAll('#resume a.resume-exp-link')].map((a) => {
+      const cs = getComputedStyle(a);
+      return { text: text(a), more: a.classList.contains('more'), chev: !!a.querySelector('.chev'), weight: cs.fontWeight, top: Math.round(a.getBoundingClientRect().top), inline: a.getAttribute('style') };
+    });
+    return {
+      hero: text(q('#hero .btn-pill')), all: text(q('[data-proj-all]')), contact: text(q('#contact .cta-pill')), sheetLinks, resume,
+      cv: [...document.querySelectorAll('a[download][href$="CV.pdf"]')].map(text),
+      expCta: [...document.querySelectorAll('#experience .exp-card-cta')].map((b) => b.getAttribute('aria-label')),
+    };
+  }, text.toString());
+  assert.equal(r.hero, 'View Projects');
+  assert.match(r.all, /^See All \d+ Projects$/);
+  assert.equal(r.contact, 'Get in Touch');
+  assert.equal(r.sheetLinks.length, 18, 'one contact link at the foot of each of the 18 sheets');
+  assert.deepEqual([...new Set(r.sheetLinks)], ['Get in Touch'], 'the sheet links spell the label as the Contact pill does');
+  assert.deepEqual(r.resume.map((l) => l.text), ['View Experience', 'Download CV']);
+  for (const l of r.resume) {
+    assert.ok(l.more && l.chev, `"${l.text}" is not the site's standard link with a drawn chevron`);
+    assert.equal(l.weight, '400', `"${l.text}" is not regular weight`);
+    assert.equal(l.inline, null, `"${l.text}" still carries inline styles`);
+  }
+  assert.equal(r.resume[0].top, r.resume[1].top, 'on an iPhone the two Profile links share one row');
+  assert.deepEqual([...new Set(r.cv)], ['Download CV'], 'the CV link has one name everywhere');
+  assert.equal(r.expCta.length, 3);
+  for (const n of r.expCta) assert.match(n, /^Read More: /);
+  // the back pill of a project opened from the See All list
+  await page.click('[data-proj-all]');
+  await page.waitForSelector('.proj-row');
+  await page.click('.proj-row');
+  await page.waitForSelector('.proj-back');
+  // (the pill also carries the project's name for screen readers)
+  assert.match(await page.$eval('.proj-back', (b) => b.textContent.trim()), /^All Projects/);
+  await page.close();
+});
+
+test('writing > FAQ answers speak in the first person; the structured data says the same; numbers and the LinkedIn name stay whole (faq-first-person)', async () => {
+  const src = readFileSync(join(ROOT, 'index.html'), 'utf8');
+  const faq = [...src.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map((m) => JSON.parse(m[1])).find((b) => b['@type'] === 'FAQPage');
+  for (const [where, opts] of [['320', SMALL], ['iPhone', PHONE], ['iPad', { viewport: { width: 820, height: 1180 } }], ['Mac', MAC]]) {
+    const { page } = await open({ ...opts, reducedMotion: 'reduce' });
+    const r = await page.evaluate((textSrc) => {
+      const text = eval('(' + textSrc + ')');
+      document.querySelectorAll('#services .faq details').forEach((d) => { d.open = true; });
+      const lines = (el) => new Set([...el.getClientRects()].filter((x) => x.width > 0).map((x) => Math.round(x.top))).size;
+      return {
+        qa: [...document.querySelectorAll('#services .faq details')].map((d) => [text(d.querySelector('summary')), text(d.querySelector('p'))]),
+        tel: [...document.querySelectorAll('#services .faq a[href^="tel:"]')].map(lines),
+        name: [...document.querySelectorAll('#services .faq a[href*="linkedin.com"] .nw')].map((n) => [text(n), lines(n)]),
+        wbr: [...document.querySelectorAll('#services .faq a[href*="linkedin.com"]')].map((a) => a.innerHTML.includes('/in/<wbr>')),
+        sideways: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      };
+    }, text.toString());
+    assert.equal(r.qa.length, 13);
+    for (const [q, a] of r.qa) assert.doesNotMatch(a, /^(รับครับ |มีครับ |ใช่ครับ |Yes\. |Contact )?(ธนพล ชำนาญหาญ|Tanapol Chamnanhan)/, `${where}: "${q}" is answered in the third person`);
+    assert.match(r.qa[0][1], /^ผมเป็น Full-Stack Developer/);
+    assert.match(r.qa[5][1], /^Contact me via email/);
+    assert.deepEqual(r.qa, faq.mainEntity.map((e) => [e.name, e.acceptedAnswer.text]), `${where}: the FAQPage data differs from the visible questions and answers`);
+    assert.ok(r.tel.length >= 2 && r.tel.every((n) => n === 1), `${where}: a phone number wraps (${r.tel})`);
+    assert.ok(r.name.length >= 2 && r.name.every(([t, n]) => t === 'tanapol-chamnanhan/' && n === 1), `${where}: the LinkedIn name breaks at its hyphen`);
+    assert.ok(r.wbr.every(Boolean), 'the LinkedIn address may break after "/in/"');
+    assert.equal(r.sideways, 0, `${where}: the page scrolls sideways`);
+    await page.close();
+  }
+});
+
+test('writing > abbreviations are spelled out in the text or carry their full name (jargon-defined)', async () => {
+  for (const [where, opts] of [['320', SMALL], ['iPhone', PHONE], ['iPad', { viewport: { width: 820, height: 1180 } }], ['1280', { viewport: { width: 1280, height: 800 } }], ['Mac', MAC]]) {
+    const { page } = await open({ ...opts, reducedMotion: 'reduce' });
+    const r = await page.evaluate((textSrc) => {
+      const text = eval('(' + textSrc + ')');
+      const lines = (el) => new Set([...el.getClientRects()].filter((x) => x.width > 0).map((x) => Math.round(x.top))).size;
+      const abbr = [...document.querySelectorAll('abbr')];
+      const inSheets = [...document.querySelectorAll('template')].flatMap((t) => [...t.content.querySelectorAll('abbr')]);
+      const tts = [...document.querySelectorAll('.profile-bio .nw')].find((n) => /^text-to-speech/.test(n.textContent));
+      return {
+        bio: text(document.querySelector('.profile-bio')),
+        tts: tts ? lines(tts) : -1,
+        story: text(document.querySelector('[data-exp="protollcall"] .exp-card-desc, [data-exp="protollcall"] p')),
+        card: text(document.querySelector('[data-exp="protollcall"]')),
+        page: abbr.length, sheets: inSheets.length,
+        untitled: [...abbr, ...inSheets].filter((a) => !a.title).length,
+        names: [...new Set([...abbr, ...inSheets].map((a) => a.textContent + '=' + a.title))].sort(),
+        line: getComputedStyle(abbr[0]).textDecorationLine + ' ' + getComputedStyle(abbr[0]).textDecorationStyle,
+        // a question with an abbreviation is still one piece of text beside its chevron
+        split: [...document.querySelectorAll('#services .faq summary')].filter((s) => s.querySelector('abbr') && s.children.length !== 1).length,
+        qH: [...document.querySelectorAll('#services .faq summary')].map((s) => Math.round(s.getBoundingClientRect().height)),
+        sideways: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      };
+    }, text.toString());
+    assert.match(r.bio, /LLM \(large language model\) integration, voice AI \(speech recognition, text-to-speech, speech-to-speech\)/, `${where}: the bio`);
+    assert.doesNotMatch(r.bio, /ASR|TTS/);
+    assert.equal(r.tts, 1, `${where}: "text-to-speech" breaks at a hyphen`);
+    assert.match(r.card, /CRM \(customer relationship management\) systems/);
+    assert.match(r.card, /IVR \(interactive voice response\)/);
+    assert.doesNotMatch(r.card, /TTS\/ASR\/LLM/);
+    assert.equal(r.page, 69, `${where}: abbreviations marked on the page`);
+    assert.equal(r.sheets, 88, 'abbreviations marked in the sheets');
+    assert.equal(r.untitled, 0);
+    assert.deepEqual(r.names, ['ASR=automatic speech recognition', 'CRM=customer relationship management', 'IVR=interactive voice response', 'LLM=large language model', 'TTS=text-to-speech']);
+    assert.match(r.line, /underline dotted/);
+    assert.equal(r.split, 0, 'a FAQ question is split into columns around its abbreviation');
+    assert.equal(r.sideways, 0, `${where}: the page scrolls sideways`);
+    await page.close();
+  }
+});
+
+test('writing > durations use whole words everywhere: years and months (duration-units-consistent)', async () => {
+  const src = readFileSync(join(ROOT, 'index.html'), 'utf8');
+  assert.doesNotMatch(src.slice(src.indexOf('<body')), /\d (yrs?|mos?)\b/, 'an abbreviated unit is left in the page');
+  const { page } = await open({ ...PHONE, reducedMotion: 'reduce' });
+  // June 2024 to a fixed "today" is checked through the page's own clock
+  const r = await page.evaluate((textSrc) => {
+    const text = eval('(' + textSrc + ')');
+    return {
+      chips: [...document.querySelectorAll('#experience .exp-duration')].map(text),
+      periods: [...document.querySelectorAll('#experience [data-exp="scg"] *')].filter((e) => !e.children.length || e.matches('strong, .exp-period')).map(text).filter((t) => /20\d\d - .* · /.test(t)),
+      all: text(document.querySelector('#experience')),
+    };
+  }, text.toString());
+  assert.match(r.chips[0], /^(\d+ years? ?)?(\d+ months?)?$/, `the live duration reads "${r.chips[0]}"`);
+  assert.ok(r.chips[0].length > 0);
+  assert.deepEqual(r.chips.slice(1), ['2 internships · 8 months', '4 months']);
+  assert.match(r.all, /December 2023 - March 2024 · 4 months/);
+  assert.match(r.all, /April 2023 - July 2023 · 4 months/);
+  assert.doesNotMatch(r.all, /\b(yrs?|mos)\b/);
+  await page.close();
+});
+
+test('typography > at very large text a hyphenated name wraps rather than runs off its card; chips wrap at their spaces (nowrap-release-large-text)', async () => {
+  const probe = () => {
+    const cs = (s) => { const c = getComputedStyle(document.querySelector(s)); return c.display + ' ' + c.whiteSpaceCollapse + ' ' + c.textWrapMode; };
+    const qa = [...document.querySelectorAll('.nw')].filter((n) => n.getClientRects().length).find((n) => n.textContent === 'Question-Answering');
+    const box = qa.closest('.data-box').getBoundingClientRect();
+    const chips = [...document.querySelectorAll('#skill .skill-tools li, #services .svc-chips li')].filter((li) => li.getClientRects().length);
+    return {
+      nw: cs('.profile-bio .nw'), svcNw: cs('#services .svc-nw'), skillChip: cs('#skill .skill-tools li'), svcChip: cs('#services .svc-chips li'),
+      qaOut: Math.round(qa.getBoundingClientRect().right - box.right),
+      // (each chip against its own card: the skill cards sit in a sideways scroller)
+      chipsOut: chips.filter((li) => li.getBoundingClientRect().right > li.closest('ul').parentElement.getBoundingClientRect().right + 0.5).length,
+      // no punctuation is left outside a no-wrap span, where it could drop to a line of its own
+      loose: [...document.querySelectorAll('.nw, .svc-nw')].filter((n) => n.nextSibling && n.nextSibling.nodeType === 3 && /^[,.;:)]/.test(n.nextSibling.nodeValue)).length,
+    };
+  };
+  const at = async (width) => {
+    const { page } = await open({ viewport: { width, height: 700 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, reducedMotion: 'reduce' });
+    const r = await page.evaluate(probe);
+    await page.close();
+    return r;
+  };
+  // 320px (every phone at default text): nothing is released
+  let r = await at(320);
+  assert.equal(r.nw, 'inline collapse nowrap');
+  assert.equal(r.skillChip.split(' ')[2], 'nowrap');
+  assert.equal(r.svcChip.split(' ')[2], 'nowrap');
+  assert.equal(r.loose, 0, 'punctuation sits outside a no-wrap span');
+  // 300px (under 19em): the chips may wrap at their spaces, names still hold
+  r = await at(300);
+  assert.equal(r.skillChip.split(' ')[2], 'wrap', 'skill chips do not wrap under 19em');
+  assert.equal(r.svcChip.split(' ')[2], 'wrap', 'service chips do not wrap under 19em');
+  assert.equal(r.nw, 'inline collapse nowrap', 'names are released before 14em');
+  assert.equal(r.svcNw, 'inline collapse nowrap');
+  // 230px: still above 14em
+  r = await at(230);
+  assert.equal(r.nw, 'inline collapse nowrap');
+  // 220px (under 14em, an iPhone at 175% zoom): a name moves whole, and wraps at its hyphen only when wider than the line
+  r = await at(220);
+  assert.equal(r.nw, 'inline-block collapse wrap');
+  assert.equal(r.svcNw, 'inline-block collapse wrap');
+  assert.ok(r.qaOut <= 0, `"Question-Answering" runs ${r.qaOut}px past its card`);
+  assert.equal(r.chipsOut, 0, 'a chip runs past its card');
+});
+
+test('layout > phones: an experience card gives its title the full width, and the logo follows the role details (exp-header-stack-phone)', async () => {
+  const probe = () => [...document.querySelectorAll('#experience .data-box[data-exp]')].map((c) => {
+    const head = c.querySelector(':scope > .d-flex');
+    const logo = c.querySelector('.company-logo').getBoundingClientRect();
+    const title = head.querySelector('h3').getBoundingClientRect();
+    const chip = c.querySelector('.exp-duration').getBoundingClientRect();
+    const cs = getComputedStyle(c);
+    const next = head.nextElementSibling.getBoundingClientRect();
+    return {
+      dir: getComputedStyle(head).flexDirection,
+      headFull: Math.round(head.getBoundingClientRect().width - (c.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight))),
+      titleLines: Math.round(title.height / parseFloat(getComputedStyle(head.querySelector('h3')).lineHeight)),
+      titleFirst: title.top < logo.top,
+      logoUnderChip: Math.round(logo.top - chip.bottom),
+      logoLeft: Math.round(logo.left - title.left),
+      toStory: Math.round(next.top - logo.bottom),
+      logo: [Math.round(logo.width), Math.round(logo.height)],
+    };
+  });
+  for (const [where, opts] of [['320', SMALL], ['iPhone', PHONE], ['576', { viewport: { width: 576, height: 800 } }]]) {
+    const { page } = await open({ ...opts, reducedMotion: 'reduce' });
+    const cards = await page.evaluate(probe);
+    assert.equal(cards.length, 3);
+    for (const [i, c] of cards.entries()) {
+      assert.equal(c.dir, 'column', `${where} card ${i}: the header is not stacked`);
+      assert.equal(c.headFull, 0, `${where} card ${i}: the role details do not get the card's full width`);
+      assert.ok(c.titleFirst, `${where} card ${i}: the logo is above the title`);
+      assert.ok(c.logoUnderChip >= 12 && c.logoUnderChip <= 24, `${where} card ${i}: the logo is ${c.logoUnderChip}px under the duration`);
+      assert.equal(c.logoLeft, 0, `${where} card ${i}: the logo is not on the text's left edge`);
+      assert.ok(c.toStory >= 24, `${where} card ${i}: only ${c.toStory}px between the logo and the story`);
+    }
+    // beside the logo these titles took 2, 3 and 3 lines on an iPhone
+    if (where === 'iPhone') assert.deepEqual(cards.map((c) => c.titleLines), [1, 2, 2]);
+    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), 0, `${where}: the page scrolls sideways`);
+    await page.close();
+  }
+  // from 577px the logo stays beside the title, as before
+  for (const opts of [{ viewport: { width: 577, height: 800 } }, { viewport: { width: 820, height: 1180 } }, MAC]) {
+    const { page } = await open({ ...opts, reducedMotion: 'reduce' });
+    for (const c of await page.evaluate(probe)) {
+      assert.equal(c.dir, 'row');
+      assert.ok(c.logoLeft > 100, 'the logo left its place beside the title');
+    }
     await page.close();
   }
 });

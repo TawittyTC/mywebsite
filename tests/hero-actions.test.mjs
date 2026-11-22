@@ -1,4 +1,4 @@
-// The two actions under the hero's role line ("View projects" and "Download
+// The two actions under the hero's role line ("View Projects" and "Download
 // CV"), and what they ask of the constellation around them: the labelled
 // nodes move to a band below the buttons, and the graph's composition follows
 // the stylesheet's breakpoint.
@@ -19,7 +19,7 @@ const seeded = (page, seed) => page.addInitScript((s0) => {
   Math.random = () => { s = (s * 1664525 + 1013904223) % 4294967296; return s / 4294967296; };
 }, seed);
 
-test('the hero offers "View projects" and "Download CV" under the role line', async () => {
+test('the hero offers "View Projects" and "Download CV" under the role line', async () => {
   const { page } = await ctx.openPage({ reducedMotion: 'reduce' });
   await page.waitForTimeout(900);   // the entrance holds each line back by up to 0.55s, also with reduced motion
   const a = await page.evaluate(() => {
@@ -37,7 +37,7 @@ test('the hero offers "View projects" and "Download CV" under the role line', as
   });
   assert.equal(a.count, 2);
   assert.equal(a.after, 'hero-role', 'the actions come straight after the role line');
-  assert.equal(a.pill.text, 'View projects');
+  assert.equal(a.pill.text, 'View Projects');
   assert.equal(a.pill.href, '#portfolio');
   assert.match(a.pill.cls, /\bscrollto\b/);
   assert.equal(a.pill.bg, 'rgb(18, 100, 206)', 'the pill is the site blue');
@@ -54,7 +54,7 @@ test('the hero offers "View projects" and "Download CV" under the role line', as
   assert.ok(a.pill.h >= 44 && a.more.h >= 40, `tap heights ${a.pill.h} and ${a.more.h}`);
   assert.ok(Math.abs((a.pill.y + a.pill.h / 2) - (a.more.y + a.more.h / 2)) < 1.5, 'the pill and the link share one centre line');
 
-  // "View projects" takes the visitor to the Projects section
+  // "View Projects" takes the visitor to the Projects section
   await page.$eval('#hero .hero-actions .btn-pill', (el) => el.click());
   const at = await page.evaluate(() => ({ y: scrollY, top: document.getElementById('portfolio').getBoundingClientRect().top + scrollY }));
   assert.ok(Math.abs(at.y - (at.top - 60)) <= 2, `expected to land at ${at.top - 60}, at ${at.y}`);

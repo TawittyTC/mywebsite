@@ -272,6 +272,16 @@ section {
     max-width: 130px;
   }
 }
+/* phones: the role title stays at the top of the card with the card's
+   full width, and the logo follows the role details on its own row, so
+   the visual order matches the reading order. 16px ties the logo to the
+   details above it; 28px (the card's inside step) keeps it apart from
+   the story below, which otherwise reads as a caption under the logo.
+   (!important: the markup's .gap-3 utility is !important too) */
+@media (max-width: 576px) {
+  #experience .data-box[data-exp] > .d-flex { flex-direction: column; align-items: flex-start; gap: 16px !important; margin-bottom: 28px; }
+  .company-logo { margin-top: 0; }
+}
 
 
 .fw-light {
@@ -2840,11 +2850,36 @@ a.info-item:hover .info-value { color: var(--color-link); }
   .contact-strip .info-item[href^="tel:"] .info-value { white-space: normal; overflow-wrap: break-word; }
 }
 
+/* The same very large text: the skill and service chips wrap at their
+   spaces, so a chip longer than its card stays inside it */
+@media (max-width: 19em) {
+  #skill .skill-tools li, #services .svc-chips li { white-space: normal; }
+}
+
 @media (max-width: 16em) {
   .container { padding-left: 10px; padding-right: 10px; }
   .row { --bs-gutter-x: 20px; }
   .data-box.profile-featured { padding: 16px; }
   .section-title h2 { font-size: min(2rem, 13vw); }
+}
+
+/* Larger still (14em is 224px at the default size: about 175% page zoom
+   on an iPhone, or 200% text): a hyphenated name still moves to the next
+   line whole, and wraps at its hyphen only when it is wider than the whole
+   line, rather than run off its card */
+@media (max-width: 14em) {
+  .nw, #services .svc-nw { display: inline-block; white-space: normal; }
+}
+
+/* the LinkedIn name and the phone number in FAQ answers stay whole; only an
+   answer too narrow to hold them (very large text on a small phone) lets them
+   wrap, so they never run off the card */
+#services .faq details > p { container-type: inline-size; }
+@container (max-width: 10.5em) {
+  #services .faq details > p a[href*="linkedin.com"] .nw { white-space: normal; }
+}
+@container (max-width: 8em) {
+  #services .faq details > p a[href^="tel:"] .nw { white-space: normal; }
 }
 
 /* links inside FAQ answers are told apart by more than their colour */
