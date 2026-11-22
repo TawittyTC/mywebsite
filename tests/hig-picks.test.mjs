@@ -2087,3 +2087,266 @@ test('feedback > back in the See all list, the row you came from is filled light
     await page.close();
   }
 });
+
+// ── Dark appearance (dark-appearance, v2.73.0) ──────────────────────────
+// The page follows the device's appearance setting. Light is the page as it
+// was; Dark is one block at the end of style.css plus a first-paint block in
+// index.html. These helpers judge what is drawn, not what is written.
+
+/**
+ * In the page: every visible text run under `sel` (the whole page without
+ * one), its colour against the colours of the boxes behind it. Returns the
+ * runs below 4.5:1 (3:1 for 24px, or bold 18.66px, and larger), and how
+ * many runs were judged.
+ */
+const lowContrast = (sel) => {
+  const parse = (c) => { const p = ((c || '').match(/rgba?\(([^)]+)\)/) || [0, ''])[1].split(/[,\s/]+/).filter(Boolean).map(Number); return p.length < 3 ? null : { r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1 }; };
+  const lum = (c) => { const f = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }; return 0.2126 * f(c.r) + 0.7152 * f(c.g) + 0.0722 * f(c.b); };
+  const over = (t, u) => ({ r: t.r * t.a + u.r * (1 - t.a), g: t.g * t.a + u.g * (1 - t.a), b: t.b * t.a + u.b * (1 - t.a), a: 1 });
+  const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((m, n) => n - m); return (x + 0.05) / (y + 0.05); };
+  const behind = (el) => {
+    const layers = [];
+    for (let n = el; n && n.nodeType === 1; n = n.parentElement) { const c = parse(getComputedStyle(n).backgroundColor); if (c && c.a > 0) { layers.push(c); if (c.a >= 1) break; } }
+    let base = parse(getComputedStyle(document.body).backgroundColor);
+    for (let i = layers.length - 1; i >= 0; i--) base = over(layers[i], base);
+    return base;
+  };
+  const shown = (el) => {
+    const r = el.getBoundingClientRect(); if (r.width < 2 || r.height < 2) return false;
+    for (let n = el; n && n.nodeType === 1; n = n.parentElement) { const cs = getComputedStyle(n); if (cs.display === 'none' || cs.visibility === 'hidden' || +cs.opacity < 0.05 || (cs.clip && cs.clip !== 'auto')) return false; }
+    return true;
+  };
+  const root = sel ? document.querySelector(sel) : document.body, low = [], seen = new Set();
+  let runs = 0;
+  const tw = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  while (tw.nextNode()) {
+    const el = tw.currentNode.parentElement;
+    if (!tw.currentNode.nodeValue.trim() || seen.has(el) || /^(SCRIPT|STYLE|NOSCRIPT|OPTION)$/.test(el.tagName) || !shown(el)) continue;
+    seen.add(el);
+    const cs = getComputedStyle(el), bg = behind(el), fill = parse(cs.webkitTextFillColor);
+    // gradient type (the name, the Contact headline): every stop is judged
+    const inks = /text/.test(cs.webkitBackgroundClip) && fill && fill.a === 0 ? (cs.backgroundImage.match(/rgba?\([^)]+\)/g) || []).map(parse) : [parse(cs.color)];
+    const size = parseFloat(cs.fontSize), need = size >= 24 || (size >= 18.66 && +cs.fontWeight >= 700) ? 3 : 4.5;
+    const worst = Math.min(...inks.map((c) => ratio(over(c, bg), bg)));
+    runs++;
+    if (worst < need) low.push(`${el.className || el.tagName} "${tw.currentNode.nodeValue.trim().slice(0, 24)}" ${worst.toFixed(2)}:1`);
+  }
+  return { runs, low };
+};
+
+/** Boxes under `sel` still filled with a light colour (logo plates and pictures are meant to be). */
+const lightBoxes = (sel) => {
+  const lum = (p) => { const f = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }; return 0.2126 * f(p[0]) + 0.7152 * f(p[1]) + 0.0722 * f(p[2]); };
+  const out = [];
+  for (const el of (sel ? document.querySelector(sel) : document.body).querySelectorAll('*')) {
+    if (el.matches('img, canvas, .company-logo, .exp-modal-company-logo, .proj-logo') || el.closest('svg')) continue;
+    const r = el.getBoundingClientRect(); if (r.width < 30 || r.height < 20) continue;   // dots, chevrons and glyphs are marks, not surfaces
+    const cs = getComputedStyle(el); if (cs.display === 'none' || cs.visibility === 'hidden') continue;
+    const p = (cs.backgroundColor.match(/[\d.]+/g) || []).map(Number);
+    if (p.length >= 3 && (p.length < 4 || p[3] > 0.5) && lum(p) > 0.42) out.push(`${el.className || el.tagName} ${cs.backgroundColor}`);
+  }
+  return [...new Set(out)];
+};
+
+/** Dark, with the other system settings a test asks for (Playwright has no switch for Reduce Transparency). */
+async function openDark(opts, media = {}) {
+  const page = await ctx.browser.newPage({ serviceWorkers: 'block', colorScheme: 'dark', reducedMotion: 'reduce', ...opts });
+  const features = [{ name: 'prefers-color-scheme', value: 'dark' }, { name: 'prefers-reduced-motion', value: 'reduce' }];
+  if (media.contrast) features.push({ name: 'prefers-contrast', value: 'more' });
+  if (media.transparency) features.push({ name: 'prefers-reduced-transparency', value: 'reduce' });
+  const cdp = await page.context().newCDPSession(page);
+  await cdp.send('Emulation.setEmulatedMedia', { features });
+  const errors = [];
+  page.on('pageerror', (e) => errors.push(String(e)));
+  await page.route((u) => !u.href.startsWith(ctx.srv.url), (r) => r.abort());
+  await page.goto(ctx.srv.url + '/index.html', { waitUntil: 'load' });
+  await page.waitForFunction(styled, null, { timeout: 8000 });
+  return { page, errors };
+}
+const css = (page, sel, prop, pseudo) => page.evaluate(([s, p, ps]) => getComputedStyle(document.querySelector(s), ps || null).getPropertyValue(p), [sel, prop, pseudo]);
+
+test('Dark Mode > the page follows the device: dark bands, cards, text and links; filled buttons keep the accent (dark-appearance)', async () => {
+  const html = readFileSync(join(ROOT, 'index.html'), 'utf8');
+  assert.match(html, /<meta name="color-scheme" content="light dark">/);
+  assert.match(html, /<meta name="theme-color" media="\(prefers-color-scheme: dark\)" content="#000000">\s*<meta name="theme-color" content="#ffffff">/, 'a theme colour for each appearance, the dark one first');
+  for (const [where, opts] of [['iPhone', PHONE], ['Mac', MAC]]) {
+    const { page, errors } = await openDark(opts);
+    assert.equal(await css(page, 'html', 'color-scheme'), 'light dark');
+    const tokens = await page.evaluate(() => ['--color-text', '--color-text-secondary', '--color-text-secondary-small', '--color-link', '--sk-body-background-color'].map((t) => getComputedStyle(document.documentElement).getPropertyValue(t).trim().toUpperCase()));
+    assert.deepEqual(tokens, ['#F5F5F7', '#AEAEB2', '#AEAEB2', '#4C9DFF', '#000'], `${where}: the dark palette`);
+    for (const [sel, prop, want] of [
+      ['body', 'background-color', 'rgb(0, 0, 0)'], ['#hero', 'background-color', 'rgb(0, 0, 0)'], ['#resume', 'background-color', 'rgb(0, 0, 0)'],
+      ['#experience', 'background-color', 'rgb(28, 28, 30)'], ['#certificates', 'background-color', 'rgb(28, 28, 30)'],
+      ['#resume .data-box', 'background-color', 'rgb(28, 28, 30)'], ['#experience .data-box[data-exp]', 'background-color', 'rgb(44, 44, 46)'],
+      ['#portfolio .rf-cards-scroller-item', 'background-color', 'rgb(28, 28, 30)'], ['#certificates .cert-card', 'background-color', 'rgb(44, 44, 46)'],
+      ['body', 'color', 'rgb(245, 245, 247)'], ['#hero .more', 'color', 'rgb(76, 157, 255)'],
+      // filled controls keep #1264CE: white on the lighter link blue would be 2.77:1
+      ['#hero .btn-pill', 'background-color', 'rgb(18, 100, 206)'], ['#hero .btn-pill', 'color', 'rgb(255, 255, 255)'],
+      // the Skills filter: a grey track and a raised grey segment, not a white one
+      ['#skill .project-filters', 'background-color', 'rgb(28, 28, 30)'], ['#skill .filter-btn.active', 'background-color', 'rgb(99, 99, 102)'], ['#skill .filter-btn.active', 'color', 'rgb(255, 255, 255)'],
+      // logos on light plates, white paper a touch dimmer with its shadow kept
+      ['.company-logo', 'background-color', 'rgb(245, 245, 247)'], ['#portfolio .has-logo .work-logo img', 'background-color', 'rgb(245, 245, 247)'],
+      ['.hero-net-label', 'background-color', 'rgba(28, 28, 30, 0.85)'],
+    ]) assert.equal(await css(page, sel, prop), want, `${where}: ${sel} ${prop}`);
+    const cert = await css(page, '#certificates .cert-img img', 'filter');
+    assert.match(cert, /^brightness\(0\.92\) drop-shadow/, `${where}: certificate thumbnails are dimmed and keep their shadow`);
+    // the gradient name and the Contact headline keep their gradients, in light inks
+    for (const sel of ['.hero-name-line', '.cta-headline']) {
+      const g = await css(page, sel, 'background-image');
+      assert.ok(g.startsWith('linear-gradient') && g.includes('rgb(245, 245, 247)') && !g.includes('rgb(29, 29, 31)'), `${where}: ${sel} gradient is ${g.slice(0, 80)}`);
+    }
+    // the constellation draws in the lighter inks: the name's lit colour is a light blue, not the light page's deep one
+    await page.waitForFunction(() => /rgb/.test(document.querySelector('#hero .hero-name').style.getPropertyValue('--ink-c')), null, { timeout: 8000 });
+    const ink = rgbOf(await page.evaluate(() => document.querySelector('#hero .hero-name').style.getPropertyValue('--ink-c')));
+    assert.ok(contrast(ink, [0, 0, 0]) >= 4.5, `${where}: the name's ink ${ink} is too dark for black`);
+    const s = await page.evaluate(() => [document.documentElement.scrollWidth, document.documentElement.clientWidth]);
+    assert.equal(s[0], s[1], `${where}: the page scrolls sideways in Dark`);
+    assert.deepEqual(errors, []);
+    await page.close();
+  }
+});
+
+test('Dark Mode > every text run keeps 4.5:1 and no surface stays light: page, sheets, See all, viewer (dark-appearance)', async () => {
+  for (const [where, opts] of [['iPhone', PHONE], ['Mac', MAC]]) {
+    const { page, errors } = await openDark(opts);
+    const tap = (loc) => (opts.hasTouch ? loc.tap() : loc.click());
+    const judge = async (what, sel, min) => {
+      const t = await page.evaluate(lowContrast, sel || null);
+      assert.ok(t.runs >= min, `${where}, ${what}: only ${t.runs} text runs were judged`);
+      assert.deepEqual(t.low, [], `${where}, ${what}: text below 4.5:1`);
+      assert.deepEqual(await page.evaluate(lightBoxes, sel || null), [], `${where}, ${what}: a surface is still light`);
+    };
+    await page.evaluate(() => { document.querySelectorAll('details').forEach((d) => { d.open = true; }); document.querySelector('[data-cookie-settings]').hidden = false; window._toast('Email copied'); });
+    await page.waitForTimeout(300);
+    await judge('page', null, 500);
+    assert.equal(await css(page, '.toast', 'color'), 'rgb(245, 245, 247)');
+    assert.equal(await css(page, '.toast-check', 'background-color'), 'rgb(18, 100, 206)', `${where}: the toast's tick keeps the accent under its white mark`);
+    await page.keyboard.press('Escape');
+    // the current job's sheet: pop-up button, folded client rows, the stuck title bar
+    await page.$eval('#experience [data-exp="protollcall"] .exp-card-cta', (el) => el.click());
+    await page.waitForSelector('.exp-lightbox.open .exp-client-select');
+    await page.waitForTimeout(300);
+    await judge('sheet', '.exp-lightbox.open', 150);
+    assert.equal(await css(page, '.exp-client-select', 'background-color'), 'rgb(58, 58, 60)', `${where}: the client pop-up button`);
+    assert.match(await css(page, '.exp-client-select', 'background-image'), /stroke='%23f5f5f7'/, `${where}: its chevron is drawn in the light ink`);
+    await page.evaluate(() => { document.querySelector('.exp-lightbox.open .exp-client-toggle').click(); document.querySelector('.exp-lightbox.open .exp-lightbox-inner').scrollTop = 420; });
+    await page.waitForSelector('.exp-sheet-bar.is-stuck');
+    await page.waitForTimeout(300);
+    await judge('sheet, scrolled', '.exp-lightbox.open', 150);
+    assert.equal(await css(page, '.exp-sheet-bar.is-stuck', 'background-color'), 'rgba(28, 28, 30, 0.92)', `${where}: the stuck title bar`);
+    assert.equal(await css(page, '.exp-sheet-bar-title', 'color'), 'rgb(245, 245, 247)');
+    await page.keyboard.press('Escape');
+    await page.waitForSelector('.exp-lightbox.open', { state: 'detached' }).catch(() => {});
+    await page.waitForTimeout(400);
+    // See all, a row under the keyboard, a project, and back
+    await tap(page.locator('[data-proj-all]'));
+    await page.waitForSelector('.exp-lightbox.open .proj-row');
+    await page.waitForTimeout(300);
+    await judge('See all', '.exp-lightbox.open', 100);
+    if (!opts.hasTouch) {
+      await page.keyboard.press('Tab');
+      await page.evaluate(() => document.querySelectorAll('.proj-row')[3].focus());
+      const row = await page.evaluate(() => { const a = document.activeElement; return [a.matches('.proj-row:focus-visible'), getComputedStyle(a.closest('li')).backgroundColor, getComputedStyle(a.querySelector('.proj-name')).color, getComputedStyle(a.querySelector('.proj-kind')).color]; });
+      // white on the link blue of Dark (#4C9DFF) would be 2.77:1
+      assert.deepEqual(row, [true, 'rgb(18, 100, 206)', 'rgb(255, 255, 255)', 'rgb(255, 255, 255)'], 'Mac: the keyboard row fill keeps 5.62:1 under white type');
+      await judge('See all, keyboard row', '.exp-lightbox.open', 100);
+    }
+    await tap(page.locator('.proj-row', { hasText: 'Sales campaign CRM' }).first());
+    await page.waitForSelector('.proj-back');
+    await page.waitForTimeout(300);
+    await judge('project', '.exp-lightbox.open', 8);
+    await tap(page.locator('.proj-back'));
+    await page.waitForSelector('.exp-lightbox.open .proj-row.is-selected');
+    await page.waitForTimeout(300);
+    assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('.proj-row.is-selected').closest('li')).backgroundColor), 'rgba(255, 255, 255, 0.1)', `${where}: the row you came back from is a lighter grey, not a darker one`);
+    await judge('See all, returned', '.exp-lightbox.open', 100);
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(500);
+    // the full-screen viewer: the picture a touch dimmer
+    await page.$eval('#certificates .cert-img', (el) => el.click());
+    await page.waitForSelector('.cert-lightbox img');
+    assert.equal(await css(page, '.cert-lightbox img', 'filter'), 'brightness(0.92)', `${where}: the viewer's picture`);
+    assert.deepEqual(errors, []);
+    await page.close();
+  }
+});
+
+test('Dark Mode > Increase Contrast and Reduce Transparency also work in Dark (dark-appearance)', async () => {
+  const more = await openDark(MAC, { contrast: true });
+  const tokens = await more.page.evaluate(() => ['--color-text-secondary', '--color-text-secondary-small', '--color-link'].map((t) => getComputedStyle(document.documentElement).getPropertyValue(t).trim().toUpperCase()));
+  assert.deepEqual(tokens, ['#D1D1D6', '#D1D1D6', '#7AB6FF'], 'Increase Contrast in Dark makes grey text and links lighter (the light page makes them darker)');
+  assert.equal(await css(more.page, '#hero .btn-pill', 'background-color'), 'rgb(18, 100, 206)');
+  assert.match(await css(more.page, '#resume .data-box:not(.contact-strip)', 'box-shadow'), /rgba\(255, 255, 255, 0\.4\).*inset/, 'cards get a light edge');
+  assert.equal(await css(more.page, '.biz-card', 'background-color'), 'rgb(44, 44, 46)', 'the glass card turns solid');
+  const t = await more.page.evaluate(lowContrast, null);
+  assert.deepEqual(t.low, []);
+  assert.deepEqual(await more.page.evaluate(lightBoxes, null), []);
+  await more.page.close();
+
+  const solid = await openDark(PHONE, { transparency: true });
+  await solid.page.$eval('#experience [data-exp="protollcall"] .exp-card-cta', (el) => el.click());
+  await solid.page.waitForSelector('.exp-lightbox.open .exp-client-select');
+  await solid.page.evaluate(() => { document.querySelector('.exp-lightbox.open .exp-lightbox-inner').scrollTop = 420; window._toast('Email copied'); });
+  await solid.page.waitForSelector('.exp-sheet-bar.is-stuck');
+  for (const [sel, want] of [['.exp-lightbox-inner', 'rgb(28, 28, 30)'], ['.exp-sheet-bar.is-stuck', 'rgb(28, 28, 30)'], ['.exp-clients-folded .exp-client-filter', 'rgb(28, 28, 30)'],
+    ['.toast', 'rgb(44, 44, 46)'], ['#back-to-top', 'rgb(44, 44, 46)']]) {
+    assert.equal(await css(solid.page, sel, 'background-color'), want, `Reduce Transparency in Dark: ${sel} is a solid dark fill`);
+  }
+  assert.equal(await css(solid.page, '.biz-card', 'backdrop-filter'), 'none');
+  assert.equal(await css(solid.page, '.biz-card', 'background-color'), 'rgba(44, 44, 46, 0.85)', 'the glass card: frostier and dark, never white');
+  await solid.page.close();
+});
+
+test('Dark Mode > the hero is dark from its first paint, before style.css arrives (dark-appearance)', async () => {
+  for (const [where, opts] of [['iPhone', PHONE], ['Mac', MAC]]) {
+    const page = await ctx.browser.newPage({ serviceWorkers: 'block', colorScheme: 'dark', reducedMotion: 'reduce', ...opts });
+    // the stylesheet never arrives: what is drawn is the critical CSS alone
+    await page.route((u) => !u.href.startsWith(ctx.srv.url) || /style\.min\.css/.test(u.href), (r) => r.abort());
+    await page.goto(ctx.srv.url + '/index.html', { waitUntil: 'domcontentloaded' });
+    await page.waitForSelector('#hero .btn-pill');
+    for (const [sel, prop, want] of [['body', 'background-color', 'rgb(0, 0, 0)'], ['#hero', 'background-color', 'rgb(0, 0, 0)'],
+      ['#hero .btn-pill', 'background-color', 'rgb(18, 100, 206)'], ['#hero .more', 'color', 'rgb(76, 157, 255)'], ['#hero .hero-eyebrow', 'color', 'rgb(174, 174, 178)']]) {
+      assert.equal(await css(page, sel, prop), want, `${where}, first paint: ${sel} ${prop}`);
+    }
+    assert.equal(await css(page, '#hero', 'background-color', '::before'), 'rgba(0, 0, 0, 0.8)', `${where}: the veil over the hero`);
+    const name = await css(page, '.hero-name-line', 'background-image');
+    assert.ok(name.includes('rgb(245, 245, 247)') && !name.includes('rgb(29, 29, 31)'), `${where}: the name would be dark type on black: ${name.slice(0, 70)}`);
+    // and what is on the glass: no white, and no near-white field, anywhere in the first screen
+    const t = await page.evaluate(lowContrast, '#hero');
+    assert.deepEqual(t.low, [], `${where}, first paint: hero text below 4.5:1`);
+    const shot = (await page.screenshot({ type: 'png' })).toString('base64');
+    const bright = await page.evaluate(async (b64) => {
+      const im = new Image(); await new Promise((ok) => { im.onload = ok; im.src = 'data:image/png;base64,' + b64; });
+      const c = new OffscreenCanvas(im.width, im.height), x = c.getContext('2d'); x.drawImage(im, 0, 0);
+      const d = x.getImageData(0, 0, im.width, im.height).data; let n = 0;
+      for (let i = 0; i < d.length; i += 4) if (d[i] > 200 && d[i + 1] > 200 && d[i + 2] > 200) n++;
+      return n / (d.length / 4);
+    }, shot);
+    assert.ok(bright < 0.05, `${where}: ${(bright * 100).toFixed(1)}% of the first screen is near-white`);
+    await page.close();
+  }
+});
+
+test('Dark Mode > the light page is untouched: same tokens, same surfaces, same height as in Dark (dark-appearance)', async () => {
+  for (const [where, opts] of [['iPhone', PHONE], ['Mac', MAC]]) {
+    const { page, errors } = await open({ ...opts, colorScheme: 'light', reducedMotion: 'reduce' });
+    const tokens = await page.evaluate(() => ['--color-text', '--color-text-secondary', '--color-text-secondary-small', '--color-link', '--color-link-hover', '--color-fill', '--sk-body-background-color'].map((t) => getComputedStyle(document.documentElement).getPropertyValue(t).trim().toUpperCase()));
+    assert.deepEqual(tokens, ['#1D1D1F', '#6E6E73', '#515154', '#1264CE', '#0F57B5', '#F5F5F7', '#FFF'], `${where}: the light palette`);
+    for (const [sel, prop, want] of [
+      ['body', 'background-color', 'rgb(255, 255, 255)'], ['#hero', 'background-color', 'rgb(255, 255, 255)'], ['body', 'color', 'rgb(29, 29, 31)'],
+      ['#experience', 'background-color', 'rgb(245, 245, 247)'], ['#experience .data-box[data-exp]', 'background-color', 'rgb(255, 255, 255)'],
+      ['#hero .btn-pill', 'background-color', 'rgb(18, 100, 206)'], ['#hero .more', 'color', 'rgb(18, 100, 206)'],
+      ['#skill .project-filters', 'background-color', 'rgb(232, 232, 237)'], ['#skill .filter-btn.active', 'background-color', 'rgb(255, 255, 255)'],
+      ['.company-logo', 'background-color', 'rgba(0, 0, 0, 0)'], ['.company-logo', 'filter', 'none'], ['.hero-net-label', 'background-color', 'rgba(252, 252, 253, 0.72)'],
+    ]) assert.equal(await css(page, sel, prop), want, `${where}, light: ${sel} ${prop}`);
+    assert.doesNotMatch(await css(page, '#certificates .cert-img img', 'filter'), /brightness/, `${where}, light: certificates are not dimmed`);
+    assert.ok((await css(page, '.hero-name-line', 'background-image')).includes('rgb(29, 29, 31)'), `${where}, light: the name's gradient`);
+    const lightH = await page.evaluate(() => document.documentElement.scrollHeight);
+    // only colours change between the two: nothing moves
+    await page.emulateMedia({ colorScheme: 'dark' });
+    await page.waitForFunction(() => getComputedStyle(document.body).backgroundColor === 'rgb(0, 0, 0)');
+    assert.equal(await page.evaluate(() => document.documentElement.scrollHeight), lightH, `${where}: the page is a different height in Dark`);
+    assert.deepEqual(errors, []);
+    await page.close();
+  }
+});

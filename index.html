@@ -4,8 +4,10 @@
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport">
-  <!-- Light-only site: opt out of browser forced/auto dark theming -->
-  <meta name="color-scheme" content="only light">
+  <!-- Light and dark: the page follows the device's appearance setting
+       (light stays the default for every visitor who has not chosen Dark) -->
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000">
   <meta name="theme-color" content="#ffffff">
 
   <title>ธนพล ชำนาญหาญ | รับทำเว็บไซต์ รับพัฒนา AI Agent กรุงเทพ | Full-Stack & AI Developer</title>
@@ -109,8 +111,8 @@
       font-size: 1rem;
       font-weight: 400;
       line-height: 1.5;
-      color: #1d1d1f;
-      background-color: #fff
+      color: var(--color-text);
+      background-color: var(--sk-body-background-color)
     }
 
     .container {
@@ -174,7 +176,7 @@
 
     /* ── Site critical CSS (hero section) ── */
     :root {
-      color-scheme: only light;
+      color-scheme: light dark;
     }
 
     * {
@@ -187,7 +189,7 @@
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Inter', 'Noto Sans Thai', 'Helvetica Neue', Helvetica, Arial, sans-serif;
       line-height: 1.65;
-      color: #1d1d1f;
+      color: var(--color-text);
       font-size: 1rem;
       font-weight: 400;
       letter-spacing: -.022em
@@ -211,7 +213,7 @@
 
     #hero:before {
       content: "";
-      background: rgba(255, 255, 255, 0.8);
+      background: var(--hero-veil);
       position: absolute;
       bottom: 0;
       top: 0;
@@ -226,7 +228,7 @@
       font-weight: 700;
       line-height: 1.05;
       letter-spacing: -4px;
-      color: #1d1d1f
+      color: var(--color-text)
     }
 
     #hero p {
@@ -267,6 +269,8 @@
       --color-text-secondary: #6E6E73;
       --color-text-secondary-small: #515154;
       --color-link: #1264CE;
+      --sk-body-background-color: #fff;
+      --hero-veil: rgba(255, 255, 255, 0.8);
       --r-capsule: 980px
     }
 
@@ -293,7 +297,7 @@
       height: 100vh;
       min-height: -webkit-fill-available;
       overflow: hidden;
-      background: #fff
+      background: var(--sk-body-background-color)
     }
 
     @supports (min-height: 100svh) {
@@ -1845,6 +1849,62 @@
         animation-duration: .01ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: .01ms !important
+      }
+    }
+
+    /* ── Dark appearance, first paint ──
+       Only when the device is set to Dark: the tokens above turn to the
+       dark palette and the hero (painted from this block, with no loader
+       in front of it) is dark from its first frame, never white;
+       style.css carries the rest. Light is untouched. Keep in sync with
+       the "Dark appearance" block of style.css. */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --color-text: #F5F5F7;
+        --color-text-secondary: #AEAEB2;
+        --color-text-secondary-small: #AEAEB2;
+        --color-link: #4C9DFF;
+        --sk-body-background-color: #000;
+        --hero-veil: rgba(0, 0, 0, 0.8)
+      }
+
+      #hero .hero-name {
+        --ink-c: #4C9DFF
+      }
+
+      @supports ((-webkit-background-clip: text) or (background-clip: text)) {
+        .hero-name-line {
+          background-image: linear-gradient(100deg,
+              #F5F5F7 0%,
+              #F5F5F7 calc(var(--ink-x) - 30%),
+              var(--ink-c) var(--ink-x),
+              #F5F5F7 calc(var(--ink-x) + 30%),
+              #F5F5F7 100%)
+        }
+      }
+
+      .hero-net-label {
+        background: rgba(28, 28, 30, 0.85)
+      }
+
+      #hero .hero-copy::before {
+        background: radial-gradient(circle,
+            rgba(76, 157, 255, 0.18) 0%,
+            rgba(76, 157, 255, 0) 62%)
+      }
+
+      /* the filled button keeps the accent: white on it stays 5.62:1 */
+      .btn-pill {
+        background: #1264CE
+      }
+    }
+
+    /* Dark with Increase Contrast: lighter greys and blues, not darker */
+    @media (prefers-color-scheme: dark) and (prefers-contrast: more) {
+      :root {
+        --color-text-secondary: #D1D1D6;
+        --color-text-secondary-small: #D1D1D6;
+        --color-link: #7AB6FF
       }
     }
   </style>
@@ -3837,7 +3897,7 @@
 
         <div class="row ">
           <div class="col-12 col-md-4 mt-3">
-            <div style="font-size: 1rem;font-weight:600;color:#1d1d1f;margin-bottom:8px;letter-spacing:-0.2px;">Tanapol
+            <div style="font-size: 1rem;font-weight:600;color:var(--color-text);margin-bottom:8px;letter-spacing:-0.2px;">Tanapol
               Chamnanhan</div>
             <div class="fw-light" style="font-size: 0.8235rem;color:var(--color-text-secondary-small);line-height:1.6;"><span class="nw">Full-Stack</span> Developer &amp;
               Software Engineer based in Bangkok, Thailand.</div>
@@ -3847,7 +3907,7 @@
           </div>
 
           <div class="col-12 col-md-4 mt-3">
-            <div style="font-size: 1rem;font-weight:600;color:#1d1d1f;margin-bottom:8px;letter-spacing:-0.2px;">Contact
+            <div style="font-size: 1rem;font-weight:600;color:var(--color-text);margin-bottom:8px;letter-spacing:-0.2px;">Contact
             </div>
             <div class="fw-light" style="font-size: 0.8235rem;color:var(--color-text-secondary);"><a href="mailto:tanapol.ch@rmutsvmail.com"
                 class="text-decoration-none footer-contact-link">tanapol.ch@<wbr>rmutsvmail.com</a></div>
