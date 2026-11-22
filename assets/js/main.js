@@ -403,12 +403,69 @@ var overlayHistory = (function () {
       lbImg.style.transform = "";
       lbImg.style.opacity = "";
       lbImg.style.transformOrigin = "";
+      setPull(0);
     }
   });
 
+  // Swipe down to close (touch only): the picture follows the finger and the
+  // backdrop thins as it goes; let go past 120px, or flick, and it closes,
+  // otherwise it springs back. Sideways panning stays the browser's own.
+  let pullY = 0;
+  function setPull(y) {
+    pullY = y;
+    frame.style.transform = y ? "translateY(" + y.toFixed(2) + "px)" : "";
+    lightbox.style.backgroundColor = y ? "rgba(0, 0, 0, " + (0.85 * Math.max(0, 1 - y / 400)).toFixed(3) + ")" : "";
+  }
+  const pullBack = createSpring({ response: 0.3, damping: 1, onFrame: setPull });
+  let pull = null;
+  function springBack() {
+    if (reduce) pullBack.jump(0);
+    else { pullBack.jump(pullY); pullBack.to(0); }
+  }
+  frame.addEventListener("touchstart", function (e) {
+    // a second finger ends a pull: the picture springs back, never stays put
+    if (pull && (pull.on || pull.from)) springBack();
+    pull = null;
+    // pinch-zoomed in: a drag moves around the zoomed picture, never closes it
+    if (e.touches.length !== 1 || !lightbox.classList.contains("open") || (window.visualViewport && visualViewport.scale > 1.01)) return;
+    const t = e.touches[0];
+    // a spring-back still settling: stop it, the finger takes the picture from where it is
+    const from = pullY;
+    if (from) pullBack.jump(from);
+    pull = { x0: t.clientX, y0: t.clientY, y: t.clientY, at: e.timeStamp, v: 0, on: false, decided: false, from: from };
+  }, { passive: true });
+  frame.addEventListener("touchmove", function (e) {
+    if (!pull || e.touches.length !== 1) return;
+    const t = e.touches[0], dx = t.clientX - pull.x0, dy = t.clientY - pull.y0;
+    if (!pull.decided) {
+      pull.decided = true;
+      // downward and more down than sideways, or it is a pan
+      if (dy <= 0 || Math.abs(dx) > dy) { const held = pull.from; pull = null; if (held) springBack(); return; }
+      pull.on = true;
+    }
+    if (e.cancelable) e.preventDefault();
+    const dt = e.timeStamp - pull.at;
+    if (dt > 0) pull.v = 0.8 * ((t.clientY - pull.y) / dt) + 0.2 * pull.v;
+    pull.y = t.clientY;
+    pull.at = e.timeStamp;
+    setPull(Math.max(0, pull.from + dy));
+  }, { passive: false });
+  function endPull() {
+    const p = pull;
+    pull = null;
+    if (!p) return;
+    if (!p.on) { if (p.from) springBack(); return; }   // a tap that stopped a spring-back: finish it
+    if (pullY > 120 || p.v > 0.5) closeLightbox();
+    else springBack();
+  }
+  frame.addEventListener("touchend", endPull);
+  frame.addEventListener("touchcancel", endPull);
+
   let showing = 0;   // which opening a late-arriving full picture belongs to
-  function openLightbox(src, alt, source, label, title) {
+  let afterClose = null; // run once when this picture closes (the list it came from)
+  function openLightbox(src, alt, source, label, title, ev, onClose) {
     if (!lightbox.classList.contains("open")) overlayHistory.opened(closeLightbox);
+    afterClose = onClose || null;
     const turn = ++showing;
     lbImg.style.width = lbImg.style.height = "";
     lbImg.alt = alt;
@@ -475,8 +532,17 @@ var overlayHistory = (function () {
     syncPageInert();
     anchorOrigin(lbImg, source);
     frame.scrollLeft = 0;
+    // reopened while a swiped picture is still fading out: start from its place
+    setPull(0);
     if (reduce) motion.jump(1); else motion.to(1);
-    closeBtn.focus();
+    // a tap or click shows no focus ring: the viewer itself takes focus and
+    // the next Tab reaches the close button; a key press focuses it at once
+    if (ev && ev.detail > 0) {
+      lightbox.setAttribute("tabindex", "-1");
+      lightbox.focus({ preventScroll: true });
+    } else {
+      closeBtn.focus();
+    }
   }
   function closeLightbox() {
     if (!lightbox.classList.contains("open")) return; // Escape pressed elsewhere
@@ -491,6 +557,11 @@ var overlayHistory = (function () {
     if (lastFocus && typeof lastFocus.focus === "function") lastFocus.focus({ preventScroll: true });
     lastFocus = null;
     overlayHistory.closed(closeLightbox);
+    // bring back what it was opened from, once its history step has landed
+    // (and, after Back, once the Back handler has finished closing layers)
+    const fn = afterClose;
+    afterClose = null;
+    if (fn) overlayHistory.afterSettle(function () { setTimeout(fn, 0); });
   }
   closeBtn.addEventListener("click", closeLightbox);
   lightbox.addEventListener("click", function (e) {
@@ -522,14 +593,37 @@ var overlayHistory = (function () {
   closeBtn.className = 'exp-lightbox-close';
   closeBtn.setAttribute('aria-label', 'Close');
   closeBtn.innerHTML = '&#x2715;';
-  inner.appendChild(closeBtn);
+  // a sticky top bar: the close button, and once the big title has scrolled
+  // out of the sheet a compact copy of it, so you always know where you are
+  const bar = document.createElement('div');
+  bar.className = 'exp-sheet-bar';
+  const barTitle = document.createElement('span');
+  barTitle.className = 'exp-sheet-bar-title';
+  barTitle.setAttribute('aria-hidden', 'true'); // the dialog is already labelled by the title
+  bar.appendChild(barTitle);
+  bar.appendChild(closeBtn);
+  inner.appendChild(bar);
   lightbox.appendChild(inner);
+  var titleWatch = null;
+  // a long title ends in an ellipsis; one left under 96px (a project opened
+  // from the list on the smallest phones, beside the way back) stays out
+  // rather than show only "Full…"
+  function fitBarTitle() {
+    barTitle.classList.toggle('is-cut', barTitle.clientWidth < 96 && barTitle.scrollWidth > barTitle.clientWidth + 1);
+  }
+  // the bar's material and hairline come on as soon as it sticks, before any
+  // text can slide under the close button; the compact title follows later
+  function syncStuck() {
+    bar.classList.toggle('is-stuck', inner.scrollTop > parseFloat(getComputedStyle(inner).paddingTop) - 8);
+  }
+  inner.addEventListener('scroll', syncStuck, { passive: true });
   document.body.appendChild(lightbox);
 
   let lastFocus = null;
   // One spring owns the whole presentation: backdrop, sheet scale and fade
   // all read from it, so opening and closing are the same motion re-aimed.
   const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var pullY = 0; // how far a finger has pulled the sheet down
   const motion = createSpring({
     response: 0.34,
     damping: 1,
@@ -538,7 +632,8 @@ var overlayHistory = (function () {
       lightbox.style.visibility = (p > 0.002 || lightbox.classList.contains('open')) ? 'visible' : 'hidden';
       lightbox.style.opacity = Math.min(1, p * 1.25);
       inner.style.opacity = Math.min(1, p * 1.4);
-      inner.style.transform = 'translateY(' + ((1 - p) * 8).toFixed(2) + 'px) scale('
+      // swiped away, it carries on down from where the finger let go
+      inner.style.transform = 'translateY(' + (pullY ? pullY + (1 - p) * 160 : (1 - p) * 8).toFixed(2) + 'px) scale('
         + (0.92 + 0.08 * p).toFixed(4) + ')';
     },
     onRest: function (p) {
@@ -548,8 +643,81 @@ var overlayHistory = (function () {
       inner.style.opacity = '';
       inner.style.transform = '';
       inner.style.transformOrigin = '';
+      setPull(0);
     }
   });
+
+  // Swipe down to close (touch only), from the top of the sheet: it follows
+  // the finger 1:1 and the dimming thins as it goes; let go past 120px, or
+  // flick, and it closes, otherwise it springs back. Not from the sideways
+  // client row, and not while the sheet is scrolled.
+  var dim0 = 0.25, blur0 = true;
+  function setPull(y) {
+    pullY = y;
+    if (!y) {
+      lightbox.style.backgroundColor = lightbox.style.backdropFilter = lightbox.style.webkitBackdropFilter = '';
+      return;
+    }
+    var k = Math.max(0, 1 - y / 400);
+    lightbox.style.backgroundColor = 'rgba(0, 0, 0, ' + (dim0 * k).toFixed(3) + ')';
+    var f = blur0 ? 'blur(' + (20 * k).toFixed(1) + 'px) saturate(' + (1 + 0.8 * k).toFixed(2) + ')' : 'none';
+    lightbox.style.backdropFilter = lightbox.style.webkitBackdropFilter = f;
+    inner.style.transform = 'translateY(' + y.toFixed(2) + 'px)';
+  }
+  const pullBack = createSpring({ response: 0.3, damping: 1, onFrame: function (y) {
+    setPull(y);
+    if (!y) inner.style.transform = '';
+  } });
+  var pull = null;
+  function springBack() {
+    if (reduce) pullBack.jump(0);
+    else { pullBack.jump(pullY); pullBack.to(0); }
+  }
+  inner.addEventListener('touchstart', function (e) {
+    // a second finger ends a pull: the sheet springs back, never stays put
+    if (pull && (pull.on || pull.from)) springBack();
+    pull = null;
+    if (e.touches.length !== 1 || !lightbox.classList.contains('open') || inner.scrollTop > 0 ||
+        (window.visualViewport && visualViewport.scale > 1.01) ||
+        e.target.closest('.exp-client-filter')) return;
+    var t = e.touches[0];
+    // a spring-back still settling: stop it, the finger takes the sheet from where it is
+    var from = pullY;
+    if (from) pullBack.jump(from);
+    pull = { x0: t.clientX, y0: t.clientY, y: t.clientY, at: e.timeStamp, v: 0, on: false, decided: false, from: from };
+  }, { passive: true });
+  inner.addEventListener('touchmove', function (e) {
+    if (!pull || e.touches.length !== 1) return;
+    var t = e.touches[0], dx = t.clientX - pull.x0, dy = t.clientY - pull.y0;
+    if (!pull.decided) {
+      pull.decided = true;
+      // only a downward drag from the top; anything else scrolls as usual
+      if (dy <= 0 || Math.abs(dx) > dy || inner.scrollTop > 0) { var held = pull.from; pull = null; if (held) springBack(); return; }
+      pull.on = true;
+      // the resting dimming and blur (not the thinned ones a spring-back left inline)
+      if (!pull.from) {
+        var cs = getComputedStyle(lightbox), a = /rgba?\(([^)]*)\)/.exec(cs.backgroundColor);
+        dim0 = a && a[1].split(',')[3] ? parseFloat(a[1].split(',')[3]) : 0.25;
+        blur0 = (cs.backdropFilter || cs.webkitBackdropFilter || 'none') !== 'none';
+      }
+    }
+    if (e.cancelable) e.preventDefault();
+    var dt = e.timeStamp - pull.at;
+    if (dt > 0) pull.v = 0.8 * ((t.clientY - pull.y) / dt) + 0.2 * pull.v;
+    pull.y = t.clientY;
+    pull.at = e.timeStamp;
+    setPull(Math.max(0, pull.from + dy));
+  }, { passive: false });
+  function endPull() {
+    var p = pull;
+    pull = null;
+    if (!p) return;
+    if (!p.on) { if (p.from) springBack(); return; }   // a tap that stopped a spring-back: finish it
+    if (pullY > 120 || p.v > 0.5) closeExp();
+    else springBack();
+  }
+  inner.addEventListener('touchend', endPull);
+  inner.addEventListener('touchcancel', endPull);
 
   var back = null; // a project opened from the "See all" list: Back returns to the list
   function closeExp() {
@@ -586,7 +754,8 @@ var overlayHistory = (function () {
       if (!focusables.length) return;
       var first = focusables[0];
       var last = focusables[focusables.length - 1];
-      if (e.shiftKey && document.activeElement === first) {
+      // the sheet itself (focused after a tap) counts as the start of the loop
+      if (e.shiftKey && (document.activeElement === first || document.activeElement === inner)) {
         e.preventDefault();
         last.focus();
       } else if (!e.shiftKey && document.activeElement === last) {
@@ -599,10 +768,12 @@ var overlayHistory = (function () {
     }
   });
 
-  window._expLightboxOpen = function (html, source, client) {
+  window._expLightboxOpen = function (html, source, client, ev) {
     var was = lightbox.classList.contains('open');
     if (!was) overlayHistory.opened(closeExp);
     while (inner.children.length > 1) inner.removeChild(inner.lastChild);
+    var oldBack = bar.querySelector('.proj-back');
+    if (oldBack) bar.removeChild(oldBack);
     const content = document.createElement('div');
     content.innerHTML = html;
     inner.appendChild(content);
@@ -617,6 +788,19 @@ var overlayHistory = (function () {
       lightbox.setAttribute('aria-label', 'Experience details');
       lightbox.removeAttribute('aria-labelledby');
     }
+    // the compact title shows in the bar once the big one has left the sheet
+    barTitle.textContent = title ? title.textContent.trim() : '';
+    bar.classList.remove('is-scrolled');
+    fitBarTitle();
+    if (titleWatch) titleWatch.disconnect();
+    titleWatch = null;
+    if (title && 'IntersectionObserver' in window) {
+      titleWatch = new IntersectionObserver(function (entries) {
+        var e = entries[entries.length - 1];
+        bar.classList.toggle('is-scrolled', !e.isIntersecting && !!e.rootBounds && e.boundingClientRect.top < e.rootBounds.top);
+      }, { root: inner, rootMargin: '-' + (bar.offsetHeight || 52) + 'px 0px 0px 0px' });
+      titleWatch.observe(title);
+    }
     lightbox.classList.add('open');
     document.body.style.overflow = 'hidden';
     if (!was) lastFocus = document.activeElement;
@@ -624,8 +808,17 @@ var overlayHistory = (function () {
     // make it measurable, then grow it out of the card that was clicked
     lightbox.style.visibility = 'visible';
     anchorOrigin(inner, source);
+    // reopened while a swiped sheet is still fading out: start from its place
+    setPull(0);
     if (reduce) motion.jump(1); else motion.to(1);
-    closeBtn.focus();
+    // a tap or click shows no focus ring: the sheet itself takes focus and
+    // the next Tab reaches the close button; a key press focuses it at once
+    if (ev && ev.detail > 0) {
+      inner.setAttribute('tabindex', '-1');
+      inner.focus({ preventScroll: true });
+    } else {
+      closeBtn.focus();
+    }
 
     // Initialize the client pop-up button
     var select = inner.querySelector('.exp-client-select');
@@ -677,8 +870,8 @@ var overlayHistory = (function () {
           }
         });
         // chosen from the stuck picker further down: bring the story up under it
-        if (clientsBlock && inner.scrollTop > clientsBlock.offsetTop - 8) {
-          inner.scrollTop = clientsBlock.offsetTop - 8;
+        if (clientsBlock && inner.scrollTop > clientsBlock.offsetTop - bar.offsetHeight - 8) {
+          inner.scrollTop = clientsBlock.offsetTop - bar.offsetHeight - 8;
         }
       };
       select.addEventListener('change', function () { choose(select.value); });
@@ -686,14 +879,16 @@ var overlayHistory = (function () {
       if (preset && clientsBlock) {
         // opened from a client-work card: straight to that client, preselected
         choose(client);
-        inner.scrollTop = Math.max(0, clientsBlock.offsetTop - 8);
+        inner.scrollTop = Math.max(0, clientsBlock.offsetTop - bar.offsetHeight - 8);
       }
     } else if (client) {
       // a sheet without a client picker (SCG): open it on that project
       var sec = inner.querySelector('.exp-client-section[data-client="' + client + '"]');
-      if (sec) inner.scrollTop = Math.max(0, sec.offsetTop - 8);
+      if (sec) inner.scrollTop = Math.max(0, sec.offsetTop - bar.offsetHeight - 8);
     }
+    syncStuck();
   };
+  window._expLightboxClose = closeExp;
   window._expLightboxNest = function (html, source, client, restore) {
     back = function () { back = null; restore(); };
     overlayHistory.opened(back);
@@ -701,7 +896,7 @@ var overlayHistory = (function () {
     var b = document.createElement('button');
     b.type = 'button';
     b.className = 'more proj-back';
-    b.innerHTML = '<span class="chev" aria-hidden="true"></span>All projects';
+    b.innerHTML = '<span class="chev" aria-hidden="true"></span>All Projects';
     // screen readers hear which project they are in, not just the way back
     var nm = source && source.querySelector('.proj-name');
     if (nm) {
@@ -713,12 +908,15 @@ var overlayHistory = (function () {
       b.setAttribute('aria-describedby', 'proj-back-note');
     }
     b.addEventListener('click', function () { history.back(); }, { once: true });
-    inner.insertBefore(b, closeBtn.nextSibling);
+    // the way back takes the bar's leading end, the compact title after it
+    bar.insertBefore(b, bar.firstChild);
+    fitBarTitle();
     b.focus({ preventScroll: true });
     // the sheet opened on a project (scrolled to it): start it below the pill
     var picker = inner.querySelector('.exp-client-select');
     var t = inner.scrollTop && (picker ? picker.closest('.exp-modal-section') : inner.querySelector('.exp-client-section[data-client="' + client + '"]'));
-    if (t) inner.scrollTop = Math.max(0, t.offsetTop - parseFloat(getComputedStyle(inner).paddingTop) - b.offsetHeight - 8);
+    if (t) inner.scrollTop = Math.max(0, t.offsetTop - bar.offsetHeight - 8);
+    syncStuck();
   };
 })();
 
@@ -746,9 +944,9 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   document.querySelectorAll('#experience .data-box[data-exp]').forEach(function (card) {
-    card.addEventListener('click', function () {
+    card.addEventListener('click', function (e) {
       var tmpl = document.getElementById('exp-' + card.dataset.exp);
-      if (tmpl) window._expLightboxOpen(tmpl.innerHTML, card);
+      if (tmpl) window._expLightboxOpen(tmpl.innerHTML, card, undefined, e);
     });
   });
 
@@ -803,18 +1001,18 @@ document.addEventListener("DOMContentLoaded", function () {
   document.querySelectorAll("#portfolio .rf-cards-scroller-item").forEach(function (card) {
     // client-work cards open their story in the experience sheet, on that client
     if (card.dataset.openExp) {
-      card.addEventListener("click", function () {
+      card.addEventListener("click", function (e) {
         var tmpl = document.getElementById("exp-" + card.dataset.openExp);
-        if (tmpl) window._expLightboxOpen(tmpl.innerHTML, card, card.dataset.client);
+        if (tmpl) window._expLightboxOpen(tmpl.innerHTML, card, card.dataset.client, e);
       });
       return;
     }
     var img = card.querySelector(".project-img img");
     if (!img) return;
     var title = card.querySelector("h3");
-    card.addEventListener("click", function () {
+    card.addEventListener("click", function (e) {
       window._certLightboxOpen(img.currentSrc || img.src, img.alt, card.querySelector(".project-img"), "Project screenshot",
-        title ? title.textContent : "");
+        title ? title.textContent : "", e);
     });
   });
 });
@@ -869,11 +1067,17 @@ document.addEventListener("DOMContentLoaded", function () {
   }
   // the list is one Tab stop; Up and Down walk it, across the companies
   var settleRows = rovingFocus(inner, ".proj-row", "list");
+  // the row last opened stays marked, so the way back shows where you were
+  function mark(row) {
+    inner.querySelectorAll(".proj-row.is-selected").forEach(function (r) { if (r !== row) r.classList.remove("is-selected"); });
+    if (row) row.classList.add("is-selected");
+  }
   function showList() {
     window._expLightboxOpen(list(), btn);
     inner.scrollTop = at;
     var row = from && inner.querySelector('.proj-row[data-i="' + from + '"]');
     settleRows(row);
+    mark(row);
     if (row) row.focus({ preventScroll: true });
   }
   btn.addEventListener("click", function () { at = 0; from = null; showList(); });
@@ -881,8 +1085,25 @@ document.addEventListener("DOMContentLoaded", function () {
     var row = e.target.closest(".proj-row");
     if (!row) return;
     var c = cards[+row.dataset.i];
-    // a screenshot card: its viewer opens over the list
-    if (!c.dataset.openExp) { c.click(); return; }
+    // a screenshot card: one modal at a time. The list closes, the picture
+    // opens once the list's history step has landed, and closing the
+    // picture (X, Escape, backdrop or Back) brings the list back where it was
+    if (!c.dataset.openExp) {
+      at = inner.scrollTop;
+      from = row.dataset.i;
+      var img = c.querySelector(".project-img img"), h = c.querySelector("h3");
+      window._expLightboxClose();
+      overlayHistory.afterSettle(function () {
+        // in a task of its own, not inside the animation frame that ran this:
+        // the viewer's fade starts on the next frame, so opening it here
+        // would paint one frame of the picture at full strength first
+        setTimeout(function () {
+          window._certLightboxOpen(img.currentSrc || img.src, img.alt, c.querySelector(".project-img"), "Project screenshot",
+            h ? h.textContent : "", e, showList);
+        }, 0);
+      });
+      return;
+    }
     at = inner.scrollTop;
     from = row.dataset.i;
     window._expLightboxNest(document.getElementById("exp-" + c.dataset.openExp).innerHTML, row, c.dataset.client, showList);
@@ -954,7 +1175,6 @@ document.addEventListener("DOMContentLoaded", function () {
       expandMark.className = "cert-expand-btn";
       expandMark.setAttribute("aria-hidden", "true");
       expandMark.textContent = "+";
-      card.style.cursor = "pointer";
       // a click anywhere on the tile, or Enter / Space on its button
       card.addEventListener("click", function () {
         // the viewer is named after the certificate it shows
@@ -1399,7 +1619,7 @@ document.addEventListener('DOMContentLoaded', function () {
   var months = now.getMonth() - start.getMonth();
   if (months < 0) { years--; months += 12; }
   var parts = [];
-  if (years > 0) parts.push(years + (years === 1 ? ' yr' : ' yrs'));
+  if (years > 0) parts.push(years + (years === 1 ? ' year' : ' years'));
   if (months > 0) parts.push(months + (months === 1 ? ' month' : ' months'));
   el.textContent = parts.join(' ') || '1 month';
 })();
@@ -1602,6 +1822,27 @@ document.addEventListener('DOMContentLoaded', function () {
   // then the hero is pinned again 150ms after the last resize. For a second
   // after the layout width changes, that movement is nobody scrolling up.
   var wide = 0, turned = 0;
+  // It never sits on another round control: the row paddles, a card's "+",
+  // a "Read more", a certificate's expand button or a question. Its box,
+  // grown by 8px so the two read as separate, is probed at the four corners,
+  // the centre and the middle of each side (30px apart, so nothing 30px or
+  // larger slips between two probes); while one is under it, it steps aside.
+  var CONTROLS = '.paddlenav-arrow, .card-plus, .exp-card-cta, .cert-expand-btn, #services .faq summary';
+  function overControl() {
+    // offsetLeft/Top give the fixed box without its hidden-state nudge
+    var l = toTop.offsetLeft - 8, t = toTop.offsetTop - 8;
+    var r = l + toTop.offsetWidth + 16, b = t + toTop.offsetHeight + 16;
+    var vw = document.documentElement.clientWidth - 1, vh = window.innerHeight - 1;
+    var xs = [l, (l + r) / 2, r], ys = [t, (t + b) / 2, b];
+    for (var i = 0; i < 9; i++) {
+      var x = Math.max(0, Math.min(vw, xs[i % 3])), yy = Math.max(0, Math.min(vh, ys[(i / 3) | 0]));
+      var under = document.elementsFromPoint(x, yy);
+      for (var j = 0; j < under.length; j++) {
+        if (under[j] !== toTop && under[j].matches && under[j].matches(CONTROLS)) return true;
+      }
+    }
+    return false;
+  }
   function update() {
     ticking = false;
     var y = window.scrollY || 0;
@@ -1617,8 +1858,10 @@ document.addEventListener('DOMContentLoaded', function () {
       else if (y < lastY - 2) { if (upFrom === null) upFrom = lastY; }
       else if (y > lastY + 2) upFrom = null;
       show = show && upFrom !== null && upFrom - y > 30;
-      count(show);
     }
+    // on every device: hidden while a control is under it, back once clear
+    if (show && overControl()) show = false;
+    if (touch) count(show);
     lastY = y;
     toTop.classList.toggle('visible', show);
     // reading progress on the ring: how close the end of the page is
@@ -1648,6 +1891,8 @@ document.addEventListener('DOMContentLoaded', function () {
       if ((window.scrollY || 0) <= window.innerHeight * 0.9) return;
       var r = toTop.getBoundingClientRect();
       if (e.clientX >= r.left - 40 && e.clientX <= r.right && e.clientY >= r.top - 40 && e.clientY <= r.bottom) {
+        // not over a control either: the pointer is probably heading for it
+        if (overControl()) return;
         toTop.classList.add('visible');
         count(true);
       }
@@ -1664,7 +1909,7 @@ document.addEventListener('DOMContentLoaded', function () {
 /**
  * Hero constellation — his multi-agent systems as a living graph.
  * Nodes drift and connect; six labeled nodes (CRM/POS/ASR/TTS/LLM/IVR);
- * cursor gently repels nearby nodes and links to them like a peer.
+ * the graph ignores the pointer (it is decoration, with nothing to click).
  * Desktop: cluster on the right of the copy. Mobile: below the copy.
  * Pauses off-screen; renders a single static frame under reduced motion.
  */
@@ -1686,10 +1931,27 @@ document.addEventListener('DOMContentLoaded', function () {
   function hexToRgb(h) {
     return { r: parseInt(h.slice(1, 3), 16), g: parseInt(h.slice(3, 5), 16), b: parseInt(h.slice(5, 7), 16) };
   }
-  var WARM1 = hexToRgb('#1877F2'), WARM2 = hexToRgb('#5AA7FF'), COOL = hexToRgb('#64748B');
+  // inks: warm blue to cool slate; in the device's Dark appearance the same
+  // ramp one step lighter, so nodes and links read on black as they do on
+  // white (switches live when the setting changes)
+  var WARM1, WARM2, COOL;
   // the name's ink peaks at a deeper blue than the nodes' light one, so the
-  // lit letters keep 3:1 on white (#5AA7FF is 2.50:1, #2F80E8 is 3.91:1)
-  var INK_LIGHT = hexToRgb('#2F80E8');
+  // lit letters keep 3:1 on white (#5AA7FF is 2.50:1, #2F80E8 is 3.91:1);
+  // on black the nodes' own lighter blue already reads (9.6:1)
+  var INK_LIGHT;
+  var darkMq = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+  function setInks() {
+    var dark = darkMq && darkMq.matches;
+    WARM1 = hexToRgb(dark ? '#4C9DFF' : '#1877F2');
+    WARM2 = hexToRgb(dark ? '#7AB6FF' : '#5AA7FF');
+    COOL = hexToRgb(dark ? '#8E9BB0' : '#64748B');
+    INK_LIGHT = hexToRgb(dark ? '#7AB6FF' : '#2F80E8');
+  }
+  setInks();
+  if (darkMq) {
+    if (darkMq.addEventListener) darkMq.addEventListener('change', setInks);
+    else if (darkMq.addListener) darkMq.addListener(setInks);
+  }
   function lerp(a, b, t) { return a + (b - a) * t; }
   function mix(c1, c2, t) {
     return { r: Math.round(lerp(c1.r, c2.r, t)), g: Math.round(lerp(c1.g, c2.g, t)), b: Math.round(lerp(c1.b, c2.b, t)) };
@@ -1733,7 +1995,7 @@ document.addEventListener('DOMContentLoaded', function () {
   var layoutMobile = null;
   // eased state for the node-lit name ink
   var nameEl = hero.querySelector('.hero-name');
-  var inkX = 62, inkR = 24, inkG = 119, inkB = 242;
+  var inkX = 62, inkR = WARM1.r, inkG = WARM1.g, inkB = WARM1.b;
   var inkNode = null, nextInkSwitch = 1.6;
   var inkXWritten = '', inkCWritten = '';
   var lastLabelT = 0; // the labels' own fade clock (drawFrame)
@@ -2115,17 +2377,8 @@ document.addEventListener('DOMContentLoaded', function () {
     if (nodes.length && painted && (bitmapChanged || reduce)) drawFrame(lastDrawT);
   }
 
-  if (finePointer) {
-    hero.addEventListener('mousemove', function (e) {
-      var r = canvas.getBoundingClientRect();
-      mouse.x = e.clientX - r.left;
-      mouse.y = e.clientY - r.top;
-      mouse.active = true;
-    }, { passive: true });
-    hero.addEventListener('mouseleave', function () {
-      mouse.active = false; mouse.x = -9999; mouse.y = -9999;
-    });
-  }
+  // (the graph no longer follows the pointer: a decorative pointer effect
+  // with nothing to click distracts, so mouse.active stays false)
   window.addEventListener('resize', resize, { passive: true });
   if ('ResizeObserver' in window) {
     new ResizeObserver(function () { resize(); }).observe(hero);
@@ -2629,6 +2882,48 @@ document.addEventListener('DOMContentLoaded', function () {
 })();
 
 /**
+ * The three hints that repeat — the scroll chevron's bounce, the "Active"
+ * pulse and the spark on the role line — run while their element is first
+ * in view, stop at the end of the cycle that is playing 10s later, and play
+ * again for 10s each time the element comes back into view. (Under Reduce
+ * Motion they are single, instant plays already and are left alone.)
+ */
+(function () {
+  if (!('IntersectionObserver' in window) || !document.documentElement.getAnimations) return;
+  var hosts = document.querySelectorAll('.hero-scroll-hint, .exp-status-active, .exp-role-spark');
+  if (!hosts.length) return;
+  var loops = function (host) {
+    return host.getAnimations({ subtree: true }).filter(function (a) {
+      return a.effect && a.effect.getTiming().iterations === Infinity;
+    });
+  };
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      var host = e.target;
+      clearTimeout(host._stopT);
+      if (!e.isIntersecting) return;
+      // back in view: play again from the start (a finished animation is
+      // no longer listed by getAnimations, so the host keeps hold of it)
+      (host._capped || []).forEach(function (a) {
+        a.effect.updateTiming({ iterations: Infinity });
+        a.currentTime = 0;
+        a.play();
+      });
+      host._capped = null;
+      host._stopT = setTimeout(function () {
+        host._capped = loops(host);
+        host._capped.forEach(function (a) {
+          var it = a.effect.getComputedTiming().currentIteration;
+          // finish the cycle under way, so it comes to rest where it began
+          a.effect.updateTiming({ iterations: (it == null ? 0 : Math.floor(it)) + 1 });
+        });
+      }, 10000);
+    });
+  });
+  hosts.forEach(function (h) { io.observe(h); });
+})();
+
+/**
  * Small rewards. On a computer an email address or phone number is copied
  * when clicked (a phone link there has nothing to dial; a mail link still
  * opens the mail app), and the CV and the contact card say they are on
@@ -2701,6 +2996,26 @@ document.addEventListener('DOMContentLoaded', function () {
       if (sel) sel.selectAllChildren(a.querySelector('.info-value') || a);
       show(tel ? "Couldn't copy. The number is selected" : "Couldn't copy. The address is selected", true);
     });
+  });
+})();
+
+/**
+ * Cookie settings: the footer button reopens the consent dialog, so a
+ * choice made once can be looked at and changed later. It stays hidden
+ * unless the consent script has loaded (a blocker or no network leaves it
+ * out, rather than a button that does nothing).
+ */
+(function () {
+  var btn = document.querySelector('[data-cookie-settings]');
+  if (!btn) return;
+  function ready() {
+    if (window.Cookiebot && typeof window.Cookiebot.renew === 'function') btn.hidden = false;
+  }
+  ready();
+  window.addEventListener('CookiebotOnLoad', ready);
+  window.addEventListener('CookiebotOnConsentReady', ready);
+  btn.addEventListener('click', function () {
+    if (window.Cookiebot) window.Cookiebot.renew();
   });
 })();
 

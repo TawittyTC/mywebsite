@@ -3,7 +3,9 @@
 // v2.71.0.
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { createContext, styled } from './helpers.mjs';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { createContext, styled, ROOT } from './helpers.mjs';
 
 let ctx;
 before(async () => { ctx = await createContext(); });
@@ -484,7 +486,7 @@ test('accessibility > focus: every keyboard ring is the system ring, in each con
 test('color > not by colour alone: the name in the copyright line is underlined at rest (footer-link-underline)', async () => {
   for (const [where, opts] of [['small phone', SMALL], ['iPhone', PHONE], ['Mac', MAC]]) {
     const { page } = await open(opts);
-    const r = await page.$eval('.footer-copy-link', (a) => {
+    const r = await page.$eval('a.footer-copy-link', (a) => {
       const cs = getComputedStyle(a);
       return { line: cs.textDecorationLine, thick: cs.textDecorationThickness, off: parseFloat(cs.textUnderlineOffset) / parseFloat(cs.fontSize), color: cs.color };
     });
@@ -494,7 +496,7 @@ test('color > not by colour alone: the name in the copyright line is underlined 
     assert.equal(r.color, BLUE, `${where}: the name changed colour`);
     if (where === 'Mac') {
       // under the pointer it behaves like the site's other links: darker, without the line
-      const a = page.locator('.footer-copy-link');
+      const a = page.locator('a.footer-copy-link');
       await a.scrollIntoViewIfNeeded();
       await a.hover();
       await settle(a);
@@ -1063,17 +1065,21 @@ test('controls > pop-up button: the 35 client chips are one grey "All Clients" c
     assert.equal(r.count, '33', `${where}: the client count changed`);
     assert.equal(r.sideways, 0, `${where}: the page scrolls sideways`);
     if (opts.isMobile && opts.viewport.width < 735) {
-      // scrolled into the stories, the capsule sticks beside the close button, level with it
+      // scrolled into the stories, the capsule sticks under the sheet's top bar
+      // (v2.73.0, sheet-title-bar: it used to stick beside the close button),
+      // 10px of air above and below it, the full width its own
       await page.evaluate(() => { const inner = document.querySelector('.exp-lightbox-inner'); inner.scrollTop = inner.querySelector('.exp-client-section[data-client="vietjet"]').offsetTop - 120; });
       await page.waitForTimeout(150);
       const s = await page.evaluate(() => {
         const inner = document.querySelector('.exp-lightbox-inner').getBoundingClientRect();
         const a = document.querySelector('.exp-lightbox .exp-client-select').getBoundingClientRect();
         const b = document.querySelector('.exp-lightbox .exp-lightbox-close').getBoundingClientRect();
-        return { mid: [a.top + a.height / 2 - inner.top, b.top + b.height / 2 - inner.top], gap: b.left - a.right };
+        const bar = document.querySelector('.exp-lightbox .exp-sheet-bar').getBoundingClientRect();
+        const row = document.querySelector('.exp-lightbox .exp-client-filter').getBoundingClientRect();
+        return { mid: [a.top + a.height / 2 - inner.top, b.top + b.height / 2 - inner.top], under: a.top - bar.bottom, below: row.bottom - a.bottom };
       });
-      assert.deepEqual(s.mid, [44, 44], `${where}: the stuck capsule and the close button are not level`);
-      assert.ok(s.gap >= 6, `${where}: the capsule comes within ${s.gap}px of the close button`);
+      assert.deepEqual(s.mid, [84, 28], `${where}: the stuck capsule is not under the top bar, or the close button is not 8px from the sheet's edge`);
+      assert.deepEqual([s.under, s.below], [10, 10], `${where}: the air around the stuck capsule`);
     }
     await page.selectOption('.exp-lightbox.open .exp-client-select', 'vietjet');
     const shown = await page.$$eval('.exp-lightbox.open .exp-client-section', (ss) => ss.filter((s) => s.style.display !== 'none').map((s) => s.dataset.client + (s.classList.contains('is-open') ? ' open' : '')));
@@ -1375,6 +1381,977 @@ test('layout > hit regions: where the card\'s e-mail and phone stack they sit 44
       return [...document.querySelectorAll('#biz-card .biz-contacts a')].map((a) => Math.round((a.getBoundingClientRect().top - c.top) * 10) / 10);
     });
     assert.deepEqual(r, [top, top], `${opts.viewport.width}px: the e-mail and phone moved`);
+    await page.close();
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Round 2 (v2.73.0): copy and text
+// ---------------------------------------------------------------------------
+
+const text = (el) => el.textContent.replace(/\s+/g, ' ').trim();
+
+test('buttons > title-style capitalisation on every button and link label, and one name per action (button-label-case)', async () => {
+  const { page } = await open({ ...PHONE, reducedMotion: 'reduce' });
+  const r = await page.evaluate((textSrc) => {
+    const text = eval('(' + textSrc + ')');
+    const q = (s) => document.querySelector(s);
+    const sheetLinks = [...document.querySelectorAll('template')].flatMap((t) => [...t.content.querySelectorAll('a.exp-sheet-link')].map(text));
+    const resume = [...document.querySelectorAll('#resume a.resume-exp-link')].map((a) => {
+      const cs = getComputedStyle(a);
+      return { text: text(a), more: a.classList.contains('more'), chev: !!a.querySelector('.chev'), weight: cs.fontWeight, top: Math.round(a.getBoundingClientRect().top), inline: a.getAttribute('style') };
+    });
+    return {
+      hero: text(q('#hero .btn-pill')), all: text(q('[data-proj-all]')), contact: text(q('#contact .cta-pill')), sheetLinks, resume,
+      cv: [...document.querySelectorAll('a[download][href$="CV.pdf"]')].map(text),
+      expCta: [...document.querySelectorAll('#experience .exp-card-cta')].map((b) => b.getAttribute('aria-label')),
+    };
+  }, text.toString());
+  assert.equal(r.hero, 'View Projects');
+  assert.match(r.all, /^See All \d+ Projects$/);
+  assert.equal(r.contact, 'Get in Touch');
+  assert.equal(r.sheetLinks.length, 18, 'one contact link at the foot of each of the 18 sheets');
+  assert.deepEqual([...new Set(r.sheetLinks)], ['Get in Touch'], 'the sheet links spell the label as the Contact pill does');
+  assert.deepEqual(r.resume.map((l) => l.text), ['View Experience', 'Download CV']);
+  for (const l of r.resume) {
+    assert.ok(l.more && l.chev, `"${l.text}" is not the site's standard link with a drawn chevron`);
+    assert.equal(l.weight, '400', `"${l.text}" is not regular weight`);
+    assert.equal(l.inline, null, `"${l.text}" still carries inline styles`);
+  }
+  assert.equal(r.resume[0].top, r.resume[1].top, 'on an iPhone the two Profile links share one row');
+  assert.deepEqual([...new Set(r.cv)], ['Download CV'], 'the CV link has one name everywhere');
+  assert.equal(r.expCta.length, 3);
+  for (const n of r.expCta) assert.match(n, /^Read More: /);
+  // the back pill of a project opened from the See All list
+  await page.click('[data-proj-all]');
+  await page.waitForSelector('.proj-row');
+  await page.click('.proj-row');
+  await page.waitForSelector('.proj-back');
+  // (the pill also carries the project's name for screen readers)
+  assert.match(await page.$eval('.proj-back', (b) => b.textContent.trim()), /^All Projects/);
+  await page.close();
+});
+
+test('writing > FAQ answers speak in the first person; the structured data says the same; numbers and the LinkedIn name stay whole (faq-first-person)', async () => {
+  const src = readFileSync(join(ROOT, 'index.html'), 'utf8');
+  const faq = [...src.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map((m) => JSON.parse(m[1])).find((b) => b['@type'] === 'FAQPage');
+  for (const [where, opts] of [['320', SMALL], ['iPhone', PHONE], ['iPad', { viewport: { width: 820, height: 1180 } }], ['Mac', MAC]]) {
+    const { page } = await open({ ...opts, reducedMotion: 'reduce' });
+    const r = await page.evaluate((textSrc) => {
+      const text = eval('(' + textSrc + ')');
+      document.querySelectorAll('#services .faq details').forEach((d) => { d.open = true; });
+      const lines = (el) => new Set([...el.getClientRects()].filter((x) => x.width > 0).map((x) => Math.round(x.top))).size;
+      return {
+        qa: [...document.querySelectorAll('#services .faq details')].map((d) => [text(d.querySelector('summary')), text(d.querySelector('p'))]),
+        tel: [...document.querySelectorAll('#services .faq a[href^="tel:"]')].map(lines),
+        name: [...document.querySelectorAll('#services .faq a[href*="linkedin.com"] .nw')].map((n) => [text(n), lines(n)]),
+        wbr: [...document.querySelectorAll('#services .faq a[href*="linkedin.com"]')].map((a) => a.innerHTML.includes('/in/<wbr>')),
+        sideways: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      };
+    }, text.toString());
+    assert.equal(r.qa.length, 13);
+    for (const [q, a] of r.qa) assert.doesNotMatch(a, /^(รับครับ |มีครับ |ใช่ครับ |Yes\. |Contact )?(ธนพล ชำนาญหาญ|Tanapol Chamnanhan)/, `${where}: "${q}" is answered in the third person`);
+    assert.match(r.qa[0][1], /^ผมเป็น Full-Stack Developer/);
+    assert.match(r.qa[5][1], /^Contact me via email/);
+    assert.deepEqual(r.qa, faq.mainEntity.map((e) => [e.name, e.acceptedAnswer.text]), `${where}: the FAQPage data differs from the visible questions and answers`);
+    assert.ok(r.tel.length >= 2 && r.tel.every((n) => n === 1), `${where}: a phone number wraps (${r.tel})`);
+    assert.ok(r.name.length >= 2 && r.name.every(([t, n]) => t === 'tanapol-chamnanhan/' && n === 1), `${where}: the LinkedIn name breaks at its hyphen`);
+    assert.ok(r.wbr.every(Boolean), 'the LinkedIn address may break after "/in/"');
+    assert.equal(r.sideways, 0, `${where}: the page scrolls sideways`);
+    await page.close();
+  }
+});
+
+test('writing > abbreviations are spelled out in the text or carry their full name (jargon-defined)', async () => {
+  for (const [where, opts] of [['320', SMALL], ['iPhone', PHONE], ['iPad', { viewport: { width: 820, height: 1180 } }], ['1280', { viewport: { width: 1280, height: 800 } }], ['Mac', MAC]]) {
+    const { page } = await open({ ...opts, reducedMotion: 'reduce' });
+    const r = await page.evaluate((textSrc) => {
+      const text = eval('(' + textSrc + ')');
+      const lines = (el) => new Set([...el.getClientRects()].filter((x) => x.width > 0).map((x) => Math.round(x.top))).size;
+      const abbr = [...document.querySelectorAll('abbr')];
+      const inSheets = [...document.querySelectorAll('template')].flatMap((t) => [...t.content.querySelectorAll('abbr')]);
+      const tts = [...document.querySelectorAll('.profile-bio .nw')].find((n) => /^text-to-speech/.test(n.textContent));
+      return {
+        bio: text(document.querySelector('.profile-bio')),
+        tts: tts ? lines(tts) : -1,
+        story: text(document.querySelector('[data-exp="protollcall"] .exp-card-desc, [data-exp="protollcall"] p')),
+        card: text(document.querySelector('[data-exp="protollcall"]')),
+        page: abbr.length, sheets: inSheets.length,
+        untitled: [...abbr, ...inSheets].filter((a) => !a.title).length,
+        names: [...new Set([...abbr, ...inSheets].map((a) => a.textContent + '=' + a.title))].sort(),
+        line: getComputedStyle(abbr[0]).textDecorationLine + ' ' + getComputedStyle(abbr[0]).textDecorationStyle,
+        // a question with an abbreviation is still one piece of text beside its chevron
+        split: [...document.querySelectorAll('#services .faq summary')].filter((s) => s.querySelector('abbr') && s.children.length !== 1).length,
+        qH: [...document.querySelectorAll('#services .faq summary')].map((s) => Math.round(s.getBoundingClientRect().height)),
+        sideways: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      };
+    }, text.toString());
+    assert.match(r.bio, /LLM \(large language model\) integration, voice AI \(speech recognition, text-to-speech, speech-to-speech\)/, `${where}: the bio`);
+    assert.doesNotMatch(r.bio, /ASR|TTS/);
+    assert.equal(r.tts, 1, `${where}: "text-to-speech" breaks at a hyphen`);
+    assert.match(r.card, /CRM \(customer relationship management\) systems/);
+    assert.match(r.card, /IVR \(interactive voice response\)/);
+    assert.doesNotMatch(r.card, /TTS\/ASR\/LLM/);
+    assert.equal(r.page, 69, `${where}: abbreviations marked on the page`);
+    assert.equal(r.sheets, 88, 'abbreviations marked in the sheets');
+    assert.equal(r.untitled, 0);
+    assert.deepEqual(r.names, ['ASR=automatic speech recognition', 'CRM=customer relationship management', 'IVR=interactive voice response', 'LLM=large language model', 'TTS=text-to-speech']);
+    assert.match(r.line, /underline dotted/);
+    assert.equal(r.split, 0, 'a FAQ question is split into columns around its abbreviation');
+    assert.equal(r.sideways, 0, `${where}: the page scrolls sideways`);
+    await page.close();
+  }
+});
+
+test('writing > durations use whole words everywhere: years and months (duration-units-consistent)', async () => {
+  const src = readFileSync(join(ROOT, 'index.html'), 'utf8');
+  assert.doesNotMatch(src.slice(src.indexOf('<body')), /\d (yrs?|mos?)\b/, 'an abbreviated unit is left in the page');
+  const { page } = await open({ ...PHONE, reducedMotion: 'reduce' });
+  // June 2024 to a fixed "today" is checked through the page's own clock
+  const r = await page.evaluate((textSrc) => {
+    const text = eval('(' + textSrc + ')');
+    return {
+      chips: [...document.querySelectorAll('#experience .exp-duration')].map(text),
+      periods: [...document.querySelectorAll('#experience [data-exp="scg"] *')].filter((e) => !e.children.length || e.matches('strong, .exp-period')).map(text).filter((t) => /20\d\d - .* · /.test(t)),
+      all: text(document.querySelector('#experience')),
+    };
+  }, text.toString());
+  assert.match(r.chips[0], /^(\d+ years? ?)?(\d+ months?)?$/, `the live duration reads "${r.chips[0]}"`);
+  assert.ok(r.chips[0].length > 0);
+  assert.deepEqual(r.chips.slice(1), ['2 internships · 8 months', '4 months']);
+  assert.match(r.all, /December 2023 - March 2024 · 4 months/);
+  assert.match(r.all, /April 2023 - July 2023 · 4 months/);
+  assert.doesNotMatch(r.all, /\b(yrs?|mos)\b/);
+  await page.close();
+});
+
+test('typography > at very large text a hyphenated name wraps rather than runs off its card; chips wrap at their spaces (nowrap-release-large-text)', async () => {
+  const probe = () => {
+    const cs = (s) => { const c = getComputedStyle(document.querySelector(s)); return c.display + ' ' + c.whiteSpaceCollapse + ' ' + c.textWrapMode; };
+    const qa = [...document.querySelectorAll('.nw')].filter((n) => n.getClientRects().length).find((n) => n.textContent === 'Question-Answering');
+    const box = qa.closest('.data-box').getBoundingClientRect();
+    const chips = [...document.querySelectorAll('#skill .skill-tools li, #services .svc-chips li')].filter((li) => li.getClientRects().length);
+    return {
+      nw: cs('.profile-bio .nw'), svcNw: cs('#services .svc-nw'), skillChip: cs('#skill .skill-tools li'), svcChip: cs('#services .svc-chips li'),
+      qaOut: Math.round(qa.getBoundingClientRect().right - box.right),
+      // (each chip against its own card: the skill cards sit in a sideways scroller)
+      chipsOut: chips.filter((li) => li.getBoundingClientRect().right > li.closest('ul').parentElement.getBoundingClientRect().right + 0.5).length,
+      // no punctuation is left outside a no-wrap span, where it could drop to a line of its own
+      loose: [...document.querySelectorAll('.nw, .svc-nw')].filter((n) => n.nextSibling && n.nextSibling.nodeType === 3 && /^[,.;:)]/.test(n.nextSibling.nodeValue)).length,
+    };
+  };
+  const at = async (width) => {
+    const { page } = await open({ viewport: { width, height: 700 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, reducedMotion: 'reduce' });
+    const r = await page.evaluate(probe);
+    await page.close();
+    return r;
+  };
+  // 320px (every phone at default text): nothing is released
+  let r = await at(320);
+  assert.equal(r.nw, 'inline collapse nowrap');
+  assert.equal(r.skillChip.split(' ')[2], 'nowrap');
+  assert.equal(r.svcChip.split(' ')[2], 'nowrap');
+  assert.equal(r.loose, 0, 'punctuation sits outside a no-wrap span');
+  // 300px: still nothing released (chips hold until 13.5em, names until 14em)
+  r = await at(300);
+  assert.equal(r.skillChip.split(' ')[2], 'nowrap', 'skill chips wrap above 13.5em');
+  assert.equal(r.svcChip.split(' ')[2], 'nowrap', 'service chips wrap above 13.5em');
+  assert.equal(r.nw, 'inline collapse nowrap', 'names are released before 14em');
+  assert.equal(r.svcNw, 'inline collapse nowrap');
+  // 230px: still above 14em
+  r = await at(230);
+  assert.equal(r.nw, 'inline collapse nowrap');
+  // 220px (under 14em, an iPhone at 175% zoom): a name moves whole, and wraps at its hyphen only when wider than the line
+  r = await at(220);
+  assert.equal(r.nw, 'inline-block collapse wrap');
+  assert.equal(r.svcNw, 'inline-block collapse wrap');
+  assert.ok(r.qaOut <= 0, `"Question-Answering" runs ${r.qaOut}px past its card`);
+  assert.equal(r.chipsOut, 0, 'a chip runs past its card');
+  // 210px (under 13.5em): the chips wrap at their spaces
+  r = await at(210);
+  assert.equal(r.skillChip.split(' ')[2], 'wrap', 'skill chips do not wrap under 13.5em');
+  assert.equal(r.svcChip.split(' ')[2], 'wrap', 'service chips do not wrap under 13.5em');
+  assert.equal(r.chipsOut, 0, 'a chip runs past its card');
+});
+
+test('layout > phones: an experience card gives its title the full width, and the logo follows the role details (exp-header-stack-phone)', async () => {
+  const probe = () => [...document.querySelectorAll('#experience .data-box[data-exp]')].map((c) => {
+    const head = c.querySelector(':scope > .d-flex');
+    const logo = c.querySelector('.company-logo').getBoundingClientRect();
+    const title = head.querySelector('h3').getBoundingClientRect();
+    const chip = c.querySelector('.exp-duration').getBoundingClientRect();
+    const cs = getComputedStyle(c);
+    const next = head.nextElementSibling.getBoundingClientRect();
+    return {
+      dir: getComputedStyle(head).flexDirection,
+      headFull: Math.round(head.getBoundingClientRect().width - (c.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight))),
+      titleLines: Math.round(title.height / parseFloat(getComputedStyle(head.querySelector('h3')).lineHeight)),
+      titleFirst: title.top < logo.top,
+      logoUnderChip: Math.round(logo.top - chip.bottom),
+      logoLeft: Math.round(logo.left - title.left),
+      toStory: Math.round(next.top - logo.bottom),
+      logo: [Math.round(logo.width), Math.round(logo.height)],
+    };
+  });
+  for (const [where, opts] of [['320', SMALL], ['iPhone', PHONE], ['576', { viewport: { width: 576, height: 800 } }]]) {
+    const { page } = await open({ ...opts, reducedMotion: 'reduce' });
+    const cards = await page.evaluate(probe);
+    assert.equal(cards.length, 3);
+    for (const [i, c] of cards.entries()) {
+      assert.equal(c.dir, 'column', `${where} card ${i}: the header is not stacked`);
+      assert.equal(c.headFull, 0, `${where} card ${i}: the role details do not get the card's full width`);
+      assert.ok(c.titleFirst, `${where} card ${i}: the logo is above the title`);
+      assert.ok(c.logoUnderChip >= 12 && c.logoUnderChip <= 24, `${where} card ${i}: the logo is ${c.logoUnderChip}px under the duration`);
+      assert.equal(c.logoLeft, 0, `${where} card ${i}: the logo is not on the text's left edge`);
+      assert.ok(c.toStory >= 24, `${where} card ${i}: only ${c.toStory}px between the logo and the story`);
+    }
+    // beside the logo these titles took 2, 3 and 3 lines on an iPhone
+    if (where === 'iPhone') assert.deepEqual(cards.map((c) => c.titleLines), [1, 2, 2]);
+    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), 0, `${where}: the page scrolls sideways`);
+    await page.close();
+  }
+  // from 577px the logo stays beside the title, as before
+  for (const opts of [{ viewport: { width: 577, height: 800 } }, { viewport: { width: 820, height: 1180 } }, MAC]) {
+    const { page } = await open({ ...opts, reducedMotion: 'reduce' });
+    for (const c of await page.evaluate(probe)) {
+      assert.equal(c.dir, 'row');
+      assert.ok(c.logoLeft > 100, 'the logo left its place beside the title');
+    }
+    await page.close();
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Round 2 (v2.73.0): controls and motion
+// ---------------------------------------------------------------------------
+
+/** open(), with a stand-in for the consent script (the real one is cut off). */
+async function openWithConsent(opts) {
+  const page = await ctx.browser.newPage({ serviceWorkers: 'block', ...opts });
+  await page.route((u) => !u.href.startsWith(ctx.srv.url), (r) => r.abort());
+  await page.addInitScript(() => { window.Cookiebot = { renew() { window.__renewed = (window.__renewed || 0) + 1; } }; });
+  await page.goto(ctx.srv.url + '/index.html', { waitUntil: 'load' });
+  await page.waitForFunction(styled, null, { timeout: 8000 });
+  return page;
+}
+
+/** Scroll to y + 200 and come back up 160px in steps, as a finger would. */
+async function scrollUpTo(page, y) {
+  await page.evaluate((to) => scrollTo(0, to + 200), y);
+  await page.waitForTimeout(250);
+  for (let i = 0; i < 8; i++) { await page.evaluate(() => scrollBy(0, -20)); await page.waitForTimeout(40); }
+  await page.waitForTimeout(200);
+}
+
+test('pointing devices > the hero graph does not react to the pointer, with or without Reduce Motion (hero-no-pointer-effect)', async () => {
+  for (const reducedMotion of ['no-preference', 'reduce']) {
+    const page = await ctx.browser.newPage({ serviceWorkers: 'block', ...MAC, reducedMotion });
+    await page.route((u) => !u.href.startsWith(ctx.srv.url), (r) => r.abort());
+    await page.addInitScript(() => {
+      window.__heroListeners = [];
+      const add = EventTarget.prototype.addEventListener;
+      EventTarget.prototype.addEventListener = function (type) {
+        if (this instanceof Element && this.closest('#hero') && /^(mouse|pointer)(move|enter|leave|over|out)$/.test(type)) window.__heroListeners.push(type);
+        return add.apply(this, arguments);
+      };
+    });
+    await page.goto(ctx.srv.url + '/index.html', { waitUntil: 'load' });
+    await page.waitForFunction(styled, null, { timeout: 8000 });
+    await page.mouse.move(1010, 405);
+    assert.deepEqual(await page.evaluate(() => window.__heroListeners), [], `${reducedMotion}: the hero still listens for the pointer`);
+    await page.close();
+  }
+});
+
+test('motion > the three repeating hints stop at the end of a cycle about 10s after coming into view, and play again on return (hint-loops-finite, closest)', async () => {
+  const { page, errors } = await open(MAC);
+  const endless = () => document.querySelector('.hero-scroll-hint').getAnimations({ subtree: true })
+    .filter((a) => a.effect.getTiming().iterations === Infinity).length;
+  await page.waitForFunction(endless, null, { timeout: 5000 });   // loops as before while first in view
+  await page.waitForTimeout(10600);
+  assert.equal(await page.evaluate(endless), 0, 'the scroll hint still loops without end after 10s');
+  // the cycle under way is finished, not cut: it ends on a whole iteration
+  const its = await page.evaluate(() => document.querySelector('.hero-scroll-hint')._capped.map((a) => a.effect.getTiming().iterations));
+  assert.ok(its.length > 0 && its.every((n) => Number.isInteger(n) && n >= 1), `capped at ${its}`);
+  // out of view and back: it plays again
+  await page.evaluate(() => scrollTo(0, 3000));
+  await page.waitForTimeout(300);
+  await page.evaluate(() => scrollTo(0, 0));
+  await page.waitForFunction(endless, null, { timeout: 5000 });
+  // the other two hints are under the same cap
+  const src = readFileSync(join(ROOT, 'assets/js/main.js'), 'utf8');
+  assert.match(src, /'\.hero-scroll-hint, \.exp-status-active, \.exp-role-spark'/);
+  assert.deepEqual(errors, []);
+  await page.close();
+});
+
+test('pointing devices > the arrow on buttons and on cards that open a sheet, the hand only on links, zoom-in on pictures that open full size (cursor-semantics)', async () => {
+  const { page } = await open(MAC);
+  const cur = (sel) => page.$eval(sel, (el) => getComputedStyle(el).cursor);
+  for (const sel of ['.filter-btn', '#back-to-top', '#services .faq summary', '#experience .data-box[data-exp]', '#experience .exp-card-cta',
+    '#portfolio .work-card', '#portfolio .work-card .card-plus', '.proj-all', '.paddlenav-arrow:not(:disabled)',
+    '.cert-lightbox-close', '.exp-lightbox-close', '[data-cookie-settings]']) {
+    assert.equal(await cur(sel), 'default', `${sel} shows the hand`);
+  }
+  for (const sel of ['#hero a.btn-pill', 'a.footer-copy-link', 'a.footer-contact-link', '#contact a.btn-pill']) {
+    assert.equal(await cur(sel), 'pointer', `${sel}: a link keeps the hand`);
+  }
+  for (const sel of ['#certificates .cert-card', '#certificates button.cert-img', '#certificates .cert-expand-btn',
+    '#portfolio .rf-cards-scroller-item:not(.work-card)', '#portfolio .rf-cards-scroller-item:not(.work-card) .card-plus']) {
+    assert.equal(await cur(sel), 'zoom-in', `${sel} opens a picture full size`);
+  }
+  // inside the sheet: the client pop-up button and the folding client names
+  await page.locator('#experience .data-box[data-exp]').first().click({ position: { x: 30, y: 30 } });
+  await page.waitForSelector('.exp-lightbox.open .exp-client-select');
+  for (const sel of ['.exp-lightbox .exp-client-select', '.exp-lightbox .exp-client-toggle']) {
+    assert.equal(await cur(sel), 'default', `${sel} shows the hand`);
+  }
+  await page.close();
+});
+
+test('focus > a tap or click opens the sheet and the viewer without a ring on the close button; Tab reaches it next; a key press focuses it at once (no-focus-ring-after-tap)', async () => {
+  const { page, errors } = await open(MAC);
+  const focus = () => page.evaluate(() => {
+    const a = document.activeElement;
+    return { cls: a.className, outline: getComputedStyle(a).outlineStyle, radius: getComputedStyle(a).borderRadius };
+  });
+  // an experience card, clicked
+  const card = page.locator('#experience .data-box[data-exp]').first();
+  await card.click({ position: { x: 30, y: 30 } });
+  await page.waitForSelector('.exp-lightbox.open');
+  let f = await focus();
+  assert.equal(f.cls, 'exp-lightbox-inner', 'a click put focus on the close button');
+  assert.equal(f.outline, 'none');
+  await page.keyboard.press('Tab');
+  assert.equal((await focus()).cls, 'exp-lightbox-close', 'Tab did not reach the close button first');
+  await page.keyboard.press('Escape');
+  await page.waitForSelector('.exp-lightbox.open', { state: 'detached', timeout: 3000 }).catch(() => {});
+  await page.waitForFunction(() => !document.querySelector('.exp-lightbox.open'));
+  // the same card from the keyboard: the close button has focus (and its ring)
+  await page.locator('#experience .exp-card-cta').first().focus();
+  await page.keyboard.press('Enter');
+  await page.waitForSelector('.exp-lightbox.open');
+  assert.equal((await focus()).cls, 'exp-lightbox-close', 'a key press did not focus the close button');
+  await page.keyboard.press('Escape');
+  await page.waitForFunction(() => !document.querySelector('.exp-lightbox.open'));
+  // a screenshot card, clicked: the viewer takes focus, square and ringless
+  await page.locator('#portfolio .rf-cards-scroller-item:not(.work-card) .project-img').first().click();
+  await page.waitForSelector('.cert-lightbox.open');
+  f = await focus();
+  assert.match(f.cls, /^cert-lightbox\b/, 'a click put focus on the viewer\'s close button');
+  assert.equal(f.outline, 'none');
+  assert.equal(f.radius, '0px');
+  await page.keyboard.press('Tab');
+  assert.match((await focus()).cls, /cert-lightbox-close/);
+  assert.deepEqual(errors, []);
+  await page.close();
+});
+
+test('layout > Back to top steps aside while it would cover another control, and comes back once clear (back-to-top-clear-of-controls)', async () => {
+  const { page, errors } = await open(PHONE);
+  const at = (sel, dy) => page.evaluate(([s, d]) => {
+    const r = document.querySelector(s).getBoundingClientRect();
+    return Math.round(r.top + scrollY + d);
+  }, [sel, dy]);
+  const state = () => page.evaluate(() => {
+    const b = document.getElementById('back-to-top');
+    const x = b.offsetLeft + b.offsetWidth / 2, y = b.offsetTop + b.offsetHeight / 2;
+    return { visible: b.classList.contains('visible'),
+      control: document.elementsFromPoint(x, y).some((el) => el !== b && el.matches('.paddlenav-arrow, .card-plus, .exp-card-cta, .cert-expand-btn, #services .faq summary')) };
+  });
+  // a question lies under the button's place: it stays away
+  const q = await at('#services .faq details:nth-of-type(3) summary', 0);
+  await scrollUpTo(page, q - 844 + 60);
+  let s = await state();
+  assert.equal(s.control, true, 'the test did not put a question under the button');
+  assert.equal(s.visible, false, 'Back to top sits on a question');
+  // plain text under it (the Contact headline at the bottom of the screen): it shows as before
+  const c = await at('#contact h2, #contact .cta-title, #contact h1', 0);
+  await scrollUpTo(page, c - 844 + 80);
+  s = await state();
+  assert.equal(s.control, false);
+  assert.equal(s.visible, true, 'Back to top did not come back once clear');
+  assert.deepEqual(errors, []);
+  await page.close();
+});
+
+test('feedback > on a touch screen the confirmation sits 12px above Back to top while it shows, and glides down when it leaves; a Mac keeps it at the top (toast-above-back-to-top)', async () => {
+  for (const [where, opts] of [['320px phone', SMALL], ['iPhone', PHONE]]) {
+    const { page } = await open(opts);
+    const y = await page.evaluate(() => document.querySelector('#contact').getBoundingClientRect().top + scrollY);
+    await scrollUpTo(page, y);
+    await page.evaluate(() => {
+      const a = [...document.querySelectorAll('#contact a')].find((x) => /Download CV/.test(x.textContent));
+      a.addEventListener('click', (e) => e.preventDefault());
+      a.click();
+    });
+    await page.waitForSelector('.toast.is-shown');
+    await page.waitForTimeout(450);
+    const box = () => page.evaluate(() => {
+      const t = document.querySelector('.toast').getBoundingClientRect(), b = document.getElementById('back-to-top');
+      return { bottom: t.bottom, left: t.left, right: t.right, top: b.getBoundingClientRect().top, visible: b.classList.contains('visible'), ih: innerHeight,
+        glides: getComputedStyle(document.querySelector('.toast')).transitionProperty };
+    });
+    const up = await box();
+    assert.equal(up.visible, true, `${where}: Back to top was not showing`);
+    assert.equal(Math.round(up.top - up.bottom), 12, `${where}: the toast is not 12px above Back to top`);
+    assert.match(up.glides, /bottom/, `${where}: the toast jumps rather than glides`);
+    // the button leaves 2s after the scrolling stops; the toast (5s) settles 28px above the bottom
+    await page.waitForFunction(() => !document.getElementById('back-to-top').classList.contains('visible'), null, { timeout: 4000 });
+    await page.waitForTimeout(500);
+    const down = await box();
+    assert.equal(Math.round(down.ih - down.bottom), 28, `${where}: the toast did not return to its place`);
+    await page.close();
+  }
+  // a Mac: Back to top is never drawn, so the toast is not lifted or stretched
+  const { page } = await open(MAC);
+  await page.evaluate(() => scrollTo(0, 3000));
+  await page.waitForTimeout(300);
+  await page.evaluate(() => {
+    document.getElementById('back-to-top').classList.add('visible');
+    const a = [...document.querySelectorAll('a')].find((x) => /Download CV/.test(x.textContent));
+    a.addEventListener('click', (e) => e.preventDefault());
+    a.click();
+  });
+  await page.waitForSelector('.toast.is-shown');
+  await page.waitForTimeout(450);
+  const t = await page.evaluate(() => { const r = document.querySelector('.toast').getBoundingClientRect(); return { top: Math.round(r.top), h: r.height }; });
+  assert.equal(t.top, 24);
+  assert.ok(t.h < 60, `the toast is ${t.h}px tall`);
+  await page.close();
+});
+
+test('privacy > the footer has a Cookie settings button that reopens the consent choice; it is left out when the consent script is missing (cookie-settings-link)', async () => {
+  // no consent script (a blocker, no network): no button
+  const { page: bare } = await open(PHONE);
+  assert.equal(await bare.locator('footer [data-cookie-settings]').isVisible(), false, 'a button that does nothing is showing');
+  await bare.close();
+  for (const [where, opts] of [['320px phone', SMALL], ['iPhone', PHONE], ['iPad', { viewport: { width: 820, height: 1180 }, hasTouch: true, isMobile: true }], ['Mac', MAC]]) {
+    const page = await openWithConsent(opts);
+    const btn = page.locator('footer [data-cookie-settings]');
+    assert.equal(await btn.isVisible(), true, `${where}: no Cookie settings button`);
+    assert.equal(await btn.evaluate((b) => b.tagName + ':' + b.textContent), 'BUTTON:Cookie settings');
+    const m = await btn.evaluate((b) => {
+      const copy = b.previousElementSibling, r = b.getBoundingClientRect(), c = copy.getBoundingClientRect();
+      return { gap: r.top - c.bottom, mid: (r.left + r.right) / 2, right: r.right, copyRight: c.right, sameRow: Math.abs(r.top - c.top) < 2,
+        color: getComputedStyle(b).color, link: getComputedStyle(document.querySelector('#contact a.more')).color,
+        ruleRight: document.querySelector('#footer .border-top').getBoundingClientRect().right,
+        vw: document.documentElement.clientWidth, sw: document.documentElement.scrollWidth };
+    });
+    assert.equal(m.color, m.link, `${where}: not the link blue`);
+    assert.equal(m.sw, m.vw, `${where}: the page scrolls sideways`);
+    if (where === 'Mac') {
+      assert.equal(m.sameRow, true, 'Mac: not on the copyright row');
+      assert.ok(m.right > m.copyRight + 200 && m.right <= m.ruleRight, 'Mac: not at the trailing end of the row');
+    } else {
+      // under the copyright, centred, a small gap so it is not a third copyright line
+      assert.ok(m.gap >= 6 && m.gap <= 8.5, `${where}: ${m.gap}px under the copyright`);
+      assert.ok(Math.abs(m.mid - m.vw / 2) <= 1, `${where}: not centred`);
+    }
+    await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
+    await btn.click();
+    assert.equal(await page.evaluate(() => window.__renewed), 1, `${where}: the consent dialog was not reopened`);
+    await page.close();
+  }
+});
+
+test('layout > the page runs edge to edge on a phone held sideways, and the floating buttons keep clear of the sensor housing (landscape-edge-to-edge)', async () => {
+  const html = readFileSync(join(ROOT, 'index.html'), 'utf8');
+  assert.match(html, /<meta content="width=device-width, initial-scale=1\.0, viewport-fit=cover" name="viewport">/);
+  const css = readFileSync(join(ROOT, 'assets/css/style.css'), 'utf8');
+  assert.match(css, /#back-to-top \{\s*bottom: calc\(22px \+ env\(safe-area-inset-bottom, 0px\)\);\s*right: calc\(22px \+ env\(safe-area-inset-right, 0px\)\);/);
+  assert.match(css, /\.cert-lightbox-close \{[^}]*top: calc\(20px \+ env\(safe-area-inset-top, 0px\)\);\s*right: calc\(24px \+ env\(safe-area-inset-right, 0px\)\);/);
+  // with no insets (portrait in a browser without a notch) nothing moves
+  const { page } = await open(PHONE);
+  const pos = await page.evaluate(() => {
+    const b = getComputedStyle(document.getElementById('back-to-top'));
+    return { right: b.right, bottom: b.bottom, sw: document.documentElement.scrollWidth, vw: document.documentElement.clientWidth };
+  });
+  assert.deepEqual([pos.right, pos.bottom], ['22px', '22px']);
+  assert.equal(pos.sw, pos.vw);
+  await page.close();
+});
+
+// ── v2.73.0 round 2: the sheet ──────────────────────────────────────────
+
+/** What the sheet's top bar shows right now, measured from the sheet's own edges. */
+const sheetBar = () => {
+  const inner = document.querySelector('.exp-lightbox-inner'), ir = inner.getBoundingClientRect();
+  const bar = inner.querySelector('.exp-sheet-bar');
+  if (!bar) return null;
+  const br = bar.getBoundingClientRect(), c = bar.querySelector('.exp-lightbox-close').getBoundingClientRect();
+  const t = bar.querySelector('.exp-sheet-bar-title'), ts = getComputedStyle(t), back = bar.querySelector('.proj-back');
+  const big = inner.querySelector('.exp-modal-title');
+  return {
+    h: br.height, edge: [br.left - ir.left, ir.right - br.right], closeTop: Math.round(c.top - ir.top), closeH: c.height,
+    stuck: bar.classList.contains('is-stuck'), material: getComputedStyle(bar).backgroundColor,
+    title: t.textContent, shown: ts.opacity === '1' && ts.visibility === 'visible', cut: t.classList.contains('is-cut'),
+    bigTop: big ? big.getBoundingClientRect().top - c.bottom : null,
+    backTop: back ? Math.round(back.getBoundingClientRect().top - ir.top) : null,
+    order: [...bar.children].map((el) => el.className.split(' ').pop()),
+    sideways: inner.scrollWidth - inner.clientWidth,
+  };
+};
+const sheetScroll = async (page, y) => {
+  await page.evaluate((top) => { document.querySelector('.exp-lightbox-inner').scrollTop = top; }, y);
+  await page.waitForTimeout(350);
+};
+
+test('navigation > the sheet has a top bar: the close button rests where it was, the bar turns to material as soon as it sticks, and the title joins it once the big one has left (sheet-title-bar)', async () => {
+  for (const [where, opts, pad] of [['small phone', SMALL, 24], ['iPhone', PHONE, 24], ['iPad', IPAD, 36], ['Mac', MAC, 36]]) {
+    const { page, errors } = await open({ ...opts, reducedMotion: 'reduce' });
+    await openProtollcall(page);
+    const rest = await page.evaluate(sheetBar);
+    assert.ok(rest, `${where}: the sheet has no top bar`);
+    assert.deepEqual([rest.h, rest.edge, rest.closeH], [52, [0, 0], 40], `${where}: the bar is not 52px, edge to edge, around a 40px close button`);
+    assert.equal(rest.closeTop, pad, `${where}: at rest the close button moved from its v2.71 place`);
+    assert.deepEqual([rest.stuck, rest.material, rest.shown], [false, 'rgba(0, 0, 0, 0)', false], `${where}: at rest the bar is not bare`);
+    assert.ok(rest.bigTop >= 0, `${where}: the title is not below the close button`);
+    assert.equal(rest.sideways, 0, `${where}: the sheet scrolls sideways`);
+    // a little scroll: the bar has stuck, 8px from the sheet's edge, on its material; no title yet
+    await sheetScroll(page, pad + 4);
+    const stuck = await page.evaluate(sheetBar);
+    assert.deepEqual([stuck.stuck, stuck.closeTop, stuck.material, stuck.shown], [true, 8, 'rgba(255, 255, 255, 0.92)', false], `${where}: just scrolled`);
+    // deep in the stories: the compact title shows
+    await page.evaluate(() => { const i = document.querySelector('.exp-lightbox-inner'); i.scrollTop = i.querySelector('.exp-client-section[data-client="netbay"]').offsetTop - 130; });
+    await page.waitForTimeout(450);
+    const deep = await page.evaluate(sheetBar);
+    assert.deepEqual([deep.stuck, deep.closeTop, deep.title, deep.shown], [true, 8, 'Full Stack Developer', true], `${where}: scrolled into the stories`);
+    // back at the top the bar is bare again
+    await sheetScroll(page, 0);
+    const again = await page.evaluate(sheetBar);
+    assert.deepEqual([again.stuck, again.closeTop], [false, pad], `${where}: back at the top`);
+    await page.keyboard.press('Escape');
+    // a project opened from See all: the way back, the title and the close button share the bar
+    await page.$eval('[data-proj-all]', (b) => b.click());
+    await page.waitForSelector('.exp-lightbox.open .proj-row');
+    await page.locator('.proj-row', { hasText: 'Sales campaign CRM' }).first().evaluate((r) => r.click());
+    await page.waitForSelector('.exp-sheet-bar .proj-back');
+    await page.waitForTimeout(450);
+    const nested = await page.evaluate(sheetBar);
+    assert.deepEqual(nested.order, ['proj-back', 'exp-sheet-bar-title', 'exp-lightbox-close'].slice(0, 3).map((c, i) => (i === 1 && nested.cut ? 'is-cut' : c)), `${where}: the bar's order`);
+    assert.deepEqual([nested.stuck, nested.backTop, nested.closeTop], [true, 8, 8], `${where}: the way back and the close button are not 8px from the edge`);
+    // each button answers its own taps (their 44px hit regions do not spread over the bar)
+    const hits = await page.evaluate(() => ['.proj-back', '.exp-lightbox-close'].map((sel) => {
+      const el = document.querySelector('.exp-sheet-bar ' + sel), r = el.getBoundingClientRect();
+      return document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2).closest('button') === el;
+    }));
+    assert.deepEqual(hits, [true, true], `${where}: a bar button is covered by another's hit region`);
+    // the smallest phones have no room for the title beside the way back: it stays out rather than show "Full…"
+    assert.equal(nested.shown, where !== 'small phone', `${where}: the compact title beside "All Projects"`);
+    assert.equal(nested.sideways, 0, `${where}: the nested sheet scrolls sideways`);
+    assert.deepEqual(errors, []);
+    await page.close();
+  }
+});
+
+/** One finger down at (x, y0), dragged to y1 (or x1) in steps, then lifted. */
+async function touchDrag(page, x, y0, y1, { steps = 10, wait = 16, x1 = x } = {}) {
+  const cdp = await page.context().newCDPSession(page);
+  const pt = (px, py) => [{ x: px, y: py, id: 1 }];
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: pt(x, y0) });
+  for (let i = 1; i <= steps; i++) {
+    await page.waitForTimeout(wait);
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: pt(x + (x1 - x) * i / steps, y0 + (y1 - y0) * i / steps) });
+  }
+  await page.waitForTimeout(wait);
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  await cdp.detach();
+  await page.waitForTimeout(500);
+}
+
+test('gestures > a sheet or a picture is swiped down to close: a short slow pull springs back, a long one closes, and a zoomed or sideways drag never does (sheet-swipe-dismiss)', async () => {
+  const css = readFileSync(join(ROOT, 'assets/css/style.css'), 'utf8');
+  assert.doesNotMatch(css, /\.cert-lightbox-frame\s*\{[^}]*touch-action/, 'a touch-action rule on the frame would stop pinch-zoom');
+  const { page, errors } = await open(PHONE);
+  const sheet = () => page.evaluate(() => ({ open: !!document.querySelector('.exp-lightbox.open'), transform: document.querySelector('.exp-lightbox-inner').style.transform, depth: (history.state && history.state.overlay) || 0 }));
+  // the sheet
+  await openProtollcall(page);
+  assert.equal(await page.$eval('.exp-lightbox-inner', (el) => getComputedStyle(el).overscrollBehaviorY), 'contain');
+  await touchDrag(page, 195, 200, 260, { steps: 12, wait: 40 });
+  await page.waitForTimeout(700); // the spring back settles
+  assert.deepEqual(await sheet(), { open: true, transform: '', depth: 1 }, 'a slow 60px pull did not spring back');
+  // scrolled, a downward drag scrolls the sheet and never closes it
+  await page.evaluate(() => { document.querySelector('.exp-lightbox-inner').scrollTop = 600; });
+  await touchDrag(page, 195, 300, 600);
+  assert.equal((await sheet()).open, true, 'a drag in a scrolled sheet closed it');
+  await page.evaluate(() => { document.querySelector('.exp-lightbox-inner').scrollTop = 0; });
+  await page.waitForTimeout(200);
+  // pinch-zoomed in: the drag moves around the zoomed page
+  await page.evaluate(() => Object.defineProperty(window.visualViewport, 'scale', { configurable: true, get: () => 2 }));
+  await touchDrag(page, 195, 200, 500);
+  assert.equal((await sheet()).open, true, 'a drag while zoomed in closed the sheet');
+  await page.evaluate(() => { delete window.visualViewport.scale; });
+  await touchDrag(page, 195, 200, 500);
+  await page.waitForFunction(() => !document.querySelector('.exp-lightbox.open') && !(history.state && history.state.overlay));
+  // a picture
+  const viewer = () => page.evaluate(() => ({ open: !!document.querySelector('.cert-lightbox.open'), transform: document.querySelector('.cert-lightbox-frame').style.transform }));
+  await page.$eval('#images-list .cert-card', (c) => c.click());
+  await page.waitForSelector('.cert-lightbox.open');
+  await page.waitForTimeout(600);
+  await touchDrag(page, 195, 400, 460, { steps: 12, wait: 40 });
+  await page.waitForTimeout(700);
+  assert.deepEqual(await viewer(), { open: true, transform: '' }, 'a slow 60px pull on the picture did not spring back');
+  await page.evaluate(() => Object.defineProperty(window.visualViewport, 'scale', { configurable: true, get: () => 2 }));
+  await touchDrag(page, 195, 300, 600);
+  assert.equal((await viewer()).open, true, 'a drag while zoomed in closed the picture');
+  await page.evaluate(() => { delete window.visualViewport.scale; });
+  await touchDrag(page, 195, 300, 600);
+  await page.waitForFunction(() => !document.querySelector('.cert-lightbox.open') && !(history.state && history.state.overlay));
+  // a wide screenshot still pans sideways
+  await page.$eval('#scroller > .rf-cards-scroller-item:not([data-open-exp])', (el) => el.click());
+  await page.waitForSelector('.cert-lightbox.open.lb-pan');
+  await page.waitForTimeout(600);
+  await touchDrag(page, 300, 400, 410, { x1: 80 });
+  const pan = await page.evaluate(() => ({ open: !!document.querySelector('.cert-lightbox.open'), left: document.querySelector('.cert-lightbox-frame').scrollLeft, transform: document.querySelector('.cert-lightbox-frame').style.transform }));
+  assert.equal(pan.open, true, 'a sideways drag closed the screenshot');
+  assert.equal(pan.transform, '', 'a sideways drag pulled the screenshot down');
+  assert.ok(pan.left > 100, `the screenshot panned ${pan.left}px sideways`);
+  assert.deepEqual(errors, []);
+  await page.close();
+});
+
+test('modality > a screenshot opened from the See all list is the only thing open; closing it brings the list back on that row (one-modal-at-a-time)', async () => {
+  for (const [where, opts] of [['iPhone', PHONE], ['Mac', MAC]]) {
+    const { page, errors } = await open({ ...opts, reducedMotion: 'reduce' });
+    await page.$eval('[data-proj-all]', (b) => b.click());
+    await page.waitForSelector('.exp-lightbox.open .proj-row');
+    // the row brought into view first, so the click itself scrolls nothing
+    await page.locator('.proj-row', { hasText: 'Classroom' }).evaluate((r) => r.scrollIntoView({ block: 'center' }));
+    const at = await page.$eval('.exp-lightbox-inner', (el) => el.scrollTop);
+    assert.ok(at > 300, `${where}: the row is not far down the list`);
+    await page.locator('.proj-row', { hasText: 'Classroom' }).click();
+    await page.waitForSelector('.cert-lightbox.open');
+    await page.waitForTimeout(300);
+    const one = await page.evaluate(() => ({
+      list: !!document.querySelector('.exp-lightbox.open'),
+      closeButtons: [...document.querySelectorAll('.exp-lightbox-close, .cert-lightbox-close')].filter((b) => b.checkVisibility({ visibilityProperty: true })).length,
+      depth: history.state && history.state.overlay,
+    }));
+    assert.deepEqual(one, { list: false, closeButtons: 1, depth: 1 }, `${where}: the list is still open under the picture`);
+    await page.keyboard.press('Escape');
+    await page.waitForFunction(() => !document.querySelector('.cert-lightbox.open') && !!document.querySelector('.exp-lightbox.open .proj-row'));
+    await page.waitForTimeout(200);
+    const back = await page.evaluate(() => ({ top: document.querySelector('.exp-lightbox-inner').scrollTop, focus: document.activeElement.textContent, depth: history.state && history.state.overlay,
+      taps: getComputedStyle(document.querySelector('.cert-lightbox')).pointerEvents }));
+    assert.equal(back.top, at, `${where}: the list did not come back where it was`);
+    assert.match(back.focus, /Classroom/, `${where}: not back on the row`);
+    assert.deepEqual([back.depth, back.taps], [1, 'none'], `${where}: history depth, and the fading viewer takes taps`);
+    // the next row can be opened at once, and the close button leaves history clean
+    await page.locator('.proj-row', { hasText: 'Classroom' }).click();
+    await page.waitForSelector('.cert-lightbox.open');
+    await page.goBack();
+    await page.waitForFunction(() => !document.querySelector('.cert-lightbox.open') && !!document.querySelector('.exp-lightbox.open .proj-row'));
+    await page.click('.exp-lightbox .exp-lightbox-close');
+    await page.waitForFunction(() => !document.querySelector('.exp-lightbox.open') && !(history.state && history.state.overlay));
+    assert.deepEqual(errors, []);
+    await page.close();
+  }
+});
+
+test('feedback > back in the See all list, the row you came from is filled light grey edge to edge; a keyboard return shows only the blue focus fill (see-all-return-highlight)', async () => {
+  const fill = () => {
+    const rows = [...document.querySelectorAll('.exp-lightbox .proj-row.is-selected')];
+    if (rows.length !== 1) return { marked: rows.length };
+    const li = rows[0].closest('li'), r = li.getBoundingClientRect(), box = li.parentNode.getBoundingClientRect(), cs = getComputedStyle(li);
+    return { marked: 1, name: rows[0].querySelector('.proj-name').textContent, bg: cs.backgroundColor, edge: [r.left - box.left, box.right - r.right],
+      radius: cs.borderRadius, first: li === li.parentNode.firstElementChild, ring: rows[0].matches(':focus-visible') };
+  };
+  for (const [where, opts] of [['iPhone', PHONE], ['Mac', MAC]]) {
+    const { page, errors } = await open({ ...opts, reducedMotion: 'reduce' });
+    const tap = (loc) => (opts.hasTouch ? loc.tap() : loc.click());
+    await tap(page.locator('[data-proj-all]'));
+    await page.waitForSelector('.exp-lightbox.open .proj-row');
+    assert.equal(await page.locator('.proj-row.is-selected').count(), 0, `${where}: a row is marked before any was opened`);
+    await tap(page.locator('.proj-row', { hasText: 'Sales campaign CRM' }).first());
+    await page.waitForSelector('.proj-back');
+    await page.waitForTimeout(300);
+    await tap(page.locator('.proj-back'));
+    await page.waitForSelector('.exp-lightbox.open .proj-row.is-selected');
+    await page.waitForTimeout(300);
+    const f = await page.evaluate(fill);
+    assert.deepEqual([f.marked, f.name, f.ring], [1, 'Sales campaign CRM', false], `${where}: the row that was opened`);
+    assert.deepEqual([f.bg, f.edge], ['rgba(0, 0, 0, 0.05)', [0, 0]], `${where}: not a light grey fill from edge to edge`);
+    if (f.first) assert.equal(f.radius, '18px 18px 0px 0px', `${where}: the first row's fill does not follow the box's corners`);
+    // another row opened: the mark moves with it
+    await tap(page.locator('.proj-row', { hasText: 'Chatbot and LINE images' }).first());
+    await page.waitForSelector('.proj-back');
+    await page.waitForTimeout(300);
+    if (opts.hasTouch) {
+      await tap(page.locator('.proj-back'));
+    } else {
+      // by keyboard: only the blue focus fill, no grey under it
+      await page.keyboard.press('Enter');
+    }
+    await page.waitForSelector('.exp-lightbox.open .proj-row.is-selected');
+    await page.waitForTimeout(300);
+    const g = await page.evaluate(fill);
+    assert.deepEqual([g.marked, g.name], [1, 'Chatbot and LINE images'], `${where}: the mark did not move to the row opened last`);
+    if (!opts.hasTouch) assert.deepEqual([g.ring, g.bg], [true, 'rgb(18, 100, 206)'], 'Mac, keyboard: grey shows instead of the focus fill');
+    assert.deepEqual(errors, []);
+    await page.close();
+  }
+});
+
+// ── Dark appearance (dark-appearance, v2.73.0) ──────────────────────────
+// The page follows the device's appearance setting. Light is the page as it
+// was; Dark is one block at the end of style.css plus a first-paint block in
+// index.html. These helpers judge what is drawn, not what is written.
+
+/**
+ * In the page: every visible text run under `sel` (the whole page without
+ * one), its colour against the colours of the boxes behind it. Returns the
+ * runs below 4.5:1 (3:1 for 24px, or bold 18.66px, and larger), and how
+ * many runs were judged.
+ */
+const lowContrast = (sel) => {
+  const parse = (c) => { const p = ((c || '').match(/rgba?\(([^)]+)\)/) || [0, ''])[1].split(/[,\s/]+/).filter(Boolean).map(Number); return p.length < 3 ? null : { r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1 }; };
+  const lum = (c) => { const f = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }; return 0.2126 * f(c.r) + 0.7152 * f(c.g) + 0.0722 * f(c.b); };
+  const over = (t, u) => ({ r: t.r * t.a + u.r * (1 - t.a), g: t.g * t.a + u.g * (1 - t.a), b: t.b * t.a + u.b * (1 - t.a), a: 1 });
+  const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((m, n) => n - m); return (x + 0.05) / (y + 0.05); };
+  const behind = (el) => {
+    const layers = [];
+    for (let n = el; n && n.nodeType === 1; n = n.parentElement) { const c = parse(getComputedStyle(n).backgroundColor); if (c && c.a > 0) { layers.push(c); if (c.a >= 1) break; } }
+    let base = parse(getComputedStyle(document.body).backgroundColor);
+    for (let i = layers.length - 1; i >= 0; i--) base = over(layers[i], base);
+    return base;
+  };
+  const shown = (el) => {
+    const r = el.getBoundingClientRect(); if (r.width < 2 || r.height < 2) return false;
+    for (let n = el; n && n.nodeType === 1; n = n.parentElement) { const cs = getComputedStyle(n); if (cs.display === 'none' || cs.visibility === 'hidden' || +cs.opacity < 0.05 || (cs.clip && cs.clip !== 'auto')) return false; }
+    return true;
+  };
+  const root = sel ? document.querySelector(sel) : document.body, low = [], seen = new Set();
+  let runs = 0;
+  const tw = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  while (tw.nextNode()) {
+    const el = tw.currentNode.parentElement;
+    if (!tw.currentNode.nodeValue.trim() || seen.has(el) || /^(SCRIPT|STYLE|NOSCRIPT|OPTION)$/.test(el.tagName) || !shown(el)) continue;
+    seen.add(el);
+    const cs = getComputedStyle(el), bg = behind(el), fill = parse(cs.webkitTextFillColor);
+    // gradient type (the name, the Contact headline): every stop is judged
+    const inks = /text/.test(cs.webkitBackgroundClip) && fill && fill.a === 0 ? (cs.backgroundImage.match(/rgba?\([^)]+\)/g) || []).map(parse) : [parse(cs.color)];
+    const size = parseFloat(cs.fontSize), need = size >= 24 || (size >= 18.66 && +cs.fontWeight >= 700) ? 3 : 4.5;
+    const worst = Math.min(...inks.map((c) => ratio(over(c, bg), bg)));
+    runs++;
+    if (worst < need) low.push(`${el.className || el.tagName} "${tw.currentNode.nodeValue.trim().slice(0, 24)}" ${worst.toFixed(2)}:1`);
+  }
+  return { runs, low };
+};
+
+/** Boxes under `sel` still filled with a light colour (logo plates and pictures are meant to be). */
+const lightBoxes = (sel) => {
+  const lum = (p) => { const f = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }; return 0.2126 * f(p[0]) + 0.7152 * f(p[1]) + 0.0722 * f(p[2]); };
+  const out = [];
+  for (const el of (sel ? document.querySelector(sel) : document.body).querySelectorAll('*')) {
+    if (el.matches('img, canvas, .company-logo, .exp-modal-company-logo, .proj-logo') || el.closest('svg')) continue;
+    const r = el.getBoundingClientRect(); if (r.width < 30 || r.height < 20) continue;   // dots, chevrons and glyphs are marks, not surfaces
+    const cs = getComputedStyle(el); if (cs.display === 'none' || cs.visibility === 'hidden') continue;
+    const p = (cs.backgroundColor.match(/[\d.]+/g) || []).map(Number);
+    if (p.length >= 3 && (p.length < 4 || p[3] > 0.5) && lum(p) > 0.42) out.push(`${el.className || el.tagName} ${cs.backgroundColor}`);
+  }
+  return [...new Set(out)];
+};
+
+/** Dark, with the other system settings a test asks for (Playwright has no switch for Reduce Transparency). */
+async function openDark(opts, media = {}) {
+  const page = await ctx.browser.newPage({ serviceWorkers: 'block', colorScheme: 'dark', reducedMotion: 'reduce', ...opts });
+  const features = [{ name: 'prefers-color-scheme', value: 'dark' }, { name: 'prefers-reduced-motion', value: 'reduce' }];
+  if (media.contrast) features.push({ name: 'prefers-contrast', value: 'more' });
+  if (media.transparency) features.push({ name: 'prefers-reduced-transparency', value: 'reduce' });
+  const cdp = await page.context().newCDPSession(page);
+  await cdp.send('Emulation.setEmulatedMedia', { features });
+  const errors = [];
+  page.on('pageerror', (e) => errors.push(String(e)));
+  await page.route((u) => !u.href.startsWith(ctx.srv.url), (r) => r.abort());
+  await page.goto(ctx.srv.url + '/index.html', { waitUntil: 'load' });
+  await page.waitForFunction(styled, null, { timeout: 8000 });
+  return { page, errors };
+}
+const css = (page, sel, prop, pseudo) => page.evaluate(([s, p, ps]) => getComputedStyle(document.querySelector(s), ps || null).getPropertyValue(p), [sel, prop, pseudo]);
+
+test('Dark Mode > the page follows the device: dark bands, cards, text and links; filled buttons keep the accent (dark-appearance)', async () => {
+  const html = readFileSync(join(ROOT, 'index.html'), 'utf8');
+  assert.match(html, /<meta name="color-scheme" content="light dark">/);
+  assert.match(html, /<meta name="theme-color" media="\(prefers-color-scheme: dark\)" content="#000000">\s*<meta name="theme-color" content="#ffffff">/, 'a theme colour for each appearance, the dark one first');
+  for (const [where, opts] of [['iPhone', PHONE], ['Mac', MAC]]) {
+    const { page, errors } = await openDark(opts);
+    assert.equal(await css(page, 'html', 'color-scheme'), 'light dark');
+    const tokens = await page.evaluate(() => ['--color-text', '--color-text-secondary', '--color-text-secondary-small', '--color-link', '--sk-body-background-color'].map((t) => getComputedStyle(document.documentElement).getPropertyValue(t).trim().toUpperCase()));
+    assert.deepEqual(tokens, ['#F5F5F7', '#AEAEB2', '#AEAEB2', '#4C9DFF', '#000'], `${where}: the dark palette`);
+    for (const [sel, prop, want] of [
+      ['body', 'background-color', 'rgb(0, 0, 0)'], ['#hero', 'background-color', 'rgb(0, 0, 0)'], ['#resume', 'background-color', 'rgb(0, 0, 0)'],
+      ['#experience', 'background-color', 'rgb(28, 28, 30)'], ['#certificates', 'background-color', 'rgb(28, 28, 30)'],
+      ['#resume .data-box', 'background-color', 'rgb(28, 28, 30)'], ['#experience .data-box[data-exp]', 'background-color', 'rgb(44, 44, 46)'],
+      ['#portfolio .rf-cards-scroller-item', 'background-color', 'rgb(28, 28, 30)'], ['#certificates .cert-card', 'background-color', 'rgb(44, 44, 46)'],
+      ['body', 'color', 'rgb(245, 245, 247)'], ['#hero .more', 'color', 'rgb(76, 157, 255)'],
+      // filled controls keep #1264CE: white on the lighter link blue would be 2.77:1
+      ['#hero .btn-pill', 'background-color', 'rgb(18, 100, 206)'], ['#hero .btn-pill', 'color', 'rgb(255, 255, 255)'],
+      // the Skills filter: a grey track and a raised grey segment, not a white one
+      ['#skill .project-filters', 'background-color', 'rgb(28, 28, 30)'], ['#skill .filter-btn.active', 'background-color', 'rgb(99, 99, 102)'], ['#skill .filter-btn.active', 'color', 'rgb(255, 255, 255)'],
+      // logos on light plates, white paper a touch dimmer with its shadow kept
+      ['.company-logo', 'background-color', 'rgb(245, 245, 247)'], ['#portfolio .has-logo .work-logo img', 'background-color', 'rgb(245, 245, 247)'],
+      ['.hero-net-label', 'background-color', 'rgba(28, 28, 30, 0.85)'],
+    ]) assert.equal(await css(page, sel, prop), want, `${where}: ${sel} ${prop}`);
+    const cert = await css(page, '#certificates .cert-img img', 'filter');
+    assert.match(cert, /^brightness\(0\.92\) drop-shadow/, `${where}: certificate thumbnails are dimmed and keep their shadow`);
+    // the gradient name and the Contact headline keep their gradients, in light inks
+    for (const sel of ['.hero-name-line', '.cta-headline']) {
+      const g = await css(page, sel, 'background-image');
+      assert.ok(g.startsWith('linear-gradient') && g.includes('rgb(245, 245, 247)') && !g.includes('rgb(29, 29, 31)'), `${where}: ${sel} gradient is ${g.slice(0, 80)}`);
+    }
+    // the constellation draws in the lighter inks: the name's lit colour is a light blue, not the light page's deep one
+    await page.waitForFunction(() => /rgb/.test(document.querySelector('#hero .hero-name').style.getPropertyValue('--ink-c')), null, { timeout: 8000 });
+    const ink = rgbOf(await page.evaluate(() => document.querySelector('#hero .hero-name').style.getPropertyValue('--ink-c')));
+    assert.ok(contrast(ink, [0, 0, 0]) >= 4.5, `${where}: the name's ink ${ink} is too dark for black`);
+    const s = await page.evaluate(() => [document.documentElement.scrollWidth, document.documentElement.clientWidth]);
+    assert.equal(s[0], s[1], `${where}: the page scrolls sideways in Dark`);
+    assert.deepEqual(errors, []);
+    await page.close();
+  }
+});
+
+test('Dark Mode > every text run keeps 4.5:1 and no surface stays light: page, sheets, See all, viewer (dark-appearance)', async () => {
+  for (const [where, opts] of [['iPhone', PHONE], ['Mac', MAC]]) {
+    const { page, errors } = await openDark(opts);
+    const tap = (loc) => (opts.hasTouch ? loc.tap() : loc.click());
+    const judge = async (what, sel, min) => {
+      const t = await page.evaluate(lowContrast, sel || null);
+      assert.ok(t.runs >= min, `${where}, ${what}: only ${t.runs} text runs were judged`);
+      assert.deepEqual(t.low, [], `${where}, ${what}: text below 4.5:1`);
+      assert.deepEqual(await page.evaluate(lightBoxes, sel || null), [], `${where}, ${what}: a surface is still light`);
+    };
+    await page.evaluate(() => { document.querySelectorAll('details').forEach((d) => { d.open = true; }); document.querySelector('[data-cookie-settings]').hidden = false; window._toast('Email copied'); });
+    await page.waitForTimeout(300);
+    await judge('page', null, 500);
+    assert.equal(await css(page, '.toast', 'color'), 'rgb(245, 245, 247)');
+    assert.equal(await css(page, '.toast-check', 'background-color'), 'rgb(18, 100, 206)', `${where}: the toast's tick keeps the accent under its white mark`);
+    await page.keyboard.press('Escape');
+    // the current job's sheet: pop-up button, folded client rows, the stuck title bar
+    await page.$eval('#experience [data-exp="protollcall"] .exp-card-cta', (el) => el.click());
+    await page.waitForSelector('.exp-lightbox.open .exp-client-select');
+    await page.waitForTimeout(300);
+    await judge('sheet', '.exp-lightbox.open', 150);
+    assert.equal(await css(page, '.exp-client-select', 'background-color'), 'rgb(58, 58, 60)', `${where}: the client pop-up button`);
+    assert.match(await css(page, '.exp-client-select', 'background-image'), /stroke='%23f5f5f7'/, `${where}: its chevron is drawn in the light ink`);
+    await page.evaluate(() => { document.querySelector('.exp-lightbox.open .exp-client-toggle').click(); document.querySelector('.exp-lightbox.open .exp-lightbox-inner').scrollTop = 420; });
+    await page.waitForSelector('.exp-sheet-bar.is-stuck');
+    await page.waitForTimeout(300);
+    await judge('sheet, scrolled', '.exp-lightbox.open', 150);
+    assert.equal(await css(page, '.exp-sheet-bar.is-stuck', 'background-color'), 'rgba(28, 28, 30, 0.92)', `${where}: the stuck title bar`);
+    assert.equal(await css(page, '.exp-sheet-bar-title', 'color'), 'rgb(245, 245, 247)');
+    await page.keyboard.press('Escape');
+    await page.waitForSelector('.exp-lightbox.open', { state: 'detached' }).catch(() => {});
+    await page.waitForTimeout(400);
+    // See all, a row under the keyboard, a project, and back
+    await tap(page.locator('[data-proj-all]'));
+    await page.waitForSelector('.exp-lightbox.open .proj-row');
+    await page.waitForTimeout(300);
+    await judge('See all', '.exp-lightbox.open', 100);
+    if (!opts.hasTouch) {
+      await page.keyboard.press('Tab');
+      await page.evaluate(() => document.querySelectorAll('.proj-row')[3].focus());
+      const row = await page.evaluate(() => { const a = document.activeElement; return [a.matches('.proj-row:focus-visible'), getComputedStyle(a.closest('li')).backgroundColor, getComputedStyle(a.querySelector('.proj-name')).color, getComputedStyle(a.querySelector('.proj-kind')).color]; });
+      // white on the link blue of Dark (#4C9DFF) would be 2.77:1
+      assert.deepEqual(row, [true, 'rgb(18, 100, 206)', 'rgb(255, 255, 255)', 'rgb(255, 255, 255)'], 'Mac: the keyboard row fill keeps 5.62:1 under white type');
+      await judge('See all, keyboard row', '.exp-lightbox.open', 100);
+    }
+    await tap(page.locator('.proj-row', { hasText: 'Sales campaign CRM' }).first());
+    await page.waitForSelector('.proj-back');
+    await page.waitForTimeout(300);
+    await judge('project', '.exp-lightbox.open', 8);
+    await tap(page.locator('.proj-back'));
+    await page.waitForSelector('.exp-lightbox.open .proj-row.is-selected');
+    await page.waitForTimeout(300);
+    assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('.proj-row.is-selected').closest('li')).backgroundColor), 'rgba(255, 255, 255, 0.1)', `${where}: the row you came back from is a lighter grey, not a darker one`);
+    await judge('See all, returned', '.exp-lightbox.open', 100);
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(500);
+    // the full-screen viewer: the picture a touch dimmer
+    await page.$eval('#certificates .cert-img', (el) => el.click());
+    await page.waitForSelector('.cert-lightbox img');
+    assert.equal(await css(page, '.cert-lightbox img', 'filter'), 'brightness(0.92)', `${where}: the viewer's picture`);
+    assert.deepEqual(errors, []);
+    await page.close();
+  }
+});
+
+test('Dark Mode > Increase Contrast and Reduce Transparency also work in Dark (dark-appearance)', async () => {
+  const more = await openDark(MAC, { contrast: true });
+  const tokens = await more.page.evaluate(() => ['--color-text-secondary', '--color-text-secondary-small', '--color-link'].map((t) => getComputedStyle(document.documentElement).getPropertyValue(t).trim().toUpperCase()));
+  assert.deepEqual(tokens, ['#D1D1D6', '#D1D1D6', '#7AB6FF'], 'Increase Contrast in Dark makes grey text and links lighter (the light page makes them darker)');
+  assert.equal(await css(more.page, '#hero .btn-pill', 'background-color'), 'rgb(18, 100, 206)');
+  assert.match(await css(more.page, '#resume .data-box:not(.contact-strip)', 'box-shadow'), /rgba\(255, 255, 255, 0\.4\).*inset/, 'cards get a light edge');
+  assert.equal(await css(more.page, '.biz-card', 'background-color'), 'rgb(44, 44, 46)', 'the glass card turns solid');
+  const t = await more.page.evaluate(lowContrast, null);
+  assert.deepEqual(t.low, []);
+  assert.deepEqual(await more.page.evaluate(lightBoxes, null), []);
+  await more.page.close();
+
+  const solid = await openDark(PHONE, { transparency: true });
+  await solid.page.$eval('#experience [data-exp="protollcall"] .exp-card-cta', (el) => el.click());
+  await solid.page.waitForSelector('.exp-lightbox.open .exp-client-select');
+  await solid.page.evaluate(() => { document.querySelector('.exp-lightbox.open .exp-lightbox-inner').scrollTop = 420; window._toast('Email copied'); });
+  await solid.page.waitForSelector('.exp-sheet-bar.is-stuck');
+  for (const [sel, want] of [['.exp-lightbox-inner', 'rgb(28, 28, 30)'], ['.exp-sheet-bar.is-stuck', 'rgb(28, 28, 30)'], ['.exp-clients-folded .exp-client-filter', 'rgb(28, 28, 30)'],
+    ['.toast', 'rgb(44, 44, 46)'], ['#back-to-top', 'rgb(44, 44, 46)']]) {
+    assert.equal(await css(solid.page, sel, 'background-color'), want, `Reduce Transparency in Dark: ${sel} is a solid dark fill`);
+  }
+  assert.equal(await css(solid.page, '.biz-card', 'backdrop-filter'), 'none');
+  assert.equal(await css(solid.page, '.biz-card', 'background-color'), 'rgba(44, 44, 46, 0.85)', 'the glass card: frostier and dark, never white');
+  await solid.page.close();
+});
+
+test('Dark Mode > the hero is dark from its first paint, before style.css arrives (dark-appearance)', async () => {
+  for (const [where, opts] of [['iPhone', PHONE], ['Mac', MAC]]) {
+    const page = await ctx.browser.newPage({ serviceWorkers: 'block', colorScheme: 'dark', reducedMotion: 'reduce', ...opts });
+    // the stylesheet never arrives: what is drawn is the critical CSS alone
+    await page.route((u) => !u.href.startsWith(ctx.srv.url) || /style\.min\.css/.test(u.href), (r) => r.abort());
+    await page.goto(ctx.srv.url + '/index.html', { waitUntil: 'domcontentloaded' });
+    await page.waitForSelector('#hero .btn-pill');
+    for (const [sel, prop, want] of [['body', 'background-color', 'rgb(0, 0, 0)'], ['#hero', 'background-color', 'rgb(0, 0, 0)'],
+      ['#hero .btn-pill', 'background-color', 'rgb(18, 100, 206)'], ['#hero .more', 'color', 'rgb(76, 157, 255)'], ['#hero .hero-eyebrow', 'color', 'rgb(174, 174, 178)']]) {
+      assert.equal(await css(page, sel, prop), want, `${where}, first paint: ${sel} ${prop}`);
+    }
+    assert.equal(await css(page, '#hero', 'background-color', '::before'), 'rgba(0, 0, 0, 0.8)', `${where}: the veil over the hero`);
+    const name = await css(page, '.hero-name-line', 'background-image');
+    assert.ok(name.includes('rgb(245, 245, 247)') && !name.includes('rgb(29, 29, 31)'), `${where}: the name would be dark type on black: ${name.slice(0, 70)}`);
+    // and what is on the glass: no white, and no near-white field, anywhere in the first screen
+    const t = await page.evaluate(lowContrast, '#hero');
+    assert.deepEqual(t.low, [], `${where}, first paint: hero text below 4.5:1`);
+    const shot = (await page.screenshot({ type: 'png' })).toString('base64');
+    const bright = await page.evaluate(async (b64) => {
+      const im = new Image(); await new Promise((ok) => { im.onload = ok; im.src = 'data:image/png;base64,' + b64; });
+      const c = new OffscreenCanvas(im.width, im.height), x = c.getContext('2d'); x.drawImage(im, 0, 0);
+      const d = x.getImageData(0, 0, im.width, im.height).data; let n = 0;
+      for (let i = 0; i < d.length; i += 4) if (d[i] > 200 && d[i + 1] > 200 && d[i + 2] > 200) n++;
+      return n / (d.length / 4);
+    }, shot);
+    assert.ok(bright < 0.05, `${where}: ${(bright * 100).toFixed(1)}% of the first screen is near-white`);
+    await page.close();
+  }
+});
+
+test('Dark Mode > the light page is untouched: same tokens, same surfaces, same height as in Dark (dark-appearance)', async () => {
+  for (const [where, opts] of [['iPhone', PHONE], ['Mac', MAC]]) {
+    const { page, errors } = await open({ ...opts, colorScheme: 'light', reducedMotion: 'reduce' });
+    const tokens = await page.evaluate(() => ['--color-text', '--color-text-secondary', '--color-text-secondary-small', '--color-link', '--color-link-hover', '--color-fill', '--sk-body-background-color'].map((t) => getComputedStyle(document.documentElement).getPropertyValue(t).trim().toUpperCase()));
+    assert.deepEqual(tokens, ['#1D1D1F', '#6E6E73', '#515154', '#1264CE', '#0F57B5', '#F5F5F7', '#FFF'], `${where}: the light palette`);
+    for (const [sel, prop, want] of [
+      ['body', 'background-color', 'rgb(255, 255, 255)'], ['#hero', 'background-color', 'rgb(255, 255, 255)'], ['body', 'color', 'rgb(29, 29, 31)'],
+      ['#experience', 'background-color', 'rgb(245, 245, 247)'], ['#experience .data-box[data-exp]', 'background-color', 'rgb(255, 255, 255)'],
+      ['#hero .btn-pill', 'background-color', 'rgb(18, 100, 206)'], ['#hero .more', 'color', 'rgb(18, 100, 206)'],
+      ['#skill .project-filters', 'background-color', 'rgb(232, 232, 237)'], ['#skill .filter-btn.active', 'background-color', 'rgb(255, 255, 255)'],
+      ['.company-logo', 'background-color', 'rgba(0, 0, 0, 0)'], ['.company-logo', 'filter', 'none'], ['.hero-net-label', 'background-color', 'rgba(252, 252, 253, 0.72)'],
+    ]) assert.equal(await css(page, sel, prop), want, `${where}, light: ${sel} ${prop}`);
+    assert.doesNotMatch(await css(page, '#certificates .cert-img img', 'filter'), /brightness/, `${where}, light: certificates are not dimmed`);
+    assert.ok((await css(page, '.hero-name-line', 'background-image')).includes('rgb(29, 29, 31)'), `${where}, light: the name's gradient`);
+    const lightH = await page.evaluate(() => document.documentElement.scrollHeight);
+    // only colours change between the two: nothing moves
+    await page.emulateMedia({ colorScheme: 'dark' });
+    await page.waitForFunction(() => getComputedStyle(document.body).backgroundColor === 'rgb(0, 0, 0)');
+    assert.equal(await page.evaluate(() => document.documentElement.scrollHeight), lightH, `${where}: the page is a different height in Dark`);
+    assert.deepEqual(errors, []);
     await page.close();
   }
 });

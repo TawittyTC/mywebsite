@@ -122,8 +122,19 @@ test('on a touch screen Back to top stays while the page keeps moving, and for a
     const from = scrollY;
     const gaps = [];
     let n = 0;
+    // (v2.73: it steps aside while another control is under it, so a gap
+    // only counts where its place, grown by 8px, is clear of controls)
+    const CONTROLS = '.paddlenav-arrow, .card-plus, .exp-card-cta, .cert-expand-btn, #services .faq summary';
+    const clear = () => {
+      const l = b.offsetLeft - 8, t = b.offsetTop - 8, r = l + b.offsetWidth + 16, bt = t + b.offsetHeight + 16;
+      const vw = document.documentElement.clientWidth - 1, vh = innerHeight - 1;
+      for (const x of [l, (l + r) / 2, r]) for (const y of [t, (t + bt) / 2, bt]) {
+        if (document.elementsFromPoint(Math.min(vw, x), Math.min(vh, y)).some((el) => el !== b && el.matches(CONTROLS))) return false;
+      }
+      return true;
+    };
     const id = setInterval(() => {
-      if (n > 5 && !b.classList.contains('visible')) gaps.push(`${n * 100}ms`);
+      if (n > 5 && !b.classList.contains('visible') && clear()) gaps.push(`${n * 100}ms`);
       n += 1;
       window.scrollTo(0, from - n * 10);
       if (n === 32) { clearInterval(id); done(gaps); }

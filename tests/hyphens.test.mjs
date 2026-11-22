@@ -13,13 +13,11 @@ after(async () => { await ctx.close(); });
 const WIDTHS = [320, 390, 430, 768, 1440];
 
 // Strings that may break at their hyphen, each with its reason. Matched against
-// the whole whitespace-delimited token that holds the hyphen.
-const ALLOWED = [
-  {
-    token: 'linkedin.com/in/tanapol-chamnanhan/',
-    reason: 'a web address, not a word: kept breakable, or on a phone it would push past the screen',
-  },
-];
+// the whole whitespace-delimited token that holds the hyphen. None today: at the
+// default text size the LinkedIn address in the FAQ breaks after "/in/" (a <wbr>)
+// and keeps its name whole. (Only at very large text on a small phone does the
+// name wrap again, so it never runs off the card; this test runs at default text.)
+const ALLOWED = [];
 const allowed = ALLOWED.map((a) => a.token);
 
 // runs in the page: each "-" between two letters/digits whose neighbours sit on different lines

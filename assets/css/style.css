@@ -2,8 +2,9 @@
 # Design Tokens
 --------------------------------------------------------------*/
 :root {
-  /* light-only site: block browser forced/auto dark theming */
-  color-scheme: only light;
+  /* light by default; the device's Dark setting switches to the dark
+     palette at the end of this file */
+  color-scheme: light dark;
   /* card, chip and FAQ sizes are written as px at the 17px root, so they
      follow the reader's text size; the 2K and 4K tiers raise the root, and
      --tier keeps those sizes where they were drawn there */
@@ -103,7 +104,7 @@ footer {
   height: 100vh;
   min-height: -webkit-fill-available;
   overflow: hidden;
-  background: #fff;
+  background: var(--sk-body-background-color);
 }
 @supports (min-height: 100svh) {
   #hero { height: 100svh; min-height: 100svh; }
@@ -272,6 +273,16 @@ section {
     max-width: 130px;
   }
 }
+/* phones: the role title stays at the top of the card with the card's
+   full width, and the logo follows the role details on its own row, so
+   the visual order matches the reading order. 16px ties the logo to the
+   details above it; 28px (the card's inside step) keeps it apart from
+   the story below, which otherwise reads as a caption under the logo.
+   (!important: the markup's .gap-3 utility is !important too) */
+@media (max-width: 576px) {
+  #experience .data-box[data-exp] > .d-flex { flex-direction: column; align-items: flex-start; gap: 16px !important; margin-bottom: 28px; }
+  .company-logo { margin-top: 0; }
+}
 
 
 .fw-light {
@@ -387,7 +398,7 @@ button:disabled {
 button {
   background: none;
   border: 0;
-  cursor: pointer;
+  cursor: default;
   color: inherit;
   font: inherit;
   line-height: inherit;
@@ -612,7 +623,6 @@ button {
   border-radius: 50%;
   background: #fff;
   border: none;
-  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -651,12 +661,17 @@ button {
 .cert-lightbox img {
   will-change: transform, opacity;
 }
+/* the sheet and the viewer take focus themselves after a tap or click:
+   no ring, and no rounded corners from the generic focus rule */
+.exp-lightbox-inner:focus,
+.cert-lightbox:focus { outline: none; }
+.cert-lightbox:focus { border-radius: 0; }
 @keyframes lb-fade { from { opacity: 0; } }
 @keyframes lb-zoom { from { opacity: 0; transform: scale(0.94); } }
 .cert-lightbox-close {
   position: fixed;
-  top: 20px;
-  right: 24px;
+  top: calc(20px + env(safe-area-inset-top, 0px));
+  right: calc(24px + env(safe-area-inset-right, 0px));
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -1419,7 +1434,7 @@ select:focus-visible {
   -webkit-backdrop-filter: saturate(180%) blur(20px);
   backdrop-filter: saturate(180%) blur(20px);
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.14);
-  cursor: pointer;
+  cursor: default;
   opacity: 0;
   transform: translateY(8px);
   pointer-events: none;
@@ -1672,6 +1687,17 @@ a.info-item:hover .info-value { color: var(--color-link); }
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: .2em;
+}
+/* "Cookie settings" is a button that looks like a link */
+button.footer-copy-link { color: var(--color-link); text-decoration: none; }
+button.footer-copy-link:hover { color: var(--color-link-hover); }
+/* below 992px it drops under the copyright lines: a small gap keeps it from
+   reading as a third line of the copyright (half a line, so it grows with the text) */
+@media (max-width: 991.98px) {
+  button.footer-copy-link { margin-top: 0.5em; }
+  /* its 44px tap area reaches down into the empty footer, not up over the
+     copyright link (on one-line widths such as an iPad the two would overlap) */
+  button.footer-copy-link::after { top: 0; transform: translateX(-50%); }
 }
 
 .info-item { min-height: 44px; }
@@ -2265,7 +2291,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
   padding: 24px 12px;
   border-radius: 14px;
   list-style: none;
-  cursor: pointer;
+  cursor: default;
   font-size: calc(19rem / 17 / var(--tier));
   font-weight: 600;
   line-height: 1.36842;
@@ -2580,7 +2606,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
    line on top, the project's own line drawing large at the foot on every
    screen (phones too), the round "+" beside it. The tools live in the
    sheet the card opens. */
-#portfolio .work-card { cursor: pointer; padding-bottom: 32px; }
+#portfolio .work-card { cursor: default; padding-bottom: 32px; }
 #portfolio .work-icon {
   order: 3;
   margin-top: auto;
@@ -2669,13 +2695,11 @@ a.info-item:hover .info-value { color: var(--color-link); }
 @media (hover: hover) { .proj-row:hover .proj-name { color: var(--color-link); } }
 .proj-text { flex: 1; }
 .proj-row .chev { flex: none; color: #86868B; }
-/* a project opened from the list: "All projects" pinned top left, level
-   with the close button, the story starting below the two */
+/* a project opened from the list: "All projects" at the leading end of
+   the sheet's top bar, the story starting below it */
 .proj-back {
-  position: sticky;
-  top: 0;
-  float: left;
-  z-index: 10;
+  position: relative;
+  flex: none;
   display: flex;
   align-items: center;
   height: 40px;
@@ -2688,8 +2712,58 @@ a.info-item:hover .info-value { color: var(--color-link); }
 }
 .proj-back .chev { margin: 0 6px 0 0; transform: scaleX(-1); }
 .proj-back:hover { text-decoration: none; background: #D8D8DF; }
-.proj-back + div { clear: both; padding-top: 8px; }
-.proj-back + div .exp-client-filter { position: static; box-shadow: none; }
+.exp-lightbox-inner:has(.proj-back) .exp-client-filter { position: static; box-shadow: none; }
+
+/* The sheet's top bar: the close button, and a compact title that fades in
+   once the big one has scrolled out of the sheet. It sticks at the sheet's
+   very top edge (its top is minus the sheet's top padding, --st) and runs
+   from edge to edge (its sides are minus the sheet's side padding, --sx;
+   both are set with the sheet's padding in index.html). It is 52px
+   tall: 8px above the 40px close button, so once stuck the button keeps
+   clear of the sheet's rounded top edge, and 4px below it. Its 8px top
+   reaches up into the sheet's padding (margin-top -8px), so at rest the
+   close button sits where it always has. Its material and hairline come
+   on the moment it sticks (is-stuck), before any text can pass under the
+   close button, so at rest it is not an empty strip; the compact title
+   fades in later, once the big one has left (is-scrolled). */
+.exp-sheet-bar {
+  position: sticky;
+  top: calc(0px - var(--st));
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 52px;
+  margin: -8px calc(0px - var(--sx)) 8px;
+  padding: 8px var(--sx) 4px;
+}
+.exp-sheet-bar.is-stuck {
+  background: rgba(255, 255, 255, .92);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
+  box-shadow: 0 1px 0 #e5e5e7;
+}
+.exp-sheet-bar-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  color: #1d1d1f;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 22px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  opacity: 0;
+  transition: opacity .2s;
+}
+.exp-sheet-bar.is-scrolled .exp-sheet-bar-title { opacity: 1; }
+.exp-sheet-bar-title.is-cut { visibility: hidden; }
+/* both stay positioned: each carries its own 44px hit region (::after),
+   which would otherwise stretch across the whole bar */
+.exp-sheet-bar .exp-lightbox-close { position: relative; top: auto; float: none; flex: none; margin: 0; }
+@media (prefers-reduced-transparency: reduce) {
+  .exp-sheet-bar.is-stuck { background: #fff; -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
 
 /* The current job's sheet: each client folds to its name until it is
    opened, at every size */
@@ -2697,7 +2771,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
   position: relative;
   margin-bottom: 0;
   padding-right: 26px;
-  cursor: pointer;
+  cursor: default;
   -webkit-tap-highlight-color: transparent;
 }
 .exp-clients-folded .exp-client-section-header::after {
@@ -2716,7 +2790,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
 .exp-clients-folded .exp-client-section.is-open .exp-client-section-header { margin-bottom: 16px; }
 .exp-clients-folded .exp-client-section.is-open .exp-client-section-header::after { transform: rotate(90deg); }
 .exp-clients-folded .exp-client-section:not(.is-open) > :not(.exp-client-section-header) { display: none; }
-.exp-clients-folded .exp-client-section:not(.is-open) { cursor: pointer; }
+.exp-clients-folded .exp-client-section:not(.is-open) { cursor: default; }
 .exp-client-toggle {
   margin: 0;
   padding: 0;
@@ -2733,27 +2807,27 @@ a.info-item:hover .info-value { color: var(--color-link); }
 /* On a phone the client picker stays at the top while you read, clear of
    the close button */
 @media (max-width: 734px) {
-  /* the sheet keeps 26px (24px under 600px) of padding above its content;
-     the stuck row covers it so nothing shows through above the picker,
-     which sits level with the close button */
+  /* the stuck row sits right under the sheet's top bar (the sheet keeps
+     26px, 24px under 600px, of padding above its content) */
   .exp-clients-folded .exp-client-filter {
     position: sticky;
-    top: -26px;
+    top: 26px;
     z-index: 5;
     margin-top: 12px;
-    /* the 44px picker's middle level with the close button's */
-    padding-top: 24px;
+    /* stuck under the 52px top bar: 10px above the picker, as below it */
+    padding-top: 10px;
     padding-bottom: 10px;
-    margin-right: 46px;
-    padding-right: 0;
+    /* edge to edge, as on the left, so its hairline matches the bar's */
+    margin-right: -18px;
+    padding-right: 18px;
     background: rgba(255, 255, 255, .97);
-    box-shadow: 64px 0 0 rgba(255, 255, 255, .97), 64px 1px 0 #E8E8ED, 0 1px 0 #E8E8ED;
+    box-shadow: 0 1px 0 #E8E8ED;
   }
   @media (max-width: 600px) {
-    .exp-clients-folded .exp-client-filter { top: -24px; padding-top: 22px; }
+    .exp-clients-folded .exp-client-filter { top: 24px; padding-top: 14px; }
   }
-  /* a focused client header is never left hidden under the stuck picker */
-  .exp-lightbox-inner:has(.exp-clients-folded) { scroll-padding-top: 84px; }
+  /* a focused client header is never left hidden under the bar and the stuck picker */
+  .exp-lightbox-inner:has(.exp-clients-folded) { scroll-padding-top: 116px; }
 }
 @media (forced-colors: active) {
   .exp-clients-folded .exp-client-section-header::after { forced-color-adjust: none; background-color: CanvasText; }
@@ -2782,6 +2856,12 @@ a.info-item:hover .info-value { color: var(--color-link); }
   text-align: center;
 }
 .cert-lightbox-caption[hidden] { display: none; }
+/* the sheet's own scroll never chains to the page, so a pull at its top
+   is the sheet's to handle */
+.exp-lightbox-inner { overscroll-behavior: contain; }
+/* while it fades out the viewer takes no taps: the list it came from is
+   already back underneath */
+.cert-lightbox:not(.open) { pointer-events: none; }
 .cert-lightbox:has(.cert-lightbox-caption:not([hidden])) img { max-height: 82vh; }
 .cert-lightbox.lb-pan .cert-lightbox-frame {
   width: 100%;
@@ -2801,8 +2881,12 @@ a.info-item:hover .info-value { color: var(--color-link); }
   margin: 0 16px;
 }
 
-/* back-to-top clears the iPhone home indicator */
-#back-to-top { bottom: calc(22px + env(safe-area-inset-bottom, 0px)); }
+/* back-to-top clears the iPhone home indicator, and the sensor housing of
+   a phone held sideways (the page now runs edge to edge: viewport-fit=cover) */
+#back-to-top {
+  bottom: calc(22px + env(safe-area-inset-bottom, 0px));
+  right: calc(22px + env(safe-area-inset-right, 0px));
+}
 
 /* On a Mac the window's bottom edge is no place for a control (and the
    button sat on card text there). Home, Fn-Left or Cmd-Up reach the top;
@@ -2840,11 +2924,37 @@ a.info-item:hover .info-value { color: var(--color-link); }
   .contact-strip .info-item[href^="tel:"] .info-value { white-space: normal; overflow-wrap: break-word; }
 }
 
+/* From 13.5em down (216px at the default size, where the longest chip
+   would start to run off its card): the skill and service chips wrap at
+   their spaces */
+@media (max-width: 13.5em) {
+  #skill .skill-tools li, #services .svc-chips li { white-space: normal; }
+}
+
 @media (max-width: 16em) {
   .container { padding-left: 10px; padding-right: 10px; }
   .row { --bs-gutter-x: 20px; }
   .data-box.profile-featured { padding: 16px; }
   .section-title h2 { font-size: min(2rem, 13vw); }
+}
+
+/* Larger still (14em is 224px at the default size: about 175% page zoom
+   on an iPhone, or 200% text): a hyphenated name still moves to the next
+   line whole, and wraps at its hyphen only when it is wider than the whole
+   line, rather than run off its card */
+@media (max-width: 14em) {
+  .nw, #services .svc-nw { display: inline-block; white-space: normal; }
+}
+
+/* the LinkedIn name and the phone number in FAQ answers stay whole; only an
+   answer too narrow to hold them (very large text on a small phone) lets them
+   wrap, so they never run off the card */
+#services .faq details > p { container-type: inline-size; }
+@container (max-width: 10.5em) {
+  #services .faq details > p a[href*="linkedin.com"] .nw { white-space: normal; }
+}
+@container (max-width: 8em) {
+  #services .faq details > p a[href^="tel:"] .nw { white-space: normal; }
 }
 
 /* links inside FAQ answers are told apart by more than their colour */
@@ -3174,10 +3284,18 @@ p.profile-bio-small,
   opacity: 0;
   transform: translate(-50%, 8px);
   pointer-events: none;
-  transition: opacity .25s ease, transform .35s cubic-bezier(.32, .72, 0, 1);
+  transition: opacity .25s ease, transform .35s cubic-bezier(.32, .72, 0, 1),
+    bottom .35s cubic-bezier(.32, .72, 0, 1);
 }
 /* a shown toast takes the pointer, so hovering it keeps it open */
 .toast.is-shown { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+/* on a touch screen, while Back to top is showing, the toast sits 12px
+   above it (22 + 44 + 12) instead of over its left edge on a narrow phone,
+   and glides back down when the button leaves (2 s after scrolling stops).
+   Not on a Mac: Back to top is never drawn there and the toast is at the top */
+@media (hover: none) {
+  body:has(#back-to-top.visible) .toast { bottom: calc(78px + env(safe-area-inset-bottom, 0px)); }
+}
 /* On a Mac the bottom of the window is often below the screen edge, so
    the confirmation drops in near the top there; phones and tablets keep
    it at the bottom */
@@ -3214,7 +3332,7 @@ p.profile-bio-small,
   font: inherit;
   color: inherit;
   text-align: inherit;
-  cursor: pointer;
+  cursor: zoom-in;
   -webkit-appearance: none;
   appearance: none;
 }
@@ -3251,6 +3369,22 @@ p.profile-bio-small,
 .proj-rows li:has(> .proj-row:focus-visible) .proj-name,
 .proj-rows li:has(> .proj-row:focus-visible) .proj-kind,
 .proj-rows li:has(> .proj-row:focus-visible) .chev { color: #fff; }
+/* back from a project: the row it came from stays marked, in the same
+   edge-to-edge shape as the focus fill; while that fill shows, it wins */
+.proj-rows li:has(> .proj-row.is-selected:not(:focus-visible)) {
+  margin: 0 -16px;
+  padding: 0 16px;
+  background: rgba(0, 0, 0, .05);
+}
+.proj-rows li:first-child:has(> .proj-row.is-selected:not(:focus-visible)) { border-radius: 18px 18px 0 0; }
+.proj-rows li:last-child:has(> .proj-row.is-selected:not(:focus-visible)) { border-radius: 0 0 18px 18px; }
+.proj-rows li:only-child:has(> .proj-row.is-selected:not(:focus-visible)) { border-radius: 18px; }
+@media (forced-colors: active) {
+  .proj-rows li:has(> .proj-row.is-selected:not(:focus-visible)) { forced-color-adjust: none; background: Highlight; }
+  .proj-rows li:has(> .proj-row.is-selected:not(:focus-visible)) .proj-name,
+  .proj-rows li:has(> .proj-row.is-selected:not(:focus-visible)) .proj-kind { color: HighlightText; }
+  .proj-rows li:has(> .proj-row.is-selected:not(:focus-visible)) .chev { background: HighlightText; }
+}
 /* Reduce Transparency: Back to top and "All projects" turn opaque too
    (after their base rules, so this wins) */
 @media (prefers-reduced-transparency: reduce) {
@@ -3265,4 +3399,404 @@ p.profile-bio-small,
 /* Windows contrast themes draw no fill: the capsule keeps an edge */
 @media (forced-colors: active) {
   .btn-pill { border: 1px solid LinkText; }
+}
+
+/* Pointers, as the platforms draw them: the arrow on buttons and on cards
+   that open a sheet, the hand only on links, zoom-in on every picture that
+   opens full size (the certificates, like the screenshot cards). After the
+   merged Bootstrap rules, which give every button the hand. */
+[type=button]:not(:disabled),
+button:not(:disabled),
+[role=button],
+summary,
+#experience .data-box[data-exp],
+#portfolio .work-card { cursor: default; }
+.cert-card { cursor: zoom-in; }
+/* the corner "+" does what its card does, so it shows the card's pointer */
+#portfolio .card-plus { cursor: inherit; }
+
+/*--------------------------------------------------------------
+# Dark appearance. Applies only when the device is set to Dark; the
+  light page above stays exactly as it is for everyone else. The same
+  one-surface system, one step darker: black where light is white,
+  #1C1C1E where light is #F5F5F7, a card the next step up (#1C1C1E on
+  black, #2C2C2E on #1C1C1E) and a chip one more. Text #F5F5F7,
+  secondary text #AEAEB2 (7.69:1 on #1C1C1E), links #4C9DFF (6.14:1).
+  Filled buttons keep the #1264CE accent under white type (5.62:1).
+  Client logos sit on light plates so their own colours still read.
+--------------------------------------------------------------*/
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-text: #F5F5F7;
+    --color-text-secondary: #AEAEB2;
+    --color-text-secondary-small: #AEAEB2;   /* small grey text: the same grey, 7.69:1 on #1C1C1E */
+    --color-link: #4C9DFF;
+    --color-link-hover: #7AB6FF;
+    --color-fill: #1C1C1E;
+    --color-background-alt: #1C1C1E;
+    --sk-body-background-color: #000;
+    --bs-body-bg: #000;
+    --bs-body-color: #F5F5F7;
+    --bs-code-color: #E685B5;   /* code in the sheets: the pink one step lighter, 5.57:1 on #2C2C2E */
+    --shadow-rest: 0 1px 2px rgba(0, 0, 0, .4), 0 10px 28px rgba(0, 0, 0, .5);
+    --sk-paddlenav-background: rgba(120, 120, 128, .36);
+    --sk-paddlenav-background-hover: rgba(120, 120, 128, .48);
+    --sk-paddlenav-background-active: rgba(120, 120, 128, .56);
+    --sk-paddlenav-arrow-color: rgba(255, 255, 255, .8);
+    --sk-paddlenav-arrow-color-hover: rgba(255, 255, 255, .9);
+    --sk-paddlenav-arrow-color-active: rgba(255, 255, 255, .9);
+  }
+  body { background-color: var(--sk-body-background-color); }
+
+  /* line drawings and marks drawn in the accent: the lighter blue */
+  [stroke="#1264CE"] { stroke: #4C9DFF; }
+  [fill="#1264CE"] { fill: #4C9DFF; }
+  [fill="#5AA7FF"] { fill: #7AB6FF; }
+  [fill="#F5F5F7"] { fill: #1C1C1E; }   /* the wrench masks the chip on the card's own grey */
+
+  /* hero: the constellation, the lit name and the glow, in dark inks */
+  #hero .hero-name { --ink-c: #4C9DFF; }
+  @supports ((-webkit-background-clip: text) or (background-clip: text)) {
+    .hero-name-line {
+      background-image: linear-gradient(100deg,
+        #F5F5F7 0%,
+        #F5F5F7 calc(var(--ink-x) - 30%),
+        var(--ink-c) var(--ink-x),
+        #F5F5F7 calc(var(--ink-x) + 30%),
+        #F5F5F7 100%);
+    }
+    .cta-headline {
+      background-image: linear-gradient(100deg,
+        #F5F5F7 0%,
+        #F5F5F7 42%,
+        #4C9DFF 58%,
+        #7AB6FF 66%,
+        #F5F5F7 88%);
+    }
+  }
+  .hero-net-label { background: rgba(28, 28, 30, .85); }   /* a node drifting under it never dims the word */
+  #hero .hero-copy::before {
+    background: radial-gradient(circle,
+      rgba(76, 157, 255, .18) 0%,
+      rgba(76, 157, 255, 0) 62%);
+  }
+
+  /* filled controls keep the accent; white type on it stays 5.62:1 */
+  .btn-pill,
+  .skip-link { background: #1264CE; color: #fff; }
+  .btn-pill:hover { background: #166FE5; color: #fff; }
+  .toast-check { background-color: #1264CE; }
+
+  /* bands */
+  #resume, #skill, #portfolio, #services, #footer { background: #000; }
+  #experience, .closing-cta { background: #1C1C1E; }
+  #certificates.bg-light { background-color: #1C1C1E !important; }
+  #footer .border-top { border-top-color: rgba(255, 255, 255, .12) !important; }
+
+  /* cards and chips */
+  .data-box { background-color: #1C1C1E; border-color: rgba(255, 255, 255, .08); }
+  #resume .data-box { background: #1C1C1E; }
+  .exp-card-highlights .hl { background: #3A3A3C; }
+  .exp-card-highlights .hl-blue { color: #7AB6FF; background: rgba(76, 157, 255, .16); }
+  #resume .hl { background: #2C2C2E; }
+  #resume .hl-blue { background: #243142; }   /* the 16% blue tint, solid */
+  .contact-strip .info-item { background: #1C1C1E; border-color: rgba(255, 255, 255, .08); }
+  .info-icon { background: rgba(76, 157, 255, .14); }
+  .profile-featured .social-links a { background: #2C2C2E; }
+  .profile-featured .social-links a:hover { background: #3A3A3C; }
+  .profile-bio,
+  #experience .data-box[data-exp] > .profile-bio-small.mt-3,
+  #experience .exp-role > p.profile-bio-small { color: var(--color-text); }
+
+  .rf-cards-scroller-item { background-color: #1C1C1E; border-color: rgba(255, 255, 255, .08); }
+  #portfolio .rf-cards-scroller-item,
+  #skill .rf-cards-scroller-item { background: #1C1C1E; }
+  #portfolio .project-tag,
+  #portfolio .rf-cards-scroller-item h3,
+  #skill .rf-cards-scroller-item .title,
+  #portfolio .rf-cards-scroller-item p.fw-light,
+  #skill .rf-cards-scroller-item .skill-desc { color: var(--color-text); }
+  #skill .skill-tools li { background: #2C2C2E; color: var(--color-text); }
+  #portfolio .project-img img,
+  #portfolio .rf-cards-scroller-item img { box-shadow: 0 0 0 .5px rgba(255, 255, 255, .16), 0 8px 24px rgba(0, 0, 0, .5); }
+  .card-plus { background: rgba(120, 120, 128, .36); color: rgba(255, 255, 255, .8); }
+  #portfolio .rf-cards-scroller-item:hover .card-plus { background: rgba(120, 120, 128, .5); color: rgba(255, 255, 255, .9); }
+
+  /* Experience: #2C2C2E tiles on the #1C1C1E band */
+  #experience .data-box,
+  #experience .data-box[data-exp] { background: #2C2C2E; }
+  .exp-card-btn svg { fill: rgba(255, 255, 255, .8); }
+  #experience .data-box[data-exp]:hover .exp-card-btn { background: rgba(120, 120, 128, .5); }
+  #experience .data-box[data-exp]:hover .exp-card-btn svg { fill: rgba(255, 255, 255, .9); }
+  .exp-toggle { color: var(--color-link); }
+  .exp-status-active { color: #7AB6FF; background: rgba(76, 157, 255, .16); }
+  .exp-status-active::before,
+  .exp-work-dot,
+  .exp-role:first-child::before { background: #4C9DFF; }
+  .exp-duration { color: var(--color-text-secondary); background: #3A3A3C; }
+  .exp-card-stack,
+  .exp-card-badge-section { border-top-color: rgba(255, 255, 255, .1); }
+  .exp-card-stack span { color: var(--color-text-secondary); background: #3A3A3C; }
+  #experience .data-box[data-exp]:hover .exp-card-stack span { background: #48484A; color: var(--color-text); }
+  .exp-badge-chip { background: #3A3A3C; border-color: rgba(255, 255, 255, .08); }
+  #experience .data-box[data-exp]:hover .exp-badge-chip { background: #48484A; border-color: rgba(255, 255, 255, .12); }
+  .exp-role::before,
+  .exp-role-spark::after { background: #636366; }
+  .exp-role:not(:last-child)::after { background: rgba(255, 255, 255, .14); }
+  @keyframes exp-role-spark {
+    0% { top: 100%; opacity: 0; transform: scale(.4); background: #636366; box-shadow: 0 0 0 rgba(76, 157, 255, 0); }
+    10% { opacity: 1; transform: scale(1); background: #636366; box-shadow: 0 0 0 rgba(76, 157, 255, 0); }
+    62% { top: 0; opacity: 1; transform: scale(1); background: #4C9DFF; box-shadow: 0 0 7px rgba(76, 157, 255, .55); }
+    72%, 100% { top: 0; opacity: 0; transform: scale(.4); background: #4C9DFF; box-shadow: 0 0 7px rgba(76, 157, 255, .55); }
+  }
+  .exp-role-period,
+  .exp-role-title,
+  .exp-stat-num,
+  .exp-modal-title,
+  .exp-lightbox-close,
+  .exp-filter-chip,
+  .exp-client-section-header h3,
+  .exp-client-section li strong,
+  .exp-modal-section > h3,
+  .exp-modal-section li strong,
+  .exp-sheet-cta { color: var(--color-text); }
+  .exp-card-stats { border-top-color: rgba(255, 255, 255, .1); border-bottom-color: rgba(255, 255, 255, .1); }
+  .exp-stat-item { border-right-color: rgba(255, 255, 255, .12); }
+  .stat-sup { color: var(--color-link); }
+  .exp-stat-label,
+  .exp-modal-company,
+  .proj-group h3,
+  .proj-kind { color: var(--color-text-secondary); }
+  #experience .data-box[data-exp]:hover { box-shadow: 2px 4px 16px rgba(0, 0, 0, .5); }
+
+  /* the sheet: #1C1C1E over a deeper dim, chips one step up */
+  .exp-lightbox { background: rgba(0, 0, 0, .5); }
+  .exp-lightbox-inner { background: rgba(28, 28, 30, .97); box-shadow: 0 0 0 .5px rgba(255, 255, 255, .1), 0 32px 80px rgba(0, 0, 0, .6); }
+  .exp-lightbox-close { background: rgba(58, 58, 60, .9); }
+  .exp-lightbox-close:hover { background: #48484A; }
+  .exp-modal-header { border-bottom-color: #38383A; }
+  .exp-modal-period { color: #7AB6FF; background: rgba(76, 157, 255, .16); }
+  .exp-modal-tech span { background: #2C2C2E; }
+  .exp-filter-chip { background: #2C2C2E; }
+  .exp-filter-chip:hover { background: #3A3A3C; box-shadow: none; }
+  .exp-filter-chip.active { background: #1264CE; color: #fff; }
+  .exp-client-section { background: #2C2C2E; }
+  .exp-client-section:hover { background: #323235; }
+  .exp-client-section-header .exp-client-tag { color: #7AB6FF; background: rgba(76, 157, 255, .16); }
+  .exp-client-section li::before,
+  .exp-modal-section li::before { background: rgba(76, 157, 255, .55); }
+  .proj-rows { background: #2C2C2E; }
+  .proj-rows li + li { border-top-color: rgba(84, 84, 88, .65); }
+  .proj-well { background: #3A3A3C; }
+  .proj-name { color: var(--color-text); }
+  .proj-row .chev { color: #8E8E93; }
+  .proj-back { background: rgba(58, 58, 60, .9); color: #7AB6FF; }
+  .proj-back:hover { background: #48484A; }
+  /* a keyboard-focused row fills with the filled-button blue, so its
+     white type stays 5.62:1 (on the lighter link blue it would be 2.77:1) */
+  .proj-rows li:has(> .proj-row:focus-visible) { background: #1264CE; }
+  .exp-sheet-cta { border-top-color: #38383A; }
+  @media (max-width: 734px) {
+    .exp-clients-folded .exp-client-filter {
+      background: rgba(28, 28, 30, .97);
+      box-shadow: 0 1px 0 #38383A;
+    }
+  }
+
+  /* Certificates: #2C2C2E tiles on the #1C1C1E band */
+  #certificates .data-box,
+  #certificates .cert-card { background: #2C2C2E; }
+  #certificates .cert-expand-btn,
+  #certificates .cert-expand-btn:hover { background: #3A3A3C; color: rgba(255, 255, 255, .85); }
+  #certificates .cert-expand-btn:hover { background: #48484A; color: #fff; }
+  /* white paper and screenshots a touch dimmer, so they do not glare on
+     the dark tiles; the paper keeps its soft shadow */
+  #certificates .cert-img img {
+    filter: brightness(.92) drop-shadow(0 0 1px rgba(0, 0, 0, .14)) drop-shadow(0 6px 16px rgba(0, 0, 0, .10));
+  }
+  .cert-lightbox img { filter: brightness(.92); }
+
+  /* Services and FAQ */
+  #services .svc-card { background: #1C1C1E; color: var(--color-text); }
+  #services .svc-card h3,
+  #services .svc-card p,
+  #services .faq h3,
+  #services .faq summary { color: var(--color-text); }
+  #services .svc-chips li { background: #2C2C2E; color: var(--color-text); }
+  #services .faq-list { background: #1C1C1E; }
+  #services .faq details + details { border-top-color: rgba(84, 84, 88, .65); }
+  #services .faq details > p { color: var(--color-text-secondary); }
+
+  /* Contact: the glow, the gradient line and the Liquid Glass card */
+  .closing-cta::before {
+    background: radial-gradient(closest-side, rgba(76, 157, 255, .12) 0%, rgba(76, 157, 255, .05) 55%, rgba(76, 157, 255, 0) 100%);
+  }
+  .cta-sub { color: var(--color-text-secondary); }
+  .biz-scene::before { background: radial-gradient(circle, rgba(18, 100, 206, .5), rgba(18, 100, 206, 0) 66%); }
+  .biz-scene::after { background: radial-gradient(circle, rgba(90, 167, 255, .32), rgba(90, 167, 255, 0) 66%); }
+  .biz-card {
+    background: rgba(255, 255, 255, .06);
+    border-color: rgba(255, 255, 255, .16);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, .28),
+      inset 1px 0 0 rgba(255, 255, 255, .12),
+      inset 0 -1px 0 rgba(255, 255, 255, .08),
+      inset 0 -16px 28px -16px rgba(76, 157, 255, .22),
+      0 0 0 .5px rgba(0, 0, 0, .6),
+      0 30px 60px rgba(0, 0, 0, .55),
+      0 4px 12px rgba(0, 0, 0, .35);
+  }
+  .biz-card::before {
+    background: radial-gradient(circle 260px at var(--lx, 50%) var(--ly, 50%),
+      rgba(255, 255, 255, .14), rgba(255, 255, 255, 0) 70%);
+  }
+  .biz-card .biz-logo,
+  .biz-card .biz-role,
+  .biz-card .biz-contacts a { color: #D1D1D6; }
+  .biz-card .biz-contacts a:hover { color: #7AB6FF; }
+  .biz-net path { stroke: rgba(122, 182, 255, .55); }
+  .biz-net path + path { stroke: rgba(122, 182, 255, .28); }
+
+  /* floating glass: back to top, the toast */
+  #back-to-top { background: rgba(44, 44, 46, .85); box-shadow: 0 2px 12px rgba(0, 0, 0, .5); }
+  .toast {
+    background: rgba(44, 44, 46, .86);
+    box-shadow: 0 0 0 .5px rgba(255, 255, 255, .12), 0 8px 28px rgba(0, 0, 0, .5);
+    color: var(--color-text);
+  }
+
+  /* client logos: each on a light plate (dimmed a touch), so a dark
+     wordmark never sinks into the dark card. The plate is drawn around
+     the logo's own box (a spread shadow) or inside it (padding), never
+     added to it, so nothing around a logo moves */
+  .company-logo {
+    border-radius: 6px;
+    background: #F5F5F7;
+    box-shadow: 0 0 0 6px #F5F5F7;
+    filter: brightness(.92);
+  }
+  .exp-modal-company-logo {
+    border-color: transparent;
+    background: #F5F5F7;
+    filter: brightness(.92);
+  }
+  .proj-logo {
+    border-radius: 4px;
+    background: #F5F5F7;
+    box-shadow: 0 0 0 4px #F5F5F7;
+    filter: brightness(.92);
+  }
+  #portfolio .has-logo .work-logo img {
+    padding: 12px 16px;
+    border-radius: 14px;
+    background: #F5F5F7;
+    filter: brightness(.92);
+    mix-blend-mode: normal;
+  }
+  /* the logo keeps its own row: the plate hugs the mark, and a zero-height
+     break takes the row's full width in its place; the margins keep the
+     mark and the name exactly where they sit in light */
+  .exp-client-section-header img {
+    flex: 0 0 auto;
+    order: -2;
+    box-sizing: content-box;
+    margin: -4px 0 -12px;
+    padding: 4px 8px;
+    border-radius: 8px;
+    background: #F5F5F7;
+    filter: brightness(.92);
+    mix-blend-mode: normal !important;
+  }
+  .exp-client-section-header:has(> img)::before {
+    content: '';
+    order: -1;
+    flex: 0 0 100%;
+  }
+
+  /* the Skills filter: a segmented control on black. The track is the
+     card grey, the chosen segment the raised grey iOS uses, under white
+     type (6.0:1) */
+  #skill .project-filters { background: #1C1C1E; }
+  #skill .filter-btn.active,
+  #skill .filter-btn[aria-pressed="true"] {
+    background: #636366;
+    color: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .4);
+  }
+
+  /* the client pop-up button: a raised grey capsule, its chevron in the
+     text colour (the light rule lives in index.html) */
+  .exp-client-select {
+    background-color: #3A3A3C;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 16'%3E%3Cpath d='M1.5 5.5 5 2l3.5 3.5M1.5 10.5 5 14l3.5-3.5' fill='none' stroke='%23f5f5f7' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    color: var(--color-text);
+  }
+  .exp-client-select:hover { background-color: #48484A; }
+
+  /* the sheet's top bar once stuck: the sheet's own material */
+  .exp-sheet-bar.is-stuck { background: rgba(28, 28, 30, .92); box-shadow: 0 1px 0 #38383A; }
+  .exp-sheet-bar-title { color: var(--color-text); }
+
+  /* pressed: one step lighter instead of one step darker */
+  #portfolio .rf-cards-scroller-item .card-plus:active,
+  #experience .data-box[data-exp] .exp-card-cta:active .exp-card-btn,
+  #certificates .cert-expand-btn:active { background: rgba(142, 142, 147, .6); }
+  #services .faq summary:active,
+  .proj-row:active { background: rgba(255, 255, 255, .08); }
+  /* the row you came back from in See all */
+  .proj-rows li:has(> .proj-row.is-selected:not(:focus-visible)) { background: rgba(255, 255, 255, .1); }
+}
+@media (prefers-color-scheme: dark) and (max-width: 734px) {
+  /* the plate is taller than the bare mark: a little narrower keeps it as
+     clear of the round "+" as the light logo is */
+  #portfolio .has-logo .work-logo img { width: min(calc(var(--lw) * 100%), 60%); padding: 8px 12px; border-radius: 12px; }
+}
+@media (prefers-color-scheme: dark) and (hover: hover) {
+  #skill .filter-btn:not(.active):hover { background: rgba(255, 255, 255, .08); }
+}
+@media (prefers-color-scheme: dark) and (prefers-reduced-transparency: reduce) {
+  #back-to-top { background: #2C2C2E; }
+  .proj-back { background: #3A3A3C; }
+  .proj-back:hover { background: #48484A; }
+  .toast { background: #2C2C2E; }
+  .exp-lightbox { background: rgba(0, 0, 0, .7); }
+  .exp-lightbox-inner { background: #1C1C1E; }
+  .exp-sheet-bar.is-stuck { background: #1C1C1E; }
+  .exp-clients-folded .exp-client-filter { background: #1C1C1E; }
+  .biz-card {
+    background: rgba(44, 44, 46, .85);
+    border-color: rgba(255, 255, 255, .16);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .2), 0 30px 60px rgba(0, 0, 0, .55), 0 4px 12px rgba(0, 0, 0, .35);
+  }
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  @media (prefers-color-scheme: dark) {
+    .biz-card { background: rgba(44, 44, 46, .85); }
+  }
+}
+@media (prefers-color-scheme: dark) and (prefers-contrast: more) {
+  /* Increase Contrast in Dark: greys and blues go lighter, not darker */
+  :root {
+    --color-text-secondary: #D1D1D6;
+    --color-text-secondary-small: #D1D1D6;
+    --color-link: #7AB6FF;
+    --color-link-hover: #A3CCFF;
+  }
+  #skill .project-filters { background: #2C2C2E; }
+  #skill .filter-btn.active,
+  #skill .filter-btn[aria-pressed="true"] { box-shadow: 0 0 0 1px rgba(255, 255, 255, .5); }
+  .biz-card { background: #2C2C2E; box-shadow: 0 0 0 1px rgba(255, 255, 255, .5), 0 6px 18px rgba(0, 0, 0, .5); }
+  #resume .data-box:not(.contact-strip),
+  #resume .contact-strip .info-item,
+  #experience .data-box[data-exp],
+  #portfolio .rf-cards-scroller-item,
+  #skill .rf-cards-scroller-item,
+  #certificates .cert-card,
+  .proj-rows,
+  #skill .skill-tools li,
+  #services .svc-chips li { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .4); }
+  .proj-rows li + li,
+  #services .faq details + details { border-top-color: rgba(255, 255, 255, .4); }
+  .proj-kind,
+  #services .faq details > p { color: var(--color-text); }
 }
