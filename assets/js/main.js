@@ -407,7 +407,7 @@ var overlayHistory = (function () {
   });
 
   let showing = 0;   // which opening a late-arriving full picture belongs to
-  function openLightbox(src, alt, source, label, title) {
+  function openLightbox(src, alt, source, label, title, ev) {
     if (!lightbox.classList.contains("open")) overlayHistory.opened(closeLightbox);
     const turn = ++showing;
     lbImg.style.width = lbImg.style.height = "";
@@ -476,7 +476,14 @@ var overlayHistory = (function () {
     anchorOrigin(lbImg, source);
     frame.scrollLeft = 0;
     if (reduce) motion.jump(1); else motion.to(1);
-    closeBtn.focus();
+    // a tap or click shows no focus ring: the viewer itself takes focus and
+    // the next Tab reaches the close button; a key press focuses it at once
+    if (ev && ev.detail > 0) {
+      lightbox.setAttribute("tabindex", "-1");
+      lightbox.focus({ preventScroll: true });
+    } else {
+      closeBtn.focus();
+    }
   }
   function closeLightbox() {
     if (!lightbox.classList.contains("open")) return; // Escape pressed elsewhere
@@ -586,7 +593,8 @@ var overlayHistory = (function () {
       if (!focusables.length) return;
       var first = focusables[0];
       var last = focusables[focusables.length - 1];
-      if (e.shiftKey && document.activeElement === first) {
+      // the sheet itself (focused after a tap) counts as the start of the loop
+      if (e.shiftKey && (document.activeElement === first || document.activeElement === inner)) {
         e.preventDefault();
         last.focus();
       } else if (!e.shiftKey && document.activeElement === last) {
@@ -599,7 +607,7 @@ var overlayHistory = (function () {
     }
   });
 
-  window._expLightboxOpen = function (html, source, client) {
+  window._expLightboxOpen = function (html, source, client, ev) {
     var was = lightbox.classList.contains('open');
     if (!was) overlayHistory.opened(closeExp);
     while (inner.children.length > 1) inner.removeChild(inner.lastChild);
@@ -625,7 +633,14 @@ var overlayHistory = (function () {
     lightbox.style.visibility = 'visible';
     anchorOrigin(inner, source);
     if (reduce) motion.jump(1); else motion.to(1);
-    closeBtn.focus();
+    // a tap or click shows no focus ring: the sheet itself takes focus and
+    // the next Tab reaches the close button; a key press focuses it at once
+    if (ev && ev.detail > 0) {
+      inner.setAttribute('tabindex', '-1');
+      inner.focus({ preventScroll: true });
+    } else {
+      closeBtn.focus();
+    }
 
     // Initialize the client pop-up button
     var select = inner.querySelector('.exp-client-select');
@@ -746,9 +761,9 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   document.querySelectorAll('#experience .data-box[data-exp]').forEach(function (card) {
-    card.addEventListener('click', function () {
+    card.addEventListener('click', function (e) {
       var tmpl = document.getElementById('exp-' + card.dataset.exp);
-      if (tmpl) window._expLightboxOpen(tmpl.innerHTML, card);
+      if (tmpl) window._expLightboxOpen(tmpl.innerHTML, card, undefined, e);
     });
   });
 
@@ -803,18 +818,18 @@ document.addEventListener("DOMContentLoaded", function () {
   document.querySelectorAll("#portfolio .rf-cards-scroller-item").forEach(function (card) {
     // client-work cards open their story in the experience sheet, on that client
     if (card.dataset.openExp) {
-      card.addEventListener("click", function () {
+      card.addEventListener("click", function (e) {
         var tmpl = document.getElementById("exp-" + card.dataset.openExp);
-        if (tmpl) window._expLightboxOpen(tmpl.innerHTML, card, card.dataset.client);
+        if (tmpl) window._expLightboxOpen(tmpl.innerHTML, card, card.dataset.client, e);
       });
       return;
     }
     var img = card.querySelector(".project-img img");
     if (!img) return;
     var title = card.querySelector("h3");
-    card.addEventListener("click", function () {
+    card.addEventListener("click", function (e) {
       window._certLightboxOpen(img.currentSrc || img.src, img.alt, card.querySelector(".project-img"), "Project screenshot",
-        title ? title.textContent : "");
+        title ? title.textContent : "", e);
     });
   });
 });
@@ -954,7 +969,6 @@ document.addEventListener("DOMContentLoaded", function () {
       expandMark.className = "cert-expand-btn";
       expandMark.setAttribute("aria-hidden", "true");
       expandMark.textContent = "+";
-      card.style.cursor = "pointer";
       // a click anywhere on the tile, or Enter / Space on its button
       card.addEventListener("click", function () {
         // the viewer is named after the certificate it shows
@@ -1602,6 +1616,27 @@ document.addEventListener('DOMContentLoaded', function () {
   // then the hero is pinned again 150ms after the last resize. For a second
   // after the layout width changes, that movement is nobody scrolling up.
   var wide = 0, turned = 0;
+  // It never sits on another round control: the row paddles, a card's "+",
+  // a "Read more", a certificate's expand button or a question. Its box,
+  // grown by 8px so the two read as separate, is probed at the four corners,
+  // the centre and the middle of each side (30px apart, so nothing 30px or
+  // larger slips between two probes); while one is under it, it steps aside.
+  var CONTROLS = '.paddlenav-arrow, .card-plus, .exp-card-cta, .cert-expand-btn, #services .faq summary';
+  function overControl() {
+    // offsetLeft/Top give the fixed box without its hidden-state nudge
+    var l = toTop.offsetLeft - 8, t = toTop.offsetTop - 8;
+    var r = l + toTop.offsetWidth + 16, b = t + toTop.offsetHeight + 16;
+    var vw = document.documentElement.clientWidth - 1, vh = window.innerHeight - 1;
+    var xs = [l, (l + r) / 2, r], ys = [t, (t + b) / 2, b];
+    for (var i = 0; i < 9; i++) {
+      var x = Math.max(0, Math.min(vw, xs[i % 3])), yy = Math.max(0, Math.min(vh, ys[(i / 3) | 0]));
+      var under = document.elementsFromPoint(x, yy);
+      for (var j = 0; j < under.length; j++) {
+        if (under[j] !== toTop && under[j].matches && under[j].matches(CONTROLS)) return true;
+      }
+    }
+    return false;
+  }
   function update() {
     ticking = false;
     var y = window.scrollY || 0;
@@ -1617,8 +1652,10 @@ document.addEventListener('DOMContentLoaded', function () {
       else if (y < lastY - 2) { if (upFrom === null) upFrom = lastY; }
       else if (y > lastY + 2) upFrom = null;
       show = show && upFrom !== null && upFrom - y > 30;
-      count(show);
     }
+    // on every device: hidden while a control is under it, back once clear
+    if (show && overControl()) show = false;
+    if (touch) count(show);
     lastY = y;
     toTop.classList.toggle('visible', show);
     // reading progress on the ring: how close the end of the page is
@@ -1648,6 +1685,8 @@ document.addEventListener('DOMContentLoaded', function () {
       if ((window.scrollY || 0) <= window.innerHeight * 0.9) return;
       var r = toTop.getBoundingClientRect();
       if (e.clientX >= r.left - 40 && e.clientX <= r.right && e.clientY >= r.top - 40 && e.clientY <= r.bottom) {
+        // not over a control either: the pointer is probably heading for it
+        if (overControl()) return;
         toTop.classList.add('visible');
         count(true);
       }
@@ -1664,7 +1703,7 @@ document.addEventListener('DOMContentLoaded', function () {
 /**
  * Hero constellation — his multi-agent systems as a living graph.
  * Nodes drift and connect; six labeled nodes (CRM/POS/ASR/TTS/LLM/IVR);
- * cursor gently repels nearby nodes and links to them like a peer.
+ * the graph ignores the pointer (it is decoration, with nothing to click).
  * Desktop: cluster on the right of the copy. Mobile: below the copy.
  * Pauses off-screen; renders a single static frame under reduced motion.
  */
@@ -2115,17 +2154,8 @@ document.addEventListener('DOMContentLoaded', function () {
     if (nodes.length && painted && (bitmapChanged || reduce)) drawFrame(lastDrawT);
   }
 
-  if (finePointer) {
-    hero.addEventListener('mousemove', function (e) {
-      var r = canvas.getBoundingClientRect();
-      mouse.x = e.clientX - r.left;
-      mouse.y = e.clientY - r.top;
-      mouse.active = true;
-    }, { passive: true });
-    hero.addEventListener('mouseleave', function () {
-      mouse.active = false; mouse.x = -9999; mouse.y = -9999;
-    });
-  }
+  // (the graph no longer follows the pointer: a decorative pointer effect
+  // with nothing to click distracts, so mouse.active stays false)
   window.addEventListener('resize', resize, { passive: true });
   if ('ResizeObserver' in window) {
     new ResizeObserver(function () { resize(); }).observe(hero);
@@ -2629,6 +2659,48 @@ document.addEventListener('DOMContentLoaded', function () {
 })();
 
 /**
+ * The three hints that repeat — the scroll chevron's bounce, the "Active"
+ * pulse and the spark on the role line — run while their element is first
+ * in view, stop at the end of the cycle that is playing 10s later, and play
+ * again for 10s each time the element comes back into view. (Under Reduce
+ * Motion they are single, instant plays already and are left alone.)
+ */
+(function () {
+  if (!('IntersectionObserver' in window) || !document.documentElement.getAnimations) return;
+  var hosts = document.querySelectorAll('.hero-scroll-hint, .exp-status-active, .exp-role-spark');
+  if (!hosts.length) return;
+  var loops = function (host) {
+    return host.getAnimations({ subtree: true }).filter(function (a) {
+      return a.effect && a.effect.getTiming().iterations === Infinity;
+    });
+  };
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      var host = e.target;
+      clearTimeout(host._stopT);
+      if (!e.isIntersecting) return;
+      // back in view: play again from the start (a finished animation is
+      // no longer listed by getAnimations, so the host keeps hold of it)
+      (host._capped || []).forEach(function (a) {
+        a.effect.updateTiming({ iterations: Infinity });
+        a.currentTime = 0;
+        a.play();
+      });
+      host._capped = null;
+      host._stopT = setTimeout(function () {
+        host._capped = loops(host);
+        host._capped.forEach(function (a) {
+          var it = a.effect.getComputedTiming().currentIteration;
+          // finish the cycle under way, so it comes to rest where it began
+          a.effect.updateTiming({ iterations: (it == null ? 0 : Math.floor(it)) + 1 });
+        });
+      }, 10000);
+    });
+  });
+  hosts.forEach(function (h) { io.observe(h); });
+})();
+
+/**
  * Small rewards. On a computer an email address or phone number is copied
  * when clicked (a phone link there has nothing to dial; a mail link still
  * opens the mail app), and the CV and the contact card say they are on
@@ -2701,6 +2773,26 @@ document.addEventListener('DOMContentLoaded', function () {
       if (sel) sel.selectAllChildren(a.querySelector('.info-value') || a);
       show(tel ? "Couldn't copy. The number is selected" : "Couldn't copy. The address is selected", true);
     });
+  });
+})();
+
+/**
+ * Cookie settings: the footer button reopens the consent dialog, so a
+ * choice made once can be looked at and changed later. It stays hidden
+ * unless the consent script has loaded (a blocker or no network leaves it
+ * out, rather than a button that does nothing).
+ */
+(function () {
+  var btn = document.querySelector('[data-cookie-settings]');
+  if (!btn) return;
+  function ready() {
+    if (window.Cookiebot && typeof window.Cookiebot.renew === 'function') btn.hidden = false;
+  }
+  ready();
+  window.addEventListener('CookiebotOnLoad', ready);
+  window.addEventListener('CookiebotOnConsentReady', ready);
+  btn.addEventListener('click', function () {
+    if (window.Cookiebot) window.Cookiebot.renew();
   });
 })();
 

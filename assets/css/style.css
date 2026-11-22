@@ -397,7 +397,7 @@ button:disabled {
 button {
   background: none;
   border: 0;
-  cursor: pointer;
+  cursor: default;
   color: inherit;
   font: inherit;
   line-height: inherit;
@@ -622,7 +622,6 @@ button {
   border-radius: 50%;
   background: #fff;
   border: none;
-  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -661,12 +660,17 @@ button {
 .cert-lightbox img {
   will-change: transform, opacity;
 }
+/* the sheet and the viewer take focus themselves after a tap or click:
+   no ring, and no rounded corners from the generic focus rule */
+.exp-lightbox-inner:focus,
+.cert-lightbox:focus { outline: none; }
+.cert-lightbox:focus { border-radius: 0; }
 @keyframes lb-fade { from { opacity: 0; } }
 @keyframes lb-zoom { from { opacity: 0; transform: scale(0.94); } }
 .cert-lightbox-close {
   position: fixed;
-  top: 20px;
-  right: 24px;
+  top: calc(20px + env(safe-area-inset-top, 0px));
+  right: calc(24px + env(safe-area-inset-right, 0px));
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -1429,7 +1433,7 @@ select:focus-visible {
   -webkit-backdrop-filter: saturate(180%) blur(20px);
   backdrop-filter: saturate(180%) blur(20px);
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.14);
-  cursor: pointer;
+  cursor: default;
   opacity: 0;
   transform: translateY(8px);
   pointer-events: none;
@@ -1682,6 +1686,17 @@ a.info-item:hover .info-value { color: var(--color-link); }
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: .2em;
+}
+/* "Cookie settings" is a button that looks like a link */
+button.footer-copy-link { color: var(--color-link); text-decoration: none; }
+button.footer-copy-link:hover { color: var(--color-link-hover); }
+/* below 992px it drops under the copyright lines: a small gap keeps it from
+   reading as a third line of the copyright (half a line, so it grows with the text) */
+@media (max-width: 991.98px) {
+  button.footer-copy-link { margin-top: 0.5em; }
+  /* its 44px tap area reaches down into the empty footer, not up over the
+     copyright link (on one-line widths such as an iPad the two would overlap) */
+  button.footer-copy-link::after { top: 0; transform: translateX(-50%); }
 }
 
 .info-item { min-height: 44px; }
@@ -2275,7 +2290,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
   padding: 24px 12px;
   border-radius: 14px;
   list-style: none;
-  cursor: pointer;
+  cursor: default;
   font-size: calc(19rem / 17 / var(--tier));
   font-weight: 600;
   line-height: 1.36842;
@@ -2590,7 +2605,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
    line on top, the project's own line drawing large at the foot on every
    screen (phones too), the round "+" beside it. The tools live in the
    sheet the card opens. */
-#portfolio .work-card { cursor: pointer; padding-bottom: 32px; }
+#portfolio .work-card { cursor: default; padding-bottom: 32px; }
 #portfolio .work-icon {
   order: 3;
   margin-top: auto;
@@ -2707,7 +2722,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
   position: relative;
   margin-bottom: 0;
   padding-right: 26px;
-  cursor: pointer;
+  cursor: default;
   -webkit-tap-highlight-color: transparent;
 }
 .exp-clients-folded .exp-client-section-header::after {
@@ -2726,7 +2741,7 @@ a.info-item:hover .info-value { color: var(--color-link); }
 .exp-clients-folded .exp-client-section.is-open .exp-client-section-header { margin-bottom: 16px; }
 .exp-clients-folded .exp-client-section.is-open .exp-client-section-header::after { transform: rotate(90deg); }
 .exp-clients-folded .exp-client-section:not(.is-open) > :not(.exp-client-section-header) { display: none; }
-.exp-clients-folded .exp-client-section:not(.is-open) { cursor: pointer; }
+.exp-clients-folded .exp-client-section:not(.is-open) { cursor: default; }
 .exp-client-toggle {
   margin: 0;
   padding: 0;
@@ -2811,8 +2826,12 @@ a.info-item:hover .info-value { color: var(--color-link); }
   margin: 0 16px;
 }
 
-/* back-to-top clears the iPhone home indicator */
-#back-to-top { bottom: calc(22px + env(safe-area-inset-bottom, 0px)); }
+/* back-to-top clears the iPhone home indicator, and the sensor housing of
+   a phone held sideways (the page now runs edge to edge: viewport-fit=cover) */
+#back-to-top {
+  bottom: calc(22px + env(safe-area-inset-bottom, 0px));
+  right: calc(22px + env(safe-area-inset-right, 0px));
+}
 
 /* On a Mac the window's bottom edge is no place for a control (and the
    button sat on card text there). Home, Fn-Left or Cmd-Up reach the top;
@@ -3209,10 +3228,18 @@ p.profile-bio-small,
   opacity: 0;
   transform: translate(-50%, 8px);
   pointer-events: none;
-  transition: opacity .25s ease, transform .35s cubic-bezier(.32, .72, 0, 1);
+  transition: opacity .25s ease, transform .35s cubic-bezier(.32, .72, 0, 1),
+    bottom .35s cubic-bezier(.32, .72, 0, 1);
 }
 /* a shown toast takes the pointer, so hovering it keeps it open */
 .toast.is-shown { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+/* on a touch screen, while Back to top is showing, the toast sits 12px
+   above it (22 + 44 + 12) instead of over its left edge on a narrow phone,
+   and glides back down when the button leaves (2 s after scrolling stops).
+   Not on a Mac: Back to top is never drawn there and the toast is at the top */
+@media (hover: none) {
+  body:has(#back-to-top.visible) .toast { bottom: calc(78px + env(safe-area-inset-bottom, 0px)); }
+}
 /* On a Mac the bottom of the window is often below the screen edge, so
    the confirmation drops in near the top there; phones and tablets keep
    it at the bottom */
@@ -3249,7 +3276,7 @@ p.profile-bio-small,
   font: inherit;
   color: inherit;
   text-align: inherit;
-  cursor: pointer;
+  cursor: zoom-in;
   -webkit-appearance: none;
   appearance: none;
 }
@@ -3301,3 +3328,17 @@ p.profile-bio-small,
 @media (forced-colors: active) {
   .btn-pill { border: 1px solid LinkText; }
 }
+
+/* Pointers, as the platforms draw them: the arrow on buttons and on cards
+   that open a sheet, the hand only on links, zoom-in on every picture that
+   opens full size (the certificates, like the screenshot cards). After the
+   merged Bootstrap rules, which give every button the hand. */
+[type=button]:not(:disabled),
+button:not(:disabled),
+[role=button],
+summary,
+#experience .data-box[data-exp],
+#portfolio .work-card { cursor: default; }
+.cert-card { cursor: zoom-in; }
+/* the corner "+" does what its card does, so it shows the card's pointer */
+#portfolio .card-plus { cursor: inherit; }

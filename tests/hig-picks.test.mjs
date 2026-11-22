@@ -486,7 +486,7 @@ test('accessibility > focus: every keyboard ring is the system ring, in each con
 test('color > not by colour alone: the name in the copyright line is underlined at rest (footer-link-underline)', async () => {
   for (const [where, opts] of [['small phone', SMALL], ['iPhone', PHONE], ['Mac', MAC]]) {
     const { page } = await open(opts);
-    const r = await page.$eval('.footer-copy-link', (a) => {
+    const r = await page.$eval('a.footer-copy-link', (a) => {
       const cs = getComputedStyle(a);
       return { line: cs.textDecorationLine, thick: cs.textDecorationThickness, off: parseFloat(cs.textUnderlineOffset) / parseFloat(cs.fontSize), color: cs.color };
     });
@@ -496,7 +496,7 @@ test('color > not by colour alone: the name in the copyright line is underlined 
     assert.equal(r.color, BLUE, `${where}: the name changed colour`);
     if (where === 'Mac') {
       // under the pointer it behaves like the site's other links: darker, without the line
-      const a = page.locator('.footer-copy-link');
+      const a = page.locator('a.footer-copy-link');
       await a.scrollIntoViewIfNeeded();
       await a.hover();
       await settle(a);
@@ -1610,4 +1610,255 @@ test('layout > phones: an experience card gives its title the full width, and th
     }
     await page.close();
   }
+});
+
+// ---------------------------------------------------------------------------
+// Round 2 (v2.73.0): controls and motion
+// ---------------------------------------------------------------------------
+
+/** open(), with a stand-in for the consent script (the real one is cut off). */
+async function openWithConsent(opts) {
+  const page = await ctx.browser.newPage({ serviceWorkers: 'block', ...opts });
+  await page.route((u) => !u.href.startsWith(ctx.srv.url), (r) => r.abort());
+  await page.addInitScript(() => { window.Cookiebot = { renew() { window.__renewed = (window.__renewed || 0) + 1; } }; });
+  await page.goto(ctx.srv.url + '/index.html', { waitUntil: 'load' });
+  await page.waitForFunction(styled, null, { timeout: 8000 });
+  return page;
+}
+
+/** Scroll to y + 200 and come back up 160px in steps, as a finger would. */
+async function scrollUpTo(page, y) {
+  await page.evaluate((to) => scrollTo(0, to + 200), y);
+  await page.waitForTimeout(250);
+  for (let i = 0; i < 8; i++) { await page.evaluate(() => scrollBy(0, -20)); await page.waitForTimeout(40); }
+  await page.waitForTimeout(200);
+}
+
+test('pointing devices > the hero graph does not react to the pointer, with or without Reduce Motion (hero-no-pointer-effect)', async () => {
+  for (const reducedMotion of ['no-preference', 'reduce']) {
+    const page = await ctx.browser.newPage({ serviceWorkers: 'block', ...MAC, reducedMotion });
+    await page.route((u) => !u.href.startsWith(ctx.srv.url), (r) => r.abort());
+    await page.addInitScript(() => {
+      window.__heroListeners = [];
+      const add = EventTarget.prototype.addEventListener;
+      EventTarget.prototype.addEventListener = function (type) {
+        if (this instanceof Element && this.closest('#hero') && /^(mouse|pointer)(move|enter|leave|over|out)$/.test(type)) window.__heroListeners.push(type);
+        return add.apply(this, arguments);
+      };
+    });
+    await page.goto(ctx.srv.url + '/index.html', { waitUntil: 'load' });
+    await page.waitForFunction(styled, null, { timeout: 8000 });
+    await page.mouse.move(1010, 405);
+    assert.deepEqual(await page.evaluate(() => window.__heroListeners), [], `${reducedMotion}: the hero still listens for the pointer`);
+    await page.close();
+  }
+});
+
+test('motion > the three repeating hints stop at the end of a cycle about 10s after coming into view, and play again on return (hint-loops-finite, closest)', async () => {
+  const { page, errors } = await open(MAC);
+  const endless = () => document.querySelector('.hero-scroll-hint').getAnimations({ subtree: true })
+    .filter((a) => a.effect.getTiming().iterations === Infinity).length;
+  await page.waitForFunction(endless, null, { timeout: 5000 });   // loops as before while first in view
+  await page.waitForTimeout(10600);
+  assert.equal(await page.evaluate(endless), 0, 'the scroll hint still loops without end after 10s');
+  // the cycle under way is finished, not cut: it ends on a whole iteration
+  const its = await page.evaluate(() => document.querySelector('.hero-scroll-hint')._capped.map((a) => a.effect.getTiming().iterations));
+  assert.ok(its.length > 0 && its.every((n) => Number.isInteger(n) && n >= 1), `capped at ${its}`);
+  // out of view and back: it plays again
+  await page.evaluate(() => scrollTo(0, 3000));
+  await page.waitForTimeout(300);
+  await page.evaluate(() => scrollTo(0, 0));
+  await page.waitForFunction(endless, null, { timeout: 5000 });
+  // the other two hints are under the same cap
+  const src = readFileSync(join(ROOT, 'assets/js/main.js'), 'utf8');
+  assert.match(src, /'\.hero-scroll-hint, \.exp-status-active, \.exp-role-spark'/);
+  assert.deepEqual(errors, []);
+  await page.close();
+});
+
+test('pointing devices > the arrow on buttons and on cards that open a sheet, the hand only on links, zoom-in on pictures that open full size (cursor-semantics)', async () => {
+  const { page } = await open(MAC);
+  const cur = (sel) => page.$eval(sel, (el) => getComputedStyle(el).cursor);
+  for (const sel of ['.filter-btn', '#back-to-top', '#services .faq summary', '#experience .data-box[data-exp]', '#experience .exp-card-cta',
+    '#portfolio .work-card', '#portfolio .work-card .card-plus', '.proj-all', '.paddlenav-arrow:not(:disabled)',
+    '.cert-lightbox-close', '.exp-lightbox-close', '[data-cookie-settings]']) {
+    assert.equal(await cur(sel), 'default', `${sel} shows the hand`);
+  }
+  for (const sel of ['#hero a.btn-pill', 'a.footer-copy-link', 'a.footer-contact-link', '#contact a.btn-pill']) {
+    assert.equal(await cur(sel), 'pointer', `${sel}: a link keeps the hand`);
+  }
+  for (const sel of ['#certificates .cert-card', '#certificates button.cert-img', '#certificates .cert-expand-btn',
+    '#portfolio .rf-cards-scroller-item:not(.work-card)', '#portfolio .rf-cards-scroller-item:not(.work-card) .card-plus']) {
+    assert.equal(await cur(sel), 'zoom-in', `${sel} opens a picture full size`);
+  }
+  // inside the sheet: the client pop-up button and the folding client names
+  await page.locator('#experience .data-box[data-exp]').first().click({ position: { x: 30, y: 30 } });
+  await page.waitForSelector('.exp-lightbox.open .exp-client-select');
+  for (const sel of ['.exp-lightbox .exp-client-select', '.exp-lightbox .exp-client-toggle']) {
+    assert.equal(await cur(sel), 'default', `${sel} shows the hand`);
+  }
+  await page.close();
+});
+
+test('focus > a tap or click opens the sheet and the viewer without a ring on the close button; Tab reaches it next; a key press focuses it at once (no-focus-ring-after-tap)', async () => {
+  const { page, errors } = await open(MAC);
+  const focus = () => page.evaluate(() => {
+    const a = document.activeElement;
+    return { cls: a.className, outline: getComputedStyle(a).outlineStyle, radius: getComputedStyle(a).borderRadius };
+  });
+  // an experience card, clicked
+  const card = page.locator('#experience .data-box[data-exp]').first();
+  await card.click({ position: { x: 30, y: 30 } });
+  await page.waitForSelector('.exp-lightbox.open');
+  let f = await focus();
+  assert.equal(f.cls, 'exp-lightbox-inner', 'a click put focus on the close button');
+  assert.equal(f.outline, 'none');
+  await page.keyboard.press('Tab');
+  assert.equal((await focus()).cls, 'exp-lightbox-close', 'Tab did not reach the close button first');
+  await page.keyboard.press('Escape');
+  await page.waitForSelector('.exp-lightbox.open', { state: 'detached', timeout: 3000 }).catch(() => {});
+  await page.waitForFunction(() => !document.querySelector('.exp-lightbox.open'));
+  // the same card from the keyboard: the close button has focus (and its ring)
+  await page.locator('#experience .exp-card-cta').first().focus();
+  await page.keyboard.press('Enter');
+  await page.waitForSelector('.exp-lightbox.open');
+  assert.equal((await focus()).cls, 'exp-lightbox-close', 'a key press did not focus the close button');
+  await page.keyboard.press('Escape');
+  await page.waitForFunction(() => !document.querySelector('.exp-lightbox.open'));
+  // a screenshot card, clicked: the viewer takes focus, square and ringless
+  await page.locator('#portfolio .rf-cards-scroller-item:not(.work-card) .project-img').first().click();
+  await page.waitForSelector('.cert-lightbox.open');
+  f = await focus();
+  assert.match(f.cls, /^cert-lightbox\b/, 'a click put focus on the viewer\'s close button');
+  assert.equal(f.outline, 'none');
+  assert.equal(f.radius, '0px');
+  await page.keyboard.press('Tab');
+  assert.match((await focus()).cls, /cert-lightbox-close/);
+  assert.deepEqual(errors, []);
+  await page.close();
+});
+
+test('layout > Back to top steps aside while it would cover another control, and comes back once clear (back-to-top-clear-of-controls)', async () => {
+  const { page, errors } = await open(PHONE);
+  const at = (sel, dy) => page.evaluate(([s, d]) => {
+    const r = document.querySelector(s).getBoundingClientRect();
+    return Math.round(r.top + scrollY + d);
+  }, [sel, dy]);
+  const state = () => page.evaluate(() => {
+    const b = document.getElementById('back-to-top');
+    const x = b.offsetLeft + b.offsetWidth / 2, y = b.offsetTop + b.offsetHeight / 2;
+    return { visible: b.classList.contains('visible'),
+      control: document.elementsFromPoint(x, y).some((el) => el !== b && el.matches('.paddlenav-arrow, .card-plus, .exp-card-cta, .cert-expand-btn, #services .faq summary')) };
+  });
+  // a question lies under the button's place: it stays away
+  const q = await at('#services .faq details:nth-of-type(3) summary', 0);
+  await scrollUpTo(page, q - 844 + 60);
+  let s = await state();
+  assert.equal(s.control, true, 'the test did not put a question under the button');
+  assert.equal(s.visible, false, 'Back to top sits on a question');
+  // plain text under it (the Contact headline at the bottom of the screen): it shows as before
+  const c = await at('#contact h2, #contact .cta-title, #contact h1', 0);
+  await scrollUpTo(page, c - 844 + 80);
+  s = await state();
+  assert.equal(s.control, false);
+  assert.equal(s.visible, true, 'Back to top did not come back once clear');
+  assert.deepEqual(errors, []);
+  await page.close();
+});
+
+test('feedback > on a touch screen the confirmation sits 12px above Back to top while it shows, and glides down when it leaves; a Mac keeps it at the top (toast-above-back-to-top)', async () => {
+  for (const [where, opts] of [['320px phone', SMALL], ['iPhone', PHONE]]) {
+    const { page } = await open(opts);
+    const y = await page.evaluate(() => document.querySelector('#contact').getBoundingClientRect().top + scrollY);
+    await scrollUpTo(page, y);
+    await page.evaluate(() => {
+      const a = [...document.querySelectorAll('#contact a')].find((x) => /Download CV/.test(x.textContent));
+      a.addEventListener('click', (e) => e.preventDefault());
+      a.click();
+    });
+    await page.waitForSelector('.toast.is-shown');
+    await page.waitForTimeout(450);
+    const box = () => page.evaluate(() => {
+      const t = document.querySelector('.toast').getBoundingClientRect(), b = document.getElementById('back-to-top');
+      return { bottom: t.bottom, left: t.left, right: t.right, top: b.getBoundingClientRect().top, visible: b.classList.contains('visible'), ih: innerHeight,
+        glides: getComputedStyle(document.querySelector('.toast')).transitionProperty };
+    });
+    const up = await box();
+    assert.equal(up.visible, true, `${where}: Back to top was not showing`);
+    assert.equal(Math.round(up.top - up.bottom), 12, `${where}: the toast is not 12px above Back to top`);
+    assert.match(up.glides, /bottom/, `${where}: the toast jumps rather than glides`);
+    // the button leaves 2s after the scrolling stops; the toast (5s) settles 28px above the bottom
+    await page.waitForFunction(() => !document.getElementById('back-to-top').classList.contains('visible'), null, { timeout: 4000 });
+    await page.waitForTimeout(500);
+    const down = await box();
+    assert.equal(Math.round(down.ih - down.bottom), 28, `${where}: the toast did not return to its place`);
+    await page.close();
+  }
+  // a Mac: Back to top is never drawn, so the toast is not lifted or stretched
+  const { page } = await open(MAC);
+  await page.evaluate(() => scrollTo(0, 3000));
+  await page.waitForTimeout(300);
+  await page.evaluate(() => {
+    document.getElementById('back-to-top').classList.add('visible');
+    const a = [...document.querySelectorAll('a')].find((x) => /Download CV/.test(x.textContent));
+    a.addEventListener('click', (e) => e.preventDefault());
+    a.click();
+  });
+  await page.waitForSelector('.toast.is-shown');
+  await page.waitForTimeout(450);
+  const t = await page.evaluate(() => { const r = document.querySelector('.toast').getBoundingClientRect(); return { top: Math.round(r.top), h: r.height }; });
+  assert.equal(t.top, 24);
+  assert.ok(t.h < 60, `the toast is ${t.h}px tall`);
+  await page.close();
+});
+
+test('privacy > the footer has a Cookie settings button that reopens the consent choice; it is left out when the consent script is missing (cookie-settings-link)', async () => {
+  // no consent script (a blocker, no network): no button
+  const { page: bare } = await open(PHONE);
+  assert.equal(await bare.locator('footer [data-cookie-settings]').isVisible(), false, 'a button that does nothing is showing');
+  await bare.close();
+  for (const [where, opts] of [['320px phone', SMALL], ['iPhone', PHONE], ['iPad', { viewport: { width: 820, height: 1180 }, hasTouch: true, isMobile: true }], ['Mac', MAC]]) {
+    const page = await openWithConsent(opts);
+    const btn = page.locator('footer [data-cookie-settings]');
+    assert.equal(await btn.isVisible(), true, `${where}: no Cookie settings button`);
+    assert.equal(await btn.evaluate((b) => b.tagName + ':' + b.textContent), 'BUTTON:Cookie settings');
+    const m = await btn.evaluate((b) => {
+      const copy = b.previousElementSibling, r = b.getBoundingClientRect(), c = copy.getBoundingClientRect();
+      return { gap: r.top - c.bottom, mid: (r.left + r.right) / 2, right: r.right, copyRight: c.right, sameRow: Math.abs(r.top - c.top) < 2,
+        color: getComputedStyle(b).color, link: getComputedStyle(document.querySelector('#contact a.more')).color,
+        ruleRight: document.querySelector('#footer .border-top').getBoundingClientRect().right,
+        vw: document.documentElement.clientWidth, sw: document.documentElement.scrollWidth };
+    });
+    assert.equal(m.color, m.link, `${where}: not the link blue`);
+    assert.equal(m.sw, m.vw, `${where}: the page scrolls sideways`);
+    if (where === 'Mac') {
+      assert.equal(m.sameRow, true, 'Mac: not on the copyright row');
+      assert.ok(m.right > m.copyRight + 200 && m.right <= m.ruleRight, 'Mac: not at the trailing end of the row');
+    } else {
+      // under the copyright, centred, a small gap so it is not a third copyright line
+      assert.ok(m.gap >= 6 && m.gap <= 8.5, `${where}: ${m.gap}px under the copyright`);
+      assert.ok(Math.abs(m.mid - m.vw / 2) <= 1, `${where}: not centred`);
+    }
+    await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
+    await btn.click();
+    assert.equal(await page.evaluate(() => window.__renewed), 1, `${where}: the consent dialog was not reopened`);
+    await page.close();
+  }
+});
+
+test('layout > the page runs edge to edge on a phone held sideways, and the floating buttons keep clear of the sensor housing (landscape-edge-to-edge)', async () => {
+  const html = readFileSync(join(ROOT, 'index.html'), 'utf8');
+  assert.match(html, /<meta content="width=device-width, initial-scale=1\.0, viewport-fit=cover" name="viewport">/);
+  const css = readFileSync(join(ROOT, 'assets/css/style.css'), 'utf8');
+  assert.match(css, /#back-to-top \{\s*bottom: calc\(22px \+ env\(safe-area-inset-bottom, 0px\)\);\s*right: calc\(22px \+ env\(safe-area-inset-right, 0px\)\);/);
+  assert.match(css, /\.cert-lightbox-close \{[^}]*top: calc\(20px \+ env\(safe-area-inset-top, 0px\)\);\s*right: calc\(24px \+ env\(safe-area-inset-right, 0px\)\);/);
+  // with no insets (portrait in a browser without a notch) nothing moves
+  const { page } = await open(PHONE);
+  const pos = await page.evaluate(() => {
+    const b = getComputedStyle(document.getElementById('back-to-top'));
+    return { right: b.right, bottom: b.bottom, sw: document.documentElement.scrollWidth, vw: document.documentElement.clientWidth };
+  });
+  assert.deepEqual([pos.right, pos.bottom], ['22px', '22px']);
+  assert.equal(pos.sw, pos.vw);
+  await page.close();
 });

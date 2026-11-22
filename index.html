@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="utf-8">
-  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport">
   <!-- Light-only site: opt out of browser forced/auto dark theming -->
   <meta name="color-scheme" content="only light">
   <meta name="theme-color" content="#ffffff">
@@ -802,7 +802,7 @@
 
     /* Experience Apple-style cards */
     #experience .data-box[data-exp] {
-      cursor: pointer;
+      cursor: default;
       position: relative;
       will-change: transform;
       transition: transform .3s cubic-bezier(.25, .46, .45, .94);
@@ -1572,7 +1572,8 @@
       font-size: calc(17rem / 17 / var(--tier)) !important;
       line-height: calc(44rem / 17 / var(--tier));
       text-overflow: ellipsis;
-      cursor: pointer;
+      /* a pop-up button, so the arrow like every button */
+      cursor: default;
       transition: background-color .2s
     }
 
@@ -1815,7 +1816,7 @@
 
     /* Cert card clickable */
     .cert-card {
-      cursor: pointer
+      cursor: zoom-in
     }
 
     @media(max-width:600px) {
@@ -3883,6 +3884,8 @@
             <a href="https://tawittytc.github.io/mywebsite" class="text-body-secondary footer-copy-link">Tanapol Chamnanhan</a>. Built and
             maintained by hand.
           </div>
+          <!-- reopens the consent choice; shown only once the consent script has loaded -->
+          <button type="button" class="footer-copy-link" data-cookie-settings hidden>Cookie settings</button>
         </div>
       </div>
     </div>
