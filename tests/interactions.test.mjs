@@ -84,7 +84,9 @@ test('an SCG card opens the SCG sheet on its own project', async () => {
   await page.waitForTimeout(100);
   const top = await page.evaluate(() => {
     const inner = document.querySelector('.exp-lightbox-inner');
-    const edge = inner.getBoundingClientRect().top;
+    // the sheet's top bar covers its top edge: the project starts below it
+    const bar = inner.querySelector('.exp-sheet-bar');
+    const edge = bar ? bar.getBoundingClientRect().bottom : inner.getBoundingClientRect().top;
     const sec = [...inner.querySelectorAll('.exp-client-section')].find((s) => s.getBoundingClientRect().bottom > edge + 20);
     return sec && sec.dataset.client;
   });
@@ -175,14 +177,21 @@ test('"See all" lists every project; a row opens it in the sheet and Back return
     focus: document.activeElement.closest('.proj-group')?.querySelector('h3').textContent }));
   assert.equal(back.top, 300, 'the list did not come back where it was');
   assert.match(back.focus, /Kasikorn/, 'focus did not return to the row');
-  // a screenshot row: the picture opens above the list, Escape closes only the picture
+  // a screenshot row: one sheet at a time. The list steps aside and the picture
+  // opens alone; Escape closes the picture and brings the list back, on that row
   await page.locator('.proj-row', { hasText: 'Classroom' }).evaluate((r) => r.click());
   await page.waitForSelector('.cert-lightbox.open');
   assert.ok(await page.evaluate(() => !!document.elementFromPoint(innerWidth / 2, innerHeight / 2).closest('.cert-lightbox')),
     'the screenshot opened under the list');
+  assert.ok(await page.evaluate(() => !document.querySelector('.exp-lightbox.open') && history.state && history.state.overlay === 1),
+    'the list stayed open under the picture');
   await page.keyboard.press('Escape');
   await page.waitForFunction(() => !document.querySelector('.cert-lightbox.open'));
   await page.waitForFunction(() => !!document.querySelector('.exp-lightbox.open .proj-row') && history.state && history.state.overlay === 1);
+  const again = await page.evaluate(() => ({ top: document.querySelector('.exp-lightbox-inner').scrollTop,
+    focus: document.activeElement.classList.contains('proj-row') ? document.activeElement.textContent : '' }));
+  assert.equal(again.top, 300, 'the list did not come back where it was');
+  assert.match(again.focus, /Classroom/, 'focus did not return to the screenshot row');
   // a new project, then the X: both history steps are taken back off
   await page.locator('.proj-group', { has: page.locator('h3', { hasText: 'Genius Track' }) }).locator('.proj-row').click();
   await page.waitForSelector('.proj-back');

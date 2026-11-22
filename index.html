@@ -1316,7 +1316,10 @@
       width: 100%;
       max-height: 88vh;
       overflow-y: auto;
-      padding: 36px 40px;
+      /* --st/--sx: the sheet's top and side padding; its top bar reads them */
+      --st: 36px;
+      --sx: 40px;
+      padding: var(--st) var(--sx);
       position: relative;
       box-shadow: 0 32px 80px rgba(0, 0, 0, .22);
       /* resting state only — the spring writes transform/opacity each frame,
@@ -1355,7 +1358,9 @@
       }
 
       .exp-lightbox-inner {
-        padding: 26px 20px;
+        --st: 26px;
+        --sx: 20px;
+        padding: var(--st) var(--sx);
         border-radius: 22px;
         max-height: 92vh
       }
@@ -1808,10 +1813,10 @@
       .exp-modal-section ul { font-size: 1.0588rem; }
     }
     @media (min-width: 2000px) {
-      .exp-lightbox-inner { max-width: 836px; padding: 41px 45px; }
+      .exp-lightbox-inner { max-width: 836px; --st: 41px; --sx: 45px; padding: var(--st) var(--sx); }
     }
     @media (min-width: 3000px) and (min-height: 1700px) {
-      .exp-lightbox-inner { max-width: 1073px; padding: 52px 58px; }
+      .exp-lightbox-inner { max-width: 1073px; --st: 52px; --sx: 58px; padding: var(--st) var(--sx); }
     }
 
     /* Cert card clickable */
@@ -1821,7 +1826,9 @@
 
     @media(max-width:600px) {
       .exp-lightbox-inner {
-        padding: 24px 18px
+        --st: 24px;
+        --sx: 18px;
+        padding: var(--st) var(--sx)
       }
 
       .exp-modal-title {

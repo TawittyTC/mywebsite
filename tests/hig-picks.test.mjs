@@ -1065,17 +1065,21 @@ test('controls > pop-up button: the 35 client chips are one grey "All Clients" c
     assert.equal(r.count, '33', `${where}: the client count changed`);
     assert.equal(r.sideways, 0, `${where}: the page scrolls sideways`);
     if (opts.isMobile && opts.viewport.width < 735) {
-      // scrolled into the stories, the capsule sticks beside the close button, level with it
+      // scrolled into the stories, the capsule sticks under the sheet's top bar
+      // (v2.73.0, sheet-title-bar: it used to stick beside the close button),
+      // 10px of air above and below it, the full width its own
       await page.evaluate(() => { const inner = document.querySelector('.exp-lightbox-inner'); inner.scrollTop = inner.querySelector('.exp-client-section[data-client="vietjet"]').offsetTop - 120; });
       await page.waitForTimeout(150);
       const s = await page.evaluate(() => {
         const inner = document.querySelector('.exp-lightbox-inner').getBoundingClientRect();
         const a = document.querySelector('.exp-lightbox .exp-client-select').getBoundingClientRect();
         const b = document.querySelector('.exp-lightbox .exp-lightbox-close').getBoundingClientRect();
-        return { mid: [a.top + a.height / 2 - inner.top, b.top + b.height / 2 - inner.top], gap: b.left - a.right };
+        const bar = document.querySelector('.exp-lightbox .exp-sheet-bar').getBoundingClientRect();
+        const row = document.querySelector('.exp-lightbox .exp-client-filter').getBoundingClientRect();
+        return { mid: [a.top + a.height / 2 - inner.top, b.top + b.height / 2 - inner.top], under: a.top - bar.bottom, below: row.bottom - a.bottom };
       });
-      assert.deepEqual(s.mid, [44, 44], `${where}: the stuck capsule and the close button are not level`);
-      assert.ok(s.gap >= 6, `${where}: the capsule comes within ${s.gap}px of the close button`);
+      assert.deepEqual(s.mid, [84, 28], `${where}: the stuck capsule is not under the top bar, or the close button is not 8px from the sheet's edge`);
+      assert.deepEqual([s.under, s.below], [10, 10], `${where}: the air around the stuck capsule`);
     }
     await page.selectOption('.exp-lightbox.open .exp-client-select', 'vietjet');
     const shown = await page.$$eval('.exp-lightbox.open .exp-client-section', (ss) => ss.filter((s) => s.style.display !== 'none').map((s) => s.dataset.client + (s.classList.contains('is-open') ? ' open' : '')));
@@ -1861,4 +1865,225 @@ test('layout > the page runs edge to edge on a phone held sideways, and the floa
   assert.deepEqual([pos.right, pos.bottom], ['22px', '22px']);
   assert.equal(pos.sw, pos.vw);
   await page.close();
+});
+
+// ── v2.73.0 round 2: the sheet ──────────────────────────────────────────
+
+/** What the sheet's top bar shows right now, measured from the sheet's own edges. */
+const sheetBar = () => {
+  const inner = document.querySelector('.exp-lightbox-inner'), ir = inner.getBoundingClientRect();
+  const bar = inner.querySelector('.exp-sheet-bar');
+  if (!bar) return null;
+  const br = bar.getBoundingClientRect(), c = bar.querySelector('.exp-lightbox-close').getBoundingClientRect();
+  const t = bar.querySelector('.exp-sheet-bar-title'), ts = getComputedStyle(t), back = bar.querySelector('.proj-back');
+  const big = inner.querySelector('.exp-modal-title');
+  return {
+    h: br.height, edge: [br.left - ir.left, ir.right - br.right], closeTop: Math.round(c.top - ir.top), closeH: c.height,
+    stuck: bar.classList.contains('is-stuck'), material: getComputedStyle(bar).backgroundColor,
+    title: t.textContent, shown: ts.opacity === '1' && ts.visibility === 'visible', cut: t.classList.contains('is-cut'),
+    bigTop: big ? big.getBoundingClientRect().top - c.bottom : null,
+    backTop: back ? Math.round(back.getBoundingClientRect().top - ir.top) : null,
+    order: [...bar.children].map((el) => el.className.split(' ').pop()),
+    sideways: inner.scrollWidth - inner.clientWidth,
+  };
+};
+const sheetScroll = async (page, y) => {
+  await page.evaluate((top) => { document.querySelector('.exp-lightbox-inner').scrollTop = top; }, y);
+  await page.waitForTimeout(350);
+};
+
+test('navigation > the sheet has a top bar: the close button rests where it was, the bar turns to material as soon as it sticks, and the title joins it once the big one has left (sheet-title-bar)', async () => {
+  for (const [where, opts, pad] of [['small phone', SMALL, 24], ['iPhone', PHONE, 24], ['iPad', IPAD, 36], ['Mac', MAC, 36]]) {
+    const { page, errors } = await open({ ...opts, reducedMotion: 'reduce' });
+    await openProtollcall(page);
+    const rest = await page.evaluate(sheetBar);
+    assert.ok(rest, `${where}: the sheet has no top bar`);
+    assert.deepEqual([rest.h, rest.edge, rest.closeH], [52, [0, 0], 40], `${where}: the bar is not 52px, edge to edge, around a 40px close button`);
+    assert.equal(rest.closeTop, pad, `${where}: at rest the close button moved from its v2.71 place`);
+    assert.deepEqual([rest.stuck, rest.material, rest.shown], [false, 'rgba(0, 0, 0, 0)', false], `${where}: at rest the bar is not bare`);
+    assert.ok(rest.bigTop >= 0, `${where}: the title is not below the close button`);
+    assert.equal(rest.sideways, 0, `${where}: the sheet scrolls sideways`);
+    // a little scroll: the bar has stuck, 8px from the sheet's edge, on its material; no title yet
+    await sheetScroll(page, pad + 4);
+    const stuck = await page.evaluate(sheetBar);
+    assert.deepEqual([stuck.stuck, stuck.closeTop, stuck.material, stuck.shown], [true, 8, 'rgba(255, 255, 255, 0.92)', false], `${where}: just scrolled`);
+    // deep in the stories: the compact title shows
+    await page.evaluate(() => { const i = document.querySelector('.exp-lightbox-inner'); i.scrollTop = i.querySelector('.exp-client-section[data-client="netbay"]').offsetTop - 130; });
+    await page.waitForTimeout(450);
+    const deep = await page.evaluate(sheetBar);
+    assert.deepEqual([deep.stuck, deep.closeTop, deep.title, deep.shown], [true, 8, 'Full Stack Developer', true], `${where}: scrolled into the stories`);
+    // back at the top the bar is bare again
+    await sheetScroll(page, 0);
+    const again = await page.evaluate(sheetBar);
+    assert.deepEqual([again.stuck, again.closeTop], [false, pad], `${where}: back at the top`);
+    await page.keyboard.press('Escape');
+    // a project opened from See all: the way back, the title and the close button share the bar
+    await page.$eval('[data-proj-all]', (b) => b.click());
+    await page.waitForSelector('.exp-lightbox.open .proj-row');
+    await page.locator('.proj-row', { hasText: 'Sales campaign CRM' }).first().evaluate((r) => r.click());
+    await page.waitForSelector('.exp-sheet-bar .proj-back');
+    await page.waitForTimeout(450);
+    const nested = await page.evaluate(sheetBar);
+    assert.deepEqual(nested.order, ['proj-back', 'exp-sheet-bar-title', 'exp-lightbox-close'].slice(0, 3).map((c, i) => (i === 1 && nested.cut ? 'is-cut' : c)), `${where}: the bar's order`);
+    assert.deepEqual([nested.stuck, nested.backTop, nested.closeTop], [true, 8, 8], `${where}: the way back and the close button are not 8px from the edge`);
+    // each button answers its own taps (their 44px hit regions do not spread over the bar)
+    const hits = await page.evaluate(() => ['.proj-back', '.exp-lightbox-close'].map((sel) => {
+      const el = document.querySelector('.exp-sheet-bar ' + sel), r = el.getBoundingClientRect();
+      return document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2).closest('button') === el;
+    }));
+    assert.deepEqual(hits, [true, true], `${where}: a bar button is covered by another's hit region`);
+    // the smallest phones have no room for the title beside the way back: it stays out rather than show "Full…"
+    assert.equal(nested.shown, where !== 'small phone', `${where}: the compact title beside "All Projects"`);
+    assert.equal(nested.sideways, 0, `${where}: the nested sheet scrolls sideways`);
+    assert.deepEqual(errors, []);
+    await page.close();
+  }
+});
+
+/** One finger down at (x, y0), dragged to y1 (or x1) in steps, then lifted. */
+async function touchDrag(page, x, y0, y1, { steps = 10, wait = 16, x1 = x } = {}) {
+  const cdp = await page.context().newCDPSession(page);
+  const pt = (px, py) => [{ x: px, y: py, id: 1 }];
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: pt(x, y0) });
+  for (let i = 1; i <= steps; i++) {
+    await page.waitForTimeout(wait);
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: pt(x + (x1 - x) * i / steps, y0 + (y1 - y0) * i / steps) });
+  }
+  await page.waitForTimeout(wait);
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  await cdp.detach();
+  await page.waitForTimeout(500);
+}
+
+test('gestures > a sheet or a picture is swiped down to close: a short slow pull springs back, a long one closes, and a zoomed or sideways drag never does (sheet-swipe-dismiss)', async () => {
+  const css = readFileSync(join(ROOT, 'assets/css/style.css'), 'utf8');
+  assert.doesNotMatch(css, /\.cert-lightbox-frame\s*\{[^}]*touch-action/, 'a touch-action rule on the frame would stop pinch-zoom');
+  const { page, errors } = await open(PHONE);
+  const sheet = () => page.evaluate(() => ({ open: !!document.querySelector('.exp-lightbox.open'), transform: document.querySelector('.exp-lightbox-inner').style.transform, depth: (history.state && history.state.overlay) || 0 }));
+  // the sheet
+  await openProtollcall(page);
+  assert.equal(await page.$eval('.exp-lightbox-inner', (el) => getComputedStyle(el).overscrollBehaviorY), 'contain');
+  await touchDrag(page, 195, 200, 260, { steps: 12, wait: 40 });
+  await page.waitForTimeout(700); // the spring back settles
+  assert.deepEqual(await sheet(), { open: true, transform: '', depth: 1 }, 'a slow 60px pull did not spring back');
+  // scrolled, a downward drag scrolls the sheet and never closes it
+  await page.evaluate(() => { document.querySelector('.exp-lightbox-inner').scrollTop = 600; });
+  await touchDrag(page, 195, 300, 600);
+  assert.equal((await sheet()).open, true, 'a drag in a scrolled sheet closed it');
+  await page.evaluate(() => { document.querySelector('.exp-lightbox-inner').scrollTop = 0; });
+  await page.waitForTimeout(200);
+  // pinch-zoomed in: the drag moves around the zoomed page
+  await page.evaluate(() => Object.defineProperty(window.visualViewport, 'scale', { configurable: true, get: () => 2 }));
+  await touchDrag(page, 195, 200, 500);
+  assert.equal((await sheet()).open, true, 'a drag while zoomed in closed the sheet');
+  await page.evaluate(() => { delete window.visualViewport.scale; });
+  await touchDrag(page, 195, 200, 500);
+  await page.waitForFunction(() => !document.querySelector('.exp-lightbox.open') && !(history.state && history.state.overlay));
+  // a picture
+  const viewer = () => page.evaluate(() => ({ open: !!document.querySelector('.cert-lightbox.open'), transform: document.querySelector('.cert-lightbox-frame').style.transform }));
+  await page.$eval('#images-list .cert-card', (c) => c.click());
+  await page.waitForSelector('.cert-lightbox.open');
+  await page.waitForTimeout(600);
+  await touchDrag(page, 195, 400, 460, { steps: 12, wait: 40 });
+  await page.waitForTimeout(700);
+  assert.deepEqual(await viewer(), { open: true, transform: '' }, 'a slow 60px pull on the picture did not spring back');
+  await page.evaluate(() => Object.defineProperty(window.visualViewport, 'scale', { configurable: true, get: () => 2 }));
+  await touchDrag(page, 195, 300, 600);
+  assert.equal((await viewer()).open, true, 'a drag while zoomed in closed the picture');
+  await page.evaluate(() => { delete window.visualViewport.scale; });
+  await touchDrag(page, 195, 300, 600);
+  await page.waitForFunction(() => !document.querySelector('.cert-lightbox.open') && !(history.state && history.state.overlay));
+  // a wide screenshot still pans sideways
+  await page.$eval('#scroller > .rf-cards-scroller-item:not([data-open-exp])', (el) => el.click());
+  await page.waitForSelector('.cert-lightbox.open.lb-pan');
+  await page.waitForTimeout(600);
+  await touchDrag(page, 300, 400, 410, { x1: 80 });
+  const pan = await page.evaluate(() => ({ open: !!document.querySelector('.cert-lightbox.open'), left: document.querySelector('.cert-lightbox-frame').scrollLeft, transform: document.querySelector('.cert-lightbox-frame').style.transform }));
+  assert.equal(pan.open, true, 'a sideways drag closed the screenshot');
+  assert.equal(pan.transform, '', 'a sideways drag pulled the screenshot down');
+  assert.ok(pan.left > 100, `the screenshot panned ${pan.left}px sideways`);
+  assert.deepEqual(errors, []);
+  await page.close();
+});
+
+test('modality > a screenshot opened from the See all list is the only thing open; closing it brings the list back on that row (one-modal-at-a-time)', async () => {
+  for (const [where, opts] of [['iPhone', PHONE], ['Mac', MAC]]) {
+    const { page, errors } = await open({ ...opts, reducedMotion: 'reduce' });
+    await page.$eval('[data-proj-all]', (b) => b.click());
+    await page.waitForSelector('.exp-lightbox.open .proj-row');
+    // the row brought into view first, so the click itself scrolls nothing
+    await page.locator('.proj-row', { hasText: 'Classroom' }).evaluate((r) => r.scrollIntoView({ block: 'center' }));
+    const at = await page.$eval('.exp-lightbox-inner', (el) => el.scrollTop);
+    assert.ok(at > 300, `${where}: the row is not far down the list`);
+    await page.locator('.proj-row', { hasText: 'Classroom' }).click();
+    await page.waitForSelector('.cert-lightbox.open');
+    await page.waitForTimeout(300);
+    const one = await page.evaluate(() => ({
+      list: !!document.querySelector('.exp-lightbox.open'),
+      closeButtons: [...document.querySelectorAll('.exp-lightbox-close, .cert-lightbox-close')].filter((b) => b.checkVisibility({ visibilityProperty: true })).length,
+      depth: history.state && history.state.overlay,
+    }));
+    assert.deepEqual(one, { list: false, closeButtons: 1, depth: 1 }, `${where}: the list is still open under the picture`);
+    await page.keyboard.press('Escape');
+    await page.waitForFunction(() => !document.querySelector('.cert-lightbox.open') && !!document.querySelector('.exp-lightbox.open .proj-row'));
+    await page.waitForTimeout(200);
+    const back = await page.evaluate(() => ({ top: document.querySelector('.exp-lightbox-inner').scrollTop, focus: document.activeElement.textContent, depth: history.state && history.state.overlay,
+      taps: getComputedStyle(document.querySelector('.cert-lightbox')).pointerEvents }));
+    assert.equal(back.top, at, `${where}: the list did not come back where it was`);
+    assert.match(back.focus, /Classroom/, `${where}: not back on the row`);
+    assert.deepEqual([back.depth, back.taps], [1, 'none'], `${where}: history depth, and the fading viewer takes taps`);
+    // the next row can be opened at once, and the close button leaves history clean
+    await page.locator('.proj-row', { hasText: 'Classroom' }).click();
+    await page.waitForSelector('.cert-lightbox.open');
+    await page.goBack();
+    await page.waitForFunction(() => !document.querySelector('.cert-lightbox.open') && !!document.querySelector('.exp-lightbox.open .proj-row'));
+    await page.click('.exp-lightbox .exp-lightbox-close');
+    await page.waitForFunction(() => !document.querySelector('.exp-lightbox.open') && !(history.state && history.state.overlay));
+    assert.deepEqual(errors, []);
+    await page.close();
+  }
+});
+
+test('feedback > back in the See all list, the row you came from is filled light grey edge to edge; a keyboard return shows only the blue focus fill (see-all-return-highlight)', async () => {
+  const fill = () => {
+    const rows = [...document.querySelectorAll('.exp-lightbox .proj-row.is-selected')];
+    if (rows.length !== 1) return { marked: rows.length };
+    const li = rows[0].closest('li'), r = li.getBoundingClientRect(), box = li.parentNode.getBoundingClientRect(), cs = getComputedStyle(li);
+    return { marked: 1, name: rows[0].querySelector('.proj-name').textContent, bg: cs.backgroundColor, edge: [r.left - box.left, box.right - r.right],
+      radius: cs.borderRadius, first: li === li.parentNode.firstElementChild, ring: rows[0].matches(':focus-visible') };
+  };
+  for (const [where, opts] of [['iPhone', PHONE], ['Mac', MAC]]) {
+    const { page, errors } = await open({ ...opts, reducedMotion: 'reduce' });
+    const tap = (loc) => (opts.hasTouch ? loc.tap() : loc.click());
+    await tap(page.locator('[data-proj-all]'));
+    await page.waitForSelector('.exp-lightbox.open .proj-row');
+    assert.equal(await page.locator('.proj-row.is-selected').count(), 0, `${where}: a row is marked before any was opened`);
+    await tap(page.locator('.proj-row', { hasText: 'Sales campaign CRM' }).first());
+    await page.waitForSelector('.proj-back');
+    await page.waitForTimeout(300);
+    await tap(page.locator('.proj-back'));
+    await page.waitForSelector('.exp-lightbox.open .proj-row.is-selected');
+    await page.waitForTimeout(300);
+    const f = await page.evaluate(fill);
+    assert.deepEqual([f.marked, f.name, f.ring], [1, 'Sales campaign CRM', false], `${where}: the row that was opened`);
+    assert.deepEqual([f.bg, f.edge], ['rgba(0, 0, 0, 0.05)', [0, 0]], `${where}: not a light grey fill from edge to edge`);
+    if (f.first) assert.equal(f.radius, '18px 18px 0px 0px', `${where}: the first row's fill does not follow the box's corners`);
+    // another row opened: the mark moves with it
+    await tap(page.locator('.proj-row', { hasText: 'Chatbot and LINE images' }).first());
+    await page.waitForSelector('.proj-back');
+    await page.waitForTimeout(300);
+    if (opts.hasTouch) {
+      await tap(page.locator('.proj-back'));
+    } else {
+      // by keyboard: only the blue focus fill, no grey under it
+      await page.keyboard.press('Enter');
+    }
+    await page.waitForSelector('.exp-lightbox.open .proj-row.is-selected');
+    await page.waitForTimeout(300);
+    const g = await page.evaluate(fill);
+    assert.deepEqual([g.marked, g.name], [1, 'Chatbot and LINE images'], `${where}: the mark did not move to the row opened last`);
+    if (!opts.hasTouch) assert.deepEqual([g.ring, g.bg], [true, 'rgb(18, 100, 206)'], 'Mac, keyboard: grey shows instead of the focus fill');
+    assert.deepEqual(errors, []);
+    await page.close();
+  }
 });

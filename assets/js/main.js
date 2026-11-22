@@ -403,12 +403,69 @@ var overlayHistory = (function () {
       lbImg.style.transform = "";
       lbImg.style.opacity = "";
       lbImg.style.transformOrigin = "";
+      setPull(0);
     }
   });
 
+  // Swipe down to close (touch only): the picture follows the finger and the
+  // backdrop thins as it goes; let go past 120px, or flick, and it closes,
+  // otherwise it springs back. Sideways panning stays the browser's own.
+  let pullY = 0;
+  function setPull(y) {
+    pullY = y;
+    frame.style.transform = y ? "translateY(" + y.toFixed(2) + "px)" : "";
+    lightbox.style.backgroundColor = y ? "rgba(0, 0, 0, " + (0.85 * Math.max(0, 1 - y / 400)).toFixed(3) + ")" : "";
+  }
+  const pullBack = createSpring({ response: 0.3, damping: 1, onFrame: setPull });
+  let pull = null;
+  function springBack() {
+    if (reduce) pullBack.jump(0);
+    else { pullBack.jump(pullY); pullBack.to(0); }
+  }
+  frame.addEventListener("touchstart", function (e) {
+    // a second finger ends a pull: the picture springs back, never stays put
+    if (pull && (pull.on || pull.from)) springBack();
+    pull = null;
+    // pinch-zoomed in: a drag moves around the zoomed picture, never closes it
+    if (e.touches.length !== 1 || !lightbox.classList.contains("open") || (window.visualViewport && visualViewport.scale > 1.01)) return;
+    const t = e.touches[0];
+    // a spring-back still settling: stop it, the finger takes the picture from where it is
+    const from = pullY;
+    if (from) pullBack.jump(from);
+    pull = { x0: t.clientX, y0: t.clientY, y: t.clientY, at: e.timeStamp, v: 0, on: false, decided: false, from: from };
+  }, { passive: true });
+  frame.addEventListener("touchmove", function (e) {
+    if (!pull || e.touches.length !== 1) return;
+    const t = e.touches[0], dx = t.clientX - pull.x0, dy = t.clientY - pull.y0;
+    if (!pull.decided) {
+      pull.decided = true;
+      // downward and more down than sideways, or it is a pan
+      if (dy <= 0 || Math.abs(dx) > dy) { const held = pull.from; pull = null; if (held) springBack(); return; }
+      pull.on = true;
+    }
+    if (e.cancelable) e.preventDefault();
+    const dt = e.timeStamp - pull.at;
+    if (dt > 0) pull.v = 0.8 * ((t.clientY - pull.y) / dt) + 0.2 * pull.v;
+    pull.y = t.clientY;
+    pull.at = e.timeStamp;
+    setPull(Math.max(0, pull.from + dy));
+  }, { passive: false });
+  function endPull() {
+    const p = pull;
+    pull = null;
+    if (!p) return;
+    if (!p.on) { if (p.from) springBack(); return; }   // a tap that stopped a spring-back: finish it
+    if (pullY > 120 || p.v > 0.5) closeLightbox();
+    else springBack();
+  }
+  frame.addEventListener("touchend", endPull);
+  frame.addEventListener("touchcancel", endPull);
+
   let showing = 0;   // which opening a late-arriving full picture belongs to
-  function openLightbox(src, alt, source, label, title, ev) {
+  let afterClose = null; // run once when this picture closes (the list it came from)
+  function openLightbox(src, alt, source, label, title, ev, onClose) {
     if (!lightbox.classList.contains("open")) overlayHistory.opened(closeLightbox);
+    afterClose = onClose || null;
     const turn = ++showing;
     lbImg.style.width = lbImg.style.height = "";
     lbImg.alt = alt;
@@ -475,6 +532,8 @@ var overlayHistory = (function () {
     syncPageInert();
     anchorOrigin(lbImg, source);
     frame.scrollLeft = 0;
+    // reopened while a swiped picture is still fading out: start from its place
+    setPull(0);
     if (reduce) motion.jump(1); else motion.to(1);
     // a tap or click shows no focus ring: the viewer itself takes focus and
     // the next Tab reaches the close button; a key press focuses it at once
@@ -498,6 +557,11 @@ var overlayHistory = (function () {
     if (lastFocus && typeof lastFocus.focus === "function") lastFocus.focus({ preventScroll: true });
     lastFocus = null;
     overlayHistory.closed(closeLightbox);
+    // bring back what it was opened from, once its history step has landed
+    // (and, after Back, once the Back handler has finished closing layers)
+    const fn = afterClose;
+    afterClose = null;
+    if (fn) overlayHistory.afterSettle(function () { setTimeout(fn, 0); });
   }
   closeBtn.addEventListener("click", closeLightbox);
   lightbox.addEventListener("click", function (e) {
@@ -529,14 +593,37 @@ var overlayHistory = (function () {
   closeBtn.className = 'exp-lightbox-close';
   closeBtn.setAttribute('aria-label', 'Close');
   closeBtn.innerHTML = '&#x2715;';
-  inner.appendChild(closeBtn);
+  // a sticky top bar: the close button, and once the big title has scrolled
+  // out of the sheet a compact copy of it, so you always know where you are
+  const bar = document.createElement('div');
+  bar.className = 'exp-sheet-bar';
+  const barTitle = document.createElement('span');
+  barTitle.className = 'exp-sheet-bar-title';
+  barTitle.setAttribute('aria-hidden', 'true'); // the dialog is already labelled by the title
+  bar.appendChild(barTitle);
+  bar.appendChild(closeBtn);
+  inner.appendChild(bar);
   lightbox.appendChild(inner);
+  var titleWatch = null;
+  // a long title ends in an ellipsis; one left under 96px (a project opened
+  // from the list on the smallest phones, beside the way back) stays out
+  // rather than show only "Full…"
+  function fitBarTitle() {
+    barTitle.classList.toggle('is-cut', barTitle.clientWidth < 96 && barTitle.scrollWidth > barTitle.clientWidth + 1);
+  }
+  // the bar's material and hairline come on as soon as it sticks, before any
+  // text can slide under the close button; the compact title follows later
+  function syncStuck() {
+    bar.classList.toggle('is-stuck', inner.scrollTop > parseFloat(getComputedStyle(inner).paddingTop) - 8);
+  }
+  inner.addEventListener('scroll', syncStuck, { passive: true });
   document.body.appendChild(lightbox);
 
   let lastFocus = null;
   // One spring owns the whole presentation: backdrop, sheet scale and fade
   // all read from it, so opening and closing are the same motion re-aimed.
   const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var pullY = 0; // how far a finger has pulled the sheet down
   const motion = createSpring({
     response: 0.34,
     damping: 1,
@@ -545,7 +632,8 @@ var overlayHistory = (function () {
       lightbox.style.visibility = (p > 0.002 || lightbox.classList.contains('open')) ? 'visible' : 'hidden';
       lightbox.style.opacity = Math.min(1, p * 1.25);
       inner.style.opacity = Math.min(1, p * 1.4);
-      inner.style.transform = 'translateY(' + ((1 - p) * 8).toFixed(2) + 'px) scale('
+      // swiped away, it carries on down from where the finger let go
+      inner.style.transform = 'translateY(' + (pullY ? pullY + (1 - p) * 160 : (1 - p) * 8).toFixed(2) + 'px) scale('
         + (0.92 + 0.08 * p).toFixed(4) + ')';
     },
     onRest: function (p) {
@@ -555,8 +643,81 @@ var overlayHistory = (function () {
       inner.style.opacity = '';
       inner.style.transform = '';
       inner.style.transformOrigin = '';
+      setPull(0);
     }
   });
+
+  // Swipe down to close (touch only), from the top of the sheet: it follows
+  // the finger 1:1 and the dimming thins as it goes; let go past 120px, or
+  // flick, and it closes, otherwise it springs back. Not from the sideways
+  // client row, and not while the sheet is scrolled.
+  var dim0 = 0.25, blur0 = true;
+  function setPull(y) {
+    pullY = y;
+    if (!y) {
+      lightbox.style.backgroundColor = lightbox.style.backdropFilter = lightbox.style.webkitBackdropFilter = '';
+      return;
+    }
+    var k = Math.max(0, 1 - y / 400);
+    lightbox.style.backgroundColor = 'rgba(0, 0, 0, ' + (dim0 * k).toFixed(3) + ')';
+    var f = blur0 ? 'blur(' + (20 * k).toFixed(1) + 'px) saturate(' + (1 + 0.8 * k).toFixed(2) + ')' : 'none';
+    lightbox.style.backdropFilter = lightbox.style.webkitBackdropFilter = f;
+    inner.style.transform = 'translateY(' + y.toFixed(2) + 'px)';
+  }
+  const pullBack = createSpring({ response: 0.3, damping: 1, onFrame: function (y) {
+    setPull(y);
+    if (!y) inner.style.transform = '';
+  } });
+  var pull = null;
+  function springBack() {
+    if (reduce) pullBack.jump(0);
+    else { pullBack.jump(pullY); pullBack.to(0); }
+  }
+  inner.addEventListener('touchstart', function (e) {
+    // a second finger ends a pull: the sheet springs back, never stays put
+    if (pull && (pull.on || pull.from)) springBack();
+    pull = null;
+    if (e.touches.length !== 1 || !lightbox.classList.contains('open') || inner.scrollTop > 0 ||
+        (window.visualViewport && visualViewport.scale > 1.01) ||
+        e.target.closest('.exp-client-filter')) return;
+    var t = e.touches[0];
+    // a spring-back still settling: stop it, the finger takes the sheet from where it is
+    var from = pullY;
+    if (from) pullBack.jump(from);
+    pull = { x0: t.clientX, y0: t.clientY, y: t.clientY, at: e.timeStamp, v: 0, on: false, decided: false, from: from };
+  }, { passive: true });
+  inner.addEventListener('touchmove', function (e) {
+    if (!pull || e.touches.length !== 1) return;
+    var t = e.touches[0], dx = t.clientX - pull.x0, dy = t.clientY - pull.y0;
+    if (!pull.decided) {
+      pull.decided = true;
+      // only a downward drag from the top; anything else scrolls as usual
+      if (dy <= 0 || Math.abs(dx) > dy || inner.scrollTop > 0) { var held = pull.from; pull = null; if (held) springBack(); return; }
+      pull.on = true;
+      // the resting dimming and blur (not the thinned ones a spring-back left inline)
+      if (!pull.from) {
+        var cs = getComputedStyle(lightbox), a = /rgba?\(([^)]*)\)/.exec(cs.backgroundColor);
+        dim0 = a && a[1].split(',')[3] ? parseFloat(a[1].split(',')[3]) : 0.25;
+        blur0 = (cs.backdropFilter || cs.webkitBackdropFilter || 'none') !== 'none';
+      }
+    }
+    if (e.cancelable) e.preventDefault();
+    var dt = e.timeStamp - pull.at;
+    if (dt > 0) pull.v = 0.8 * ((t.clientY - pull.y) / dt) + 0.2 * pull.v;
+    pull.y = t.clientY;
+    pull.at = e.timeStamp;
+    setPull(Math.max(0, pull.from + dy));
+  }, { passive: false });
+  function endPull() {
+    var p = pull;
+    pull = null;
+    if (!p) return;
+    if (!p.on) { if (p.from) springBack(); return; }   // a tap that stopped a spring-back: finish it
+    if (pullY > 120 || p.v > 0.5) closeExp();
+    else springBack();
+  }
+  inner.addEventListener('touchend', endPull);
+  inner.addEventListener('touchcancel', endPull);
 
   var back = null; // a project opened from the "See all" list: Back returns to the list
   function closeExp() {
@@ -611,6 +772,8 @@ var overlayHistory = (function () {
     var was = lightbox.classList.contains('open');
     if (!was) overlayHistory.opened(closeExp);
     while (inner.children.length > 1) inner.removeChild(inner.lastChild);
+    var oldBack = bar.querySelector('.proj-back');
+    if (oldBack) bar.removeChild(oldBack);
     const content = document.createElement('div');
     content.innerHTML = html;
     inner.appendChild(content);
@@ -625,6 +788,19 @@ var overlayHistory = (function () {
       lightbox.setAttribute('aria-label', 'Experience details');
       lightbox.removeAttribute('aria-labelledby');
     }
+    // the compact title shows in the bar once the big one has left the sheet
+    barTitle.textContent = title ? title.textContent.trim() : '';
+    bar.classList.remove('is-scrolled');
+    fitBarTitle();
+    if (titleWatch) titleWatch.disconnect();
+    titleWatch = null;
+    if (title && 'IntersectionObserver' in window) {
+      titleWatch = new IntersectionObserver(function (entries) {
+        var e = entries[entries.length - 1];
+        bar.classList.toggle('is-scrolled', !e.isIntersecting && !!e.rootBounds && e.boundingClientRect.top < e.rootBounds.top);
+      }, { root: inner, rootMargin: '-' + (bar.offsetHeight || 52) + 'px 0px 0px 0px' });
+      titleWatch.observe(title);
+    }
     lightbox.classList.add('open');
     document.body.style.overflow = 'hidden';
     if (!was) lastFocus = document.activeElement;
@@ -632,6 +808,8 @@ var overlayHistory = (function () {
     // make it measurable, then grow it out of the card that was clicked
     lightbox.style.visibility = 'visible';
     anchorOrigin(inner, source);
+    // reopened while a swiped sheet is still fading out: start from its place
+    setPull(0);
     if (reduce) motion.jump(1); else motion.to(1);
     // a tap or click shows no focus ring: the sheet itself takes focus and
     // the next Tab reaches the close button; a key press focuses it at once
@@ -692,8 +870,8 @@ var overlayHistory = (function () {
           }
         });
         // chosen from the stuck picker further down: bring the story up under it
-        if (clientsBlock && inner.scrollTop > clientsBlock.offsetTop - 8) {
-          inner.scrollTop = clientsBlock.offsetTop - 8;
+        if (clientsBlock && inner.scrollTop > clientsBlock.offsetTop - bar.offsetHeight - 8) {
+          inner.scrollTop = clientsBlock.offsetTop - bar.offsetHeight - 8;
         }
       };
       select.addEventListener('change', function () { choose(select.value); });
@@ -701,14 +879,16 @@ var overlayHistory = (function () {
       if (preset && clientsBlock) {
         // opened from a client-work card: straight to that client, preselected
         choose(client);
-        inner.scrollTop = Math.max(0, clientsBlock.offsetTop - 8);
+        inner.scrollTop = Math.max(0, clientsBlock.offsetTop - bar.offsetHeight - 8);
       }
     } else if (client) {
       // a sheet without a client picker (SCG): open it on that project
       var sec = inner.querySelector('.exp-client-section[data-client="' + client + '"]');
-      if (sec) inner.scrollTop = Math.max(0, sec.offsetTop - 8);
+      if (sec) inner.scrollTop = Math.max(0, sec.offsetTop - bar.offsetHeight - 8);
     }
+    syncStuck();
   };
+  window._expLightboxClose = closeExp;
   window._expLightboxNest = function (html, source, client, restore) {
     back = function () { back = null; restore(); };
     overlayHistory.opened(back);
@@ -728,12 +908,15 @@ var overlayHistory = (function () {
       b.setAttribute('aria-describedby', 'proj-back-note');
     }
     b.addEventListener('click', function () { history.back(); }, { once: true });
-    inner.insertBefore(b, closeBtn.nextSibling);
+    // the way back takes the bar's leading end, the compact title after it
+    bar.insertBefore(b, bar.firstChild);
+    fitBarTitle();
     b.focus({ preventScroll: true });
     // the sheet opened on a project (scrolled to it): start it below the pill
     var picker = inner.querySelector('.exp-client-select');
     var t = inner.scrollTop && (picker ? picker.closest('.exp-modal-section') : inner.querySelector('.exp-client-section[data-client="' + client + '"]'));
-    if (t) inner.scrollTop = Math.max(0, t.offsetTop - parseFloat(getComputedStyle(inner).paddingTop) - b.offsetHeight - 8);
+    if (t) inner.scrollTop = Math.max(0, t.offsetTop - bar.offsetHeight - 8);
+    syncStuck();
   };
 })();
 
@@ -884,11 +1067,17 @@ document.addEventListener("DOMContentLoaded", function () {
   }
   // the list is one Tab stop; Up and Down walk it, across the companies
   var settleRows = rovingFocus(inner, ".proj-row", "list");
+  // the row last opened stays marked, so the way back shows where you were
+  function mark(row) {
+    inner.querySelectorAll(".proj-row.is-selected").forEach(function (r) { if (r !== row) r.classList.remove("is-selected"); });
+    if (row) row.classList.add("is-selected");
+  }
   function showList() {
     window._expLightboxOpen(list(), btn);
     inner.scrollTop = at;
     var row = from && inner.querySelector('.proj-row[data-i="' + from + '"]');
     settleRows(row);
+    mark(row);
     if (row) row.focus({ preventScroll: true });
   }
   btn.addEventListener("click", function () { at = 0; from = null; showList(); });
@@ -896,8 +1085,25 @@ document.addEventListener("DOMContentLoaded", function () {
     var row = e.target.closest(".proj-row");
     if (!row) return;
     var c = cards[+row.dataset.i];
-    // a screenshot card: its viewer opens over the list
-    if (!c.dataset.openExp) { c.click(); return; }
+    // a screenshot card: one modal at a time. The list closes, the picture
+    // opens once the list's history step has landed, and closing the
+    // picture (X, Escape, backdrop or Back) brings the list back where it was
+    if (!c.dataset.openExp) {
+      at = inner.scrollTop;
+      from = row.dataset.i;
+      var img = c.querySelector(".project-img img"), h = c.querySelector("h3");
+      window._expLightboxClose();
+      overlayHistory.afterSettle(function () {
+        // in a task of its own, not inside the animation frame that ran this:
+        // the viewer's fade starts on the next frame, so opening it here
+        // would paint one frame of the picture at full strength first
+        setTimeout(function () {
+          window._certLightboxOpen(img.currentSrc || img.src, img.alt, c.querySelector(".project-img"), "Project screenshot",
+            h ? h.textContent : "", e, showList);
+        }, 0);
+      });
+      return;
+    }
     at = inner.scrollTop;
     from = row.dataset.i;
     window._expLightboxNest(document.getElementById("exp-" + c.dataset.openExp).innerHTML, row, c.dataset.client, showList);

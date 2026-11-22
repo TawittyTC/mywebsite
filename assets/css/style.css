@@ -2694,13 +2694,11 @@ button.footer-copy-link:hover { color: var(--color-link-hover); }
 @media (hover: hover) { .proj-row:hover .proj-name { color: var(--color-link); } }
 .proj-text { flex: 1; }
 .proj-row .chev { flex: none; color: #86868B; }
-/* a project opened from the list: "All projects" pinned top left, level
-   with the close button, the story starting below the two */
+/* a project opened from the list: "All projects" at the leading end of
+   the sheet's top bar, the story starting below it */
 .proj-back {
-  position: sticky;
-  top: 0;
-  float: left;
-  z-index: 10;
+  position: relative;
+  flex: none;
   display: flex;
   align-items: center;
   height: 40px;
@@ -2713,8 +2711,58 @@ button.footer-copy-link:hover { color: var(--color-link-hover); }
 }
 .proj-back .chev { margin: 0 6px 0 0; transform: scaleX(-1); }
 .proj-back:hover { text-decoration: none; background: #D8D8DF; }
-.proj-back + div { clear: both; padding-top: 8px; }
-.proj-back + div .exp-client-filter { position: static; box-shadow: none; }
+.exp-lightbox-inner:has(.proj-back) .exp-client-filter { position: static; box-shadow: none; }
+
+/* The sheet's top bar: the close button, and a compact title that fades in
+   once the big one has scrolled out of the sheet. It sticks at the sheet's
+   very top edge (its top is minus the sheet's top padding, --st) and runs
+   from edge to edge (its sides are minus the sheet's side padding, --sx;
+   both are set with the sheet's padding in index.html). It is 52px
+   tall: 8px above the 40px close button, so once stuck the button keeps
+   clear of the sheet's rounded top edge, and 4px below it. Its 8px top
+   reaches up into the sheet's padding (margin-top -8px), so at rest the
+   close button sits where it always has. Its material and hairline come
+   on the moment it sticks (is-stuck), before any text can pass under the
+   close button, so at rest it is not an empty strip; the compact title
+   fades in later, once the big one has left (is-scrolled). */
+.exp-sheet-bar {
+  position: sticky;
+  top: calc(0px - var(--st));
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 52px;
+  margin: -8px calc(0px - var(--sx)) 8px;
+  padding: 8px var(--sx) 4px;
+}
+.exp-sheet-bar.is-stuck {
+  background: rgba(255, 255, 255, .92);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
+  box-shadow: 0 1px 0 #e5e5e7;
+}
+.exp-sheet-bar-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  color: #1d1d1f;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 22px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  opacity: 0;
+  transition: opacity .2s;
+}
+.exp-sheet-bar.is-scrolled .exp-sheet-bar-title { opacity: 1; }
+.exp-sheet-bar-title.is-cut { visibility: hidden; }
+/* both stay positioned: each carries its own 44px hit region (::after),
+   which would otherwise stretch across the whole bar */
+.exp-sheet-bar .exp-lightbox-close { position: relative; top: auto; float: none; flex: none; margin: 0; }
+@media (prefers-reduced-transparency: reduce) {
+  .exp-sheet-bar.is-stuck { background: #fff; -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
 
 /* The current job's sheet: each client folds to its name until it is
    opened, at every size */
@@ -2758,27 +2806,27 @@ button.footer-copy-link:hover { color: var(--color-link-hover); }
 /* On a phone the client picker stays at the top while you read, clear of
    the close button */
 @media (max-width: 734px) {
-  /* the sheet keeps 26px (24px under 600px) of padding above its content;
-     the stuck row covers it so nothing shows through above the picker,
-     which sits level with the close button */
+  /* the stuck row sits right under the sheet's top bar (the sheet keeps
+     26px, 24px under 600px, of padding above its content) */
   .exp-clients-folded .exp-client-filter {
     position: sticky;
-    top: -26px;
+    top: 26px;
     z-index: 5;
     margin-top: 12px;
-    /* the 44px picker's middle level with the close button's */
-    padding-top: 24px;
+    /* stuck under the 52px top bar: 10px above the picker, as below it */
+    padding-top: 10px;
     padding-bottom: 10px;
-    margin-right: 46px;
-    padding-right: 0;
+    /* edge to edge, as on the left, so its hairline matches the bar's */
+    margin-right: -18px;
+    padding-right: 18px;
     background: rgba(255, 255, 255, .97);
-    box-shadow: 64px 0 0 rgba(255, 255, 255, .97), 64px 1px 0 #E8E8ED, 0 1px 0 #E8E8ED;
+    box-shadow: 0 1px 0 #E8E8ED;
   }
   @media (max-width: 600px) {
-    .exp-clients-folded .exp-client-filter { top: -24px; padding-top: 22px; }
+    .exp-clients-folded .exp-client-filter { top: 24px; padding-top: 14px; }
   }
-  /* a focused client header is never left hidden under the stuck picker */
-  .exp-lightbox-inner:has(.exp-clients-folded) { scroll-padding-top: 84px; }
+  /* a focused client header is never left hidden under the bar and the stuck picker */
+  .exp-lightbox-inner:has(.exp-clients-folded) { scroll-padding-top: 116px; }
 }
 @media (forced-colors: active) {
   .exp-clients-folded .exp-client-section-header::after { forced-color-adjust: none; background-color: CanvasText; }
@@ -2807,6 +2855,12 @@ button.footer-copy-link:hover { color: var(--color-link-hover); }
   text-align: center;
 }
 .cert-lightbox-caption[hidden] { display: none; }
+/* the sheet's own scroll never chains to the page, so a pull at its top
+   is the sheet's to handle */
+.exp-lightbox-inner { overscroll-behavior: contain; }
+/* while it fades out the viewer takes no taps: the list it came from is
+   already back underneath */
+.cert-lightbox:not(.open) { pointer-events: none; }
 .cert-lightbox:has(.cert-lightbox-caption:not([hidden])) img { max-height: 82vh; }
 .cert-lightbox.lb-pan .cert-lightbox-frame {
   width: 100%;
@@ -3313,6 +3367,22 @@ p.profile-bio-small,
 .proj-rows li:has(> .proj-row:focus-visible) .proj-name,
 .proj-rows li:has(> .proj-row:focus-visible) .proj-kind,
 .proj-rows li:has(> .proj-row:focus-visible) .chev { color: #fff; }
+/* back from a project: the row it came from stays marked, in the same
+   edge-to-edge shape as the focus fill; while that fill shows, it wins */
+.proj-rows li:has(> .proj-row.is-selected:not(:focus-visible)) {
+  margin: 0 -16px;
+  padding: 0 16px;
+  background: rgba(0, 0, 0, .05);
+}
+.proj-rows li:first-child:has(> .proj-row.is-selected:not(:focus-visible)) { border-radius: 18px 18px 0 0; }
+.proj-rows li:last-child:has(> .proj-row.is-selected:not(:focus-visible)) { border-radius: 0 0 18px 18px; }
+.proj-rows li:only-child:has(> .proj-row.is-selected:not(:focus-visible)) { border-radius: 18px; }
+@media (forced-colors: active) {
+  .proj-rows li:has(> .proj-row.is-selected:not(:focus-visible)) { forced-color-adjust: none; background: Highlight; }
+  .proj-rows li:has(> .proj-row.is-selected:not(:focus-visible)) .proj-name,
+  .proj-rows li:has(> .proj-row.is-selected:not(:focus-visible)) .proj-kind { color: HighlightText; }
+  .proj-rows li:has(> .proj-row.is-selected:not(:focus-visible)) .chev { background: HighlightText; }
+}
 /* Reduce Transparency: Back to top and "All projects" turn opaque too
    (after their base rules, so this wins) */
 @media (prefers-reduced-transparency: reduce) {
