@@ -96,14 +96,17 @@ test('asset size budgets hold', () => {
   // collection, the inert page behind a sheet, announced filter results)
   // 49KB after v2.72 (the owner's HIG picks: Reduce Motion stills and word
   // fades, swipe-free sheets with a client pop-up, longer toasts)
-  budget('assets/js/main.min.js', 49);
+  // 55KB after v2.73 (sheet title bar, swipe to dismiss, one modal at a time,
+  // Back to top stepping aside, finite hint loops, dark constellation inks)
+  budget('assets/js/main.min.js', 55);
   // 66KB minified (~13KB gzipped) after the v2.47 usability fixes and the
   // v2.48 surface system; 68KB after v2.71 (larger text, focus on whole
   // cards), with no unused class left to sweep. Sweep dead rules before
   // raising it again.
   // 71KB after v2.72 (segmented filter, equal-height Skills cards, press
   // states, Increase Contrast colours, Mac-only rules for the footer and toast)
-  budget('assets/css/style.min.css', 71);
+  // 86KB after v2.73: Dark Mode gives every colour a dark twin (about 12KB)
+  budget('assets/css/style.min.css', 86);
   for (const f of readdirSync(join(ROOT, 'assets/img/certificate'))) {
     budget(`assets/img/certificate/${f}`, 80);
   }

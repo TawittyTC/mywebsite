@@ -1552,10 +1552,10 @@ test('typography > at very large text a hyphenated name wraps rather than runs o
   assert.equal(r.skillChip.split(' ')[2], 'nowrap');
   assert.equal(r.svcChip.split(' ')[2], 'nowrap');
   assert.equal(r.loose, 0, 'punctuation sits outside a no-wrap span');
-  // 300px (under 19em): the chips may wrap at their spaces, names still hold
+  // 300px: still nothing released (chips hold until 13.5em, names until 14em)
   r = await at(300);
-  assert.equal(r.skillChip.split(' ')[2], 'wrap', 'skill chips do not wrap under 19em');
-  assert.equal(r.svcChip.split(' ')[2], 'wrap', 'service chips do not wrap under 19em');
+  assert.equal(r.skillChip.split(' ')[2], 'nowrap', 'skill chips wrap above 13.5em');
+  assert.equal(r.svcChip.split(' ')[2], 'nowrap', 'service chips wrap above 13.5em');
   assert.equal(r.nw, 'inline collapse nowrap', 'names are released before 14em');
   assert.equal(r.svcNw, 'inline collapse nowrap');
   // 230px: still above 14em
@@ -1566,6 +1566,11 @@ test('typography > at very large text a hyphenated name wraps rather than runs o
   assert.equal(r.nw, 'inline-block collapse wrap');
   assert.equal(r.svcNw, 'inline-block collapse wrap');
   assert.ok(r.qaOut <= 0, `"Question-Answering" runs ${r.qaOut}px past its card`);
+  assert.equal(r.chipsOut, 0, 'a chip runs past its card');
+  // 210px (under 13.5em): the chips wrap at their spaces
+  r = await at(210);
+  assert.equal(r.skillChip.split(' ')[2], 'wrap', 'skill chips do not wrap under 13.5em');
+  assert.equal(r.svcChip.split(' ')[2], 'wrap', 'service chips do not wrap under 13.5em');
   assert.equal(r.chipsOut, 0, 'a chip runs past its card');
 });
 

@@ -2924,9 +2924,10 @@ button.footer-copy-link:hover { color: var(--color-link-hover); }
   .contact-strip .info-item[href^="tel:"] .info-value { white-space: normal; overflow-wrap: break-word; }
 }
 
-/* The same very large text: the skill and service chips wrap at their
-   spaces, so a chip longer than its card stays inside it */
-@media (max-width: 19em) {
+/* From 13.5em down (216px at the default size, where the longest chip
+   would start to run off its card): the skill and service chips wrap at
+   their spaces */
+@media (max-width: 13.5em) {
   #skill .skill-tools li, #services .svc-chips li { white-space: normal; }
 }
 
