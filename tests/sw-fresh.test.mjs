@@ -41,7 +41,7 @@ after(async () => { await browser.close(); server.close(); });
 
 const builtAs = (page) => page.evaluate(() => document.querySelector('meta[name="x-build"]')?.content);
 
-test('a returning visitor gets a new deploy on the next plain visit, and the cached page when offline', async () => {
+test('a returning visitor gets a new deploy on the next plain visit, and nothing is stored on the device', async () => {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
   const page = await context.newPage();
   build = 1;
@@ -61,10 +61,9 @@ test('a returning visitor gets a new deploy on the next plain visit, and the cac
   await page.goto(base, { waitUntil: 'load' });
   assert.equal(await builtAs(page), '2');
 
-  // offline: the service worker answers with the page it kept
-  up = false;
-  await page.goto(base, { waitUntil: 'domcontentloaded' });
-  assert.equal(await builtAs(page), '2', 'offline, the kept page should be shown');
+  // nothing is stored on the device: only the empty version marker exists
+  const stored = await page.evaluate(async () => { const out = []; for (const k of await caches.keys()) out.push(k + ':' + (await (await caches.open(k)).keys()).length); return out; });
+  assert.ok(stored.every((k) => k.endsWith(':0')), 'the service worker stored something: ' + stored.join(', '));
   up = true;
   await context.close();
 });
