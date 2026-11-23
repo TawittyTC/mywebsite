@@ -1,18 +1,29 @@
-const CACHE = 'v170';
+const CACHE = 'v171';
 const PRECACHE = [
-  'assets/css/style.min.css?v=2.75.0',
+  'assets/css/style.min.css?v=2.76.0',
   'assets/fonts/inter-latin.woff2',
   'assets/fonts/notosansthai-thai.woff2',
   'assets/fonts/notosansthai-latin.woff2',
-  'assets/js/main.min.js?v=2.75.0',
+  'assets/js/main.min.js?v=2.76.0',
 ];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(PRECACHE)).then(() => self.skipWaiting()));
 });
 
+// A new version: drop every older cache, take over the open pages, and reload
+// the ones that were drawn by the older version (a tab left open, or a page
+// Safari restored from memory, would otherwise keep showing the old site).
+// A first visit has no older cache, so it is never reloaded.
 self.addEventListener('activate', e => {
-  e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim()));
+  e.waitUntil(caches.keys().then(keys => {
+    const old = keys.filter(k => k !== CACHE);
+    return Promise.all(old.map(k => caches.delete(k)))
+      .then(() => self.clients.claim())
+      .then(() => old.length ? self.clients.matchAll({ type: 'window' }) : [])
+      // not waited for: the reload's own request is held until this activation has finished
+      .then(list => { list.forEach(c => { c.navigate(c.url).catch(() => {}); }); });
+  }));
 });
 
 self.addEventListener('fetch', e => {
@@ -36,7 +47,9 @@ self.addEventListener('fetch', e => {
           caches.open(CACHE).then(c => c.put(e.request, clone));
         }
         return res;
-      }).catch(() => caches.match(e.request))
+      }).catch(() => fresh === e.request ? caches.match(e.request)
+        // the no-cache copy failed (an engine quirk, not the network): try the plain request before the stored page
+        : fetch(e.request).catch(() => caches.match(e.request)))
     );
     return;
   }
