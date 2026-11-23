@@ -105,8 +105,9 @@ test('asset size budgets hold', () => {
   // raising it again.
   // 71KB after v2.72 (segmented filter, equal-height Skills cards, press
   // states, Increase Contrast colours, Mac-only rules for the footer and toast)
-  // 86KB after v2.73: Dark Mode gives every colour a dark twin (about 12KB)
-  budget('assets/css/style.min.css', 86);
+  // 74KB after v2.74 (v2.73's sheet title bar, cursors and copy rules; Dark
+  // Mode was shipped in v2.73 and removed again at the owner's request)
+  budget('assets/css/style.min.css', 74);
   for (const f of readdirSync(join(ROOT, 'assets/img/certificate'))) {
     budget(`assets/img/certificate/${f}`, 80);
   }

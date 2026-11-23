@@ -1931,27 +1931,10 @@ document.addEventListener('DOMContentLoaded', function () {
   function hexToRgb(h) {
     return { r: parseInt(h.slice(1, 3), 16), g: parseInt(h.slice(3, 5), 16), b: parseInt(h.slice(5, 7), 16) };
   }
-  // inks: warm blue to cool slate; in the device's Dark appearance the same
-  // ramp one step lighter, so nodes and links read on black as they do on
-  // white (switches live when the setting changes)
-  var WARM1, WARM2, COOL;
+  var WARM1 = hexToRgb('#1877F2'), WARM2 = hexToRgb('#5AA7FF'), COOL = hexToRgb('#64748B');
   // the name's ink peaks at a deeper blue than the nodes' light one, so the
-  // lit letters keep 3:1 on white (#5AA7FF is 2.50:1, #2F80E8 is 3.91:1);
-  // on black the nodes' own lighter blue already reads (9.6:1)
-  var INK_LIGHT;
-  var darkMq = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
-  function setInks() {
-    var dark = darkMq && darkMq.matches;
-    WARM1 = hexToRgb(dark ? '#4C9DFF' : '#1877F2');
-    WARM2 = hexToRgb(dark ? '#7AB6FF' : '#5AA7FF');
-    COOL = hexToRgb(dark ? '#8E9BB0' : '#64748B');
-    INK_LIGHT = hexToRgb(dark ? '#7AB6FF' : '#2F80E8');
-  }
-  setInks();
-  if (darkMq) {
-    if (darkMq.addEventListener) darkMq.addEventListener('change', setInks);
-    else if (darkMq.addListener) darkMq.addListener(setInks);
-  }
+  // lit letters keep 3:1 on white (#5AA7FF is 2.50:1, #2F80E8 is 3.91:1)
+  var INK_LIGHT = hexToRgb('#2F80E8');
   function lerp(a, b, t) { return a + (b - a) * t; }
   function mix(c1, c2, t) {
     return { r: Math.round(lerp(c1.r, c2.r, t)), g: Math.round(lerp(c1.g, c2.g, t)), b: Math.round(lerp(c1.b, c2.b, t)) };
@@ -1995,7 +1978,7 @@ document.addEventListener('DOMContentLoaded', function () {
   var layoutMobile = null;
   // eased state for the node-lit name ink
   var nameEl = hero.querySelector('.hero-name');
-  var inkX = 62, inkR = WARM1.r, inkG = WARM1.g, inkB = WARM1.b;
+  var inkX = 62, inkR = 24, inkG = 119, inkB = 242;
   var inkNode = null, nextInkSwitch = 1.6;
   var inkXWritten = '', inkCWritten = '';
   var lastLabelT = 0; // the labels' own fade clock (drawFrame)
