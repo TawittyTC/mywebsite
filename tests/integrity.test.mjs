@@ -98,7 +98,8 @@ test('asset size budgets hold', () => {
   // fades, swipe-free sheets with a client pop-up, longer toasts)
   // 55KB after v2.73 (sheet title bar, swipe to dismiss, one modal at a time,
   // Back to top stepping aside, finite hint loops, dark constellation inks)
-  budget('assets/js/main.min.js', 55);
+  // 63KB with the hero's opening (wave, transit line, gears of three sizes)
+  budget('assets/js/main.min.js', 63);
   // 66KB minified (~13KB gzipped) after the v2.47 usability fixes and the
   // v2.48 surface system; 68KB after v2.71 (larger text, focus on whole
   // cards), with no unused class left to sweep. Sweep dead rules before

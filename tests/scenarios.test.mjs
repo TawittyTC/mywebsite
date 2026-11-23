@@ -268,11 +268,11 @@ test('hero intro replays when the page returns from the back-forward cache', asy
   await labelsVisible(); // first intro fully done (slow CI runners take a while)
   // iOS-style bfcache restore
   await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true })));
-  // during the replayed shake every label hides
+  // as the opening starts over every label hides (a label returns with its stop on the line)
   await page.waitForFunction(() =>
     Math.max(...[...document.querySelectorAll('#hero-net-labels .hero-net-label')]
       .map((e) => parseFloat(e.style.opacity || '1'))) < 0.1, null, { timeout: 5000 });
-  await labelsVisible(); // and they bloom back after the detonation
+  await labelsVisible(); // and they come back as the line reaches them
   await page.close();
 });
 

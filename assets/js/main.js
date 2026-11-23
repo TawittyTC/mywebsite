@@ -1932,6 +1932,8 @@ document.addEventListener('DOMContentLoaded', function () {
     return { r: parseInt(h.slice(1, 3), 16), g: parseInt(h.slice(3, 5), 16), b: parseInt(h.slice(5, 7), 16) };
   }
   var WARM1 = hexToRgb('#1877F2'), WARM2 = hexToRgb('#5AA7FF'), COOL = hexToRgb('#64748B');
+  // the site's own blue, for the opening's line; a soft grey-blue for its gears
+  var DEEP = hexToRgb('#1264CE'), MIST = hexToRgb('#7C98BF'), MIST2 = hexToRgb('#5F8FD0');
   // the name's ink peaks at a deeper blue than the nodes' light one, so the
   // lit letters keep 3:1 on white (#5AA7FF is 2.50:1, #2F80E8 is 3.91:1)
   var INK_LIGHT = hexToRgb('#2F80E8');
@@ -2001,26 +2003,333 @@ document.addEventListener('DOMContentLoaded', function () {
     return false;
   }
 
-  // ── Big-bang intro: the whole graph starts as one clustered blob,
-  // trembles harder and harder, then detonates outward — every node
-  // overshoots to its home (Duolingo-inspired burst). ──
-  var SHAKE_END = 0.5, EXPLODE_DUR = 0.5, INTRO_END = SHAKE_END + EXPLODE_DUR;
-  var introCluster = null;
-  // Intro plays in its own clock (time - introT0) so it can REPLAY:
+  // ── The opening, one continuous piece of motion on the six labelled
+  // nodes' own spots: a single line draws a sound wave, runs on as a transit
+  // line through the stops (IVR, ASR, LLM, TTS, with a branch to CRM and
+  // POS), is reeled into gears that grow on those stops (a clockwork of
+  // three sizes), and the gears let go into the drifting graph. Times are
+  // in seconds on a desktop (7 in all); a compact screen runs the same thing
+  // a quarter faster, and one too narrow for readable gears goes from the
+  // line straight to the graph. ──
+  var T_GEAR = 3.3;
+  // The opening plays in its own clock (time - introT0) so it can REPLAY:
   // iOS restores tabs from the back-forward cache without reloading,
   // which used to mean no intro at all on "reopening" the site.
   var introT0 = 0, replayQueued = false;
+  // introOff: the opening is over (or was skipped); from fadeT0 the graph
+  // fades in where it lives, and from calmT its drift and signals pick up
+  var introOff = false, introLive = false, fadeT0 = -9, calmT = -9, drift0 = 1, OP = null;
   window.addEventListener('pageshow', function (e) {
     if (e.persisted) replayQueued = true;
   });
-  function clusterPoint() {
-    // the blob forms dead-center BEHIND the name, then detonates out
-    // (the name's own box: the copy block also holds the role and actions)
-    var nr = nameRect || copyRect;
-    if (nr) {
-      return { x: (nr.x0 + nr.x1) / 2, y: (nr.y0 + nr.y1) / 2 };
+  function endIntro(t) {
+    for (var i = 0; i < nodes.length; i++) nodes[i].k = introLive && nodes[i].special ? nodes[i].iv : 0;
+    drift0 = introLive ? driftNow : t === -9 ? 1 : 0;
+    introOff = true; introLive = false;
+    fadeT0 = t === undefined ? lastDrawT : t;
+    calmT = lastDrawT;
+  }
+  // any scroll, tap, click or key goes straight to the graph
+  ['scroll', 'wheel', 'touchstart', 'pointerdown', 'keydown'].forEach(function (ev) {
+    window.addEventListener(ev, function () { if (introLive) endIntro(); }, { passive: true });
+  });
+  var driftNow = 1;
+  function sm(x) { x = x < 0 ? 0 : x > 1 ? 1 : x; return x * x * (3 - 2 * x); }
+  // distance run by something that eases up to speed 1 over e seconds
+  function ramp(x, e) { var u = x / e; return x <= 0 ? 0 : u < 1 ? e * u * u * u * (1 - u / 2) : x - e / 2; }
+  function lens(p) {
+    var L = [0];
+    for (var i = 1; i < p.length; i++) L[i] = L[i - 1] + Math.hypot(p[i][0] - p[i - 1][0], p[i][1] - p[i - 1][1]);
+    return L;
+  }
+  // where a leg of the line turns, as a transit map draws it: a 45-degree
+  // run and a straight one (null: the leg is as good as straight already)
+  function elbow(a, b, diagFirst) {
+    var dx = b[0] - a[0], dy = b[1] - a[1], ax = Math.abs(dx), ay = Math.abs(dy), m = Math.min(ax, ay);
+    if (m <= 13 || Math.max(ax, ay) - m <= 13) return null;
+    var sx = dx < 0 ? -m : m, sy = dy < 0 ? -m : m;
+    return diagFirst ? [a[0] + sx, a[1] + sy] : [b[0] - sx, b[1] - sy];
+  }
+  // The line through its corners V, drawn by a calm hand onto the end of P
+  // (whose last point is V[0]): no corner is left hard. An elbow is rounded
+  // as far as its two legs allow, so most of a leg is one long curve; a stop
+  // (a corner marked [x, y, 1]) is turned in a small arc that stays under
+  // its node. Returns the index in P of each stop and of the end.
+  function route(P, V) {
+    var at = [], cap = compact ? 64 : 120, sr = compact ? 8 : 11, i, k;
+    for (i = 1; i < V.length - 1; i++) {
+      var A = V[i - 1], B = V[i], C = V[i + 1];
+      var la = Math.hypot(B[0] - A[0], B[1] - A[1]) || 1, lb = Math.hypot(C[0] - B[0], C[1] - B[1]) || 1;
+      var rr = B[2] ? Math.min(sr, la * 0.48, lb * 0.48) : Math.max(1, Math.min(cap, la - sr, lb - sr)), n = B[2] ? 6 : 18;
+      var ex = B[0] + (A[0] - B[0]) * rr / la, ey = B[1] + (A[1] - B[1]) * rr / la;
+      var fx = B[0] + (C[0] - B[0]) * rr / lb, fy = B[1] + (C[1] - B[1]) * rr / lb;
+      for (k = 0; k <= n; k++) {
+        var t = k / n, u = 1 - t;
+        P.push([u * u * ex + 2 * u * t * B[0] + t * t * fx, u * u * ey + 2 * u * t * B[1] + t * t * fy]);
+        if (B[2] && k === 3) at.push(P.length - 1);
+      }
     }
-    return isMobile() ? { x: W * 0.5, y: H * 0.34 } : { x: W * 0.24, y: H * 0.46 };
+    P.push(V[V.length - 1]);
+    at.push(P.length - 1);
+    return at;
+  }
+  // The opening's geometry, built once per layout from the six homes (the
+  // one thing every phase shares). null when there is no room for it: the
+  // six stand around the copy (a phone on its side), and the graph fades in.
+  function opening() {
+    var S = [], key = layoutW + layoutH * 3, i, j, k, n, e;
+    for (i = 0; i < 6; i++) {
+      n = nodes[i];
+      S[i] = [n.fx * layoutW, n.fy * layoutH];
+      key += S[i][0] * (i + 2) + S[i][1] * (i + 9);
+    }
+    if (OP && OP.key === key) return OP.ok ? OP : null;
+    var o = OP = { key: key, S: S, at: OP ? OP.at : [], ok: false };
+    var x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9, cy = 0, c = copyRect;
+    for (i = 0; i < 6; i++) {
+      x0 = Math.min(x0, S[i][0]); x1 = Math.max(x1, S[i][0]);
+      y0 = Math.min(y0, S[i][1]); y1 = Math.max(y1, S[i][1]);
+      cy += S[i][1] / 6;
+    }
+    if (c && x0 < c.x1 && x1 > c.x0 && y0 < c.y1 && y1 > c.y0) return null;
+    o.ok = true;
+    // the line: a stretch of sound wave, a curl into IVR, then the route
+    var xl = Math.max(10, x0 - (x1 - x0) * 0.3), xr = S[5][0] - (x1 - x0) * 0.08;
+    if (c && cy > c.y0 - 30 && cy < c.y1 + 30) xl = Math.max(xl, c.x1 + 60);
+    var P = [], nW = Math.max(2, Math.round((xr - xl) / 1.5));
+    for (i = 0; i < nW; i++) P.push([xl + (xr - xl) * i / (nW - 1), cy]);
+    o.nW = nW; o.cy = cy; o.A = Math.max(14, Math.min(44, (y1 - y0) * 0.16));
+    var ord = o.ord = [5, 2, 4, 3], V = [S[5]], I = S[5];
+    for (k = 1; k < 4; k++) {
+      e = elbow(S[ord[k - 1]], S[ord[k]], true);
+      if (e) V.push(e);
+      V.push([S[ord[k]][0], S[ord[k]][1], 1]);
+    }
+    var dx = V[1][0] - I[0], dy = V[1][1] - I[1], dl = Math.hypot(dx, dy) || 1;
+    var cl = Math.hypot(I[0] - xr, I[1] - cy) * 0.75 + 16;
+    for (k = 1; k <= 28; k++) { // arrives at IVR already heading down the route
+      var t = k / 28, u = 1 - t, b1 = 3 * u * u * t, b2 = 3 * u * t * t;
+      P.push([u * u * u * xr + b1 * (xr + cl) + b2 * (I[0] - dx / dl * cl) + t * t * t * I[0],
+        (u * u * u + b1) * cy + b2 * (I[1] - dy / dl * cl) + t * t * t * I[1]]);
+    }
+    var at = [P.length - 1].concat(route(P, V));
+    o.P = P; o.L = lens(P);
+    o.sS = at.map(function (ix) { return o.L[ix]; });
+    o.B = [[S[4]], [S[4]]];
+    for (k = 0; k < 2; k++) {
+      e = elbow(S[4], S[k]);
+      route(o.B[k], e ? [S[4], e, S[k]] : [S[4], S[k]]);
+    }
+    o.BL = [lens(o.B[0]), lens(o.B[1])];
+    // The gears, a clockwork of three sizes (two large, two medium, two
+    // small: 1 : 0.72 : 0.5), dealt to the six stops the way that lets them
+    // be largest without touching the copy, the edges, the chevron or each
+    // other, with unlike sizes side by side. Neighbours that all but touch
+    // are then brought into mesh; the rest turn on their own at the same
+    // rim speed, so the whole reads as one movement.
+    var D = function (p, r) { return Math.hypot(S[p][0] - S[r][0], S[p][1] - S[r][1]); };
+    var away = function (p, r) { return r ? Math.hypot(Math.max(r.x0 - p[0], 0, p[0] - r.x1), Math.max(r.y0 - p[1], 0, p[1] - r.y1)) : 1e9; };
+    var pitch = compact ? 7.5 : 11, gap = pitch * 0.6 + 5, hi = [], C = [1, 0.72, 0.5], best = 0;
+    for (i = 0; i < 6; i++) {
+      hi[i] = Math.min(S[i][0] - 6, layoutW - S[i][0] - 6, S[i][1] - 6, layoutH - S[i][1] - 6,
+        away(S[i], c) - 16, away(S[i], hintRect) - 14) - pitch * 0.3;
+    }
+    var fits = function (r, mate) {
+      for (var p = 0; p < 6; p++) {
+        if (r[p] > hi[p]) return false;
+        for (var w = p + 1; w < 6; w++) if (mate[p] !== w && mate[w] !== p && r[p] + r[w] > D(p, w) - gap) return false;
+      }
+      return true;
+    };
+    for (var a = 0; a < 729; a++) {
+      var m = [], cnt = [0, 0, 0], su = compact ? 70 : 112 * Math.max(1, Math.min(layoutW / 1440, 1.4)), like = 0;
+      for (i = 0, k = a; i < 6; i++, k = (k / 3) | 0) { m[i] = k % 3; cnt[m[i]]++; }
+      if (cnt[0] !== 2 || cnt[1] !== 2) continue;
+      for (i = 0; i < 6; i++) {
+        su = Math.min(su, hi[i] / C[m[i]]);
+        if (m[i] === m[(i + 1) % 6]) like++;
+        for (j = i + 1; j < 6; j++) su = Math.min(su, (D(i, j) - gap) / (C[m[i]] + C[m[j]]));
+      }
+      var R = m.map(function (x) { return su * C[x]; }), mate = [-1, -1, -1, -1, -1, -1], done = [], pairs = [], nm = 0;
+      for (i = 0; i < 6; i++) for (j = i + 1; j < 6; j++) pairs.push([D(i, j) - R[i] - R[j], i, j]);
+      pairs.sort(function (p, w) { return p[0] - w[0]; });
+      // (a wheel gives or takes an eighth at most to reach its neighbour,
+      // so a large one stays large and a small one small)
+      var T = R, near = function (p, v) { return v > T[p] * 0.9 && v < T[p] * 1.12; };
+      for (k = 0; k < 15; k++) {
+        var pa = pairs[k][1], pb = pairs[k][2], dd = D(pa, pb), mt = mate.slice(), f = dd / (R[pa] + R[pb]), tries, r;
+        if (done[pa] && done[pb]) continue;
+        if (done[pa]) { j = pa; pa = pb; pb = j; } // pa joins the train pb is in
+        tries = done[pb] ? [R[pb]] : [R[pb] * f, R[pb], dd - R[pa]];
+        mt[pa] = pb;
+        for (j = 0; j < tries.length; j++) {
+          r = R.slice(); r[pb] = tries[j]; r[pa] = dd - tries[j];
+          if (near(pa, r[pa]) && near(pb, r[pb]) && fits(r, mt)) { R = r; mate = mt; done[pa] = done[pb] = 1; nm++; break; }
+        }
+      }
+      var sc = Math.min.apply(null, R) * (1 + 0.1 * nm) * (1 - 0.05 * like);
+      if (sc > best) { best = sc; o.r = R; o.mate = mate; o.cls = m; }
+    }
+    // too small to read as gears (the narrowest phones): no gear phase
+    o.gears = best > 0 && Math.min.apply(null, o.r) >= (compact ? 15 : 20);
+    o.tr = o.gears ? 5.2 : T_GEAR + 0.15; // the release
+    o.end = o.tr + 1.8;
+    cnt = [0, 0, 0];
+    o.z = []; o.st = [];
+    for (i = 0; o.gears && i < 6; i++) {
+      o.z[i] = Math.max(8, Math.round(6.2832 * o.r[i] / pitch));
+      o.st[i] = o.cls[i] * 2 + cnt[o.cls[i]]++; // what the wheel looks like inside
+    }
+    o.t0 = [3.4, 3.5, 3.5, 3.8, 3.65, 3.3]; // each gear grows as the line's tail leaves its stop
+    // the plain nodes ride the nearest gear until it lets go (those whose
+    // way home would cross the copy just fade in where they live)
+    o.cnt = [0, 0, 0, 0, 0, 0];
+    for (i = 6; i < nodes.length; i++) {
+      n = nodes[i];
+      var hx = n.fx * layoutW, hy = n.fy * layoutH, bk = 0, bd = 1e9, d;
+      for (j = 0; j < 6; j++) {
+        d = Math.hypot(hx - S[j][0], hy - S[j][1]);
+        if (d < bd) { bd = d; bk = j; }
+      }
+      n.g = o.gears && fadeAt((hx + S[bk][0]) / 2, (hy + S[bk][1]) / 2) > 0.6 && fadeAt(hx, hy) > 0.3 ? bk : -1;
+      if (n.g >= 0) n.ga = o.cnt[bk]++;
+    }
+    return o;
+  }
+  function gearAngle(o, k, psi) {
+    var m = o.mate[k];
+    if (m < 0) return (k % 2 ? -psi : psi) / o.r[k];
+    var al = Math.atan2(o.S[k][1] - o.S[m][1], o.S[k][0] - o.S[m][0]);
+    return al + Math.PI + Math.PI / o.z[k] - (gearAngle(o, m, psi) - al) * o.z[m] / o.z[k];
+  }
+  // where everything is at q seconds in
+  function openingStep(q) {
+    var o = OP, k, psi = (compact ? 60 : 90) * (ramp(q - T_GEAR, 0.9) - ramp(q - o.tr, 1.4));
+    o.th = []; o.b = [];
+    for (k = 0; k < 6; k++) {
+      o.b[k] = o.gears ? sm((q - o.t0[k]) / 0.8) : 0;
+      o.th[k] = o.gears ? gearAngle(o, k, psi) : 0;
+    }
+    // the pen: the line's head, and the tail that follows it
+    var tot = o.L[o.L.length - 1], u = Math.min(q / 2.5, 1);
+    o.h = tot * (0.45 * u + 0.55 * sm(u));
+    o.tl = q < T_GEAR ? o.sS[0] * sm((q - 1.4) / 1.05) : o.sS[0] + (tot - o.sS[0]) * sm((q - T_GEAR) / 0.7);
+    for (k = 0; k < 4; k++) if (!o.at[o.ord[k]] && o.h >= o.sS[k]) o.at[o.ord[k]] = q;
+    o.pb = o.at[4] ? sm((q - o.at[4]) / 0.7) : 0;
+    if (o.pb > 0.96 && !o.at[0]) o.at[0] = o.at[1] = q;
+  }
+  // A stretch of a path, s0 to s1 along it, as one soft round-ended stroke.
+  // With fz its tail fades out over that length instead of ending (the
+  // stroke is drawn whole, then thinned along the tail, so there is no seam).
+  var pen = [0, 0, 0, 0];
+  function trace(P, L, s0, s1) {
+    ctx.beginPath();
+    for (var i = 1, on = 0; i < P.length && L[i - 1] <= s1; i++) {
+      if (L[i] < s0) continue;
+      var a = P[i - 1], b = P[i], sg = L[i] - L[i - 1] || 1;
+      var u0 = Math.max(0, (s0 - L[i - 1]) / sg), u1 = Math.min(1, (s1 - L[i - 1]) / sg);
+      if (!on) { ctx.moveTo(pen[0] = a[0] + (b[0] - a[0]) * u0, pen[1] = a[1] + (b[1] - a[1]) * u0); on = 1; }
+      ctx.lineTo(pen[2] = a[0] + (b[0] - a[0]) * u1, pen[3] = a[1] + (b[1] - a[1]) * u1);
+    }
+  }
+  function part(P, L, s0, s1, fz) {
+    if (s1 - s0 < 0.5) return false;
+    trace(P, L, s0, s1);
+    ctx.stroke();
+    var hx = pen[2], hy = pen[3], lw = ctx.lineWidth;
+    fz = Math.min(fz, (s1 - s0) * 0.7);
+    if (fz > 2) {
+      trace(P, L, s0, s0 + fz);
+      var g = ctx.createLinearGradient(pen[0], pen[1], pen[2], pen[3]);
+      g.addColorStop(0, 'rgba(0,0,0,1)');
+      g.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.strokeStyle = g; ctx.lineWidth = lw + 2;
+      ctx.stroke();
+      ctx.globalCompositeOperation = 'source-over';
+    }
+    pen[2] = hx; pen[3] = hy;
+    return true;
+  }
+  function ring(x, y, r) { ctx.moveTo(x + r, y); ctx.arc(x, y, r, 0, 6.2832); }
+  // what is inside each wheel: [inner rim, second ring, spokes, their inner
+  // end, holes] (radii as shares of the wheel's): two spoked wheels, two
+  // pierced plates, a ringed pinion and a plain one
+  var WHEEL = [[0.82, 0, 6, 0, 0], [0.86, 0.5, 8, 0.5, 0], [0, 0, 0, 0, 6], [0.8, 0.4, 3, 0.4, 0], [0.62, 0, 0, 0, 0], [0, 0, 0, 0, 4]];
+  function gear(x, y, r, z, th, tk, al, col, st) {
+    var tau = 6.2832 / z, p = r * tau, ro = r + p * 0.3 * tk, ri = r - p * 0.32 * tk, j, c;
+    // the wheel: a breath of tint, and its rim
+    ctx.beginPath();
+    ring(x, y, ri);
+    ctx.fillStyle = rgba(col, 0.05 * al); ctx.fill();
+    ctx.strokeStyle = rgba(col, 0.66 * al); ctx.lineWidth = 1.15; ctx.stroke();
+    // the teeth, lighter than the rim
+    if (tk > 0.03) {
+      ctx.beginPath();
+      for (j = 0; j < z; j++) {
+        c = th + j * tau;
+        ctx.moveTo(x + ri * Math.cos(c - 0.3 * tau), y + ri * Math.sin(c - 0.3 * tau));
+        ctx.lineTo(x + ro * Math.cos(c - 0.14 * tau), y + ro * Math.sin(c - 0.14 * tau));
+        ctx.lineTo(x + ro * Math.cos(c + 0.14 * tau), y + ro * Math.sin(c + 0.14 * tau));
+        ctx.lineTo(x + ri * Math.cos(c + 0.3 * tau), y + ri * Math.sin(c + 0.3 * tau));
+      }
+      ctx.strokeStyle = rgba(col, 0.4 * al * tk); ctx.lineWidth = 1; ctx.stroke();
+    }
+    // the inside turns with it
+    var w = WHEEL[st], hub = Math.max(ri * 0.2, Math.min(10, ri * 0.4)), n = w[2] || w[4], a = w[3] ? ri * w[3] : hub;
+    ctx.beginPath();
+    ring(x, y, hub);
+    if (w[0]) ring(x, y, ri * w[0]);
+    if (w[1]) ring(x, y, ri * w[1]);
+    for (j = 0; j < n; j++) {
+      c = th + j * 6.2832 / n;
+      if (w[4]) ring(x + ri * 0.58 * Math.cos(c), y + ri * 0.58 * Math.sin(c), ri * (w[4] > 4 ? 0.15 : 0.19));
+      else {
+        ctx.moveTo(x + a * Math.cos(c), y + a * Math.sin(c));
+        ctx.lineTo(x + ri * w[0] * Math.cos(c), y + ri * w[0] * Math.sin(c));
+      }
+    }
+    ctx.strokeStyle = rgba(col, 0.34 * al * tk); ctx.lineWidth = 0.9; ctx.stroke();
+  }
+  function drawOpening(q, time) {
+    var o = OP, P = o.P, i, k, w = compact ? 2 : 2.4, fz = compact ? 70 : 120;
+    ctx.lineCap = ctx.lineJoin = 'round';
+    // the branch to CRM and POS leaves LLM under the main line
+    var cut = sm((q - T_GEAR) / 0.6);
+    if (o.pb > 0 && cut < 1) {
+      for (k = 0; k < 2; k++) {
+        var tb = o.BL[k][o.BL[k].length - 1];
+        ctx.strokeStyle = rgba(COOL, 0.5); ctx.lineWidth = w * 0.75;
+        part(o.B[k], o.BL[k], tb * cut, tb * o.pb, cut > 0 ? fz * 0.6 : 0);
+      }
+    }
+    // the one line: the wave settles as the pen runs on, and the line
+    // fills out and turns blue into the route; its tail fades as it goes
+    var amp = o.A * (1 - sm((q - 1.1) / 0.8)), tk = sm((q - 1.3) / 1.2);
+    for (i = 0; amp > 0 && i < o.nW; i++) {
+      var u = i / (o.nW - 1), ph = P[i][0] * 0.7 - time * 10;
+      P[i][1] = o.cy + amp * Math.pow(Math.sin(Math.PI * u), 0.7) * (0.25 + 0.75 * Math.abs(Math.sin(u * 9.4 + 1))) *
+        (0.7 * Math.sin(ph) + 0.3 * Math.sin(ph * 1.73 + 1));
+    }
+    ctx.strokeStyle = rgba(mix(COOL, DEEP, tk), 0.62 + 0.16 * tk);
+    ctx.lineWidth = (1.1 + (w - 1.1) * tk) * (1 - 0.3 * sm((q - T_GEAR) / 0.7));
+    if (part(P, o.L, o.tl, o.h, fz) && q < 2.7) {
+      // the pen's tip, while it writes
+      ctx.beginPath();
+      ring(pen[2], pen[3], w * 2.4);
+      ctx.fillStyle = rgba(DEEP, 0.13 * (1 - sm((q - 2.3) / 0.4))); ctx.fill();
+    }
+    // the gears: grow on the stops, turn, then pull their teeth in and
+    // shrink, slowly, back onto the nodes that were their axles all along,
+    // while the graph's own links come up around them
+    var out = sm((q - o.tr) / 1.3);
+    for (k = 0; k < 6; k++) {
+      if (o.b[k] <= 0 || out >= 1) continue;
+      gear(nodes[k].x, nodes[k].y, 7 + (o.r[k] - 7) * o.b[k] * (1 - out), o.z[k], o.th[k],
+        sm((o.b[k] - 0.35) / 0.65) * (1 - sm((q - o.tr) / 0.75)),
+        Math.min(1, o.b[k] * 3) * (1 - sm((q - o.tr - 0.35) / 0.9)), k % 2 ? MIST : MIST2, o.st[k]);
+    }
+    ctx.lineCap = 'butt'; ctx.lineJoin = 'miter'; ctx.lineWidth = 1;
   }
   function bounds() {
     var bw = layoutW || W, bh = layoutH || H;
@@ -2174,7 +2483,7 @@ document.addEventListener('DOMContentLoaded', function () {
     clearHint();
     pulses = [];
     inkNode = null;
-    introCluster = null; // re-pick on relayout (only matters mid-intro)
+    OP = null; // the opening's geometry belongs to the old nodes
   }
 
   // A labelled node whose home lies in the chevron's fade zone would spend
@@ -2341,7 +2650,7 @@ document.addEventListener('DOMContentLoaded', function () {
       layoutH = H;
       layoutMobile = isMobile();
       makeNodes();
-      replayQueued = true;
+      endIntro(); // no second opening: the new layout fades in
     } else if (Math.abs(W - layoutW) > 1 || Math.abs(H - layoutH) > layoutH * 0.25) {
       // real layout change (rotation, desktop window resize) — re-anchor;
       // toolbar-sized height churn is deliberately ignored
@@ -2402,45 +2711,42 @@ document.addEventListener('DOMContentLoaded', function () {
     frameBounds = bounds();
     ctx.clearRect(0, 0, W, H);
     var ampScale = Math.max(1, Math.min(W / 1100, 2));
-    // The blob lives BEHIND the name, so the keep-out fade is suspended
-    // during the shake and blends back in while the nodes fly out.
-    var it = time - introT0; // intro-relative clock (replayable)
-    var koBlend = reduce ? 1 : Math.min(Math.max((it - SHAKE_END) / EXPLODE_DUR, 0), 1);
+    // the opening's clock; while it is live the six homes stand still
+    var q = (time - introT0) * (compact ? 1.25 : 1);
+    var live = !reduce && !introOff && !!opening() && q < OP.end;
+    if (!live && !introOff) endIntro(OP && OP.ok && q >= OP.end ? -9 : time);
+    introLive = live;
+    // after a skip the graph fades in where it lives; otherwise it is there
+    var fin = reduce ? 1 : Math.min(1, (time - fadeT0) / 0.35);
+    // how much of the drift is in play, and of the web of links
+    var dg = driftNow = reduce ? 1 : live ? sm((q - OP.tr) / (OP.end - OP.tr)) : Math.min(1, drift0 + (time - calmT) / 0.6);
+    var web = live ? sm((q - OP.tr - 0.05) / 1.5) : 1;
+    if (live) openingStep(q);
 
     for (var i = 0; i < nodes.length; i++) {
       var n = nodes[i];
       // layered-sine wander around the fractional home point;
       // amplitudes scale with the hero so 2K screens feel as alive
       // as phones (fixed px reads tiny on a wide canvas)
-      var A = ampScale;
+      var A = ampScale * dg;
       n.x = n.fx * layoutW + A * (n.a1 * Math.sin(time * n.f1 + n.p1) + n.a2 * Math.sin(time * n.f2 + n.p2));
       n.y = n.fy * layoutH + A * n.vy * (n.a1 * Math.cos(time * n.f1 * 0.83 + n.p3) + n.a2 * Math.sin(time * n.f2 * 1.27 + n.p4));
 
-      // entrance: cluster → violent shake → detonation (skipped under
-      // reduced motion). Deterministic per-node phases keep it smooth.
-      if (reduce || it >= INTRO_END) {
-        n.iv = 1;
+      if (!live) {
+        n.iv = reduce ? 1 : (n.k || 0) + (1 - (n.k || 0)) * fin;
+      } else if (n.special) {
+        // a stop comes up as the line reaches it
+        n.iv = OP.at[i] ? Math.min(1, (q - OP.at[i]) / 0.25) : 0;
       } else {
-        if (!introCluster) introCluster = clusterPoint();
-        var cox = n.ix * (5 + n.r * 2.2); // tight per-node spot in the blob
-        var coy = n.iy * (5 + n.r * 2.2);
-        var jx = Math.sin(time * 43 + n.p1 * 7);
-        var jy = Math.cos(time * 39 + n.p2 * 7);
-        if (it < SHAKE_END) {
-          // wind-up: trembling ramps to a violent shake
-          var w = it / SHAKE_END;
-          var amp = 1.5 + w * w * w * 24;
-          n.x = introCluster.x + cox + jx * amp;
-          n.y = introCluster.y + coy + jy * amp;
-          n.iv = Math.min(it / 0.25, 1) * 0.75; // dim enough to read the name through
-        } else {
-          // detonation: overshoot out to the homes computed above
-          var ep = (it - SHAKE_END) / EXPLODE_DUR;
-          var eb = 1 + 2.70158 * Math.pow(ep - 1, 3) + 1.70158 * Math.pow(ep - 1, 2); // easeOutBack
-          var res = (1 - ep) * 6; // shake residue dies out mid-flight
-          n.x = introCluster.x + cox + (n.x - introCluster.x - cox) * eb + jx * res;
-          n.y = introCluster.y + coy + (n.y - introCluster.y - coy) * eb + jy * res;
-          n.iv = 0.85 + 0.15 * ep;
+        // let go of the gear and home, each node in its own time
+        var go = sm((q - OP.tr - n.p1 * 0.06) / 1.1), gk = n.g;
+        if (gk < 0) n.iv = go;
+        else {
+          var ja = OP.th[gk] + n.ga * 6.2832 / OP.cnt[gk], jr = OP.r[gk] * 0.62 * OP.b[gk];
+          var jx = nodes[gk].x + Math.cos(ja) * jr, jy = nodes[gk].y + Math.sin(ja) * jr;
+          n.x = jx + (n.x - jx) * go;
+          n.y = jy + (n.y - jy) * go;
+          n.iv = sm((q - OP.t0[gk] - 0.3) / 0.4);
         }
       }
 
@@ -2457,26 +2763,14 @@ document.addEventListener('DOMContentLoaded', function () {
       }
       n.px += (tx - n.px) * 0.08;
       n.py += (ty - n.py) * 0.08;
-      // how visible this node is near the copy block (0 gone → 1 full);
-      // keep-out is suspended while the intro blob sits behind the name
+      // how visible this node is near the copy block (0 gone → 1 full)
       var fk = fadeAt(n.x + n.px, n.y + n.py);
-      n.f = (koBlend < 1 ? (1 - koBlend) + koBlend * fk : fk) * n.iv;
+      n.f = fk * n.iv;
     }
-
-    // detonation moment: an expanding shockwave ring (silent: the page
-    // never makes a sound the visitor did not ask for)
-    if (!reduce && introCluster && it >= SHAKE_END && it < SHAKE_END + 0.7) {
-      var rp = (it - SHAKE_END) / 0.7;
-      ctx.strokeStyle = rgba(WARM1, (1 - rp) * 0.35);
-      ctx.lineWidth = 2 - rp;
-      ctx.beginPath();
-      ctx.arc(introCluster.x, introCluster.y, 10 + rp * rp * 340, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.lineWidth = 1;
-    }
+    if (live) drawOpening(q, time);
 
     // signals: bright dots travelling along links — the system talking
-    if (!reduce && it > 1.4) {
+    if (!reduce && !live && time > calmT + 0.4) {
       if (time >= nextPulse && pulses.length < 4) {
         var A = nodes[(Math.random() * nodes.length) | 0];
         if (A && A.f > 0.35) {
@@ -2512,7 +2806,7 @@ document.addEventListener('DOMContentLoaded', function () {
           var d = Math.sqrt(d2);
           var lk = lineFade(ax, ay, bx, by);
           if (lk <= 0.02) continue;
-          ctx.strokeStyle = rgba(colorForX((ax + bx) / 2), (1 - d / CONNECT) * 0.3 * lf * lk);
+          ctx.strokeStyle = rgba(colorForX((ax + bx) / 2), (1 - d / CONNECT) * 0.3 * lf * lk * web);
           ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by); ctx.stroke();
         }
       }
@@ -2537,7 +2831,7 @@ document.addEventListener('DOMContentLoaded', function () {
       if (dd < best) { best = dd; nearest = nk; }
     }
     if (nearest) {
-      var breathe = (0.08 + 0.08 * (0.5 + 0.5 * Math.sin(time * 0.9))) *
+      var breathe = (0.08 + 0.08 * (0.5 + 0.5 * Math.sin(time * 0.9))) * web *
         lineFade(anchor.x, anchor.y, nearest.x + nearest.px, nearest.y + nearest.py);
       var g = ctx.createLinearGradient(anchor.x, anchor.y, nearest.x + nearest.px, nearest.y + nearest.py);
       g.addColorStop(0, rgba(WARM2, breathe));
@@ -2581,10 +2875,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // nodes (clearer: brighter cores, wider halos on specials);
     // near the copy block they shrink with their fade and disappear
-    // (labels stay hidden until just after the detonation — a crowd of
-    // words inside the shaking blob would be noise)
-    var labelGate = (reduce || it >= SHAKE_END + 0.45) ? 1
-      : (it <= SHAKE_END ? 0 : (it - SHAKE_END) / 0.45);
+    // (a label comes in with its node: at its stop on the line, in the opening)
+    var labelGate = 1;
     // real seconds since the labels were last stepped (their fades run on
     // the wall clock; a long gap just lands them where they are going)
     var labelNow = performance.now();
@@ -2756,7 +3048,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (replayQueued) { // bfcache reopen: restart the intro on this clock
       replayQueued = false;
       introT0 = lastDrawT;
-      introCluster = null;
+      introOff = false; OP = null;
     }
     drawFrame(lastDrawT);
     requestAnimationFrame(loop);
