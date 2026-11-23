@@ -115,7 +115,7 @@ test('hero renders name, eyebrow and the multi-agent constellation', async () =>
   assert.equal(await page.locator('#hero-net').count(), 1, 'constellation canvas missing');
   const labels = await page.$$eval('#hero-net-labels .hero-net-label', (els) => els.map((e) => e.textContent));
   assert.deepEqual(labels.sort(), ['ASR', 'CRM', 'IVR', 'LLM', 'POS', 'TTS'], 'labeled nodes missing');
-  // canvas actually draws (the intro blob fades in from zero, so poll
+  // canvas actually draws (the opening's line starts from nothing, so poll
   // rather than sampling one instant that may land before first paint)
   const painted = await page.waitForFunction(() => {
     const c = document.getElementById('hero-net');

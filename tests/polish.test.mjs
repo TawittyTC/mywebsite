@@ -404,7 +404,7 @@ test('the hero chevron is a working link; no node, line or label is drawn throug
   // stayed up to 1024px and seeded the labelled node "POS" on the chevron's spot.)
   for (const [width, height] of [[993, 700], [1024, 768], [1440, 900]]) {
     const { page } = await ctx.openPage({ viewport: { width, height } });
-    await page.waitForTimeout(3000);   // the intro burst is over, the keep-out is in force
+    await page.waitForTimeout(3000);   // the keep-out is in force, in the opening (its gears are growing by now) as after it
     const box = await page.$eval('.hero-scroll-hint', (el) => {
       const r = el.querySelector('svg').getBoundingClientRect();
       const b = el.getBoundingClientRect();
