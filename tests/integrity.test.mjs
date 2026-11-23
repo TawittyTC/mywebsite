@@ -65,20 +65,12 @@ test('every <img> declares alt text', () => {
   assert.deepEqual(missing.map((t) => t.slice(0, 60)), [], 'images without alt');
 });
 
-test('service worker precache matches the versions index.html actually uses', () => {
-  const sw = readFileSync(join(ROOT, 'sw.js'), 'utf8');
-  for (const asset of ['assets/css/style.min.css', 'assets/js/main.min.js']) {
-    const inHtml = html.match(new RegExp(`${asset.replace(/[./]/g, '\\$&')}\\?v=([0-9.]+)`))?.[1];
-    const inSw = sw.match(new RegExp(`${asset.replace(/[./]/g, '\\$&')}\\?v=([0-9.]+)`))?.[1];
-    assert.equal(inSw, inHtml, `${asset}: sw.js has v=${inSw}, index.html has v=${inHtml} — update sw.js PRECACHE + bump CACHE`);
-  }
-});
-
-test('service worker serves navigations network-first', () => {
-  const sw = readFileSync(join(ROOT, 'sw.js'), 'utf8');
+test('the service worker stores nothing and always asks the server for the page', () => {
+  const sw = readFileSync(join(ROOT, 'sw.js'), 'utf8').replace(/\/\/.*$/gm, '');
+  assert.doesNotMatch(sw, /addAll|\.put\(|caches\.match/, 'sw.js must not store pages or files: a phone kept an old version that way');
   assert.match(sw, /mode === 'navigate'/, 'sw.js must special-case navigations');
-  assert.match(sw, /catch\(\(\) => caches\.match/, 'navigations should fall back to cache only when offline');
-  assert.doesNotMatch(sw, /'\.\/'/, 'do not precache the HTML shell — it pins visitors to old builds');
+  assert.match(sw, /cache: 'no-cache'/, 'navigations must ask the server every time');
+  assert.match(sw, /caches\.delete/, 'older caches must be deleted on activate');
 });
 
 test('robots.txt and sitemap.xml exist and agree on the site URL', () => {
